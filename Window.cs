@@ -78,7 +78,7 @@ namespace Quest
 
             // Handlers
             gameHandler = new GameHandler(this, spriteBatch);
-            gameHandler.ReadLevel("Test");
+            gameHandler.ReadLevel("BinLevel");
             gameHandler.LoadLevel(0);
             gameHandler.LoadContent(Content);
 

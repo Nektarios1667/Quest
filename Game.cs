@@ -141,32 +141,34 @@ namespace Quest
             string[] lines = data.Split('\n');
 
             // Make buffer
-            List<Tile> tilesBuffer = new();
+            List<Tile> tilesBuffer = [];
 
             // Parse
-            int l = 0;
-            int s = 0;
-            for (l = 0; l < lines.Length; l++)
+            uint width; uint height; uint count;
+            using (BinaryReader reader = new(File.Open($"Levels/{filename}.lvl", FileMode.Open)))
             {
-                string line = lines[l];
-                string[] squares = line.Split(' ');
-                for (s = 0; s < squares.Length; s++)
+                count = reader.ReadUInt16();
+                width = reader.ReadByte();
+                height = reader.ReadByte();
+                for (int i = 0; i < count; i++)
                 {
-                    // Parse parts
-                    string[] parts = squares[s].Split('.');
-                    int type = int.Parse(parts[0]);
-                    // Empty tile
-                    if (type == -1) continue;
-                    // Normal tile
-                    Xna.Vector2 position = new(s, l);
-                    tilesBuffer.Add(new Tile(position, (Tile.TileType)type));
+                    // Read tile data
+                    int x = reader.ReadByte();
+                    int y = reader.ReadByte();
+                    int type = reader.ReadByte();
+                    // Check if valid tile type
+                    if (type < 0 || type >= Enum.GetValues(typeof(Tile.TileType)).Length)
+                        throw new ArgumentException($"Invalid tile type {type} in level file.");
+                    // Create tile and add to buffer
+                    Tile tile = new Tile(new Xna.Vector2(x, y), (Tile.TileType)type);
+                    tilesBuffer.Add(tile);
                 }
             }
 
             // If successful add level
             if (tilesBuffer.Count == 0)
                 throw new ArgumentException("No tiles found in level file.");
-            Level created = new Level(filename, tilesBuffer.ToArray(), new Xna.Vector2(s, l));
+            Level created = new Level(filename, tilesBuffer.ToArray(), new Xna.Vector2(width, height));
             Levels.Add(created);
         }
         // Utilities

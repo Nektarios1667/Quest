@@ -12,6 +12,7 @@ using System.Reflection.Metadata;
 using MonoGame.Extended.Input;
 using SharpDX.Direct3D9;
 using SharpDX.Direct2D1.Effects;
+using System.IO;
 
 namespace Quest.Editor
 {
@@ -39,6 +40,7 @@ namespace Quest.Editor
         private Tile.TileType Material;
         private int Selection;
         private readonly Color highlightColor = new(1, 1, 1, .8f);
+        private float modifier;
 
         // Deltatime
         private float delta;
@@ -114,11 +116,15 @@ namespace Quest.Editor
             // Delta time
             delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            // Movement
-            if (IsAnyKeyDown(Keys.A, Keys.Left)) { Camera.X -= 300 * delta; }
-            if (IsAnyKeyDown(Keys.D, Keys.Right)) { Camera.X += 300 * delta; }
-            if (IsAnyKeyDown(Keys.S, Keys.Down)) { Camera.Y += 300 * delta; }
-            if (IsAnyKeyDown(Keys.W, Keys.Up)) { Camera.Y -= 300 * delta; }
+            // Movemen
+            if (IsKeyDown(Keys.LeftShift)) modifier = 0.5f;
+            else if (IsKeyDown(Keys.LeftControl)) modifier = 2f;
+            else modifier = 1f;
+
+            if (IsAnyKeyDown(Keys.A, Keys.Left)) Camera.X -= 600 * delta * modifier;
+            if (IsAnyKeyDown(Keys.D, Keys.Right)) Camera.X += 600 * delta * modifier;
+            if (IsAnyKeyDown(Keys.S, Keys.Down)) Camera.Y += 600 * delta * modifier;
+            if (IsAnyKeyDown(Keys.W, Keys.Up)) Camera.Y -= 600 * delta * modifier;
             Camera = Vector2.Clamp(Camera, new Xna.Vector2(0, 0), new Xna.Vector2(10000, 10000));
 
             // Change material
@@ -148,6 +154,9 @@ namespace Quest.Editor
                 Tile tile = new(mouseCoord, Material);
                 Tiles.RemoveAll(t => t.Location == tile.Location);
             }
+
+            // Save
+            if (IsKeyPressed(Keys.S) && IsKeyDown(Keys.LeftControl)) SaveLevel();
 
             // Set previous key state
             previousKeyState = keyState;
@@ -191,7 +200,48 @@ namespace Quest.Editor
             spriteBatch.End();
             base.Draw(gameTime);
         }
+        public void SaveLevel()
+        {
+            // Auto collect data
+            Tile? left = null; Tile? right = null; Tile? up = null; Tile? down = null;
+            foreach (var tile in Tiles)
+            {
+                if (left == null || tile.Location.X < left.Value.Location.X) { left = tile; }
+                if (right == null || tile.Location.X > right.Value.Location.X) { right = tile; }
+                if (up == null || tile.Location.Y < up.Value.Location.Y) { up = tile; }
+                if (down == null || tile.Location.Y > down.Value.Location.Y) { down = tile; }
+            }
+            // Check
+            if (left == null || right == null || up == null || down == null)
+                throw new InvalidOperationException("No tiles to save.");
+
+            int width = (int)(right.Value.Location.X - left.Value.Location.X + 1);
+            int height = (int)(down.Value.Location.Y - up.Value.Location.Y + 1);
+
+            // Parse
+            using (BinaryWriter writer = new(File.Open("new_level.lvl", FileMode.Create)))
+            {
+                // Dimensions
+                writer.Write((ushort)Tiles.Count);
+                writer.Write(IntToByte(width));
+                writer.Write(IntToByte(height));
+                for (int i = 0; i < Tiles.Count; i++)
+                {
+                    Tile tile = Tiles[i];
+                    // Write tile data
+                    writer.Write(IntToByte((int)tile.Location.X));
+                    writer.Write(IntToByte((int)tile.Location.Y));
+                    writer.Write(IntToByte((int)tile.Type));
+                }
+            }
+        }
         // Key presses
+        public static byte IntToByte(int value)
+        {
+            if (value < 0 || value > 255)
+                throw new ArgumentOutOfRangeException(nameof(value), "Value must be between 0 and 255.");
+            return (byte)value;
+        }
         public bool IsKeyDown(Keys key) => keyState.IsKeyDown(key);
         public bool IsAnyKeyDown(params Keys[] keys)
         {
