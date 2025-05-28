@@ -27,11 +27,10 @@ namespace Quest {
         }
         public static readonly TileType[] Walkable = [TileType.Grass];
 
-        public Xna.Vector3 Location { get; private set; }
-        public Xna.Vector2 Projection => new(Location.X, Location.Y - Location.Z);
+        public Xna.Vector2 Location { get; private set; }
         public readonly bool IsWalkable => Walkable.Contains(Type);
         public TileType Type { get; private set; }
-        public Tile(Xna.Vector3 location, TileType type)
+        public Tile(Xna.Vector2 location, TileType type)
         {
             // Initialize the tile
             Location = location;

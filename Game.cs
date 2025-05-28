@@ -31,7 +31,7 @@ namespace Quest
         public Level Level { get; private set; }
         public Dictionary<string, Texture2D> TileTextures { get; private set; }
         public Tile[] Tiles { get; private set; }
-        private Xna.Vector3 tileSize;
+        private Xna.Vector2 tileSize;
         public GameHandler(Window window, SpriteBatch spriteBatch)
         {
             // Initialize the game
@@ -61,7 +61,7 @@ namespace Quest
             foreach (Tile tile in Tiles)
             {
                 // Draw each tile using the sprite batch
-                Xna.Vector2 dest = new(tile.Location.X * tileSize.X - Camera.X, (tile.Location.Y * tileSize.Y) - (tile.Location.Z * tileSize.Z) - Camera.Y);
+                Xna.Vector2 dest = tile.Location * tileSize - Camera;
                 dest += Constants.Middle;
                 // Check x in bounds
                 if (dest.X + Constants.TileSize.X < 0 || dest.X > Constants.Window.X) continue;
@@ -69,7 +69,7 @@ namespace Quest
                 // Draw
                 dest.Round();
                 Texture2D texture = TileTextures[tile.Type.ToString()];
-                Batch.Draw(texture, dest, tile.Location == new Xna.Vector3(Coord, tile.Location.Z) ? Color.Red : Color.White);
+                Batch.Draw(texture, dest, tile.Location == Coord ? Color.Red : Color.White);
                 TilesDrawn++;
             }
 
@@ -82,9 +82,14 @@ namespace Quest
             // Move
             if (move == Xna.Vector2.Zero) return;
             Xna.Vector2 finalMove = Xna.Vector2.Normalize(move) * Delta * Constants.PlayerSpeed;
-            Camera += finalMove;
-            // Check collision and undo
-            if (!IsTileWalkable()) Camera -= finalMove;
+
+            // Check collision for x
+            Camera += new Vector2(finalMove.X, 0);
+            if (!IsTileWalkable()) Camera -= new Vector2(finalMove.X, 0);
+            // Check collision for y
+            Camera += new Vector2(0, finalMove.Y);
+            if (!IsTileWalkable()) Camera -= new Vector2(0, finalMove.Y);
+
         }
         public void Move(float x, float y)
         {
@@ -93,10 +98,8 @@ namespace Quest
         // Loading and reading
         public void LoadContent(ContentManager content)
         {
-            string[] tileNames = ["Water", "Grass", "Wall", "Door"];
-
             // Dynamically load images
-            foreach (string filename in tileNames)
+            foreach (string filename in Constants.TileNames)
             {
                 if (!string.IsNullOrEmpty(filename))
                 {
@@ -155,8 +158,7 @@ namespace Quest
                     // Empty tile
                     if (type == -1) continue;
                     // Normal tile
-                    int z = int.Parse(parts[1]);
-                    Xna.Vector3 position = new(s, l, z);
+                    Xna.Vector2 position = new(s, l);
                     tilesBuffer.Add(new Tile(position, (Tile.TileType)type));
                 }
             }
@@ -173,15 +175,10 @@ namespace Quest
             // Check if level loaded
             if (Level == null) return false;
             // Out of bounds
-            Coord = Vector2.Round(Camera / Constants.TileSize2D) + new Xna.Vector2(0, 1);
+            Coord = Vector2.Round(Camera / Constants.TileSize);
             if (Coord.X < 0 || Coord.X > Level.Dimensions.X || Coord.Y < 0 || Coord.Y > Level.Dimensions.X) return false;
             // Check if the tile is walkable
-            TileBelow = Tiles.LastOrDefault(t => t.Projection == Coord);
-            if (TileBelow.Projection != new Xna.Vector2(TileBelow.Location.X, TileBelow.Location.Y))
-            {
-                Console.WriteLine(TileBelow.Projection);
-                Console.WriteLine(TileBelow.Location);
-            }
+            TileBelow = Tiles[(int)(Coord.X + Coord.Y * Level.Dimensions.X)];
             return TileBelow.IsWalkable;
         }
     }
