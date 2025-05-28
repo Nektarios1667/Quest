@@ -10,6 +10,8 @@ using System.IO;
 using System.Reflection.Metadata;
 using Microsoft.Xna.Framework.Content;
 using Quest.Gui;
+using Quest.Tiles;
+using System.Diagnostics;
 
 namespace Quest
 {
@@ -18,8 +20,10 @@ namespace Quest
         // TODO REMOVE THIS AND REPLACE WITH NPCS
         public Widget[] Widgets { get; private set; }
         // Debug
+        public Stopwatch Watch { get; private set; }
         public Tile TileBelow { get; private set; }
         public Xna.Vector2 Coord { get; private set; }
+        public Dictionary<string, double> FrameTimes { get; private set; }
         // Properties
         public GuiHandler Gui { get; private set; } // GUI handler
         public Window Window { get; private set; }
@@ -44,37 +48,53 @@ namespace Quest
             Camera = Xna.Vector2.Zero;
             string dialog = "This is some example dialog! The NPC can talk to the player through this box which appears when near. The quick brown fox jumped over the lazy dog.";
             Gui = new();
-            Gui.Widgets = [new Dialog(Gui, new(Constants.Middle.X - 600, 800), new(1200, 100), new(194, 125, 64), Color.Black, dialog, Window.PixelOperator, borderColor:new(36, 19, 4))];
+            Gui.Widgets = [new Dialog(Gui, new(Constants.Middle.X - 600, 800), new(1200, 100), new(194, 125, 64), Color.Black, dialog, Window.PixelOperator, borderColor: new(36, 19, 4))];
+            Watch = new();
+            FrameTimes = new()
+            {
+                { "GuiUpdate", 0 },
+                { "TileDraws", 0 },
+                { "GuiDraw", 0 },
+            };
         }
         public void Update(float deltaTime)
         {
             // Update the game state
             Delta = deltaTime;
+            Watch.Restart();
             Gui.Update(deltaTime);
+            FrameTimes["GuiUpdate"] = Watch.Elapsed.TotalMilliseconds;
         }
         public void Draw()
         {
             // Tiles
+            Watch.Restart();
             if (Tiles == null || Tiles.Length == 0) return;
 
             TilesDrawn = 0;
-            foreach (Tile tile in Tiles)
+            for (int t = 0; t < Tiles.Length; t++)
             {
+                // Check null
+                if (Tiles[t] == null) continue;
+                Tile tile = Tiles[t];
                 // Draw each tile using the sprite batch
-                Xna.Vector2 dest = tile.Location * tileSize - Camera;
+                Xna.Vector2 dest = tile.Location.ToVector2() * tileSize - Camera;
                 dest += Constants.Middle;
                 // Check x in bounds
                 if (dest.X + Constants.TileSize.X < 0 || dest.X > Constants.Window.X) continue;
-                if (dest.Y + Constants.TileSize.Y*2 < 0 || dest.Y > Constants.Window.Y) continue;
+                if (dest.Y + Constants.TileSize.Y * 2 < 0 || dest.Y > Constants.Window.Y) continue;
                 // Draw
                 dest.Round();
                 Texture2D texture = TileTextures[tile.Type.ToString()];
-                Batch.Draw(texture, dest, tile.Location == Coord ? Color.Red : Color.White);
+                Batch.Draw(texture, dest, tile.Location.ToVector2() == Coord ? Color.White : Color.White);
                 TilesDrawn++;
             }
+            FrameTimes["TileDraws"] = Watch.Elapsed.TotalMilliseconds;
 
             // Widgets
+            Watch.Restart();
             Gui.Draw(Batch);
+            FrameTimes["GuiDraw"] = Watch.Elapsed.TotalMilliseconds;
         }
         // Movements
         public void Move(Xna.Vector2 move)
@@ -82,6 +102,13 @@ namespace Quest
             // Move
             if (move == Xna.Vector2.Zero) return;
             Xna.Vector2 finalMove = Xna.Vector2.Normalize(move) * Delta * Constants.PlayerSpeed;
+
+            // Allow escaping
+            if (!IsTileWalkable())
+            {
+                Camera += finalMove;
+                return;
+            }
 
             // Check collision for x
             Camera += new Vector2(finalMove.X, 0);
@@ -140,16 +167,18 @@ namespace Quest
             string data = File.ReadAllText($"Levels/{filename}.lvl");
             string[] lines = data.Split('\n');
 
-            // Make buffer
-            List<Tile> tilesBuffer = [];
-
             // Parse
+            Tile?[] tilesBuffer;
             uint width; uint height; uint count;
             using (BinaryReader reader = new(File.Open($"Levels/{filename}.lvl", FileMode.Open)))
             {
                 count = reader.ReadUInt16();
                 width = reader.ReadByte();
                 height = reader.ReadByte();
+
+                // Make buffer
+                tilesBuffer = new Tile[width * height];
+
                 for (int i = 0; i < count; i++)
                 {
                     // Read tile data
@@ -157,18 +186,19 @@ namespace Quest
                     int y = reader.ReadByte();
                     int type = reader.ReadByte();
                     // Check if valid tile type
-                    if (type < 0 || type >= Enum.GetValues(typeof(Tile.TileType)).Length)
+                    if (type < 0 || type >= Enum.GetValues(typeof(Tiles.TileType)).Length)
                         throw new ArgumentException($"Invalid tile type {type} in level file.");
                     // Create tile and add to buffer
-                    Tile tile = new Tile(new Xna.Vector2(x, y), (Tile.TileType)type);
-                    tilesBuffer.Add(tile);
+                    Tile tile = TileFromId(type, new(x, y));
+                    int idx = (int)(tile.Location.X + tile.Location.Y * width);
+                    tilesBuffer[idx] = tile;
                 }
             }
 
             // If successful add level
-            if (tilesBuffer.Count == 0)
+            if (tilesBuffer == null)
                 throw new ArgumentException("No tiles found in level file.");
-            Level created = new Level(filename, tilesBuffer.ToArray(), new Xna.Vector2(width, height));
+            Level created = new Level(filename, tilesBuffer, new Xna.Vector2(width, height));
             Levels.Add(created);
         }
         // Utilities
@@ -181,7 +211,20 @@ namespace Quest
             if (Coord.X < 0 || Coord.X > Level.Dimensions.X || Coord.Y < 0 || Coord.Y > Level.Dimensions.X) return false;
             // Check if the tile is walkable
             TileBelow = Tiles[(int)(Coord.X + Coord.Y * Level.Dimensions.X)];
-            return TileBelow.IsWalkable;
+            return TileBelow != null && TileBelow.IsWalkable;
+        }
+        public static Tile TileFromId(int id, Xna.Point location)
+        {
+            // Create a tile from an id
+            TileType type = (TileType)id;
+            return type switch
+            {
+                TileType.Water => new Water(location),
+                TileType.Grass => new Grass(location),
+                TileType.Wall => new Wall(location),
+                TileType.Stairs => new Stairs(location),
+                _ => new Tile(location), // Default tile
+            };
         }
     }
 }

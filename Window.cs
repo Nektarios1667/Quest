@@ -49,7 +49,7 @@ namespace Quest
                 PreferredBackBufferWidth = (int)Constants.Window.X,
                 PreferredBackBufferHeight = (int)Constants.Window.Y,
                 IsFullScreen = false,
-                SynchronizeWithVerticalRetrace = true,
+                //SynchronizeWithVerticalRetrace = true,
             };
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -138,7 +138,9 @@ namespace Quest
                 spriteBatch.Draw(RobotIdle, Constants.Middle, Color.White);
 
             // Text gui
-            spriteBatch.DrawString(Arial, $"FPS: {1f / delta:0.0}\nCamera: {gameHandler.Camera}\nTiles Drawn: {gameHandler.TilesDrawn}\nTile Below: {gameHandler.TileBelow.Type}\nCoord: {gameHandler.Coord}", new Vector2(10, 10), Color.Black);
+            spriteBatch.DrawString(Arial, $"FPS: {1f / delta:0.0}\nCamera: {gameHandler.Camera}\nTiles Drawn: {gameHandler.TilesDrawn}\nTile Below: {(gameHandler.TileBelow == null ? "none" : gameHandler.TileBelow.Type)}\nCoord: {gameHandler.Coord}", new Vector2(10, 10), Color.Black);
+            string frameString = string.Join("\n", gameHandler.FrameTimes.Select(kv => $"{kv.Key}: {kv.Value:0.0}ms"));
+            spriteBatch.DrawString(Arial, frameString, new Vector2(Constants.Window.X - 200, 50), Color.Black);
 
             // Final
             spriteBatch.End();

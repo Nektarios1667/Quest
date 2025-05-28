@@ -8,11 +8,9 @@ using Xna = Microsoft.Xna.Framework;
 using Quest.Gui;
 using System.Collections.Generic;
 using MonoGame.Extended;
-using System.Reflection.Metadata;
-using MonoGame.Extended.Input;
-using SharpDX.Direct3D9;
-using SharpDX.Direct2D1.Effects;
 using System.IO;
+using Quest.Tiles;
+using MonoGUI;
 
 namespace Quest.Editor
 {
@@ -29,7 +27,7 @@ namespace Quest.Editor
         private KeyboardState previousKeyState;
         private MouseState mouseState;
         private MouseState previousMouseState;
-        private Xna.Vector2 mouseCoord;
+        private Point mouseCoord;
 
         // Editing
         private List<Tile> Tiles;
@@ -37,10 +35,16 @@ namespace Quest.Editor
         private Xna.Vector2 tileSize = Constants.TileSize;
         private Xna.Vector2 tileSize2D = new(Constants.TileSize.X, Constants.TileSize.Y);
         private Dictionary<string, Texture2D> TileTextures = new();
-        private Tile.TileType Material;
+        private TileType Material;
         private int Selection;
         private readonly Color highlightColor = new(1, 1, 1, .8f);
         private float modifier;
+        private string LevelName = "new_level";
+
+        // Gui
+        private GUI Gui { get; set; }
+        private Popup LevelPopup { get; set; }
+        private Input LevelInput { get; set; }
 
         // Deltatime
         private float delta;
@@ -77,7 +81,7 @@ namespace Quest.Editor
             previousMouseState = mouseState;
             Tiles = [];
             Camera = new Vector2(5000, 5000) + Constants.Middle;
-            Material = Tile.TileType.Water;
+            Material = TileType.Water;
             Selection = (int)Material;
 
             base.Initialize();
@@ -101,6 +105,19 @@ namespace Quest.Editor
                     TileTextures[filename] = texture;
                 }
             }
+
+            // Gui
+            Gui = new(this, spriteBatch);
+            Gui.LoadContent(Content);
+            LevelPopup = new Popup(Gui, Constants.Middle - new Vector2(300, 200), new(600, 400), Color.Gray, LevelName, titleFont:Arial, barColor:new(80, 80, 80));
+            LevelInput = new Input(Gui, LevelPopup.Location + new Vector2(5, 60), new(250, 30), Color.Black, Color.DarkGray, new(180, 180, 180), font: Arial);
+            LevelPopup.Widgets = [
+                new Label(Gui, LevelPopup.Location + new Vector2(5, 40), Color.Black, "Level:", font:Arial),
+                LevelInput,
+                new Button(Gui, LevelPopup.Location + new Vector2(5, 110), new(100, 40), Color.White, Color.Green, Color.Lime, SaveLevel, args:[this], text:"Save")
+            ];
+            Gui.Widgets = [LevelPopup];
+            LevelPopup.Visible = false;
         }
 
         protected override void Update(GameTime gameTime)
@@ -108,7 +125,7 @@ namespace Quest.Editor
             // Inputs
             keyState = Keyboard.GetState();
             mouseState = Mouse.GetState();
-            mouseCoord = Xna.Vector2.Floor((mouseState.Position.ToVector2() + Camera) / tileSize2D);
+            mouseCoord = Xna.Vector2.Floor((mouseState.Position.ToVector2() + Camera) / tileSize2D).ToPoint();
 
             // Exit
             if (IsKeyDown(Keys.Escape)) Exit();
@@ -116,47 +133,54 @@ namespace Quest.Editor
             // Delta time
             delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            // Movemen
-            if (IsKeyDown(Keys.LeftShift)) modifier = 0.5f;
-            else if (IsKeyDown(Keys.LeftControl)) modifier = 2f;
-            else modifier = 1f;
+            // Editor
+            if (!LevelPopup.Visible)
+            {
+                // Movement
+                if (IsKeyDown(Keys.LeftShift)) modifier = 0.5f;
+                else if (IsKeyDown(Keys.LeftControl)) modifier = 2f;
+                else modifier = 1f;
 
-            if (IsAnyKeyDown(Keys.A, Keys.Left)) Camera.X -= 600 * delta * modifier;
-            if (IsAnyKeyDown(Keys.D, Keys.Right)) Camera.X += 600 * delta * modifier;
-            if (IsAnyKeyDown(Keys.S, Keys.Down)) Camera.Y += 600 * delta * modifier;
-            if (IsAnyKeyDown(Keys.W, Keys.Up)) Camera.Y -= 600 * delta * modifier;
-            Camera = Vector2.Clamp(Camera, new Xna.Vector2(0, 0), new Xna.Vector2(10000, 10000));
+                if (IsAnyKeyDown(Keys.A, Keys.Left)) Camera.X -= 600 * delta * modifier;
+                if (IsAnyKeyDown(Keys.D, Keys.Right)) Camera.X += 600 * delta * modifier;
+                if (IsAnyKeyDown(Keys.S, Keys.Down)) Camera.Y += 600 * delta * modifier;
+                if (IsAnyKeyDown(Keys.W, Keys.Up)) Camera.Y -= 600 * delta * modifier;
+                Camera = Vector2.Clamp(Camera, new Xna.Vector2(0, 0), new Xna.Vector2(10000, 10000));
 
-            // Change material
-            if (mouseState.ScrollWheelValue > previousMouseState.ScrollWheelValue)
-            {
-                Selection = (Selection + 1) % Constants.TileNames.Length;
-                Material = (Tile.TileType)Enum.Parse(typeof(Tile.TileType), Constants.TileNames[Selection]);
-            }
-            if (mouseState.ScrollWheelValue < previousMouseState.ScrollWheelValue)
-            {
-                Selection = (Selection - 1) % Constants.TileNames.Length;
-                if (Selection < 0) Selection += Constants.TileNames.Length;
-                Material = (Tile.TileType)Enum.Parse(typeof(Tile.TileType), Constants.TileNames[Selection]);
-            }
+                // Change material
+                if (mouseState.ScrollWheelValue > previousMouseState.ScrollWheelValue)
+                {
+                    Selection = (Selection + 1) % Constants.TileNames.Length;
+                    Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileNames[Selection]);
+                }
+                if (mouseState.ScrollWheelValue < previousMouseState.ScrollWheelValue)
+                {
+                    Selection = (Selection - 1) % Constants.TileNames.Length;
+                    if (Selection < 0) Selection += Constants.TileNames.Length;
+                    Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileNames[Selection]);
+                }
 
-            // Draw
-            if (mouseState.LeftButton == ButtonState.Pressed)
-            {
-                // Add tile
-                Tile tile = new(mouseCoord, Material);
-                if (!Tiles.Any(t => t.Location == tile.Location))
-                    Tiles.Add(tile);
-            }
-            if (mouseState.RightButton == ButtonState.Pressed)
-            {
-                // Remove tile
-                Tile tile = new(mouseCoord, Material);
-                Tiles.RemoveAll(t => t.Location == tile.Location);
+                // Draw
+                if (mouseState.LeftButton == ButtonState.Pressed)
+                {
+                    // Add tile
+                    Tile tile = GameHandler.TileFromId(Selection, mouseCoord);
+                    if (!Tiles.Any(t => t.Location == tile.Location))
+                        Tiles.Add(tile);
+                }
+                if (mouseState.RightButton == ButtonState.Pressed)
+                {
+                    // Remove tile
+                    Tile tile = GameHandler.TileFromId(Selection, mouseCoord);
+                    Tiles.RemoveAll(t => t.Location == tile.Location);
+                }
             }
 
             // Save
-            if (IsKeyPressed(Keys.S) && IsKeyDown(Keys.LeftControl)) SaveLevel();
+            if (IsKeyPressed(Keys.S) && IsKeyDown(Keys.LeftControl)) LevelPopup.Visible = true;
+
+            // Gui
+            Gui.Update(delta, mouseState, keyState);
 
             // Set previous key state
             previousKeyState = keyState;
@@ -177,7 +201,7 @@ namespace Quest.Editor
             foreach (Tile tile in Tiles)
             {
                 // Draw each tile using the sprite batch
-                Xna.Vector2 dest = tile.Location * tileSize - Camera;
+                Xna.Vector2 dest = tile.Location.ToVector2() * tileSize - Camera;
                 // Check x in bounds
                 if (dest.X + Constants.TileSize.X < 0 || dest.X > Constants.Window.X) continue;
                 if (dest.Y + Constants.TileSize.Y * 2 < 0 || dest.Y > Constants.Window.Y) continue;
@@ -189,48 +213,58 @@ namespace Quest.Editor
             }
 
             // Cursor
-            Xna.Vector2 cursorPos = mouseCoord * tileSize - Camera;
+            Xna.Vector2 cursorPos = mouseCoord.ToVector2() * tileSize - Camera;
             spriteBatch.FillRectangle(new(cursorPos, tileSize), Color.White);
             spriteBatch.Draw(TileTextures[Material.ToString()], cursorPos, highlightColor);
 
             // Text gui
             spriteBatch.DrawString(Arial, $"FPS: {1f / delta:0.0}\nCamera: {Camera}\nMaterial: {Material} [{Selection}]\nTiles Drawn: {TilesDrawn}\nCoord: {mouseCoord}", new Vector2(10, 10), Color.Black);
 
+            // Gui
+            Gui.Draw();
+
             // Final
             spriteBatch.End();
             base.Draw(gameTime);
         }
-        public void SaveLevel()
+        public static void SaveLevel(EditorWindow editor)
         {
+            string name = editor.LevelInput.Text;
+            editor.LevelName = name;
+            editor.LevelPopup.Title = name;
+            editor.LevelInput.SetText("");
+            Console.WriteLine(editor.LevelPopup.Title);
             // Auto collect data
-            Tile? left = null; Tile? right = null; Tile? up = null; Tile? down = null;
-            foreach (var tile in Tiles)
+            Tile left = null; Tile right = null; Tile up = null; Tile down = null;
+            foreach (var tile in editor.Tiles)
             {
-                if (left == null || tile.Location.X < left.Value.Location.X) { left = tile; }
-                if (right == null || tile.Location.X > right.Value.Location.X) { right = tile; }
-                if (up == null || tile.Location.Y < up.Value.Location.Y) { up = tile; }
-                if (down == null || tile.Location.Y > down.Value.Location.Y) { down = tile; }
+                if (left == null || tile.Location.X < left.Location.X) { left = tile; }
+                if (right == null || tile.Location.X > right.Location.X) { right = tile; }
+                if (up == null || tile.Location.Y < up.Location.Y) { up = tile; }
+                if (down == null || tile.Location.Y > down.Location.Y) { down = tile; }
             }
             // Check
-            if (left == null || right == null || up == null || down == null)
-                throw new InvalidOperationException("No tiles to save.");
-
-            int width = (int)(right.Value.Location.X - left.Value.Location.X + 1);
-            int height = (int)(down.Value.Location.Y - up.Value.Location.Y + 1);
+            int width = 0;
+            int height = 0;
+            if (left != null && right != null && up != null && down != null)
+            {
+                width = (right.Location.X - left.Location.X + 1);
+                height = (down.Location.Y - up.Location.Y + 1);
+            }
 
             // Parse
-            using (BinaryWriter writer = new(File.Open("new_level.lvl", FileMode.Create)))
+            Directory.CreateDirectory("Levels");
+            using (BinaryWriter writer = new(File.Open($"Levels/{name}.lvl", FileMode.Create)))
             {
                 // Dimensions
-                writer.Write((ushort)Tiles.Count);
+                writer.Write((ushort)editor.Tiles.Count);
                 writer.Write(IntToByte(width));
                 writer.Write(IntToByte(height));
-                for (int i = 0; i < Tiles.Count; i++)
+                for (int i = 0; i < editor.Tiles.Count; i++)
                 {
-                    Tile tile = Tiles[i];
+                    Tile tile = editor.Tiles[i];
                     // Write tile data
-                    writer.Write(IntToByte((int)tile.Location.X));
-                    writer.Write(IntToByte((int)tile.Location.Y));
+                    writer.Write(IntToByte(tile.Location.Y));
                     writer.Write(IntToByte((int)tile.Type));
                 }
             }

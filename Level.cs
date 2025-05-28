@@ -6,38 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Xna = Microsoft.Xna.Framework;
+using Quest.Tiles;
 
 // TODO
-// 1. Player model w/ directions
-// 2. Collision
 // 3. Stairs
-// 2. GUI system (MonoGUI or custom)
 // 2. Signs
 // 3. NPCs w/ dialog
 
 namespace Quest {
-    public struct Tile
-    {
-        public enum TileType
-        {
-            Water = 0,
-            Grass = 1,
-            Wall = 2,
-            Door = 3,
-        }
-        public static readonly TileType[] Walkable = [TileType.Grass];
-
-        public Xna.Vector2 Location { get; private set; }
-        public readonly bool IsWalkable => Walkable.Contains(Type);
-        public TileType Type { get; private set; }
-        public Tile(Xna.Vector2 location, TileType type)
-        {
-            // Initialize the tile
-            Location = location;
-            Type = type;
-        }
-
-    }
 
     public class Level
     {
