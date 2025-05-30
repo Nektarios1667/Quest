@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Xna = Microsoft.Xna.Framework;
 using Quest.Gui;
+using Quest.Tiles;
 
 namespace Quest
 {
@@ -21,7 +22,7 @@ namespace Quest
         // Devices
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
-        private GameHandler gameHandler;
+        public GameHandler GameHandler;
 
         // Fonts
         public SpriteFont Arial { get; private set; }
@@ -77,10 +78,11 @@ namespace Quest
             PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");
 
             // Handlers
-            gameHandler = new GameHandler(this, spriteBatch);
-            gameHandler.ReadLevel("BinLevel");
-            gameHandler.LoadLevel(0);
-            gameHandler.LoadContent(Content);
+            GameHandler = new GameHandler(this, spriteBatch);
+            GameHandler.ReadLevel("overworld");
+            GameHandler.ReadLevel("basement");
+            GameHandler.LoadLevel(0);
+            GameHandler.LoadContent(Content);
 
             // Robot sprites
             RobotIdle = Content.Load<Texture2D>("Images/Robot/Robot_F");
@@ -104,10 +106,10 @@ namespace Quest
             // Movement
             moveX = IsAnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : (IsAnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0);
             moveY = IsAnyKeyDown(Keys.W, Keys.Up) ? -Constants.PlayerSpeed : (IsAnyKeyDown(Keys.S, Keys.Down) ? Constants.PlayerSpeed : 0);
-            gameHandler.Move(moveX, moveY);
+            GameHandler.Move(moveX, moveY);
 
             // Game update
-            gameHandler.Update(delta);
+            GameHandler.Update(delta);
 
             // Set previous key state
             previousKeyState = keyState;
@@ -123,7 +125,7 @@ namespace Quest
             spriteBatch.Begin();
 
             // Draw game
-            gameHandler.Draw();
+            GameHandler.Draw();
 
             // Player
             if (moveX < 0)
@@ -138,8 +140,8 @@ namespace Quest
                 spriteBatch.Draw(RobotIdle, Constants.Middle, Color.White);
 
             // Text gui
-            spriteBatch.DrawString(Arial, $"FPS: {1f / delta:0.0}\nCamera: {gameHandler.Camera}\nTiles Drawn: {gameHandler.TilesDrawn}\nTile Below: {(gameHandler.TileBelow == null ? "none" : gameHandler.TileBelow.Type)}\nCoord: {gameHandler.Coord}", new Vector2(10, 10), Color.Black);
-            string frameString = string.Join("\n", gameHandler.FrameTimes.Select(kv => $"{kv.Key}: {kv.Value:0.0}ms"));
+            spriteBatch.DrawString(Arial, $"FPS: {1f / delta:0.0}\nCamera: {GameHandler.Camera}\nTiles Drawn: {GameHandler.TilesDrawn}\nTile Below: {(GameHandler.TileBelow == null ? "none" : GameHandler.TileBelow.Type)}\nCoord: {GameHandler.Coord}\nLevel: {GameHandler.Level.Name}", new Vector2(10, 10), Color.Black);
+            string frameString = string.Join("\n", GameHandler.FrameTimes.Select(kv => $"{kv.Key}: {kv.Value:0.0}ms"));
             spriteBatch.DrawString(Arial, frameString, new Vector2(Constants.Window.X - 200, 50), Color.Black);
 
             // Final

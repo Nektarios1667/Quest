@@ -144,18 +144,6 @@
 /processorParam:TextureFormat=Color
 /build:Images/Robot/Robot_U.png
 
-#begin Images/Tiles/Brick.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Tiles/Brick.png
-
 #begin Images/Tiles/Door.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -179,6 +167,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Tiles/Grass.png
+
+#begin Images/Tiles/Sky.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Tiles/Sky.png
 
 #begin Images/Tiles/Stairs.png
 /importer:TextureImporter

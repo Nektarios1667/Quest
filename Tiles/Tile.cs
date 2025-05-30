@@ -9,25 +9,25 @@ namespace Quest.Tiles
 {
     public enum TileType
     {
-        Tile = -1,
-        Water = 0,
+        Sky = 0,
         Grass = 1,
-        Wall = 2,
-        Stairs = 3,
+        Water = 2,
+        Wall = 3,
+        Stairs = 4,
     }
     public class Tile
     {
         // Auto generated - no setter
         public Xna.Point Location { get;}
-        public TileType Type { get; }
         // Properties - protected setter
         public bool IsWalkable { get; protected set; }
+        public TileType Type { get; protected set; }
         public Tile(Xna.Point location)
         {
             // Initialize the tile
             Location = location;
-            Type = (TileType)Enum.Parse(typeof(TileType), GetType().Name);
             IsWalkable = true;
+            Type = (TileType)Enum.Parse(typeof(TileType), GetType().Name);
         }
         public virtual void OnPlayerEnter(GameHandler game) { }
         public virtual void OnPlayerExit(GameHandler game) { }

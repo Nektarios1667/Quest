@@ -11,6 +11,7 @@ using MonoGame.Extended;
 using System.IO;
 using Quest.Tiles;
 using MonoGUI;
+using System.IO.Compression;
 
 namespace Quest.Editor
 {
@@ -30,7 +31,7 @@ namespace Quest.Editor
         private Point mouseCoord;
 
         // Editing
-        private List<Tile> Tiles;
+        private Tile[] Tiles;
         private Xna.Vector2 Camera;
         private Xna.Vector2 tileSize = Constants.TileSize;
         private Xna.Vector2 tileSize2D = new(Constants.TileSize.X, Constants.TileSize.Y);
@@ -79,8 +80,13 @@ namespace Quest.Editor
             previousKeyState = keyState;
             mouseState = Mouse.GetState();
             previousMouseState = mouseState;
-            Tiles = [];
-            Camera = new Vector2(5000, 5000) + Constants.Middle;
+            Tiles = new Tile[Constants.MapSize.X * Constants.MapSize.Y];
+            for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++)
+            {
+                Tile tile = new Sky(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
+                SetTile(tile);
+            }
+            Camera = new Xna.Vector2(128 * Constants.TileSize.X, 128 * Constants.TileSize.Y) - Constants.Middle;
             Material = TileType.Water;
             Selection = (int)Material;
 
@@ -145,7 +151,7 @@ namespace Quest.Editor
                 if (IsAnyKeyDown(Keys.D, Keys.Right)) Camera.X += 600 * delta * modifier;
                 if (IsAnyKeyDown(Keys.S, Keys.Down)) Camera.Y += 600 * delta * modifier;
                 if (IsAnyKeyDown(Keys.W, Keys.Up)) Camera.Y -= 600 * delta * modifier;
-                Camera = Vector2.Clamp(Camera, new Xna.Vector2(0, 0), new Xna.Vector2(10000, 10000));
+                Camera = Vector2.Clamp(Camera, new Xna.Vector2(0, 0), (tileSize * Constants.MapSize.ToVector2()) - Constants.Window);
 
                 // Change material
                 if (mouseState.ScrollWheelValue > previousMouseState.ScrollWheelValue)
@@ -164,15 +170,40 @@ namespace Quest.Editor
                 if (mouseState.LeftButton == ButtonState.Pressed)
                 {
                     // Add tile
-                    Tile tile = GameHandler.TileFromId(Selection, mouseCoord);
-                    if (!Tiles.Any(t => t.Location == tile.Location))
-                        Tiles.Add(tile);
+                    Tile tile;
+                    if (Selection == (int)TileType.Stairs)
+                        tile = new Stairs(mouseCoord, "_null", Constants.MiddleCoord);
+                    else 
+                        tile = GameHandler.TileFromId(Selection, mouseCoord);
+
+                    SetTile(tile);
                 }
+                // Edit options
                 if (mouseState.RightButton == ButtonState.Pressed)
                 {
-                    // Remove tile
-                    Tile tile = GameHandler.TileFromId(Selection, mouseCoord);
-                    Tiles.RemoveAll(t => t.Location == tile.Location);
+                    Tile tileBelow = Tiles.FirstOrDefault(t => t.Location == mouseCoord);
+                    if (tileBelow is Stairs stairs)
+                    {
+                        // Destination level
+                        Console.WriteLine($"__Editing Stairs__\nDest level [{stairs.DestLevel}]: ");
+                        string resp = Console.ReadLine();
+                        if (resp != "") stairs.DestLevel = resp;
+
+                        // Destination position
+                        Console.WriteLine($"\nDest position [{stairs.DestPosition.X}, {stairs.DestPosition.Y}]: ");
+                        resp = Console.ReadLine();
+                        if (resp != "")
+                        {
+                            string[] parts = resp.Split(',');
+                            if (parts.Length == 2 && int.TryParse(parts[0], out int x) && int.TryParse(parts[1], out int y))
+                                if (x >= 0 && x < Constants.MapSize.X && y >= 0 && y < Constants.MapSize.Y)
+                                    stairs.DestPosition = new(x, y);
+                                else
+                                    Console.WriteLine($"Position out of bounds - must be within the map size {Constants.MapSize.X}x{Constants.MapSize.Y}.");
+                            else
+                                Console.WriteLine("Invalid position format - use 'x,y'.");
+                        }
+                    }
                 }
             }
 
@@ -213,9 +244,12 @@ namespace Quest.Editor
             }
 
             // Cursor
-            Xna.Vector2 cursorPos = mouseCoord.ToVector2() * tileSize - Camera;
-            spriteBatch.FillRectangle(new(cursorPos, tileSize), Color.White);
-            spriteBatch.Draw(TileTextures[Material.ToString()], cursorPos, highlightColor);
+            if (!LevelPopup.Visible)
+            {
+                Vector2 cursorPos = mouseCoord.ToVector2() * tileSize - Camera;
+                spriteBatch.FillRectangle(new(cursorPos, tileSize), Color.White);
+                spriteBatch.Draw(TileTextures[Material.ToString()], cursorPos, highlightColor);
+            }
 
             // Text gui
             spriteBatch.DrawString(Arial, $"FPS: {1f / delta:0.0}\nCamera: {Camera}\nMaterial: {Material} [{Selection}]\nTiles Drawn: {TilesDrawn}\nCoord: {mouseCoord}", new Vector2(10, 10), Color.Black);
@@ -227,45 +261,36 @@ namespace Quest.Editor
             spriteBatch.End();
             base.Draw(gameTime);
         }
+        public void SetTile(Tile tile)
+        {
+            Tiles[tile.Location.X + tile.Location.Y * Constants.MapSize.X] = tile;
+        }
         public static void SaveLevel(EditorWindow editor)
         {
             string name = editor.LevelInput.Text;
             editor.LevelName = name;
             editor.LevelPopup.Title = name;
             editor.LevelInput.SetText("");
-            Console.WriteLine(editor.LevelPopup.Title);
-            // Auto collect data
-            Tile left = null; Tile right = null; Tile up = null; Tile down = null;
-            foreach (var tile in editor.Tiles)
-            {
-                if (left == null || tile.Location.X < left.Location.X) { left = tile; }
-                if (right == null || tile.Location.X > right.Location.X) { right = tile; }
-                if (up == null || tile.Location.Y < up.Location.Y) { up = tile; }
-                if (down == null || tile.Location.Y > down.Location.Y) { down = tile; }
-            }
-            // Check
-            int width = 0;
-            int height = 0;
-            if (left != null && right != null && up != null && down != null)
-            {
-                width = (right.Location.X - left.Location.X + 1);
-                height = (down.Location.Y - up.Location.Y + 1);
-            }
 
             // Parse
             Directory.CreateDirectory("Levels");
-            using (BinaryWriter writer = new(File.Open($"Levels/{name}.lvl", FileMode.Create)))
+            using FileStream fileStream = File.Create($"Levels/{name}.lvl");
+            using GZipStream gzipStream = new(fileStream, CompressionLevel.Optimal);
+            using BinaryWriter writer = new(gzipStream);
+            // Dimensions
+            for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
             {
-                // Dimensions
-                writer.Write((ushort)editor.Tiles.Count);
-                writer.Write(IntToByte(width));
-                writer.Write(IntToByte(height));
-                for (int i = 0; i < editor.Tiles.Count; i++)
+                Tile tile = editor.Tiles[i];
+                // Write tile data
+
+                writer.Write(IntToByte((int)tile.Type));
+                // Extra properties
+                if (tile is Stairs stairs)
                 {
-                    Tile tile = editor.Tiles[i];
-                    // Write tile data
-                    writer.Write(IntToByte(tile.Location.Y));
-                    writer.Write(IntToByte((int)tile.Type));
+                    // Write destination
+                    writer.Write(stairs.DestLevel);
+                    writer.Write(IntToByte(stairs.DestPosition.X));
+                    writer.Write(IntToByte(stairs.DestPosition.Y));
                 }
             }
         }

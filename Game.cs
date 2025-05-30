@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Content;
 using Quest.Gui;
 using Quest.Tiles;
 using System.Diagnostics;
+using System.IO.Compression;
 
 namespace Quest
 {
@@ -28,7 +29,7 @@ namespace Quest
         public GuiHandler Gui { get; private set; } // GUI handler
         public Window Window { get; private set; }
         public int TilesDrawn { get; private set; } // For debugging
-        public Xna.Vector2 Camera { get; private set; }
+        public Xna.Vector2 Camera { get; set; }
         public float Delta { get; private set; }
         public SpriteBatch Batch { get; private set; }
         public List<Level> Levels { get; private set; }
@@ -45,7 +46,7 @@ namespace Quest
             Levels = [];
             TileTextures = new();
             Tiles = [];
-            Camera = Xna.Vector2.Zero;
+            Camera = new Xna.Vector2(128 * Constants.TileSize.X, 128 * Constants.TileSize.Y) - Constants.Middle;
             string dialog = "This is some example dialog! The NPC can talk to the player through this box which appears when near. The quick brown fox jumped over the lazy dog.";
             Gui = new();
             Gui.Widgets = [new Dialog(Gui, new(Constants.Middle.X - 600, 800), new(1200, 100), new(194, 125, 64), Color.Black, dialog, Window.PixelOperator, borderColor: new(36, 19, 4))];
@@ -107,6 +108,7 @@ namespace Quest
             if (!IsTileWalkable())
             {
                 Camera += finalMove;
+                TileBelow?.OnPlayerEnter(this);
                 return;
             }
 
@@ -117,6 +119,10 @@ namespace Quest
             Camera += new Vector2(0, finalMove.Y);
             if (!IsTileWalkable()) Camera -= new Vector2(0, finalMove.Y);
 
+            // On tile enter
+            Coord = Vector2.Round(Camera / Constants.TileSize);
+            TileBelow = Tiles[(int)(Coord.X + Coord.Y * Level.Dimensions.X)];
+            TileBelow.OnPlayerEnter(this);
         }
         public void Move(float x, float y)
         {
@@ -150,12 +156,16 @@ namespace Quest
         }
         public void LoadLevel(string levelName)
         {
-            int l = 0;
-            foreach (Level level in Levels)
+            for (int l = 0; l < Levels.Count; l++)
             {
-                if (level.Name == levelName) { LoadLevel(l); }
-                l++;
+                if (Levels[l].Name == levelName)
+                {
+                    LoadLevel(l);
+                    return;
+                }
             }
+            // If not found, throw an error
+            throw new ArgumentException($"Level '{levelName}' not found in stored levels. Make sure the level file has been read before loading.");
         }
         public void ReadLevel(string filename)
         {
@@ -168,37 +178,39 @@ namespace Quest
             string[] lines = data.Split('\n');
 
             // Parse
-            Tile?[] tilesBuffer;
-            uint width; uint height; uint count;
-            using (BinaryReader reader = new(File.Open($"Levels/{filename}.lvl", FileMode.Open)))
+            Tile[] tilesBuffer;
+            using FileStream fileStream = File.OpenRead($"Levels/{filename}.lvl");
+            using GZipStream gzipStream = new(fileStream, CompressionMode.Decompress);
+            using BinaryReader reader = new(gzipStream);
+            // Make buffer
+            tilesBuffer = new Tile[Constants.MapSize.X * Constants.MapSize.Y];
+
+            for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
             {
-                count = reader.ReadUInt16();
-                width = reader.ReadByte();
-                height = reader.ReadByte();
-
-                // Make buffer
-                tilesBuffer = new Tile[width * height];
-
-                for (int i = 0; i < count; i++)
-                {
-                    // Read tile data
-                    int x = reader.ReadByte();
-                    int y = reader.ReadByte();
-                    int type = reader.ReadByte();
-                    // Check if valid tile type
-                    if (type < 0 || type >= Enum.GetValues(typeof(Tiles.TileType)).Length)
-                        throw new ArgumentException($"Invalid tile type {type} in level file.");
-                    // Create tile and add to buffer
-                    Tile tile = TileFromId(type, new(x, y));
-                    int idx = (int)(tile.Location.X + tile.Location.Y * width);
-                    tilesBuffer[idx] = tile;
-                }
+                // Read tile data
+                int type = reader.ReadByte();
+                // Check if valid tile type
+                if (type < 0 || type >= Enum.GetValues(typeof(TileType)).Length)
+                    throw new ArgumentException($"Invalid tile type {type} @ {i % Constants.MapSize.X}, {i / Constants.MapSize.X} in level file.");
+                // Extra properties
+                Tile tile;
+                if (type == (int)TileType.Stairs)
+                    tile = new Stairs(new(i % Constants.MapSize.X, i / Constants.MapSize.X), reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
+                else // Regular tile
+                    tile = TileFromId(type, new(i % Constants.MapSize.X, i / Constants.MapSize.X));
+                int idx = (int)(tile.Location.X + tile.Location.Y * Constants.MapSize.X);
+                tilesBuffer[idx] = tile;
             }
 
-            // If successful add level
+            // Check null
             if (tilesBuffer == null)
                 throw new ArgumentException("No tiles found in level file.");
-            Level created = new Level(filename, tilesBuffer, new Xna.Vector2(width, height));
+            // Check size
+            if (tilesBuffer.Length != Constants.MapSize.X * Constants.MapSize.Y)
+                throw new ArgumentException($"Invalid level size - expected {Constants.MapSize.X}x{Constants.MapSize.X} tiles.");
+
+            // Make and add the level
+            Level created = new(filename, tilesBuffer, new(Constants.MapSize.X, Constants.MapSize.Y));
             Levels.Add(created);
         }
         // Utilities
@@ -219,10 +231,11 @@ namespace Quest
             TileType type = (TileType)id;
             return type switch
             {
-                TileType.Water => new Water(location),
+                TileType.Sky => new Sky(location),
                 TileType.Grass => new Grass(location),
+                TileType.Water => new Water(location),
                 TileType.Wall => new Wall(location),
-                TileType.Stairs => new Stairs(location),
+                TileType.Stairs => new Stairs(location, "_null", Constants.MiddleCoord),
                 _ => new Tile(location), // Default tile
             };
         }
