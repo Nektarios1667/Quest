@@ -12,7 +12,7 @@ namespace Quest.Tiles
         Sky = 0,
         Grass = 1,
         Water = 2,
-        Wall = 3,
+        StoneWall = 3,
         Stairs = 4,
     }
     public class Tile

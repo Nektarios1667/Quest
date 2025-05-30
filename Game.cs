@@ -13,6 +13,7 @@ using Quest.Gui;
 using Quest.Tiles;
 using System.Diagnostics;
 using System.IO.Compression;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Quest
 {
@@ -29,7 +30,8 @@ namespace Quest
         public GuiHandler Gui { get; private set; } // GUI handler
         public Window Window { get; private set; }
         public int TilesDrawn { get; private set; } // For debugging
-        public Xna.Vector2 Camera { get; set; }
+        public Xna.Vector2 Camera { get; set; } // Current camera position w/ smooth movement
+        public Xna.Vector2 CameraDest { get; set; } // Where the camera is going
         public float Delta { get; private set; }
         public SpriteBatch Batch { get; private set; }
         public List<Level> Levels { get; private set; }
@@ -47,6 +49,7 @@ namespace Quest
             TileTextures = new();
             Tiles = [];
             Camera = new Xna.Vector2(128 * Constants.TileSize.X, 128 * Constants.TileSize.Y) - Constants.Middle;
+            CameraDest = Camera;
             string dialog = "This is some example dialog! The NPC can talk to the player through this box which appears when near. The quick brown fox jumped over the lazy dog.";
             Gui = new();
             Gui.Widgets = [new Dialog(Gui, new(Constants.Middle.X - 600, 800), new(1200, 100), new(194, 125, 64), Color.Black, dialog, Window.PixelOperator, borderColor: new(36, 19, 4))];
@@ -62,6 +65,10 @@ namespace Quest
         {
             // Update the game state
             Delta = deltaTime;
+
+            // Lerp camera
+            Camera = Vector2.Lerp(Camera, CameraDest, Constants.CameraRigidity);
+
             Watch.Restart();
             Gui.Update(deltaTime);
             FrameTimes["GuiUpdate"] = Watch.Elapsed.TotalMilliseconds;
@@ -75,8 +82,6 @@ namespace Quest
             TilesDrawn = 0;
             for (int t = 0; t < Tiles.Length; t++)
             {
-                // Check null
-                if (Tiles[t] == null) continue;
                 Tile tile = Tiles[t];
                 // Draw each tile using the sprite batch
                 Xna.Vector2 dest = tile.Location.ToVector2() * tileSize - Camera;
@@ -84,10 +89,10 @@ namespace Quest
                 // Check x in bounds
                 if (dest.X + Constants.TileSize.X < 0 || dest.X > Constants.Window.X) continue;
                 if (dest.Y + Constants.TileSize.Y * 2 < 0 || dest.Y > Constants.Window.Y) continue;
-                // Draw
                 dest.Round();
+                // Draw
                 Texture2D texture = TileTextures[tile.Type.ToString()];
-                Batch.Draw(texture, dest, tile.Location.ToVector2() == Coord ? Color.White : Color.White);
+                Batch.Draw(texture, dest, TileTextureSource(tile), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
                 TilesDrawn++;
             }
             FrameTimes["TileDraws"] = Watch.Elapsed.TotalMilliseconds;
@@ -107,20 +112,20 @@ namespace Quest
             // Allow escaping
             if (!IsTileWalkable())
             {
-                Camera += finalMove;
+                CameraDest += finalMove;
                 TileBelow?.OnPlayerEnter(this);
                 return;
             }
 
             // Check collision for x
-            Camera += new Vector2(finalMove.X, 0);
-            if (!IsTileWalkable()) Camera -= new Vector2(finalMove.X, 0);
+            CameraDest += new Vector2(finalMove.X, 0);
+            if (!IsTileWalkable()) CameraDest -= new Vector2(finalMove.X, 0);
             // Check collision for y
-            Camera += new Vector2(0, finalMove.Y);
-            if (!IsTileWalkable()) Camera -= new Vector2(0, finalMove.Y);
+            CameraDest += new Vector2(0, finalMove.Y);
+            if (!IsTileWalkable()) CameraDest -= new Vector2(0, finalMove.Y);
 
             // On tile enter
-            Coord = Vector2.Round(Camera / Constants.TileSize);
+            Coord = Vector2.Round(CameraDest / Constants.TileSize);
             TileBelow = Tiles[(int)(Coord.X + Coord.Y * Level.Dimensions.X)];
             TileBelow.OnPlayerEnter(this);
         }
@@ -136,7 +141,7 @@ namespace Quest
             {
                 if (!string.IsNullOrEmpty(filename))
                 {
-                    Texture2D texture = content.Load<Texture2D>($"Images/Tiles/{filename}");
+                    Texture2D texture = content.Load<Texture2D>($"Images/Tiles/{filename}Tilemap");
                     TileTextures[filename] = texture;
                 }
             }
@@ -219,7 +224,7 @@ namespace Quest
             // Check if level loaded
             if (Level == null) return false;
             // Out of bounds
-            Coord = Vector2.Round(Camera / Constants.TileSize);
+            Coord = Vector2.Round(CameraDest / Constants.TileSize);
             if (Coord.X < 0 || Coord.X > Level.Dimensions.X || Coord.Y < 0 || Coord.Y > Level.Dimensions.X) return false;
             // Check if the tile is walkable
             TileBelow = Tiles[(int)(Coord.X + Coord.Y * Level.Dimensions.X)];
@@ -234,10 +239,43 @@ namespace Quest
                 TileType.Sky => new Sky(location),
                 TileType.Grass => new Grass(location),
                 TileType.Water => new Water(location),
-                TileType.Wall => new Wall(location),
+                TileType.StoneWall => new StoneWall(location),
                 TileType.Stairs => new Stairs(location, "_null", Constants.MiddleCoord),
                 _ => new Tile(location), // Default tile
             };
+        }
+        public Tile GetTile(Xna.Point coord)
+        {
+            if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
+                throw new ArgumentOutOfRangeException(nameof(coord), "Coordinates are out of bounds of the level.");
+            return Tiles[coord.X + coord.Y * Constants.MapSize.X];
+        }
+        public Tile GetTile(int x, int y)
+        {
+            return GetTile(new Point(x, y));
+        }
+        public Rectangle TileTextureSource(Tile tile)
+        {
+
+            int mask = TileConnectionsMask(tile);
+
+            int srcX = (mask % Constants.TileMapDim.X) * (int)Constants.TilePixelSize.X;
+            int srcY = (mask / Constants.TileMapDim.X) * (int)Constants.TilePixelSize.Y;
+
+            return new(srcX, srcY, (int)Constants.TilePixelSize.X, (int)Constants.TilePixelSize.Y);
+        }
+        public int TileConnectionsMask(Tile tile)
+        {
+            int mask = 0;
+            int x = tile.Location.X;
+            int y = tile.Location.Y;
+
+            if (x > 0 && GetTile(x - 1, y).Type == tile.Type) mask |= 1; // left
+            if (y < Constants.MapSize.Y - 1 && GetTile(x, y + 1).Type == tile.Type) mask |= 2; // down
+            if (x < Constants.MapSize.X - 1 && GetTile(x + 1, y).Type == tile.Type) mask |= 4; // right
+            if (y > 0 && GetTile(x, y - 1).Type == tile.Type) mask |= 8; // up
+
+            return mask;
         }
     }
 }

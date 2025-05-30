@@ -23,7 +23,8 @@ namespace Quest.Tiles
             // Load another level
             Console.WriteLine($"[System] Teleporting to level '{DestLevel}' @ {DestPosition.X}, {DestPosition.Y}");
             game.LoadLevel(DestLevel);
-            game.Camera = DestPosition.ToVector2() * Constants.TileSize;
+            game.CameraDest = DestPosition.ToVector2() * Constants.TileSize;
+            game.Camera = game.CameraDest;
         }
     }
 }

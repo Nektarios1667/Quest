@@ -7,9 +7,9 @@ using Xna = Microsoft.Xna.Framework;
 
 namespace Quest.Tiles
 {
-    public class Wall : Tile
+    public class StoneWall : Tile
     {
-        public Wall(Xna.Point location) : base(location)
+        public StoneWall(Xna.Point location) : base(location)
         {
             IsWalkable = false;
         }

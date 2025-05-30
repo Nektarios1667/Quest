@@ -20,30 +20,6 @@
 /processorParam:TextureFormat=Compressed
 /build:Arial.spritefont
 
-#begin ArrowDown.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:ArrowDown.png
-
-#begin CircleOutline.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:CircleOutline.png
-
 #begin Fonts/Arial.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -144,7 +120,7 @@
 /processorParam:TextureFormat=Color
 /build:Images/Robot/Robot_U.png
 
-#begin Images/Tiles/Door.png
+#begin Images/Tiles/GrassTilemap.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -154,9 +130,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/Door.png
+/build:Images/Tiles/GrassTilemap.png
 
-#begin Images/Tiles/Grass.png
+#begin Images/Tiles/SkyTilemap.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -166,9 +142,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/Grass.png
+/build:Images/Tiles/SkyTilemap.png
 
-#begin Images/Tiles/Sky.png
+#begin Images/Tiles/StairsTilemap.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -178,9 +154,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/Sky.png
+/build:Images/Tiles/StairsTilemap.png
 
-#begin Images/Tiles/Stairs.png
+#begin Images/Tiles/StoneWallTilemap.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -190,9 +166,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/Stairs.png
+/build:Images/Tiles/StoneWallTilemap.png
 
-#begin Images/Tiles/Wall.png
+#begin Images/Tiles/TemplateTilemap.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -202,9 +178,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/Wall.png
+/build:Images/Tiles/TemplateTilemap.png
 
-#begin Images/Tiles/Water.png
+#begin Images/Tiles/WaterTilemap.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -214,5 +190,5 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/Water.png
+/build:Images/Tiles/WaterTilemap.png
 

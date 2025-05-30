@@ -122,22 +122,23 @@ namespace Quest
         {
             // Clear
             GraphicsDevice.Clear(Color.Magenta);
-            spriteBatch.Begin();
+            spriteBatch.Begin(samplerState:SamplerState.PointClamp);
 
             // Draw game
             GameHandler.Draw();
 
             // Player
+            Xna.Vector2 playerDest = Constants.Middle + GameHandler.CameraDest - GameHandler.Camera;
             if (moveX < 0)
-                spriteBatch.Draw(RobotLeft, Constants.Middle, Color.White);
+                spriteBatch.Draw(RobotLeft, playerDest, Color.White);
             else if (moveX > 0)
-                spriteBatch.Draw(RobotRight, Constants.Middle, Color.White);
+                spriteBatch.Draw(RobotRight, playerDest, Color.White);
             else if (moveY < 0)
-                spriteBatch.Draw(RobotUp, Constants.Middle, Color.White);
+                spriteBatch.Draw(RobotUp, playerDest, Color.White);
             else if (moveY > 0)
-                spriteBatch.Draw(RobotDown, Constants.Middle, Color.White);
+                spriteBatch.Draw(RobotDown, playerDest, Color.White);
             else
-                spriteBatch.Draw(RobotIdle, Constants.Middle, Color.White);
+                spriteBatch.Draw(RobotIdle, playerDest, Color.White);
 
             // Text gui
             spriteBatch.DrawString(Arial, $"FPS: {1f / delta:0.0}\nCamera: {GameHandler.Camera}\nTiles Drawn: {GameHandler.TilesDrawn}\nTile Below: {(GameHandler.TileBelow == null ? "none" : GameHandler.TileBelow.Type)}\nCoord: {GameHandler.Coord}\nLevel: {GameHandler.Level.Name}", new Vector2(10, 10), Color.Black);
