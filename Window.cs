@@ -104,8 +104,11 @@ namespace Quest
             delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             // Movement
-            moveX = IsAnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : (IsAnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0);
-            moveY = IsAnyKeyDown(Keys.W, Keys.Up) ? -Constants.PlayerSpeed : (IsAnyKeyDown(Keys.S, Keys.Down) ? Constants.PlayerSpeed : 0);
+            moveX = 0; moveY = 0;
+            moveX += IsAnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : 0;
+            moveX += IsAnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0;
+            moveY += IsAnyKeyDown(Keys.W, Keys.Up) ? -Constants.PlayerSpeed : 0;
+            moveY += IsAnyKeyDown(Keys.S, Keys.Down) ? Constants.PlayerSpeed : 0;
             GameHandler.Move(moveX, moveY);
 
             // Game update

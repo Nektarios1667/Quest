@@ -108,18 +108,18 @@ namespace Quest.Editor
                 if (!string.IsNullOrEmpty(filename))
                 {
                     Logger.Log($"Loaded tile image '{filename}'");
-                    Texture2D texture = Content.Load<Texture2D>($"Images/Tiles/{filename}");
+                    Texture2D texture = Content.Load<Texture2D>($"Images/Tiles/{filename}Tilemap");
                     TileTextures[filename] = texture;
                 }
             }
         }
 
-        protected override async void Update(GameTime gameTime)
+        protected override void Update(GameTime gameTime)
         {
             // Inputs
             keyState = Keyboard.GetState();
             mouseState = Mouse.GetState();
-            mouseCoord = Xna.Vector2.Floor((mouseState.Position.ToVector2() + Camera) / tileSize2D).ToPoint();
+            mouseCoord = Vector2.Floor((mouseState.Position.ToVector2() + Camera) / tileSize2D).ToPoint();
 
             // Exit
             if (IsKeyDown(Keys.Escape))
@@ -160,7 +160,7 @@ namespace Quest.Editor
             // Draw
             if (mouseState.LeftButton == ButtonState.Pressed)
             {
-                if (Tiles[mouseCoord.X + mouseCoord.Y * Constants.MapSize.X].Type != Material)
+                if (GetTile(mouseCoord).Type != Material)
                 {
                     // Add tile
                     Tile tile;
@@ -170,7 +170,6 @@ namespace Quest.Editor
                         tile = GameHandler.TileFromId(Selection, mouseCoord);
 
                     SetTile(tile);
-
                     Logger.Log($"Set tile to '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}.");
                 }
             }
@@ -195,28 +194,29 @@ namespace Quest.Editor
         {
             // Clear
             GraphicsDevice.Clear(Color.Magenta);
-            spriteBatch.Begin();
+            spriteBatch.Begin(samplerState:SamplerState.PointClamp);
 
             // Tiles
             TilesDrawn = 0;
-            foreach (Tile tile in Tiles)
+            for (int t = 0; t < Tiles.Length; t++)
             {
+                Tile tile = Tiles[t];
                 // Draw each tile using the sprite batch
                 Xna.Vector2 dest = tile.Location.ToVector2() * tileSize - Camera;
                 // Check x in bounds
                 if (dest.X + Constants.TileSize.X < 0 || dest.X > Constants.Window.X) continue;
                 if (dest.Y + Constants.TileSize.Y * 2 < 0 || dest.Y > Constants.Window.Y) continue;
-                // Draw
                 dest.Round();
+                // Draw
                 Texture2D texture = TileTextures[tile.Type.ToString()];
-                spriteBatch.Draw(texture, dest, Color.White);
+                spriteBatch.Draw(texture, dest, TileTextureSource(tile), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
                 TilesDrawn++;
             }
 
             // Cursor
             Vector2 cursorPos = mouseCoord.ToVector2() * tileSize - Camera;
             spriteBatch.FillRectangle(new(cursorPos, tileSize), Color.White);
-            spriteBatch.Draw(TileTextures[Material.ToString()], cursorPos, highlightColor);
+            spriteBatch.Draw(TileTextures[Material.ToString()], cursorPos, Constants.ZeroSource, highlightColor, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
 
             // Text gui
             spriteBatch.DrawString(Arial, $"FPS: {1f / delta:0.0}\nCamera: {Camera}\nMaterial: {Material} [{Selection}]\nTiles Drawn: {TilesDrawn}\nCoord: {mouseCoord}", new Vector2(10, 10), Color.Black);
@@ -308,6 +308,39 @@ namespace Quest.Editor
         {
             foreach (Keys key in keys) { if (!(keyState.IsKeyDown(key) && !previousKeyState.IsKeyDown(key))) return false; }
             return true;
+        }
+        public Rectangle TileTextureSource(Tile tile)
+        {
+
+            int mask = TileConnectionsMask(tile);
+
+            int srcX = (mask % Constants.TileMapDim.X) * (int)Constants.TilePixelSize.X;
+            int srcY = (mask / Constants.TileMapDim.X) * (int)Constants.TilePixelSize.Y;
+
+            return new(srcX, srcY, (int)Constants.TilePixelSize.X, (int)Constants.TilePixelSize.Y);
+        }
+        public int TileConnectionsMask(Tile tile)
+        {
+            int mask = 0;
+            int x = tile.Location.X;
+            int y = tile.Location.Y;
+
+            if (x > 0 && GetTile(x - 1, y).Type == tile.Type) mask |= 1; // left
+            if (y < Constants.MapSize.Y - 1 && GetTile(x, y + 1).Type == tile.Type) mask |= 2; // down
+            if (x < Constants.MapSize.X - 1 && GetTile(x + 1, y).Type == tile.Type) mask |= 4; // right
+            if (y > 0 && GetTile(x, y - 1).Type == tile.Type) mask |= 8; // up
+
+            return mask;
+        }
+        public Tile GetTile(Xna.Point coord)
+        {
+            if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
+                throw new ArgumentOutOfRangeException(nameof(coord), "Coordinates are out of bounds of the level.");
+            return Tiles[coord.X + coord.Y * Constants.MapSize.X];
+        }
+        public Tile GetTile(int x, int y)
+        {
+            return GetTile(new Point(x, y));
         }
     }
 }

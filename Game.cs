@@ -46,7 +46,7 @@ namespace Quest
             Batch = spriteBatch;
             tileSize = Constants.TileSize;
             Levels = [];
-            TileTextures = new();
+            TileTextures = [];
             Tiles = [];
             Camera = new Xna.Vector2(128 * Constants.TileSize.X, 128 * Constants.TileSize.Y) - Constants.Middle;
             CameraDest = Camera;
@@ -67,7 +67,9 @@ namespace Quest
             Delta = deltaTime;
 
             // Lerp camera
-            Camera = Vector2.Lerp(Camera, CameraDest, Constants.CameraRigidity);
+            if (Vector2.DistanceSquared(Camera, CameraDest) < 4) Camera = CameraDest; // If close enough snap to destination
+            else if (CameraDest != Camera) // If not lerp towards destination
+                Camera = Vector2.Lerp(Camera, CameraDest, Constants.CameraRigidity);
 
             Watch.Restart();
             Gui.Update(deltaTime);
@@ -241,6 +243,8 @@ namespace Quest
                 TileType.Water => new Water(location),
                 TileType.StoneWall => new StoneWall(location),
                 TileType.Stairs => new Stairs(location, "_null", Constants.MiddleCoord),
+                TileType.Flooring => new Flooring(location),
+                TileType.Sand => new Sand(location),
                 _ => new Tile(location), // Default tile
             };
         }
