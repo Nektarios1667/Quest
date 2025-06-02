@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Xna = Microsoft.Xna.Framework;
 using Quest.Tiles;
+using System.Drawing.Text;
 
 // TODO
 // 3. Stairs
@@ -19,13 +20,13 @@ namespace Quest {
     {
         public string Name { get; private set; }
         public Tile[] Tiles { get; private set; }
-        public Xna.Vector2 Dimensions { get; private set; }
-        public Level(string name, Tile[] tiles, Xna.Vector2 dim)
+        public Xna.Point Spawn { get; private set; }
+        public Level(string name, Tile[] tiles, Xna.Point spawn)
         {
             // Initialize the level
             Name = name;
             Tiles = tiles;
-            Dimensions = dim;
+            Spawn = spawn;
         }
         public void Draw()
         {

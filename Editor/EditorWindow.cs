@@ -13,6 +13,7 @@ using Quest.Tiles;
 using MonoGUI;
 using System.IO.Compression;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Quest.Editor
 {
@@ -42,6 +43,8 @@ namespace Quest.Editor
         private readonly Color highlightColor = new(1, 1, 1, .8f);
         private float modifier;
         private string LevelName = "new_level";
+        private float time = 0;
+        private Xna.Point Spawn = Constants.MapSize / new Point(2, 2);
 
         // Deltatime
         private float delta;
@@ -130,6 +133,8 @@ namespace Quest.Editor
 
             // Delta time
             delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            // Time
+            time += delta;
 
             // Movement
             if (IsKeyDown(Keys.LeftShift)) modifier = 0.5f;
@@ -141,6 +146,26 @@ namespace Quest.Editor
             if (IsAnyKeyDown(Keys.S, Keys.Down)) Camera.Y += 600 * delta * modifier;
             if (IsAnyKeyDown(Keys.W, Keys.Up)) Camera.Y -= 600 * delta * modifier;
             Camera = Vector2.Clamp(Camera, new Xna.Vector2(0, 0), (tileSize * Constants.MapSize.ToVector2()) - Constants.Window);
+
+            // Open file
+            if (IsAllKeysDown(Keys.O, Keys.LeftControl))
+            {
+                // Input file name
+                string filename = Logger.Input("Open level file: ");
+                if (!string.IsNullOrEmpty(filename))
+                {
+                    try
+                    {
+                        ReadLevel(filename);
+                        LevelName = filename;
+                        Logger.Log($"Opened level '{filename}'.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"Failed to open level '{filename}': {ex.Message}");
+                    }
+                }
+            }
 
             // Change material
             if (mouseState.ScrollWheelValue > previousMouseState.ScrollWheelValue)
@@ -179,9 +204,27 @@ namespace Quest.Editor
                 Tile tileBelow = Tiles[mouseCoord.X + mouseCoord.Y * Constants.MapSize.X];
                 EditTile(tileBelow);
             }
+            // Erase (set to sky)
+            if (mouseState.MiddleButton == ButtonState.Pressed)
+            {
+                if (GetTile(mouseCoord).Type != TileType.Sky)
+                {
+                    // Add tile
+                    Tile tile = new Sky(mouseCoord);
+                    SetTile(tile);
+                    Logger.Log($"Set tile to '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}.");
+                }
+            }
 
             // Save
             if (IsKeyPressed(Keys.E) && IsKeyDown(Keys.LeftControl)) SaveLevel(this);
+
+            // Level info
+            if (IsKeyPressed(Keys.L) && IsKeyDown(Keys.LeftControl))
+            {
+                SetSpawn();
+            }
+
             // Set previous key state
             previousKeyState = keyState;
             previousMouseState = mouseState;
@@ -209,9 +252,14 @@ namespace Quest.Editor
                 dest.Round();
                 // Draw
                 Texture2D texture = TileTextures[tile.Type.ToString()];
-                spriteBatch.Draw(texture, dest, TileTextureSource(tile), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
+                Color color = tile.Type == TileType.Water ? Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(time + tile.Location.X + tile.Location.Y)) : Color.White;
+                spriteBatch.Draw(texture, dest, TileTextureSource(tile), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
                 TilesDrawn++;
             }
+
+            // Spawn
+            Xna.Vector2 spawnPos = Spawn.ToVector2() * tileSize - Camera;
+            spriteBatch.FillRectangle(new(spawnPos + tileSize/4, tileSize / 2), Color.Magenta);
 
             // Cursor
             Vector2 cursorPos = mouseCoord.ToVector2() * tileSize - Camera;
@@ -224,6 +272,56 @@ namespace Quest.Editor
             // Final
             spriteBatch.End();
             base.Draw(gameTime);
+        }
+        public void ReadLevel(string filename)
+        {
+            // Check exists
+            if (!File.Exists($"Levels/{filename}.lvl"))
+                throw new FileNotFoundException("Level file not found.", filename);
+
+            // Get data
+            string data = File.ReadAllText($"Levels/{filename}.lvl");
+            string[] lines = data.Split('\n');
+
+            // Parse
+            Tile[] tilesBuffer;
+            using FileStream fileStream = File.OpenRead($"Levels/{filename}.lvl");
+            using GZipStream gzipStream = new(fileStream, CompressionMode.Decompress);
+            using BinaryReader reader = new(gzipStream);
+            // Make buffer
+            tilesBuffer = new Tile[Constants.MapSize.X * Constants.MapSize.Y];
+
+            // Spawn
+            Spawn = new(reader.ReadByte(), reader.ReadByte());
+            Camera = (Spawn - Constants.MiddleCoord).ToVector2() * tileSize;
+
+            // Tiles
+            for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
+            {
+                // Read tile data
+                int type = reader.ReadByte();
+                // Check if valid tile type
+                if (type < 0 || type >= Enum.GetValues(typeof(TileType)).Length)
+                    throw new ArgumentException($"Invalid tile type {type} @ {i % Constants.MapSize.X}, {i / Constants.MapSize.X} in level file.");
+                // Extra properties
+                Tile tile;
+                if (type == (int)TileType.Stairs)
+                    tile = new Stairs(new(i % Constants.MapSize.X, i / Constants.MapSize.X), reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
+                else // Regular tile
+                    tile = GameHandler.TileFromId(type, new(i % Constants.MapSize.X, i / Constants.MapSize.X));
+                int idx = (int)(tile.Location.X + tile.Location.Y * Constants.MapSize.X);
+                tilesBuffer[idx] = tile;
+            }
+
+            // Check null
+            if (tilesBuffer == null)
+                throw new ArgumentException("No tiles found in level file.");
+            // Check size
+            if (tilesBuffer.Length != Constants.MapSize.X * Constants.MapSize.Y)
+                throw new ArgumentException($"Invalid level size - expected {Constants.MapSize.X}x{Constants.MapSize.X} tiles.");
+
+            // Make and add the level
+            Tiles = tilesBuffer;
         }
         public void SetTile(Tile tile)
         {
@@ -253,6 +351,22 @@ namespace Quest.Editor
                 }
             }
         }
+        public void SetSpawn()
+        {
+            // Destination position
+            string resp = Logger.Input($"Spawn position [{Spawn.X}, {Spawn.Y}]: ");
+            if (resp != "")
+            {
+                string[] parts = resp.Split(',');
+                if (parts.Length == 2 && int.TryParse(parts[0], out int x) && int.TryParse(parts[1], out int y))
+                    if (x >= 0 && x < Constants.MapSize.X && y >= 0 && y < Constants.MapSize.Y)
+                        Spawn = new(x, y);
+                    else
+                        Logger.Error($"Position out of bounds - must be within the map size {Constants.MapSize.X}x{Constants.MapSize.Y}.");
+                else
+                    Logger.Error("Invalid position format - use 'x,y'.");
+            }
+        }
         public static void SaveLevel(EditorWindow editor)
         {
             // Input
@@ -263,6 +377,11 @@ namespace Quest.Editor
             using FileStream fileStream = File.Create($"Levels/{name}.lvl");
             using GZipStream gzipStream = new(fileStream, CompressionLevel.Optimal);
             using BinaryWriter writer = new(gzipStream);
+
+            // Write spawn
+            writer.Write(IntToByte(editor.Spawn.X));
+            writer.Write(IntToByte(editor.Spawn.Y));
+
             // Dimensions
             for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
             {

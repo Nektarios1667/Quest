@@ -79,8 +79,8 @@ namespace Quest
 
             // Handlers
             GameHandler = new GameHandler(this, spriteBatch);
-            GameHandler.ReadLevel("overworld");
-            GameHandler.ReadLevel("basement");
+            GameHandler.ReadLevel("island_house");
+            GameHandler.ReadLevel("island_house_basement");
             GameHandler.LoadLevel(0);
             GameHandler.LoadContent(Content);
 

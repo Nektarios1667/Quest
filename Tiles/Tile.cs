@@ -19,6 +19,8 @@ namespace Quest.Tiles
     }
     public class Tile
     {
+        // Debug
+        public bool Marked { get; set; } = false; // Used for debugging to mark tiles
         // Auto generated - no setter
         public Xna.Point Location { get;}
         // Properties - protected setter
