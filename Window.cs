@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Input;
 using Xna = Microsoft.Xna.Framework;
 using Quest.Gui;
 using Quest.Tiles;
+using MonoGame.Extended;
 
 namespace Quest
 {
@@ -16,6 +17,7 @@ namespace Quest
         private KeyboardState keyState;
         private KeyboardState previousKeyState;
         private MouseState mouseState;
+        private MouseState previousMouseState;
 
         // Deltatime
         private float delta;
@@ -35,7 +37,6 @@ namespace Quest
         public Texture2D RobotDown { get; private set; }
         public Texture2D RobotLeft { get; private set; }
         public Texture2D RobotRight { get; private set; }
-
         // Movements
         private int moveX;
         private int moveY;
@@ -103,6 +104,10 @@ namespace Quest
             // Delta time
             delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+            // Inventory
+            if (IsKeyPressed(Keys.I))
+                GameHandler.Inventory.Visible = !GameHandler.Inventory.Visible;
+
             // Movement
             moveX = 0; moveY = 0;
             moveX += IsAnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : 0;
@@ -112,10 +117,11 @@ namespace Quest
             GameHandler.Move(moveX, moveY);
 
             // Game update
-            GameHandler.Update(delta);
+            GameHandler.Update(delta, previousMouseState, mouseState);
 
             // Set previous key state
             previousKeyState = keyState;
+            previousMouseState = mouseState;
 
             // Final
             base.Update(gameTime);
@@ -151,6 +157,24 @@ namespace Quest
             // Final
             spriteBatch.End();
             base.Draw(gameTime);
+        }
+        // Utilities
+        public bool TryDraw(Texture2D texture, Rectangle rect, Rectangle? sourceRect = null, Color color = default, float rotation = 0, Vector2 origin = default, Vector2 scale = default, SpriteEffects spriteEffect = default, float depth = 0)
+        {
+            // Defaults
+            if (scale == default) scale = Vector2.One;
+
+            // Missing texture
+            if (texture == null)
+            {
+                spriteBatch.FillRectangle(new(rect.X, rect.Y, rect.Width / 2, rect.Height / 2), Color.Magenta); // top left
+                spriteBatch.FillRectangle(new(rect.X + rect.Width / 2, rect.Y, rect.Width / 2, rect.Height / 2), Color.Black); // top right
+                spriteBatch.FillRectangle(new(rect.X, rect.Y + rect.Height / 2, rect.Width / 2, rect.Height / 2), Color.Black); // bottom left
+                spriteBatch.FillRectangle(new(rect.X + rect.Width / 2, rect.Y + rect.Height / 2, rect.Width / 2, rect.Height / 2), Color.Magenta); // bottom right
+                return false;
+            }
+            spriteBatch.Draw(texture, rect.Location.ToVector2(), sourceRect, color, rotation, origin, scale, spriteEffect, depth);
+            return true;
         }
         // Key presses
         public bool IsKeyDown(Keys key) => keyState.IsKeyDown(key);

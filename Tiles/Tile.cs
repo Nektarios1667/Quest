@@ -21,7 +21,7 @@ namespace Quest.Tiles
     public class Tile
     {
         // Debug
-        public bool Marked { get; set; } = false; // Used for debugging to mark tiles
+        public bool Marked { get; set; }
         // Auto generated - no setter
         public Xna.Point Location { get;}
         // Properties - protected setter
@@ -33,6 +33,7 @@ namespace Quest.Tiles
             Location = location;
             IsWalkable = true;
             Type = (TileType)Enum.Parse(typeof(TileType), GetType().Name);
+            Marked = false;
         }
         public virtual void OnPlayerEnter(GameHandler game) { }
         public virtual void OnPlayerExit(GameHandler game) { }

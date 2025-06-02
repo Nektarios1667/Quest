@@ -13,7 +13,8 @@ using Quest.Gui;
 using Quest.Tiles;
 using System.Diagnostics;
 using System.IO.Compression;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using MonoGame.Extended;
+using Microsoft.Xna.Framework.Input;
 
 namespace Quest
 {
@@ -38,6 +39,11 @@ namespace Quest
         public Level Level { get; private set; }
         public Dictionary<string, Texture2D> TileTextures { get; private set; }
         public Tile[] Tiles { get; private set; }
+        // Inventory
+        public Inventory Inventory { get; set; }
+        // Textures
+        public Texture2D Slot { get; private set; }
+        // Private
         private Xna.Vector2 tileSize;
         private float Time = 0;
         public GameHandler(Window window, SpriteBatch spriteBatch)
@@ -61,8 +67,10 @@ namespace Quest
                 { "TileDraws", 0 },
                 { "GuiDraw", 0 },
             };
+            Inventory = new(this, 6, 4);
+            Inventory.SetSlot(0, new("Sword", "A sharp, point sword", 999));
         }
-        public void Update(float deltaTime)
+        public void Update(float deltaTime, MouseState previousMouseState, MouseState mouseState)
         {
             // Update the game state
             Delta = deltaTime;
@@ -73,9 +81,15 @@ namespace Quest
             else if (CameraDest != Camera) // If not lerp towards destination
                 Camera = Vector2.Lerp(Camera, CameraDest, Constants.CameraRigidity);
 
+            // Gui
             Watch.Restart();
             Gui.Update(deltaTime);
             FrameTimes["GuiUpdate"] = Watch.Elapsed.TotalMilliseconds;
+
+            // Inventory
+            Watch.Restart();
+            Inventory.Update(previousMouseState, mouseState);
+            FrameTimes["InventoryUpdate"] = Watch.Elapsed.TotalMilliseconds;
         }
         public void Draw()
         {
@@ -95,18 +109,23 @@ namespace Quest
                 if (dest.Y + Constants.TileSize.Y * 2 < 0 || dest.Y > Constants.Window.Y) continue;
                 dest.Round();
                 // Draw
-                Texture2D texture = TileTextures[tile.Type.ToString()];
+                Texture2D? texture = TileTextures.TryGetValue(tile.Type.ToString(), out var tex) ? tex : null;
                 Color color = tile.Type == TileType.Water ? Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(Time + tile.Location.X + tile.Location.Y)) : (tile.Marked ? Color.Red : Color.White);
                 tile.Marked = false; // Reset marked state for next frame
-                Batch.Draw(texture, dest, TileTextureSource(tile), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
+                TryDraw(texture, new Rectangle(dest.ToPoint(), Constants.TileSize.ToPoint()), TileTextureSource(tile), color, 0f, Vector2.Zero, Constants.TileSizeScale);
                 TilesDrawn++;
             }
             FrameTimes["TileDraws"] = Watch.Elapsed.TotalMilliseconds;
 
             // Widgets
             Watch.Restart();
-            Gui.Draw(Batch);
+            //Gui.Draw(Batch);
             FrameTimes["GuiDraw"] = Watch.Elapsed.TotalMilliseconds;
+
+            // Inventory
+            Watch.Restart();
+            Inventory.Draw();
+            FrameTimes["InventoryDraw"] = Watch.Elapsed.TotalMilliseconds;
         }
         // Movements
         public void Move(Xna.Vector2 move)
@@ -142,7 +161,7 @@ namespace Quest
         // Loading and reading
         public void LoadContent(ContentManager content)
         {
-            // Dynamically load images
+            // Dynamically load tile images
             foreach (string filename in Constants.TileNames)
             {
                 if (!string.IsNullOrEmpty(filename))
@@ -154,6 +173,7 @@ namespace Quest
 
             // Load gui
             Gui.LoadContent(content);
+            Inventory.LoadContent(content);
         }
         // Levels
         public void LoadLevel(int levelIndex)
@@ -276,6 +296,27 @@ namespace Quest
                 TileType.Dirt => new Dirt(location),
                 _ => new Tile(location), // Default tile
             };
+        }
+        // Utilities
+        public bool TryDraw(Texture2D? texture, Rectangle rect, Rectangle? sourceRect = null, Color color = default, float rotation = 0, Vector2 origin = default, Vector2 scale = default, SpriteEffects spriteEffect = default, float depth = 0)
+        {
+            // Defaults
+            if (scale == default) scale = Vector2.One;
+            if (color == default) color = Color.White;
+
+            // Missing texture
+            if (texture == null)
+            {
+                int halfW = rect.Width / 2;
+                int halfH = rect.Height / 2;
+                Batch.FillRectangle(new(rect.X, rect.Y, halfW, halfH), Color.Magenta); // top left
+                Batch.FillRectangle(new(rect.X + halfW, rect.Y, halfW, halfH), Color.Black); // top right
+                Batch.FillRectangle(new(rect.X, rect.Y + halfH, halfW, halfH), Color.Black); // bottom left
+                Batch.FillRectangle(new(rect.X + halfW, rect.Y + halfH, halfW, halfH), Color.Magenta); // bottom right
+                return false;
+            }
+            Batch.Draw(texture, rect.Location.ToVector2(), sourceRect, color, rotation, origin, scale, spriteEffect, depth);
+            return true;
         }
         public Tile GetTile(Xna.Point coord)
         {
