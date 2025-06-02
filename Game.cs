@@ -273,6 +273,7 @@ namespace Quest
                 TileType.Stairs => new Stairs(location, "_null", Constants.MiddleCoord),
                 TileType.Flooring => new Flooring(location),
                 TileType.Sand => new Sand(location),
+                TileType.Dirt => new Dirt(location),
                 _ => new Tile(location), // Default tile
             };
         }

@@ -16,6 +16,7 @@ namespace Quest.Tiles
         Stairs = 4,
         Flooring = 5,
         Sand = 6,
+        Dirt = 7,
     }
     public class Tile
     {
