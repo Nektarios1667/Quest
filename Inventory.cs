@@ -14,27 +14,31 @@ namespace Quest
     {
         public string Name { get; private set; }
         public string Description { get; private set; }
-        public int Amount { get; private set; }
-        public Item(string name, string description, int amount = 1)
+        public int Amount { get; set; }
+        public int Max { get; private set; }
+        public Item(string name, string description, int amount = 1, int max = Constants.MaxStack)
         {
             Name = name;
             Description = description;
             Amount = amount;
+            Max = max;
         }
     }
     public class Inventory
     {
         public GameHandler Game { get; private set; }
         public Item?[,] Items { get; private set; }
-        public bool Visible { get; set; } = false;
+        public bool Opened { get; set; } = false;
         public Dictionary<string, Texture2D> ItemTextures { get; private set; }
         public Texture2D Slot { get; private set; }
-        private SpriteFont Arial { get; set; }
+        private SpriteFont PressStart { get; set; }
         public int EquippedSlot { get; set; } = 0;
         public int SelectedSlot { get; set; } = 0;
         public int Width { get; }
         public int Height { get; }
         private bool _loaded { get; set; } = false;
+        private readonly Xna.Point itemOffset = new(8, 8);
+        private readonly Vector2 itemScale = new(3, 3);
         public Inventory(GameHandler game, int width, int height)
         {
             Game = game;
@@ -57,22 +61,8 @@ namespace Quest
                 if (EquippedSlot < 0) EquippedSlot += Width;
             }
 
-            // Select slot
-            if (mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Released)
-            {
-                Point mouseSlot = GetMouseSlot(mouseState);
-                if (mouseSlot != Constants.NegOne) SelectedSlot = Flatten(mouseSlot);
-            }
-            // Swap items
-            if (mouseState.LeftButton == ButtonState.Released && previousMouseState.LeftButton == ButtonState.Pressed)
-            {
-                Point mouseSlot = GetMouseSlot(mouseState);
-                if (mouseSlot != Constants.NegOne && Flatten(mouseSlot) != SelectedSlot)
-                {
-                    Swap(SelectedSlot, Flatten(mouseSlot));
-                    SelectedSlot = Flatten(mouseSlot);
-                }
-            }
+            // Handle slot interactions
+            SlotInteractions(previousMouseState, mouseState);
         }
         public void Draw()
         {
@@ -84,19 +74,18 @@ namespace Quest
                 for (int y = 0; y < Height; y++) {
                     // Checks
                     Item? item = Items[x, y];
-                    if (!Visible && y != 0) continue;
+                    if (!Opened && y != 0) continue;
 
                     // Draw inventory slots
                     Vector2 itemDest = new(Constants.Middle.X - (Constants.SlotTextureSize.X * Width / 2) + (Constants.SlotTextureSize.X + 4) * x, Constants.Window.Y - (Slot.Height + 8) * (y + 1) - (y != 0 ? 20 : 0));
                     Game.Batch.Draw(Slot, itemDest, EquippedSlot == Flatten(x, y) ? Constants.CottonCandy : (SelectedSlot == Flatten(x, y) ? Constants.FocusBlue : Color.White));
-                    Game.Batch.DrawString(Arial, $"{Flatten(x, y)}", itemDest + new Vector2(8, 8), Color.Black);
 
                     // Draw inventory items
                     if (item == null) continue;
                     Texture2D? itemTexture = ItemTextures.TryGetValue(item.Name, out var tex) ? tex : null;
-                    Game.TryDraw(itemTexture, new(itemDest.ToPoint() + new Point(8, 8), Constants.ItemTextureSize));
-                    Vector2 textDest = itemDest + Constants.SlotTextureSize.ToVector2() - new Vector2(Arial.MeasureString($"{item.Amount}").X + 8, 28);
-                    Game.Batch.DrawString(Arial, $"{item.Amount}", textDest, Color.Black);
+                    Game.TryDraw(itemTexture, new(itemDest.ToPoint() + itemOffset, Constants.ItemTextureSize), scale:itemScale);
+                    Vector2 textDest = itemDest + Constants.SlotTextureSize.ToVector2() - new Vector2(PressStart.MeasureString($"{item.Amount}").X + 8, 30);
+                    Game.Batch.DrawString(PressStart, $"{item.Amount}", textDest, Color.Black);
                 }
             }
         }
@@ -114,12 +103,70 @@ namespace Quest
 
             // Load gui textures
             Slot = content.Load<Texture2D>("Images/Gui/Slot");
-            Arial = content.Load<SpriteFont>("Fonts/Arial");
+            PressStart = content.Load<SpriteFont>("Fonts/PressStart");
 
             _loaded = true;
         }
-
+        public void SlotInteractions(MouseState previousMouseState, MouseState mouseState)
+        {
+            // Swap items
+            if (mouseState.LeftButton == ButtonState.Released && previousMouseState.LeftButton == ButtonState.Pressed)
+            {
+                Point mouseSlot = GetMouseSlot(mouseState);
+                if (mouseSlot != Constants.NegOne && Flatten(mouseSlot) != SelectedSlot)
+                {
+                    // Merge items
+                    Item? mouseItem = GetItem(mouseSlot);
+                    Item? selectedItem = GetItem(SelectedSlot);
+                    if (SameItem(mouseItem, selectedItem))
+                        MergeItems(selectedItem, mouseItem);
+                    else if (selectedItem != null)
+                    {
+                        // Swap items
+                        Swap(SelectedSlot, Flatten(mouseSlot));
+                        SelectedSlot = Flatten(mouseSlot);
+                    }
+                }
+            }
+            // Select slot
+            if (mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Released)
+            {
+                Point mouseSlot = GetMouseSlot(mouseState);
+                if (mouseSlot != Constants.NegOne) SelectedSlot = Flatten(mouseSlot);
+            }
+        }
         // Slot interactions
+        public void MergeItems(Item? from, Item? dest)
+        {
+            if (from != null && dest != null)
+            {
+                int moved = Math.Min(Math.Abs(from.Amount), dest.Max - dest.Amount);
+                dest.Amount += moved;
+                from.Amount -= moved;
+                if (from.Amount < 1)
+                    SetSlot(SelectedSlot, null);
+            }
+        }
+        // SameItem
+        public static bool SameItem(Item? item1, Item? item2)
+        {
+            if (item1 == null || item2 == null) return false;
+            return item1.Name == item2.Name && item1.Description == item2.Description;
+        }
+        // GetItem
+        public Item? GetItem(Xna.Point pos)
+        {
+            if (pos.X < 0 || pos.X >= Width || pos.Y < 0 || pos.Y >= Height) return null;
+            return Items[pos.X, pos.Y];
+        }
+        public Item? GetItem(int x, int y) { return GetItem(new Xna.Point(x, y)); }
+        public Item? GetItem(int idx)
+        {
+            if (idx < 0 || idx >= Width * Height) return null;
+            Xna.Point pos = Expand(idx);
+            return GetItem(pos.X, pos.Y);
+        }
+        // Swap
         public void Swap(int slot1, int slot2)
         {
             Xna.Point pos1 = Expand(slot1);
@@ -130,6 +177,7 @@ namespace Quest
         {
             (Items[slot2.X, slot2.Y], Items[slot1.X, slot1.Y]) = (Items[slot1.X, slot1.Y], Items[slot2.X, slot2.Y]);
         }
+        // SetSlot
         public void SetSlot(Xna.Point pos, Item? item)
         {
             if (pos.X >= 0 && pos.X < Width && pos.Y >= 0 && pos.Y < Height) Items[pos.X, pos.Y] = item;

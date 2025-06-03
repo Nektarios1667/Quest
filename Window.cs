@@ -40,6 +40,8 @@ namespace Quest
         // Movements
         private int moveX;
         private int moveY;
+        // Shaders
+        public Effect Grayscale { get; private set; }
 
         // Vectors
         public Window()
@@ -91,6 +93,9 @@ namespace Quest
             RobotUp = Content.Load<Texture2D>("Images/Robot/Robot_U");
             RobotLeft = Content.Load<Texture2D>("Images/Robot/Robot_L");
             RobotRight = Content.Load<Texture2D>("Images/Robot/Robot_R");
+
+            // Shaders
+            Grayscale = Content.Load<Effect>("Shaders/Grayscale");
         }
 
         protected override void Update(GameTime gameTime)
@@ -106,18 +111,23 @@ namespace Quest
 
             // Inventory
             if (IsKeyPressed(Keys.I))
-                GameHandler.Inventory.Visible = !GameHandler.Inventory.Visible;
+                GameHandler.Inventory.Opened = !GameHandler.Inventory.Opened;
 
-            // Movement
-            moveX = 0; moveY = 0;
-            moveX += IsAnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : 0;
-            moveX += IsAnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0;
-            moveY += IsAnyKeyDown(Keys.W, Keys.Up) ? -Constants.PlayerSpeed : 0;
-            moveY += IsAnyKeyDown(Keys.S, Keys.Down) ? Constants.PlayerSpeed : 0;
-            GameHandler.Move(moveX, moveY);
+            if (!GameHandler.Inventory.Opened)
+            {
+                // Movement
+                moveX = 0; moveY = 0;
+                moveX += IsAnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : 0;
+                moveX += IsAnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0;
+                moveY += IsAnyKeyDown(Keys.W, Keys.Up) ? -Constants.PlayerSpeed : 0;
+                moveY += IsAnyKeyDown(Keys.S, Keys.Down) ? Constants.PlayerSpeed : 0;
+                GameHandler.Move(moveX, moveY);
 
-            // Game update
-            GameHandler.Update(delta, previousMouseState, mouseState);
+                // Update
+                GameHandler.Update(delta, previousMouseState, mouseState);
+            }
+            else // Only update gui
+                GameHandler.UpdateGui(delta, previousMouseState, mouseState);
 
             // Set previous key state
             previousKeyState = keyState;
@@ -129,12 +139,12 @@ namespace Quest
 
         protected override void Draw(GameTime gameTime)
         {
-            // Clear
+            // Clear and start shader gui
             GraphicsDevice.Clear(Color.Magenta);
-            spriteBatch.Begin(samplerState:SamplerState.PointClamp);
+            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
             // Draw game
-            GameHandler.Draw();
+            GameHandler.DrawTiles();
 
             // Player
             Xna.Vector2 playerDest = Constants.Middle + GameHandler.CameraDest - GameHandler.Camera;
@@ -148,6 +158,19 @@ namespace Quest
                 spriteBatch.Draw(RobotDown, playerDest, Color.White);
             else
                 spriteBatch.Draw(RobotIdle, playerDest, Color.White);
+
+            // Inventory darkening
+            if (GameHandler.Inventory.Opened)
+                spriteBatch.FillRectangle(new(Vector2.Zero, Constants.Window), new(0, 0, 0, 188));
+
+            // Close
+            spriteBatch.End();
+
+            // Non shader draws
+            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+
+            // Gui
+            GameHandler.DrawGui();
 
             // Text gui
             spriteBatch.DrawString(Arial, $"FPS: {1f / delta:0.0}\nCamera: {GameHandler.Camera}\nTiles Drawn: {GameHandler.TilesDrawn}\nTile Below: {(GameHandler.TileBelow == null ? "none" : GameHandler.TileBelow.Type)}\nCoord: {GameHandler.Coord}\nLevel: {GameHandler.Level.Name}", new Vector2(10, 10), Color.Black);

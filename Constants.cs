@@ -24,8 +24,9 @@ namespace Quest
 
         // Game
         public static readonly string[] TileNames = ["Sky", "Grass", "Water", "StoneWall", "Stairs", "Flooring", "Sand", "Dirt"];
-        public static readonly string[] ItemNames = ["Sword"];
+        public static readonly string[] ItemNames = ["Sword", "Pickaxe"];
         public const int PlayerSpeed = 200;
+        public const int MaxStack = 10;
 
         // Rendering and positioning
         public static readonly Xna.Rectangle ZeroSource = new(0, 0, (int)TilePixelSize.X, (int)TilePixelSize.Y); // Default tile source rect

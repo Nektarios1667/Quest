@@ -72,6 +72,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Gui/Slot.png
 
+#begin Images/Items/Pickaxe.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/Pickaxe.png
+
 #begin Images/Items/Sword.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -251,4 +263,10 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Tiles/WaterTilemap.png
+
+#begin Shaders/Grayscale.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/Grayscale.fx
 

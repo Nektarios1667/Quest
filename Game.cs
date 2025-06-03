@@ -55,11 +55,14 @@ namespace Quest
             Levels = [];
             TileTextures = [];
             Tiles = [];
-            Camera = new Xna.Vector2(128 * Constants.TileSize.X, 128 * Constants.TileSize.Y) - Constants.Middle;
+            Camera = new Vector2(128 * Constants.TileSize.X, 128 * Constants.TileSize.Y) - Constants.Middle;
             CameraDest = Camera;
             string dialog = "This is some example dialog! The NPC can talk to the player through this box which appears when near. The quick brown fox jumped over the lazy dog.";
             Gui = new();
-            Gui.Widgets = [new Dialog(Gui, new(Constants.Middle.X - 600, 800), new(1200, 100), new(194, 125, 64), Color.Black, dialog, Window.PixelOperator, borderColor: new(36, 19, 4))];
+            Gui.Widgets = [
+                new Dialog(Gui, new(Constants.Middle.X - 600, 800), new(1200, 100), new(194, 125, 64), Color.Black, dialog, Window.PixelOperator, borderColor: new(36, 19, 4)) { IsVisible = false},
+                new StatusBar(new(10, Constants.Window.Y - 35), new(300, 25), Color.Green, Color.Red, 100, 100),
+            ];
             Watch = new();
             FrameTimes = new()
             {
@@ -68,7 +71,8 @@ namespace Quest
                 { "GuiDraw", 0 },
             };
             Inventory = new(this, 6, 4);
-            Inventory.SetSlot(0, new("Sword", "A sharp, point sword", 999));
+            Inventory.SetSlot(0, new Item("Sword", "A sharp, pointy sword", amount:3, max:1));
+            Inventory.SetSlot(1, new Item("Pickaxe", "Sturdy iron pickaxe for mining", max:1));
         }
         public void Update(float deltaTime, MouseState previousMouseState, MouseState mouseState)
         {
@@ -76,11 +80,21 @@ namespace Quest
             Delta = deltaTime;
             Time += deltaTime;
 
+            // Camera
+            UpdateCamera();
+
+            // Gui
+            UpdateGui(deltaTime, previousMouseState, mouseState);
+        }
+        public void UpdateCamera()
+        {
             // Lerp camera
             if (Vector2.DistanceSquared(Camera, CameraDest) < 4) Camera = CameraDest; // If close enough snap to destination
             else if (CameraDest != Camera) // If not lerp towards destination
                 Camera = Vector2.Lerp(Camera, CameraDest, Constants.CameraRigidity);
-
+        }
+        public void UpdateGui(float deltaTime, MouseState previousMouseState, MouseState mouseState)
+        {
             // Gui
             Watch.Restart();
             Gui.Update(deltaTime);
@@ -92,6 +106,25 @@ namespace Quest
             FrameTimes["InventoryUpdate"] = Watch.Elapsed.TotalMilliseconds;
         }
         public void Draw()
+        {
+            // Tiles
+            DrawTiles();
+
+            // Gui
+            DrawGui();
+        }
+        public void DrawGui()
+        {
+            // Widgets
+            Watch.Restart();
+            Gui.Draw(Batch);
+            FrameTimes["GuiDraw"] = Watch.Elapsed.TotalMilliseconds;
+            // Inventory
+            Watch.Restart();
+            Inventory.Draw();
+            FrameTimes["InventoryDraw"] = Watch.Elapsed.TotalMilliseconds;
+        }
+        public void DrawTiles()
         {
             // Tiles
             Watch.Restart();
@@ -116,16 +149,6 @@ namespace Quest
                 TilesDrawn++;
             }
             FrameTimes["TileDraws"] = Watch.Elapsed.TotalMilliseconds;
-
-            // Widgets
-            Watch.Restart();
-            //Gui.Draw(Batch);
-            FrameTimes["GuiDraw"] = Watch.Elapsed.TotalMilliseconds;
-
-            // Inventory
-            Watch.Restart();
-            Inventory.Draw();
-            FrameTimes["InventoryDraw"] = Watch.Elapsed.TotalMilliseconds;
         }
         // Movements
         public void Move(Xna.Vector2 move)
@@ -265,7 +288,6 @@ namespace Quest
                 // Check if the player collides with a tile
                 Vector2 coord = (CameraDest + Constants.PlayerCorners[o]) / Constants.TileSize;
                 TileBelow = GetTile(new Point((int)Math.Round(coord.X), (int)Math.Round(coord.Y)));
-                TileBelow.Marked = true;
                 if (TileBelow == null || !TileBelow.IsWalkable) return false;
             }
             return true;
