@@ -9,6 +9,13 @@ namespace Quest
 {
     public static class Constants
     {
+        // Debug
+        public static readonly bool COLLISION_DEBUG = true; // Enable collision debug mode
+        public static readonly bool TEXT_INFO = true; // Show text info on screen
+        public static readonly bool FRAME_INFO = true; // Show frame info on screen
+        public static readonly bool LOG_INFO = true; // Log game info
+        public static readonly bool FRAME_BAR = true;
+
         // Tile and map
         public static readonly Xna.Vector2 TileSize = new(64, 64); // In-game tile size
         public static readonly Xna.Vector2 TilePixelSize = new(16, 16); // Native resolution of tile images
@@ -21,6 +28,7 @@ namespace Quest
         public static readonly Xna.Vector2 Middle = new(Window.X / 2, Window.Y / 2); // Center of the screen
         public static readonly Xna.Point MiddleCoord = (Middle / TileSize).ToPoint(); // Center tile coordinate
         public static readonly float CameraRigidity = .1f; // Camera smoothing weight
+        public const bool VSYNC = false;
 
         // Game
         public static readonly string[] TileNames = ["Sky", "Grass", "Water", "StoneWall", "Stairs", "Flooring", "Sand", "Dirt"];

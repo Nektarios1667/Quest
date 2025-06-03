@@ -8,6 +8,8 @@ using Xna = Microsoft.Xna.Framework;
 using Quest.Gui;
 using Quest.Tiles;
 using MonoGame.Extended;
+using System.Collections.Generic;
+using System.Security.Policy;
 
 namespace Quest
 {
@@ -25,8 +27,9 @@ namespace Quest
         public bool RMouseDown => mouseState.RightButton == ButtonState.Pressed;
         public bool RMouseRelease => mouseState.RightButton == ButtonState.Released && previousMouseState.RightButton == ButtonState.Pressed;
 
-        // Deltatime
+        // DeltadebugUpdateTime
         private float delta;
+        private Dictionary<string, double> frameTimes;
         // Devices
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
@@ -51,7 +54,15 @@ namespace Quest
         // Shaders
         public Effect Grayscale { get; private set; }
 
-        // Vectors
+        // Debug
+        private static readonly Color[] colors = {
+            Color.Purple, new Color(255, 128, 128), new Color(128, 255, 128), new Color(255, 255, 180), new Color(128, 255, 255),
+            Color.Brown, Color.Gray, new Color(192, 128, 64), new Color(64, 128, 192), new Color(192, 192, 64),
+            new Color(64, 192, 128), new Color(192, 64, 128), new Color(160, 80, 0), new Color(80, 160, 0), new Color(0, 160, 80),
+            new Color(160, 0, 80), new Color(96, 96, 192), new Color(192, 96, 96), new Color(96, 192, 96), new Color(192, 192, 96)
+        };
+        private float debugUpdateTime;
+        private float cacheDelta;
         public Window()
         {
             graphics = new GraphicsDeviceManager(this)
@@ -61,7 +72,7 @@ namespace Quest
                 PreferredBackBufferWidth = (int)Constants.Window.X,
                 PreferredBackBufferHeight = (int)Constants.Window.Y,
                 IsFullScreen = false,
-                //SynchronizeWithVerticalRetrace = false,
+                SynchronizeWithVerticalRetrace = Constants.VSYNC,
             };
             Content.RootDirectory = "Content";
             IsMouseVisible = false;
@@ -74,6 +85,9 @@ namespace Quest
             keyState = Keyboard.GetState();
             previousKeyState = keyState;
             mouseState = Mouse.GetState();
+            frameTimes = [];
+            debugUpdateTime = 0;
+            cacheDelta = 0f;
 
             base.Initialize();
         }
@@ -111,19 +125,22 @@ namespace Quest
 
         protected override void Update(GameTime gameTime)
         {
+            GameHandler.Watch.Restart();
+
             // Inputs
             keyState = Keyboard.GetState();
             mouseState = Mouse.GetState();
             // Exit
             if (IsKeyDown(Keys.Escape)) Exit();
 
-            // Delta time
+            // Delta debugUpdateTime
             delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             // Inventory
             if (IsKeyPressed(Keys.I))
                 GameHandler.Inventory.Opened = !GameHandler.Inventory.Opened;
 
+            // Movement
             if (!GameHandler.Inventory.Opened)
             {
                 // Movement
@@ -133,18 +150,26 @@ namespace Quest
                 moveY += IsAnyKeyDown(Keys.W, Keys.Up) ? -Constants.PlayerSpeed : 0;
                 moveY += IsAnyKeyDown(Keys.S, Keys.Down) ? Constants.PlayerSpeed : 0;
                 GameHandler.Move(moveX, moveY);
+            }
 
+            // Time
+            GameHandler.FrameTimes["InputUpdate"] = GameHandler.Watch.Elapsed.TotalMilliseconds;
+
+            // Game updates
+            if (!GameHandler.Inventory.Opened)
                 // Update
                 GameHandler.Update(delta, previousMouseState, mouseState);
-            }
             else // Only update gui
                 GameHandler.UpdateGui(delta, previousMouseState, mouseState);
 
             // Set previous key state
+            GameHandler.Watch.Restart();
             previousKeyState = keyState;
             previousMouseState = mouseState;
 
             // Final
+            debugUpdateTime += delta;
+            GameHandler.FrameTimes["OtherUpdates"] = GameHandler.Watch.Elapsed.TotalMilliseconds;
             base.Update(gameTime);
         }
 
@@ -158,6 +183,7 @@ namespace Quest
             GameHandler.DrawTiles();
 
             // Player
+            GameHandler.Watch.Restart();
             Xna.Vector2 playerDest = Constants.Middle + GameHandler.CameraDest - GameHandler.Camera;
             if (moveX < 0)
                 spriteBatch.Draw(RobotLeft, playerDest, Color.White);
@@ -169,6 +195,7 @@ namespace Quest
                 spriteBatch.Draw(RobotDown, playerDest, Color.White);
             else
                 spriteBatch.Draw(RobotIdle, playerDest, Color.White);
+            GameHandler.FrameTimes["PlayerDraw"] = GameHandler.Watch.Elapsed.TotalMilliseconds;
 
             // Inventory darkening
             if (GameHandler.Inventory.Opened)
@@ -183,10 +210,29 @@ namespace Quest
             // Gui
             GameHandler.DrawGui();
 
-            // Text gui
-            spriteBatch.DrawString(Arial, $"FPS: {1f / delta:0.0}\nCamera: {GameHandler.Camera}\nTile Below: {(GameHandler.TileBelow == null ? "none" : GameHandler.TileBelow.Type)}\nCoord: {GameHandler.Coord}\nLevel: {GameHandler.Level.Name}", new Vector2(10, 10), Color.Black);
-            string frameString = string.Join("\n", GameHandler.FrameTimes.Select(kv => $"{kv.Key}: {kv.Value:0.0}ms"));
-            spriteBatch.DrawString(Arial, frameString, new Vector2(Constants.Window.X - 200, 50), Color.Black);
+            // Text info
+            GameHandler.Watch.Restart();
+            if (Constants.TEXT_INFO)
+            {
+                // Background
+                spriteBatch.FillRectangle(new(0, 0, 200, 140), Color.Black * .8f);
+                spriteBatch.DrawString(Arial, $"FPS: {(cacheDelta != 0 ? 1f / cacheDelta : 0):0.0}\nTime: {debugUpdateTime:0.000}\nCamera: {GameHandler.Camera.X:0.0},{GameHandler.Camera.Y:0.0}\nTile Below: {(GameHandler.TileBelow == null ? "none" : GameHandler.TileBelow.Type)}\nCoord: {GameHandler.Coord}\nLevel: {GameHandler.Level.Name}", new Vector2(10, 10), Color.White);
+            }
+
+            // Frame info
+            if (Constants.FRAME_INFO)
+            {
+                spriteBatch.FillRectangle(new(Constants.Window.X - 190, 0, 190, GameHandler.FrameTimes.Count * 20), Color.Black * .8f);
+                string frameString = string.Join("\n", frameTimes.Select(kv => $"{kv.Key}: {kv.Value:0.0}ms"));
+                spriteBatch.DrawString(Arial, frameString, new Vector2(Constants.Window.X - 180, 10), Color.White);
+            }
+            GameHandler.FrameTimes["DebugTextDraw"] = GameHandler.Watch.Elapsed.TotalMilliseconds;
+
+            // Frame bar
+            GameHandler.Watch.Restart();
+            if (Constants.FRAME_BAR)
+                DrawFrameBar();
+            GameHandler.FrameTimes["FrameBarDraw"] = GameHandler.Watch.Elapsed.TotalMilliseconds;
 
             // Cursor
             spriteBatch.Draw(CursorArrow, mouseState.Position.ToVector2(), LMouseDown ? Color.DarkGray : Color.White);
@@ -235,6 +281,31 @@ namespace Quest
         {
             foreach (Keys key in keys) { if (!(keyState.IsKeyDown(key) && !previousKeyState.IsKeyDown(key))) return false; }
             return true;
+        }
+        // For cleaner code
+        public void DrawFrameBar()
+        {
+            // Update info twice a second
+            if (debugUpdateTime >= .5)
+            {
+                cacheDelta = delta;
+                frameTimes = new Dictionary<string, double>(GameHandler.FrameTimes);
+                debugUpdateTime = 0;
+            }
+            // Background
+            spriteBatch.FillRectangle(new(Constants.Window.X - 320, Constants.Window.Y - frameTimes.Count * 20 - 50, 320, 1000), Color.Black * .8f);
+
+            // Labels and bars
+            int start = 0;
+            int c = 0;
+            spriteBatch.FillRectangle(new(Constants.Window.X - 310, Constants.Window.Y - 40, 300, 25), Color.White);
+            foreach (KeyValuePair<string, double> process in frameTimes)
+            {
+                spriteBatch.DrawString(Arial, process.Key, new(Constants.Window.X - Arial.MeasureString(process.Key).X - 5, Constants.Window.Y - 20 * c - 60), colors[c]);
+                spriteBatch.FillRectangle(new(Constants.Window.X - 310 + start, Constants.Window.Y - 40, (int)(process.Value / (cacheDelta * 1000) * 300), 25), colors[c]);
+                start += (int)(process.Value / (cacheDelta * 1000)) * 300;
+                c++;
+            }
         }
     }
 }

@@ -34,7 +34,7 @@ namespace Quest
             Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Input")];
             Console.WriteLine($"[Input] {message}");
             Console.ForegroundColor = ConsoleColor.White; // Reset color
-            return Console.ReadLine();
+            return Console.ReadLine() ?? "";
         }
         public static void Print(string message)
         {
@@ -42,6 +42,8 @@ namespace Quest
         }
         public static void Log(string message)
         {
+            if (!Constants.LOG_INFO) return; // Skip logging if not enabled
+
             Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Log")];
             Console.WriteLine($"[Log] {message}");
             Console.ForegroundColor = ConsoleColor.White; // Reset color

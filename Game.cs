@@ -177,6 +177,8 @@ namespace Quest
             Coord = Vector2.Round(CameraDest / Constants.TileSize);
             TileBelow = GetTile((int)Coord.X, (int)Coord.Y);
             TileBelow.OnPlayerEnter(this);
+            // Debug
+            if (Constants.COLLISION_DEBUG) TileBelow.Marked = true;
         }
         public void Move(float x, float y)
         {
