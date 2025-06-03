@@ -18,6 +18,12 @@ namespace Quest
         private KeyboardState previousKeyState;
         private MouseState mouseState;
         private MouseState previousMouseState;
+        public bool LMouseClick => mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Released;
+        public bool LMouseDown => mouseState.LeftButton == ButtonState.Pressed;
+        public bool LMouseRelease => mouseState.LeftButton == ButtonState.Released && previousMouseState.LeftButton == ButtonState.Pressed;
+        public bool RMouseClick => mouseState.RightButton == ButtonState.Pressed && previousMouseState.RightButton == ButtonState.Released;
+        public bool RMouseDown => mouseState.RightButton == ButtonState.Pressed;
+        public bool RMouseRelease => mouseState.RightButton == ButtonState.Released && previousMouseState.RightButton == ButtonState.Pressed;
 
         // Deltatime
         private float delta;
@@ -25,6 +31,8 @@ namespace Quest
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         public GameHandler GameHandler;
+        // Textures
+        public Texture2D CursorArrow { get; private set; }
 
         // Fonts
         public SpriteFont Arial { get; private set; }
@@ -53,10 +61,10 @@ namespace Quest
                 PreferredBackBufferWidth = (int)Constants.Window.X,
                 PreferredBackBufferHeight = (int)Constants.Window.Y,
                 IsFullScreen = false,
-                //SynchronizeWithVerticalRetrace = true,
+                //SynchronizeWithVerticalRetrace = false,
             };
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
             IsFixedTimeStep = false;
         }
 
@@ -96,6 +104,9 @@ namespace Quest
 
             // Shaders
             Grayscale = Content.Load<Effect>("Shaders/Grayscale");
+
+            // Other
+            CursorArrow = Content.Load<Texture2D>("Images/Gui/CursorArrow");
         }
 
         protected override void Update(GameTime gameTime)
@@ -173,9 +184,12 @@ namespace Quest
             GameHandler.DrawGui();
 
             // Text gui
-            spriteBatch.DrawString(Arial, $"FPS: {1f / delta:0.0}\nCamera: {GameHandler.Camera}\nTiles Drawn: {GameHandler.TilesDrawn}\nTile Below: {(GameHandler.TileBelow == null ? "none" : GameHandler.TileBelow.Type)}\nCoord: {GameHandler.Coord}\nLevel: {GameHandler.Level.Name}", new Vector2(10, 10), Color.Black);
+            spriteBatch.DrawString(Arial, $"FPS: {1f / delta:0.0}\nCamera: {GameHandler.Camera}\nTile Below: {(GameHandler.TileBelow == null ? "none" : GameHandler.TileBelow.Type)}\nCoord: {GameHandler.Coord}\nLevel: {GameHandler.Level.Name}", new Vector2(10, 10), Color.Black);
             string frameString = string.Join("\n", GameHandler.FrameTimes.Select(kv => $"{kv.Key}: {kv.Value:0.0}ms"));
             spriteBatch.DrawString(Arial, frameString, new Vector2(Constants.Window.X - 200, 50), Color.Black);
+
+            // Cursor
+            spriteBatch.Draw(CursorArrow, mouseState.Position.ToVector2(), LMouseDown ? Color.DarkGray : Color.White);
 
             // Final
             spriteBatch.End();

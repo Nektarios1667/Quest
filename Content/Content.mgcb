@@ -48,6 +48,18 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/PixelOperator.spritefont
 
+#begin Images/Gui/CursorArrow.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Gui/CursorArrow.png
+
 #begin Images/Gui/DialogBox.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -59,6 +71,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Gui/DialogBox.png
+
+#begin Images/Gui/GuiBackground.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Gui/GuiBackground.png
 
 #begin Images/Gui/Slot.png
 /importer:TextureImporter

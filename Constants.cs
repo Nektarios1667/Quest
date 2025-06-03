@@ -20,7 +20,7 @@ namespace Quest
         public static readonly Xna.Vector2 Window = new(1400, 900); // Game window resolution
         public static readonly Xna.Vector2 Middle = new(Window.X / 2, Window.Y / 2); // Center of the screen
         public static readonly Xna.Point MiddleCoord = (Middle / TileSize).ToPoint(); // Center tile coordinate
-        public static readonly float CameraRigidity = 0.1f; // Camera smoothing weight
+        public static readonly float CameraRigidity = .1f; // Camera smoothing weight
 
         // Game
         public static readonly string[] TileNames = ["Sky", "Grass", "Water", "StoneWall", "Stairs", "Flooring", "Sand", "Dirt"];
@@ -37,7 +37,7 @@ namespace Quest
 
         // Colors
         public static readonly Xna.Color NearBlack = new(85, 85, 85);
-        public static readonly Xna.Color FocusBlue = new(209, 224, 230);
+        public static readonly Xna.Color FocusBlue = new(174, 200, 209);
         public static readonly Xna.Color CottonCandy = new(242, 182, 240);
 
         // Texture default sizes

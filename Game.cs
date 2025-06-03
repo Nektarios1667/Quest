@@ -30,7 +30,6 @@ namespace Quest
         // Properties
         public GuiHandler Gui { get; private set; } // GUI handler
         public Window Window { get; private set; }
-        public int TilesDrawn { get; private set; } // For debugging
         public Xna.Vector2 Camera { get; set; } // Current camera position w/ smooth movement
         public Xna.Vector2 CameraDest { get; set; } // Where the camera is going
         public float Delta { get; private set; }
@@ -43,6 +42,7 @@ namespace Quest
         public Inventory Inventory { get; set; }
         // Textures
         public Texture2D Slot { get; private set; }
+        public Texture2D GuiBackground { get; private set; }
         // Private
         private Xna.Vector2 tileSize;
         private float Time = 0;
@@ -81,17 +81,19 @@ namespace Quest
             Time += deltaTime;
 
             // Camera
-            UpdateCamera();
+            UpdateCamera(deltaTime);
 
             // Gui
             UpdateGui(deltaTime, previousMouseState, mouseState);
         }
-        public void UpdateCamera()
+        public void UpdateCamera(float deltaTime)
         {
             // Lerp camera
-            if (Vector2.DistanceSquared(Camera, CameraDest) < 4) Camera = CameraDest; // If close enough snap to destination
-            else if (CameraDest != Camera) // If not lerp towards destination
-                Camera = Vector2.Lerp(Camera, CameraDest, Constants.CameraRigidity);
+            Watch.Restart();
+            if (Vector2.DistanceSquared(Camera, CameraDest) < 4 * deltaTime * 60) Camera = CameraDest; // If close enough snap to destination
+            if (CameraDest != Camera) // If not, lerp towards destination
+                Camera = Vector2.Lerp(Camera, CameraDest, 1f - MathF.Pow(1f - Constants.CameraRigidity, deltaTime * 60f));
+            FrameTimes["CameraUpdate"] = Watch.Elapsed.TotalMilliseconds;
         }
         public void UpdateGui(float deltaTime, MouseState previousMouseState, MouseState mouseState)
         {
@@ -130,23 +132,22 @@ namespace Quest
             Watch.Restart();
             if (Tiles == null || Tiles.Length == 0) return;
 
-            TilesDrawn = 0;
-            for (int t = 0; t < Tiles.Length; t++)
-            {
-                Tile tile = Tiles[t];
-                // Draw each tile using the sprite batch
-                Xna.Vector2 dest = tile.Location.ToVector2() * tileSize - Camera;
-                dest += Constants.Middle;
-                // Check x in bounds
-                if (dest.X + Constants.TileSize.X < 0 || dest.X > Constants.Window.X) continue;
-                if (dest.Y + Constants.TileSize.Y * 2 < 0 || dest.Y > Constants.Window.Y) continue;
-                dest.Round();
-                // Draw
-                Texture2D? texture = TileTextures.TryGetValue(tile.Type.ToString(), out var tex) ? tex : null;
-                Color color = tile.Type == TileType.Water ? Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(Time + tile.Location.X + tile.Location.Y)) : (tile.Marked ? Color.Red : Color.White);
-                tile.Marked = false; // Reset marked state for next frame
-                TryDraw(texture, new Rectangle(dest.ToPoint(), Constants.TileSize.ToPoint()), TileTextureSource(tile), color, 0f, Vector2.Zero, Constants.TileSizeScale);
-                TilesDrawn++;
+            // Get bounds
+            Point start = ((Camera - Constants.Middle) / Constants.TileSize).ToPoint();
+            Point end = ((Camera + Constants.Middle) / Constants.TileSize).ToPoint();
+
+            for (int y = start.Y; y <= end.Y; y++) {
+                for (int x = start.X; x <= end.X; x++) {
+                    Tile tile = GetTile(x, y);
+                    // Draw each tile using the sprite batch
+                    Xna.Vector2 dest = tile.Location.ToVector2() * tileSize - Camera;
+                    dest += Constants.Middle;
+                    // Draw
+                    Texture2D? texture = TileTextures.TryGetValue(tile.Type.ToString(), out var tex) ? tex : null;
+                    Color color = tile.Type == TileType.Water ? Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(Time + tile.Location.X + tile.Location.Y)) : (tile.Marked ? Color.Red : Color.White);
+                    tile.Marked = false; // Reset marked state for next frame
+                    TryDraw(texture, new Rectangle(dest.ToPoint(), Constants.TileSize.ToPoint()), TileTextureSource(tile), color, 0f, Vector2.Zero, Constants.TileSizeScale);
+                }
             }
             FrameTimes["TileDraws"] = Watch.Elapsed.TotalMilliseconds;
         }
@@ -320,6 +321,9 @@ namespace Quest
             };
         }
         // Utilities
+        public int Flatten(Xna.Point pos) { return pos.X + pos.Y * Constants.MapSize.X; }
+        public int Flatten(int x, int y) { return x + y * Constants.MapSize.X; }
+        public int Flatten(Xna.Vector2 pos) { return Flatten((int)pos.X, (int)pos.Y); }
         public bool TryDraw(Texture2D? texture, Rectangle rect, Rectangle? sourceRect = null, Color color = default, float rotation = 0, Vector2 origin = default, Vector2 scale = default, SpriteEffects spriteEffect = default, float depth = 0)
         {
             // Defaults
