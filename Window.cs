@@ -10,6 +10,7 @@ using Quest.Tiles;
 using MonoGame.Extended;
 using System.Collections.Generic;
 using System.Security.Policy;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace Quest
 {
@@ -43,11 +44,9 @@ namespace Quest
         public SpriteFont ArialLarge { get; private set; }
         public SpriteFont PixelOperator { get; private set; }
         // Robot sprites
-        public Texture2D RobotIdle { get; private set; }
-        public Texture2D RobotUp { get; private set; }
-        public Texture2D RobotDown { get; private set; }
-        public Texture2D RobotLeft { get; private set; }
-        public Texture2D RobotRight { get; private set; }
+        public Texture2D BlueMage { get; private set; }
+        public Point BlueMageSize { get; private set; }
+        public Point BlueMageHalfSize { get; private set; }
         // Movements
         private int moveX;
         private int moveY;
@@ -109,12 +108,10 @@ namespace Quest
             GameHandler.LoadLevel(0);
             GameHandler.LoadContent(Content);
 
-            // Robot sprites
-            RobotIdle = Content.Load<Texture2D>("Images/Robot/Robot_F");
-            RobotDown = Content.Load<Texture2D>("Images/Robot/Robot_D");
-            RobotUp = Content.Load<Texture2D>("Images/Robot/Robot_U");
-            RobotLeft = Content.Load<Texture2D>("Images/Robot/Robot_L");
-            RobotRight = Content.Load<Texture2D>("Images/Robot/Robot_R");
+            // Characters
+            BlueMage = Content.Load<Texture2D>("Images/Characters/BlueMage");
+            BlueMageSize = new(BlueMage.Width / 4, BlueMage.Height / 5);
+            BlueMageHalfSize = new(BlueMageSize.X / 2, BlueMageSize.Y / 2);
 
             // Shaders
             Grayscale = Content.Load<Effect>("Shaders/Grayscale");
@@ -184,22 +181,14 @@ namespace Quest
 
             // Player
             GameHandler.Watch.Restart();
-            Xna.Vector2 playerDest = Constants.Middle + GameHandler.CameraDest - GameHandler.Camera;
-            if (moveX < 0)
-                spriteBatch.Draw(RobotLeft, playerDest, Color.White);
-            else if (moveX > 0)
-                spriteBatch.Draw(RobotRight, playerDest, Color.White);
-            else if (moveY < 0)
-                spriteBatch.Draw(RobotUp, playerDest, Color.White);
-            else if (moveY > 0)
-                spriteBatch.Draw(RobotDown, playerDest, Color.White);
-            else
-                spriteBatch.Draw(RobotIdle, playerDest, Color.White);
+            DrawPlayer();
+            if (Constants.DRAW_HITBOXES)
+                DrawPlayerHitbox();
             GameHandler.FrameTimes["PlayerDraw"] = GameHandler.Watch.Elapsed.TotalMilliseconds;
 
             // Inventory darkening
             if (GameHandler.Inventory.Opened)
-                spriteBatch.FillRectangle(new(Vector2.Zero, Constants.Window), new(0, 0, 0, 188));
+                spriteBatch.FillRectangle(new(Vector2.Zero, Constants.Window), Constants.DarkenScreen);
 
             // Close
             spriteBatch.End();
@@ -216,7 +205,7 @@ namespace Quest
             {
                 // Background
                 spriteBatch.FillRectangle(new(0, 0, 200, 140), Color.Black * .8f);
-                spriteBatch.DrawString(Arial, $"FPS: {(cacheDelta != 0 ? 1f / cacheDelta : 0):0.0}\nTime: {debugUpdateTime:0.000}\nCamera: {GameHandler.Camera.X:0.0},{GameHandler.Camera.Y:0.0}\nTile Below: {(GameHandler.TileBelow == null ? "none" : GameHandler.TileBelow.Type)}\nCoord: {GameHandler.Coord}\nLevel: {GameHandler.Level.Name}", new Vector2(10, 10), Color.White);
+                spriteBatch.DrawString(Arial, $"FPS: {(cacheDelta != 0 ? 1f / cacheDelta : 0):0.0}\nTime: {GameHandler.Time:0.00}\nCamera: {GameHandler.Camera.X:0.0},{GameHandler.Camera.Y:0.0}\nTile Below: {(GameHandler.TileBelow == null ? "none" : GameHandler.TileBelow.Type)}\nCoord: {GameHandler.Coord}\nLevel: {GameHandler.Level.Name}", new Vector2(10, 10), Color.White);
             }
 
             // Frame info
@@ -246,6 +235,7 @@ namespace Quest
         {
             // Defaults
             if (scale == default) scale = Vector2.One;
+            if (color == default) color = Color.White;
 
             // Missing texture
             if (texture == null)
@@ -306,6 +296,29 @@ namespace Quest
                 start += (int)(process.Value / (cacheDelta * 1000)) * 300;
                 c++;
             }
+        }
+        public void DrawPlayerHitbox()
+        {
+            Vector2[] points = new Vector2[4];
+            for (int c = 0; c < Constants.PlayerCorners.Length; c++)
+                points[c] = Constants.Middle + Constants.PlayerCorners[c];
+            spriteBatch.DrawLine(points[0], points[1], Color.Lime, 1); // Top line
+            spriteBatch.DrawLine(points[2], points[3], Color.Lime, 1); // Bottom line
+            spriteBatch.DrawLine(points[0], points[2], Color.Lime, 1); // Left line
+            spriteBatch.DrawLine(points[1], points[3], Color.Lime, 1); // Right line
+            spriteBatch.DrawLine(points[0], points[3], Color.Lime, 1); // Top left to bottom right
+            spriteBatch.DrawLine(points[1], points[2], Color.Lime, 1); // Top right to bottom left
+        }
+        public void DrawPlayer()
+        {
+            int sourceRow = 0;
+            if (moveX == 0 && moveY == 0) sourceRow = 0;
+            else if (moveX < 0) sourceRow = 1;
+            else if (moveX > 0) sourceRow = 3;
+            else if (moveY > 0) sourceRow = 2;
+            else if (moveY < 0) sourceRow = 4;
+            Rectangle source = new((int)(GameHandler.Time * (sourceRow == 0 ? 1.5f : 6)) % 4 * BlueMageSize.X, sourceRow * BlueMageSize.Y, BlueMageSize.X, BlueMageSize.Y);
+            TryDraw(BlueMage, new(Constants.Middle.ToPoint() - BlueMageHalfSize, BlueMageSize), sourceRect: source);
         }
     }
 }

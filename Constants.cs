@@ -14,7 +14,8 @@ namespace Quest
         public static readonly bool TEXT_INFO = true; // Show text info on screen
         public static readonly bool FRAME_INFO = true; // Show frame info on screen
         public static readonly bool LOG_INFO = true; // Log game info
-        public static readonly bool FRAME_BAR = true;
+        public static readonly bool FRAME_BAR = true; // Frame time graphical bar
+        public static readonly bool DRAW_HITBOXES = true; // Draw hitboxes for entities
 
         // Tile and map
         public static readonly Xna.Vector2 TileSize = new(64, 64); // In-game tile size
@@ -38,7 +39,7 @@ namespace Quest
 
         // Rendering and positioning
         public static readonly Xna.Rectangle ZeroSource = new(0, 0, (int)TilePixelSize.X, (int)TilePixelSize.Y); // Default tile source rect
-        public static readonly Xna.Vector2[] PlayerCorners = [new(-24, -10), new(24, -10), new(-24, 24), new(24, 24)]; // Player bounding box corners
+        public static readonly Xna.Vector2[] PlayerCorners = [new(-23, 12), new(23, 12), new(-23, 45), new(23, 45)]; // Player bounding box corners
 
         // Utility
         public static readonly Xna.Point NegOne = new(-1, -1); // Flipping vector
@@ -47,6 +48,7 @@ namespace Quest
         public static readonly Xna.Color NearBlack = new(85, 85, 85);
         public static readonly Xna.Color FocusBlue = new(174, 200, 209);
         public static readonly Xna.Color CottonCandy = new(242, 182, 240);
+        public static readonly Xna.Color DarkenScreen = new(0, 0, 0, 188);
 
         // Texture default sizes
         public static readonly Xna.Point SlotTextureSize = new(80, 80); // Default size for item slots

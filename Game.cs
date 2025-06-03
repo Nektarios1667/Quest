@@ -45,7 +45,7 @@ namespace Quest
         public Texture2D GuiBackground { get; private set; }
         // Private
         private Xna.Vector2 tileSize;
-        private float Time = 0;
+        public float Time { get; private set; }
         public GameHandler(Window window, SpriteBatch spriteBatch)
         {
             // Initialize the game
@@ -290,20 +290,11 @@ namespace Quest
             {
                 // Check if the player collides with a tile
                 Vector2 coord = (CameraDest + Constants.PlayerCorners[o]) / Constants.TileSize;
-                TileBelow = GetTile(new Point((int)Math.Round(coord.X), (int)Math.Round(coord.Y)));
+                TileBelow = GetTile((int)Math.Floor(coord.X), (int)Math.Floor(coord.Y));
+                TileBelow.Marked = true;
                 if (TileBelow == null || !TileBelow.IsWalkable) return false;
             }
             return true;
-        }
-        public bool IsTileWalkable(Xna.Vector2 offsetCoord = default)
-        {
-            // Check if level loaded
-            if (Level == null) return false;
-            // Out of bounds
-            Coord = Vector2.Round(CameraDest / Constants.TileSize);
-            // Check if the tile is walkable
-            TileBelow = GetTile((Coord + offsetCoord).ToPoint());
-            return TileBelow != null && TileBelow.IsWalkable;
         }
         public static Tile TileFromId(int id, Xna.Point location)
         {
