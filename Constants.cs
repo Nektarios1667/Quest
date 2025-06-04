@@ -28,7 +28,7 @@ namespace Quest
         public static readonly Xna.Vector2 Window = new(1400, 900); // Game window resolution
         public static readonly Xna.Vector2 Middle = new(Window.X / 2, Window.Y / 2); // Center of the screen
         public static readonly Xna.Point MiddleCoord = (Middle / TileSize).ToPoint(); // Center tile coordinate
-        public static readonly float CameraRigidity = .1f; // Camera smoothing weight
+        public static readonly float CameraRigidity = .07f; // Camera smoothing weight
         public const bool VSYNC = false;
 
         // Game

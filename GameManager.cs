@@ -365,7 +365,7 @@ namespace Quest
             else if (Window.moveY > 0) sourceRow = 2;
             else if (Window.moveY < 0) sourceRow = 4;
             Rectangle source = new((int)(Time * (sourceRow == 0 ? 1.5f : 6)) % 4 * MageSize.X, sourceRow * MageSize.Y, MageSize.X, MageSize.Y);
-            Rectangle rect = new(Constants.Middle.ToPoint() - MageHalfSize, MageSize);
+            Rectangle rect = new((Constants.Middle - MageHalfSize.ToVector2() + CameraDest - Camera).ToPoint(), MageSize);
             DrawTexture(Batch, TextureID.BlueMage, rect, source: source);
         }
     }
