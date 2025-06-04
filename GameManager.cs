@@ -13,11 +13,11 @@ using System.Diagnostics;
 using System.IO.Compression;
 using MonoGame.Extended;
 using Microsoft.Xna.Framework.Input;
-using System.Reflection.Metadata;
+using static Quest.TextureManager;
 
 namespace Quest
 {
-    public class GameHandler
+    public class GameManager
     {
         public NPC[] NPCs { get; private set; }
         // Debug
@@ -26,31 +26,25 @@ namespace Quest
         public Xna.Vector2 Coord { get; private set; }
         public Dictionary<string, double> FrameTimes { get; private set; }
         // Properties
-        public GuiHandler Gui { get; private set; } // GUI handler
+        public GuiManager Gui { get; private set; } // GUI handler
         public Window Window { get; private set; }
         public Xna.Vector2 Camera { get; set; } // Current camera position w/ smooth movement
         public Xna.Vector2 CameraDest { get; set; } // Where the camera is going
         public float Delta { get; private set; }
         public SpriteBatch Batch { get; private set; }
         public List<Level> Levels { get; private set; }
-        public Level Level { get; private set; }
+        public Level? Level { get; private set; }
         public Dictionary<string, Texture2D> TileTextures { get; private set; }
         public Tile[] Tiles { get; private set; }
         // Inventory
         public Inventory Inventory { get; set; }
-        // Textures
-
-        public Texture2D Slot { get; private set; }
-        public Texture2D GuiBackground { get; private set; }
         // Mage sprites
-        public Texture2D BlueMage { get; private set; }
-        public Texture2D WhiteMage { get; private set; }
         public Point MageSize { get; private set; }
         public Point MageHalfSize { get; private set; }
         // Private
         private Xna.Vector2 tileSize;
         public float Time { get; private set; }
-        public GameHandler(Window window, SpriteBatch spriteBatch)
+        public GameManager(Window window, SpriteBatch spriteBatch)
         {
             // Initialize the game
             Window = window;
@@ -66,10 +60,17 @@ namespace Quest
                 new StatusBar(new(10, Constants.Window.Y - 35), new(300, 25), Color.Green, Color.Red, 100, 100),
             ];
             Watch = new();
-            FrameTimes = new();
+            FrameTimes = [];
             Inventory = new(this, 6, 4);
-            Inventory.SetSlot(0, new Item("Sword", "A sharp, pointy sword", amount:3, max:1));
+            Inventory.SetSlot(0, new Item("Sword", "A sharp, pointy sword", max:1));
             Inventory.SetSlot(1, new Item("Pickaxe", "Sturdy iron pickaxe for mining", max:1));
+
+            // Characters textures
+            MageSize = GetTexture(TextureID.BlueMage).Texture.Bounds.Size / new Point(4, 5);
+            MageHalfSize = new(MageSize.X / 2, MageSize.Y / 2);
+
+            // NPCS
+            NPCs = [new(this, TextureID.WhiteMage, new(128, 131), "Saruman", " I have looked upon the Eye of Sauron. It is too strong for us. We cannot hope to match him. ... We must join with Sauron.", scale: 2)];
         }
         public void Update(float deltaTime, MouseState previousMouseState, MouseState mouseState)
         {
@@ -187,39 +188,12 @@ namespace Quest
             TileBelow = GetTile((int)Coord.X, (int)Coord.Y);
             if (TileBelow == null) return;
             TileBelow.OnPlayerEnter(this);
-            TileBelow.Marked = true;
             // Debug
             if (Constants.COLLISION_DEBUG) TileBelow.Marked = true;
         }
         public void Move(float x, float y)
         {
             Move(new Xna.Vector2(x, y));
-        }
-        // Loading and reading
-        public void LoadContent(ContentManager content)
-        {
-            // Dynamically load tile images
-            foreach (string filename in Constants.TileNames)
-            {
-                if (!string.IsNullOrEmpty(filename))
-                {
-                    Texture2D texture = content.Load<Texture2D>($"Images/Tiles/{filename}Tilemap");
-                    TileTextures[filename] = texture;
-                }
-            }
-
-            // Characters textures
-            WhiteMage = content.Load<Texture2D>("Images/Characters/WhiteMage");
-            BlueMage = content.Load<Texture2D>("Images/Characters/BlueMage");
-            MageSize = new(BlueMage.Width / 4, BlueMage.Height / 5);
-            MageHalfSize = new(MageSize.X / 2, MageSize.Y / 2);
-
-            // NPCS
-            NPCs = [new(this, WhiteMage, new(131, 131), "Saruman the White", " I have looked upon the Eye of Sauron. It is too strong for us. We cannot hope to match him. ... We must join with Sauron.", scale:2f)];
-
-            // Load gui
-            Gui.LoadContent(content);
-            Inventory.LoadContent(content);
         }
         // Levels
         public void LoadLevel(int levelIndex)
@@ -336,26 +310,6 @@ namespace Quest
         public int Flatten(Xna.Point pos) { return pos.X + pos.Y * Constants.MapSize.X; }
         public int Flatten(int x, int y) { return x + y * Constants.MapSize.X; }
         public int Flatten(Xna.Vector2 pos) { return Flatten((int)pos.X, (int)pos.Y); }
-        public bool TryDraw(Texture2D? texture, Rectangle rect, Rectangle? sourceRect = null, Color color = default, float rotation = 0, Vector2 origin = default, Vector2 scale = default, SpriteEffects spriteEffect = default, float depth = 0)
-        {
-            // Defaults
-            if (scale == default) scale = Vector2.One;
-            if (color == default) color = Color.White;
-
-            // Missing texture
-            if (texture == null)
-            {
-                int halfW = rect.Width / 2;
-                int halfH = rect.Height / 2;
-                Batch.FillRectangle(new(rect.X, rect.Y, halfW, halfH), Color.Magenta); // top left
-                Batch.FillRectangle(new(rect.X + halfW, rect.Y, halfW, halfH), Color.Black); // top right
-                Batch.FillRectangle(new(rect.X, rect.Y + halfH, halfW, halfH), Color.Black); // bottom left
-                Batch.FillRectangle(new(rect.X + halfW, rect.Y + halfH, halfW, halfH), Color.Magenta); // bottom right
-                return false;
-            }
-            Batch.Draw(texture, rect.Location.ToVector2(), sourceRect, color, rotation, origin, scale, spriteEffect, depth);
-            return true;
-        }
         public Tile? GetTile(Xna.Point coord)
         {
             if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
@@ -399,12 +353,7 @@ namespace Quest
             Vector2[] points = new Vector2[4];
             for (int c = 0; c < Constants.PlayerCorners.Length; c++)
                 points[c] = Constants.Middle + Constants.PlayerCorners[c];
-            Batch.DrawLine(points[0], points[1], Color.Lime, 1); // Top line
-            Batch.DrawLine(points[2], points[3], Color.Lime, 1); // Bottom line
-            Batch.DrawLine(points[0], points[2], Color.Lime, 1); // Left line
-            Batch.DrawLine(points[1], points[3], Color.Lime, 1); // Right line
-            Batch.DrawLine(points[0], points[3], Color.Lime, 1); // Top left to bottom right
-            Batch.DrawLine(points[1], points[2], Color.Lime, 1); // Top right to bottom left
+            Batch.FillRectangle(new Rectangle((int)points[0].X, (int)points[0].Y, (int)(points[2].X - points[0].X), (int)(points[2].Y - points[0].Y)), Constants.DebugPinkTint);
         }
         public void DrawPlayer()
         {
@@ -416,7 +365,7 @@ namespace Quest
             else if (Window.moveY < 0) sourceRow = 4;
             Rectangle source = new((int)(Time * (sourceRow == 0 ? 1.5f : 6)) % 4 * MageSize.X, sourceRow * MageSize.Y, MageSize.X, MageSize.Y);
             Rectangle rect = new(Constants.Middle.ToPoint() - MageHalfSize, MageSize);
-            TryDraw(BlueMage, rect, sourceRect: source);
+            DrawTexture(Batch, TextureID.BlueMage, rect, source: source);
         }
     }
 }

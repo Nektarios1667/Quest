@@ -8,15 +8,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Quest.Gui
 {
-    public class GuiHandler
+    public class GuiManager
     {
         public List<Widget> Widgets { get; set; }
-        public Texture2D DialogBox { get; private set; }
-        public GuiHandler()
+        public GuiManager()
         {
             // Initialize the GUI handler
             Widgets = [];
-            DialogBox = null;
         }
         public void Update(float deltaTime)
         {
@@ -36,10 +34,6 @@ namespace Quest.Gui
                     widget.Draw(batch);
                 }
             }
-        }
-        public void LoadContent(ContentManager content)
-        {
-            DialogBox = content.Load<Texture2D>("Images/Gui/DialogBox");
         }
     }
 }

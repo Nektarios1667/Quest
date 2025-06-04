@@ -18,7 +18,7 @@ namespace Quest.Tiles
             DestLevel = destLevel;
             DestPosition = destPosition;
         }
-        public override void OnPlayerEnter(GameHandler game)
+        public override void OnPlayerEnter(GameManager game)
         {
             // Load another level
             Console.WriteLine($"[System] Teleporting to level '{DestLevel}' @ {DestPosition.X}, {DestPosition.Y}");

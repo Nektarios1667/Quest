@@ -13,7 +13,7 @@ using Quest.Tiles;
 using MonoGUI;
 using System.IO.Compression;
 using System.Threading.Tasks;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static Quest.TextureManager;
 
 namespace Quest.Editor
 {
@@ -104,17 +104,6 @@ namespace Quest.Editor
             ArialSmall = Content.Load<SpriteFont>("Fonts/ArialSmall");
             ArialLarge = Content.Load<SpriteFont>("Fonts/ArialLarge");
             Logger.Log("Loaded fonts.");
-
-            // Dynamically load images
-            foreach (string filename in Constants.TileNames)
-            {
-                if (!string.IsNullOrEmpty(filename))
-                {
-                    Logger.Log($"Loaded tile image '{filename}'");
-                    Texture2D texture = Content.Load<Texture2D>($"Images/Tiles/{filename}Tilemap");
-                    TileTextures[filename] = texture;
-                }
-            }
         }
 
         protected override void Update(GameTime gameTime)
@@ -192,7 +181,7 @@ namespace Quest.Editor
                     if (Selection == (int)TileType.Stairs)
                         tile = new Stairs(mouseCoord, "_null", Constants.MiddleCoord);
                     else
-                        tile = GameHandler.TileFromId(Selection, mouseCoord);
+                        tile = GameManager.TileFromId(Selection, mouseCoord);
 
                     SetTile(tile);
                     Logger.Log($"Set tile to '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}.");
@@ -251,9 +240,10 @@ namespace Quest.Editor
                 if (dest.Y + Constants.TileSize.Y * 2 < 0 || dest.Y > Constants.Window.Y) continue;
                 dest.Round();
                 // Draw
-                Texture2D texture = TileTextures[tile.Type.ToString()];
+                TextureID texture = (TextureID)(Enum.TryParse(typeof(TextureID), tile.GetType().ToString(), out var tileTex) ? tileTex : TextureID.Null);
                 Color color = tile.Type == TileType.Water ? Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(time + tile.Location.X + tile.Location.Y)) : Color.White;
-                spriteBatch.Draw(texture, dest, TileTextureSource(tile), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
+                Rectangle rect = new((int)dest.X, (int)dest.Y, (int)tileSize.X, (int)tileSize.Y);
+                DrawTexture(spriteBatch, texture, rect, source:TileTextureSource(tile), scale: new(4));
                 TilesDrawn++;
             }
 
@@ -264,7 +254,8 @@ namespace Quest.Editor
             // Cursor
             Vector2 cursorPos = mouseCoord.ToVector2() * tileSize - Camera;
             spriteBatch.FillRectangle(new(cursorPos, tileSize), Color.White);
-            spriteBatch.Draw(TileTextures[Material.ToString()], cursorPos, Constants.ZeroSource, highlightColor, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
+            TextureID ghostTile = (TextureID)(Enum.TryParse(typeof(TextureID), Material.ToString(), out var tex) ? tex : TextureID.Null);
+            DrawTexture(spriteBatch, ghostTile, new(cursorPos.ToPoint(), Constants.TileSize.ToPoint()), source:Constants.ZeroSource, color:highlightColor, scale:new(4));
 
             // Text gui
             spriteBatch.DrawString(Arial, $"FPS: {1f / delta:0.0}\nCamera: {Camera}\nMaterial: {Material} [{Selection}]\nTiles Drawn: {TilesDrawn}\nCoord: {mouseCoord}", new Vector2(10, 10), Color.Black);
@@ -308,7 +299,7 @@ namespace Quest.Editor
                 if (type == (int)TileType.Stairs)
                     tile = new Stairs(new(i % Constants.MapSize.X, i / Constants.MapSize.X), reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
                 else // Regular tile
-                    tile = GameHandler.TileFromId(type, new(i % Constants.MapSize.X, i / Constants.MapSize.X));
+                    tile = GameManager.TileFromId(type, new(i % Constants.MapSize.X, i / Constants.MapSize.X));
                 int idx = (int)(tile.Location.X + tile.Location.Y * Constants.MapSize.X);
                 tilesBuffer[idx] = tile;
             }

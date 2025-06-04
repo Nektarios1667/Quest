@@ -9,7 +9,7 @@ using Quest.Gui;
 using Quest.Tiles;
 using MonoGame.Extended;
 using System.Collections.Generic;
-
+using static Quest.TextureManager;
 
 namespace Quest
 {
@@ -33,7 +33,7 @@ namespace Quest
         // Devices
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
-        public GameHandler GameHandler;
+        public GameManager GameManager;
         // Textures
         public Texture2D CursorArrow { get; private set; }
 
@@ -96,12 +96,14 @@ namespace Quest
             ArialLarge = Content.Load<SpriteFont>("Fonts/ArialLarge");
             PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");
 
-            // Handlers
-            GameHandler = new GameHandler(this, spriteBatch);
-            GameHandler.ReadLevel("island_house");
-            GameHandler.ReadLevel("island_house_basement");
-            GameHandler.LoadLevel(0);
-            GameHandler.LoadContent(Content);
+            // Textures
+            LoadTextures(Content);
+
+            // Managers
+            GameManager = new GameManager(this, spriteBatch);
+            GameManager.ReadLevel("island_house");
+            GameManager.ReadLevel("island_house_basement");
+            GameManager.LoadLevel(0);
 
             // Shaders
             Grayscale = Content.Load<Effect>("Shaders/Grayscale");
@@ -112,7 +114,7 @@ namespace Quest
 
         protected override void Update(GameTime gameTime)
         {
-            GameHandler.Watch.Restart();
+            GameManager.Watch.Restart();
 
             // Inputs
             keyState = Keyboard.GetState();
@@ -125,10 +127,10 @@ namespace Quest
 
             // Inventory
             if (IsKeyPressed(Keys.I))
-                GameHandler.Inventory.Opened = !GameHandler.Inventory.Opened;
+                GameManager.Inventory.Opened = !GameManager.Inventory.Opened;
 
             // Movement
-            if (!GameHandler.Inventory.Opened)
+            if (!GameManager.Inventory.Opened)
             {
                 // Movement
                 moveX = 0; moveY = 0;
@@ -136,27 +138,27 @@ namespace Quest
                 moveX += IsAnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0;
                 moveY += IsAnyKeyDown(Keys.W, Keys.Up) ? -Constants.PlayerSpeed : 0;
                 moveY += IsAnyKeyDown(Keys.S, Keys.Down) ? Constants.PlayerSpeed : 0;
-                GameHandler.Move(moveX, moveY);
+                GameManager.Move(moveX, moveY);
             }
 
             // Time
-            GameHandler.FrameTimes["InputUpdate"] = GameHandler.Watch.Elapsed.TotalMilliseconds;
+            GameManager.FrameTimes["InputUpdate"] = GameManager.Watch.Elapsed.TotalMilliseconds;
 
             // Game updates
-            if (!GameHandler.Inventory.Opened)
+            if (!GameManager.Inventory.Opened)
                 // Update
-                GameHandler.Update(delta, previousMouseState, mouseState);
+                GameManager.Update(delta, previousMouseState, mouseState);
             else // Only update gui
-                GameHandler.UpdateGui(delta, previousMouseState, mouseState);
+                GameManager.Update(delta, previousMouseState, mouseState);
 
             // Set previous key state
-            GameHandler.Watch.Restart();
+            GameManager.Watch.Restart();
             previousKeyState = keyState;
             previousMouseState = mouseState;
 
             // Final
             debugUpdateTime += delta;
-            GameHandler.FrameTimes["OtherUpdates"] = GameHandler.Watch.Elapsed.TotalMilliseconds;
+            GameManager.FrameTimes["OtherUpdates"] = GameManager.Watch.Elapsed.TotalMilliseconds;
             base.Update(gameTime);
         }
 
@@ -164,68 +166,51 @@ namespace Quest
         {
             // Clear and start shader gui
             GraphicsDevice.Clear(Color.Magenta);
-            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            spriteBatch.Begin(blendState: BlendState.NonPremultiplied, samplerState: SamplerState.PointClamp);
 
             // Draw game
-            GameHandler.DrawTiles();
-            GameHandler.DrawCharacters();
+            GameManager.DrawTiles();
+            GameManager.DrawCharacters();
 
             // Inventory darkening
-            if (GameHandler.Inventory.Opened)
+            if (GameManager.Inventory.Opened)
                 spriteBatch.FillRectangle(new(Vector2.Zero, Constants.Window), Constants.DarkenScreen, layerDepth:1);
 
             // Gui
-            GameHandler.DrawGui();
+            GameManager.DrawGui();
 
             // Text info
-            GameHandler.Watch.Restart();
+            GameManager.Watch.Restart();
             if (Constants.TEXT_INFO)
             {
                 // Background
                 spriteBatch.FillRectangle(new(0, 0, 200, 140), Color.Black * .8f);
-                spriteBatch.DrawString(Arial, $"FPS: {(cacheDelta != 0 ? 1f / cacheDelta : 0):0.0}\nTime: {GameHandler.Time:0.00}\nCamera: {GameHandler.Camera.X:0.0},{GameHandler.Camera.Y:0.0}\nTile Below: {(GameHandler.TileBelow == null ? "none" : GameHandler.TileBelow.Type)}\nCoord: {GameHandler.Coord}\nLevel: {GameHandler.Level.Name}", new Vector2(10, 10), Color.White);
+                spriteBatch.DrawString(Arial, $"FPS: {(cacheDelta != 0 ? 1f / cacheDelta : 0):0.0}\nTime: {GameManager.Time:0.00}\nCamera: {GameManager.Camera.X:0.0},{GameManager.Camera.Y:0.0}\nTile Below: {(GameManager.TileBelow == null ? "none" : GameManager.TileBelow.Type)}\nCoord: {GameManager.Coord}\nLevel: {GameManager.Level.Name}" +
+                    $"\nInventory: {GameManager.Inventory.Opened}", new Vector2(10, 10), Color.White);
             }
 
             // Frame info
             if (Constants.FRAME_INFO)
             {
-                spriteBatch.FillRectangle(new(Constants.Window.X - 190, 0, 190, GameHandler.FrameTimes.Count * 20), Color.Black * .8f);
+                spriteBatch.FillRectangle(new(Constants.Window.X - 190, 0, 190, GameManager.FrameTimes.Count * 20), Color.Black * .8f);
                 string frameString = string.Join("\n", frameTimes.Select(kv => $"{kv.Key}: {kv.Value:0.0}ms"));
                 spriteBatch.DrawString(Arial, frameString, new Vector2(Constants.Window.X - 180, 10), Color.White);
             }
-            GameHandler.FrameTimes["DebugTextDraw"] = GameHandler.Watch.Elapsed.TotalMilliseconds;
+            GameManager.FrameTimes["DebugTextDraw"] = GameManager.Watch.Elapsed.TotalMilliseconds;
 
             // Frame bar
-            GameHandler.Watch.Restart();
+            GameManager.Watch.Restart();
             if (Constants.FRAME_BAR)
                 DrawFrameBar();
-            GameHandler.FrameTimes["FrameBarDraw"] = GameHandler.Watch.Elapsed.TotalMilliseconds;
+            GameManager.FrameTimes["FrameBarDraw"] = GameManager.Watch.Elapsed.TotalMilliseconds;
 
             // Cursor
-            spriteBatch.Draw(CursorArrow, mouseState.Position.ToVector2(), LMouseDown ? Color.DarkGray : Color.White);
+            Rectangle rect = new(mouseState.Position.X, mouseState.Position.Y, 30, 30);
+            DrawTexture(spriteBatch, TextureID.CursorArrow, rect);
 
             // Final
             spriteBatch.End();
             base.Draw(gameTime);
-        }
-        // Utilities
-        public bool TryDraw(Texture2D texture, Rectangle rect, Rectangle? sourceRect = null, Color color = default, float rotation = 0, Vector2 origin = default, Vector2 scale = default, SpriteEffects spriteEffect = default, float depth = 0)
-        {
-            // Defaults
-            if (scale == default) scale = Vector2.One;
-            if (color == default) color = Color.White;
-
-            // Missing texture
-            if (texture == null)
-            {
-                spriteBatch.FillRectangle(new(rect.X, rect.Y, rect.Width / 2, rect.Height / 2), Color.Magenta); // top left
-                spriteBatch.FillRectangle(new(rect.X + rect.Width / 2, rect.Y, rect.Width / 2, rect.Height / 2), Color.Black); // top right
-                spriteBatch.FillRectangle(new(rect.X, rect.Y + rect.Height / 2, rect.Width / 2, rect.Height / 2), Color.Black); // bottom left
-                spriteBatch.FillRectangle(new(rect.X + rect.Width / 2, rect.Y + rect.Height / 2, rect.Width / 2, rect.Height / 2), Color.Magenta); // bottom right
-                return false;
-            }
-            spriteBatch.Draw(texture, rect.Location.ToVector2(), sourceRect, color, rotation, origin, scale, spriteEffect, depth);
-            return true;
         }
         // Key presses
         public bool IsKeyDown(Keys key) => keyState.IsKeyDown(key);
@@ -257,7 +242,7 @@ namespace Quest
             if (debugUpdateTime >= .5)
             {
                 cacheDelta = delta;
-                frameTimes = new Dictionary<string, double>(GameHandler.FrameTimes);
+                frameTimes = new Dictionary<string, double>(GameManager.FrameTimes);
                 debugUpdateTime = 0;
             }
             // Background

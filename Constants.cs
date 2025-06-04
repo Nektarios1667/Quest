@@ -33,7 +33,6 @@ namespace Quest
 
         // Game
         public static readonly string[] TileNames = ["Sky", "Grass", "Water", "StoneWall", "Stairs", "Flooring", "Sand", "Dirt"];
-        public static readonly string[] ItemNames = ["Sword", "Pickaxe"];
         public const int PlayerSpeed = 200;
         public const int MaxStack = 10;
 
@@ -51,6 +50,7 @@ namespace Quest
         public static readonly Xna.Color FocusBlue = new(174, 200, 209);
         public static readonly Xna.Color CottonCandy = new(242, 182, 240);
         public static readonly Xna.Color DarkenScreen = new(0, 0, 0, 188);
+        public static readonly Xna.Color DebugPinkTint = new(255, 0, 255, 128);
 
         // Texture default sizes
         public static readonly Xna.Point SlotTextureSize = new(80, 80); // Default size for item slots

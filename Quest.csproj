@@ -21,6 +21,9 @@
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="TextureManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="MonoGame.Extended" Version="4.1.0" />
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.3.0" />
 	<PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.3.0" />

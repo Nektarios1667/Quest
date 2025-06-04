@@ -8,23 +8,27 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Quest.Gui;
 using System.Security.Policy;
+using static Quest.TextureManager;
+using MonoGame.Extended;
 
 namespace Quest
 {
     public class NPC
     {
+        public bool HasTalked { get; set; }
         public bool IsTalking { get; set; }
         public Dialog DialogBox { get; private set; }
-        public GameHandler Game { get; private set; }
+        public GameManager Game { get; private set; }
         public Point Location { get; set; }
         public string Name { get; set; }
         public string Dialog { get; set; }
-        public Texture2D Texture { get; set; }
+        public TextureID Texture { get; set; }
         public Color TextureColor { get; set; }
         public float Scale { get; set; }
-        public NPC(GameHandler game, Texture2D texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1)
+        public NPC(GameManager game, TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1)
         {
             IsTalking = false;
+            HasTalked = false;
             Game = game;
             Texture = texture;
             Location = location;
@@ -37,21 +41,31 @@ namespace Quest
         }
         public void Draw()
         {
-            Rectangle rect = new(new((int)(Game.Time * 3) % 4 * Game.MageSize.X, 0), Game.MageSize);
-            Game.Batch.Draw(Texture, Location.ToVector2() * Constants.TileSize - Game.Camera + Constants.Middle, rect, TextureColor, 0f, Game.MageHalfSize.ToVector2(), scale:Scale, SpriteEffects.None, 0);
+            // Npc
+            Rectangle source = new(new((int)(Game.Time * 3) % 4 * Game.MageSize.X, 0), Game.MageSize);
+            Vector2 size = new Vector2(80, 80) * Scale;
+            Vector2 origin = new(size.X / (2 * Scale), size.Y / Scale);
+            Rectangle rect = new(((Location.ToVector2() + Constants.HalfVec) * Constants.TileSize - Game.Camera + Constants.Middle).ToPoint(), size.ToPoint());
+            DrawTexture(Game.Batch, Texture, rect, color: TextureColor, scale: new(Scale), source:source, origin:origin);
+            Game.Batch.FillRectangle(new(rect.X - origin.X*2, rect.Y - origin.Y*2, rect.Width, rect.Height), Constants.DebugPinkTint);
         }
         public void Update()
         {
-            if (Vector2.DistanceSquared(Game.Camera / Constants.TileSize, Location.ToVector2()) <= 4)
+            // State
+            if (DialogBox.Displayed == Dialog) HasTalked = true;
+
+            // Speaking
+            if (!Game.Inventory.Opened && Vector2.DistanceSquared(Game.Camera / Constants.TileSize, Location.ToVector2()) <= 4)
             {
                 if (!IsTalking)
                 {
                     DialogBox.IsVisible = true;
                     DialogBox.Displayed = "";
                     IsTalking = true;
-                    Logger.Log($"Taling to {Name}");
+                    Logger.Log($"Talking to {Name}");
                 }
             }
+            // Hiding if away
             else
             {
                 DialogBox.IsVisible = false;

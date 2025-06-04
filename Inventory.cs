@@ -8,6 +8,7 @@ using Xna = Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using static Quest.TextureManager;
 namespace Quest
 {
     public class Item
@@ -26,30 +27,26 @@ namespace Quest
     }
     public class Inventory
     {
-        public GameHandler Game { get; private set; }
+        public GameManager Game { get; private set; }
         public Item?[,] Items { get; private set; }
         public bool Opened { get; set; } = false;
-        public Dictionary<string, Texture2D> ItemTextures { get; private set; }
-        public Texture2D Slot { get; private set; }
-        public Texture2D GuiBackground { get; private set; }
         private SpriteFont PressStart { get; set; }
         public int EquippedSlot { get; set; }
         public int SelectedSlot { get; set; }
         public int HoverSlot { get; set; }
         public int Width { get; }
         public int Height { get; }
-        private bool _loaded { get; set; } = false;
         private readonly Xna.Point itemOffset = new(8, 8);
         private readonly Vector2 itemScale = new(3, 3);
-        public Inventory(GameHandler game, int width, int height)
+        public Inventory(GameManager game, int width, int height)
         {
             Game = game;
             Items = new Item?[width, height];
             Width = width;
             Height = height;
-            ItemTextures = [];
             SelectedSlot = width * height - 1;
             HoverSlot = 0;
+            PressStart = Game.Window.Content.Load<SpriteFont>("Fonts/PressStart");
         }
         public void Update(MouseState previousMouseState, MouseState mouseState)
         {
@@ -69,9 +66,6 @@ namespace Quest
         }
         public void Draw()
         {
-            // Check loaded
-            if (!_loaded) return;
-
             // Draw
             for (int x = 0; x < Width; x++) {
                 for (int y = 0; y < (Opened ? Height : 1); y++) {
@@ -79,35 +73,19 @@ namespace Quest
                     Item? item = Items[x, y];
 
                     // Draw inventory slots
-                    Vector2 itemDest = new(Constants.Middle.X - (Constants.SlotTextureSize.X * Width / 2) + (Constants.SlotTextureSize.X + 4) * x, Constants.Window.Y - (Slot.Height + 8) * (y + 1) - (y != 0 ? 20 : 0));
-                    Game.Batch.Draw(Slot, itemDest, SlotColor(x, y));
+                    Vector2 itemDest = new(Constants.Middle.X - (Constants.SlotTextureSize.X * Width / 2) + (Constants.SlotTextureSize.X + 4) * x, Constants.Window.Y - (GetTexture(TextureID.Slot).Texture.Height + 8) * (y + 1) - (y != 0 ? 20 : 0));
+                    DrawTexture(Game.Batch, TextureID.Slot, new(itemDest.ToPoint(), Constants.SlotTextureSize), color:SlotColor(x, y));
 
                     // Draw inventory items
                     if (item == null) continue;
-                    Texture2D? itemTexture = ItemTextures.TryGetValue(item.Name, out var tex) ? tex : null;
-                    Game.TryDraw(itemTexture, new(itemDest.ToPoint() + itemOffset, Constants.ItemTextureSize), scale:itemScale);
+                    TextureID textureId = (TextureID)(Enum.TryParse(typeof(TextureID), item.Name, out var tex) ? tex : TextureID.Null);
+                    DrawTexture(Game.Batch, textureId, new(itemDest.ToPoint() + itemOffset, Constants.ItemTextureSize), scale:itemScale);
 
                     // Text
                     Vector2 textDest = itemDest + Constants.SlotTextureSize.ToVector2() - new Vector2(PressStart.MeasureString($"{item.Amount}").X + 8, 30);
                     Game.Batch.DrawString(PressStart, $"{item.Amount}", textDest, Color.Black);
                 }
             }
-        }
-        public void LoadContent(ContentManager content)
-        {
-            // Dynamically load item images
-            foreach (string filename in Constants.ItemNames)
-            {
-                Texture2D texture = content.Load<Texture2D>($"Images/Items/{filename}");
-                ItemTextures[filename] = texture;
-            }
-
-            // Load gui textures
-            Slot = content.Load<Texture2D>("Images/Gui/Slot");
-            PressStart = content.Load<SpriteFont>("Fonts/PressStart");
-            GuiBackground = content.Load<Texture2D>("Images/Gui/GuiBackground");
-
-            _loaded = true;
         }
         public void SlotInteractions(MouseState previousMouseState, MouseState mouseState)
         {
@@ -136,9 +114,40 @@ namespace Quest
                 }
             }
 
+            // Spread items
+            if (Opened && Game.Window.RMouseRelease)
+            {
+                if (mouseSlot >= 0 && mouseSlot != SelectedSlot)
+                {
+                    // Merge items
+                    Item? mouseItem = GetItem(mouseSlot);
+                    Item? selectedItem = GetItem(SelectedSlot);
+                    if (selectedItem != null)
+                    {
+                        int move = (int)Math.Ceiling(selectedItem!.Amount / 2f);
+                        if (SameItem(mouseItem, selectedItem))
+                        {
+                            move = (int)Math.Min(move, mouseItem!.Max - mouseItem.Amount);
+                            mouseItem!.Amount += move;
+                            selectedItem.Amount -= move;
+                        }
+                        else if (mouseItem == null)
+                        {
+                            SetSlot(mouseSlot, new Item(selectedItem.Name, selectedItem.Description, move, selectedItem.Max));
+                            selectedItem.Amount -= move;
+                        }
+                        if (selectedItem.Amount < 1)
+                            SetSlot(SelectedSlot, null); // Remove empty item from selected slot
+                    }
+                }
+            }
+
             // Select slot
-            if (Opened && Game.Window.LMouseClick && mouseSlot >= 0)
+            if (Opened && (Game.Window.LMouseClick || Game.Window.RMouseClick) && mouseSlot >= 0)
                 SelectedSlot = mouseSlot;
+
+            // Deselect
+            if (Game.Window.LMouseDown && (mouseSlot < 0 || mouseSlot > Items.Length)) SelectedSlot = -1;
         }
         // Slot interactions
         private Color SlotColor(int x, int y)
@@ -153,7 +162,7 @@ namespace Quest
         {
             if (from != null && dest != null)
             {
-                int moved = Math.Min(Math.Abs(from.Amount), dest.Max - dest.Amount);
+                int moved = Math.Min(from.Amount, dest.Max - dest.Amount);
                 dest.Amount += moved;
                 from.Amount -= moved;
                 if (from.Amount < 1)
@@ -215,7 +224,7 @@ namespace Quest
             if (x < 0 || x >= Width) return Constants.NegOne; // Out of bounds
 
             // y coord
-            int top = (int)Constants.Window.Y - (Slot.Height + 8) * (Height + 1) - (Height != 0 ? 20 : 0);
+            int top = (int)Constants.Window.Y - (GetTexture(TextureID.Slot).Texture.Height + 8) * (Height + 1) - (Height != 0 ? 20 : 0);
             int y = (mouseState.Position.Y - top) / (Constants.SlotTextureSize.Y + 8);
             y = Height - y; // Flip y axis
             if (y < 0 || y >= Height) return Constants.NegOne; // Out of bounds

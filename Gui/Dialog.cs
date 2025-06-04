@@ -10,7 +10,7 @@ namespace Quest.Gui
 {
     public class Dialog : Widget
     {
-        public GuiHandler Gui { get; private set; }
+        public GuiManager Gui { get; private set; }
         public Xna.Vector2 Dimensions { get; private set; }
         public Rectangle Rect { get; private set; }
         public Xna.Color Color { get; private set; }
@@ -24,7 +24,7 @@ namespace Quest.Gui
         public float CharDelay { get; set; } = .05f;
         public float charWait { get; set; } = 0;
         // Private
-        public Dialog(GuiHandler gui, Xna.Vector2 location, Xna.Vector2 dimensions, Color color, Color foreground, string text, SpriteFont font, int border = 6, Color? borderColor = null) : base(location)
+        public Dialog(GuiManager gui, Xna.Vector2 location, Xna.Vector2 dimensions, Color color, Color foreground, string text, SpriteFont font, int border = 6, Color? borderColor = null) : base(location)
         {
             Gui = gui;
             Dimensions = dimensions;
@@ -55,7 +55,7 @@ namespace Quest.Gui
         public override void Draw(SpriteBatch batch)
         {
             // Not drawing
-            if (!IsVisible || Gui.DialogBox == null) { return; }
+            if (!IsVisible) { return; }
 
             // Background
             batch.FillRectangle(Rect, Color);

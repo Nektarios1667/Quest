@@ -7,6 +7,7 @@ using MonoGame.Extended;
 using Xna = Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using static Quest.TextureManager;
 
 namespace Quest.Tiles
 {
@@ -38,20 +39,19 @@ namespace Quest.Tiles
             Type = (TileType)Enum.Parse(typeof(TileType), GetType().Name);
             Marked = false;
         }
-        public virtual void Draw(GameHandler game)
+        public virtual void Draw(GameManager game)
         {
-            // Draw each tile using the sprite batch
-            Xna.Vector2 dest = Location.ToVector2() * Constants.TileSize - game.Camera;
-            dest += Constants.Middle;
             // Draw
-            Texture2D? texture = game.TileTextures.TryGetValue(Type.ToString(), out var tex) ? tex : null;
+            Xna.Vector2 dest = Location.ToVector2() * Constants.TileSize - game.Camera + Constants.Middle;
+            TextureID texture = (TextureID)(Enum.TryParse(typeof(TextureID), Type.ToString(), out var tex) ? tex : TextureID.Null);
             Color color = Marked ? Color.Red : Color.White;
-            Marked = false; // Reset marked state for next frame
-            game.TryDraw(texture, new Rectangle(dest.ToPoint(), Constants.TileSize.ToPoint()), game.TileTextureSource(this), color, 0f, Vector2.Zero, Constants.TileSizeScale);
+            Rectangle rect = new((int)dest.X, (int)dest.Y, (int)Constants.TileSize.X, (int)Constants.TileSize.Y);
+            DrawTexture(game.Batch, texture, rect, source:game.TileTextureSource(this), scale: new(4), color:color);
+            Marked = false;
         }
-        public virtual void OnPlayerEnter(GameHandler game) { }
-        public virtual void OnPlayerExit(GameHandler game) { }
-        public virtual void OnPlayerInteract(GameHandler game) { }
+        public virtual void OnPlayerEnter(GameManager game) { }
+        public virtual void OnPlayerExit(GameManager game) { }
+        public virtual void OnPlayerInteract(GameManager game) { }
 
     }
 }

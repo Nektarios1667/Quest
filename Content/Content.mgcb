@@ -60,6 +60,42 @@
 /processorParam:TextureFormat=Color
 /build:Images/Characters/BlueMage.png
 
+#begin Images/Characters/BlueMage.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Characters/BlueMage.png
+
+#begin Images/Characters/GrayMage.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Characters/GrayMage.png
+
+#begin Images/Characters/WhiteMage.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Characters/WhiteMage.png
+
 #begin Images/Characters/WhiteMage.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -120,6 +156,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Gui/Slot.png
 
+#begin Images/Gui/Speech.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Gui/Speech.png
+
 #begin Images/Items/Pickaxe.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -144,7 +192,7 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/Sword.png
 
-#begin Images/Tiles/DirtTilemap.png
+#begin Images/Tiles/Dirt.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -154,9 +202,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/DirtTilemap.png
+/build:Images/Tiles/Dirt.png
 
-#begin Images/Tiles/FlooringTilemap.png
+#begin Images/Tiles/Flooring.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -166,9 +214,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/FlooringTilemap.png
+/build:Images/Tiles/Flooring.png
 
-#begin Images/Tiles/GrassTilemap.png
+#begin Images/Tiles/Grass.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -178,9 +226,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/GrassTilemap.png
+/build:Images/Tiles/Grass.png
 
-#begin Images/Tiles/SandTilemap.png
+#begin Images/Tiles/Sand.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -190,9 +238,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/SandTilemap.png
+/build:Images/Tiles/Sand.png
 
-#begin Images/Tiles/SkyTilemap.png
+#begin Images/Tiles/Sky.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -202,9 +250,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/SkyTilemap.png
+/build:Images/Tiles/Sky.png
 
-#begin Images/Tiles/StairsTilemap.png
+#begin Images/Tiles/Stairs.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -214,9 +262,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/StairsTilemap.png
+/build:Images/Tiles/Stairs.png
 
-#begin Images/Tiles/StoneWallTilemap.png
+#begin Images/Tiles/StoneWall.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -226,9 +274,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/StoneWallTilemap.png
+/build:Images/Tiles/StoneWall.png
 
-#begin Images/Tiles/TemplateTilemap.png
+#begin Images/Tiles/Template.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -238,9 +286,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/TemplateTilemap.png
+/build:Images/Tiles/Template.png
 
-#begin Images/Tiles/WaterTilemap.png
+#begin Images/Tiles/Water.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -250,7 +298,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/WaterTilemap.png
+/build:Images/Tiles/Water.png
 
 #begin Shaders/Grayscale.fx
 /importer:EffectImporter
