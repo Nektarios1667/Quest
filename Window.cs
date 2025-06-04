@@ -42,13 +42,9 @@ namespace Quest
         public SpriteFont ArialSmall { get; private set; }
         public SpriteFont ArialLarge { get; private set; }
         public SpriteFont PixelOperator { get; private set; }
-        // Robot sprites
-        public Texture2D BlueMage { get; private set; }
-        public Point MageSize { get; private set; }
-        public Point MageHalfSize { get; private set; }
         // Movements
-        private int moveX;
-        private int moveY;
+        public int moveX;
+        public int moveY;
         // Shaders
         public Effect Grayscale { get; private set; }
 
@@ -106,11 +102,6 @@ namespace Quest
             GameHandler.ReadLevel("island_house_basement");
             GameHandler.LoadLevel(0);
             GameHandler.LoadContent(Content);
-
-            // Characters
-            BlueMage = Content.Load<Texture2D>("Images/Characters/BlueMage");
-            MageSize = new(BlueMage.Width / 4, BlueMage.Height / 5);
-            MageHalfSize = new(MageSize.X / 2, MageSize.Y / 2);
 
             // Shaders
             Grayscale = Content.Load<Effect>("Shaders/Grayscale");
@@ -177,23 +168,11 @@ namespace Quest
 
             // Draw game
             GameHandler.DrawTiles();
-
-            // Player
-            GameHandler.Watch.Restart();
-            DrawPlayer();
-            if (Constants.DRAW_HITBOXES)
-                DrawPlayerHitbox();
-            GameHandler.FrameTimes["PlayerDraw"] = GameHandler.Watch.Elapsed.TotalMilliseconds;
+            GameHandler.DrawCharacters();
 
             // Inventory darkening
             if (GameHandler.Inventory.Opened)
-                spriteBatch.FillRectangle(new(Vector2.Zero, Constants.Window), Constants.DarkenScreen);
-
-            // Close
-            spriteBatch.End();
-
-            // Non shader draws
-            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+                spriteBatch.FillRectangle(new(Vector2.Zero, Constants.Window), Constants.DarkenScreen, layerDepth:1);
 
             // Gui
             GameHandler.DrawGui();
@@ -295,30 +274,6 @@ namespace Quest
                 start += (int)(process.Value / (cacheDelta * 1000)) * 300;
                 c++;
             }
-        }
-        public void DrawPlayerHitbox()
-        {
-            Vector2[] points = new Vector2[4];
-            for (int c = 0; c < Constants.PlayerCorners.Length; c++)
-                points[c] = Constants.Middle + Constants.PlayerCorners[c];
-            spriteBatch.DrawLine(points[0], points[1], Color.Lime, 1); // Top line
-            spriteBatch.DrawLine(points[2], points[3], Color.Lime, 1); // Bottom line
-            spriteBatch.DrawLine(points[0], points[2], Color.Lime, 1); // Left line
-            spriteBatch.DrawLine(points[1], points[3], Color.Lime, 1); // Right line
-            spriteBatch.DrawLine(points[0], points[3], Color.Lime, 1); // Top left to bottom right
-            spriteBatch.DrawLine(points[1], points[2], Color.Lime, 1); // Top right to bottom left
-        }
-        public void DrawPlayer()
-        {
-            int sourceRow = 0;
-            if (moveX == 0 && moveY == 0) sourceRow = 0;
-            else if (moveX < 0) sourceRow = 1;
-            else if (moveX > 0) sourceRow = 3;
-            else if (moveY > 0) sourceRow = 2;
-            else if (moveY < 0) sourceRow = 4;
-            Rectangle source = new((int)(GameHandler.Time * (sourceRow == 0 ? 1.5f : 6)) % 4 * MageSize.X, sourceRow * MageSize.Y, MageSize.X, MageSize.Y);
-            Rectangle rect = new(Constants.Middle.ToPoint() - MageHalfSize, MageSize);
-            TryDraw(BlueMage, rect, sourceRect: source);
         }
     }
 }

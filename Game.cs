@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Xna = Microsoft.Xna.Framework;
 using System.IO;
-using System.Reflection.Metadata;
 using Microsoft.Xna.Framework.Content;
 using Quest.Gui;
 using Quest.Tiles;
@@ -15,13 +13,13 @@ using System.Diagnostics;
 using System.IO.Compression;
 using MonoGame.Extended;
 using Microsoft.Xna.Framework.Input;
+using System.Reflection.Metadata;
 
 namespace Quest
 {
     public class GameHandler
     {
-        // TODO REMOVE THIS AND REPLACE WITH NPCS
-        public Widget[] Widgets { get; private set; }
+        public NPC[] NPCs { get; private set; }
         // Debug
         public Stopwatch Watch { get; private set; }
         public Tile? TileBelow { get; private set; }
@@ -41,8 +39,14 @@ namespace Quest
         // Inventory
         public Inventory Inventory { get; set; }
         // Textures
+
         public Texture2D Slot { get; private set; }
         public Texture2D GuiBackground { get; private set; }
+        // Mage sprites
+        public Texture2D BlueMage { get; private set; }
+        public Texture2D WhiteMage { get; private set; }
+        public Point MageSize { get; private set; }
+        public Point MageHalfSize { get; private set; }
         // Private
         private Xna.Vector2 tileSize;
         public float Time { get; private set; }
@@ -57,19 +61,12 @@ namespace Quest
             Tiles = [];
             Camera = new Vector2(128 * Constants.TileSize.X, 128 * Constants.TileSize.Y) - Constants.Middle;
             CameraDest = Camera;
-            string dialog = "This is some example dialog! The NPC can talk to the player through this box which appears when near. The quick brown fox jumped over the lazy dog.";
             Gui = new();
             Gui.Widgets = [
-                new Dialog(Gui, new(Constants.Middle.X - 600, 800), new(1200, 100), new(194, 125, 64), Color.Black, dialog, Window.PixelOperator, borderColor: new(36, 19, 4)) { IsVisible = false},
                 new StatusBar(new(10, Constants.Window.Y - 35), new(300, 25), Color.Green, Color.Red, 100, 100),
             ];
             Watch = new();
-            FrameTimes = new()
-            {
-                { "GuiUpdate", 0 },
-                { "TileDraws", 0 },
-                { "GuiDraw", 0 },
-            };
+            FrameTimes = new();
             Inventory = new(this, 6, 4);
             Inventory.SetSlot(0, new Item("Sword", "A sharp, pointy sword", amount:3, max:1));
             Inventory.SetSlot(1, new Item("Pickaxe", "Sturdy iron pickaxe for mining", max:1));
@@ -80,11 +77,18 @@ namespace Quest
             Delta = deltaTime;
             Time += deltaTime;
 
+            // Characters
+            UpdateCharacters(deltaTime);
+
             // Camera
             UpdateCamera(deltaTime);
 
             // Gui
             UpdateGui(deltaTime, previousMouseState, mouseState);
+        }
+        public void UpdateCharacters(float deltaTime)
+        {
+            foreach (NPC npc in NPCs) npc.Update();
         }
         public void UpdateCamera(float deltaTime)
         {
@@ -114,6 +118,9 @@ namespace Quest
 
             // Gui
             DrawGui();
+
+            // Characters
+            DrawCharacters();
         }
         public void DrawGui()
         {
@@ -125,6 +132,13 @@ namespace Quest
             Watch.Restart();
             Inventory.Draw();
             FrameTimes["InventoryDraw"] = Watch.Elapsed.TotalMilliseconds;
+        }
+        public void DrawCharacters()
+        {
+            DrawPlayer();
+            if (Constants.DRAW_HITBOXES)
+                DrawPlayerHitbox();
+            foreach (NPC npc in NPCs) npc.Draw();
         }
         public void DrawTiles()
         {
@@ -141,14 +155,7 @@ namespace Quest
                 for (int x = start.X; x <= end.X; x++) {
                     Tile? tile = GetTile(x, y);
                     if (tile == null) continue;
-                    // Draw each tile using the sprite batch
-                    Xna.Vector2 dest = tile.Location.ToVector2() * tileSize - Camera;
-                    dest += Constants.Middle;
-                    // Draw
-                    Texture2D? texture = TileTextures.TryGetValue(tile.Type.ToString(), out var tex) ? tex : null;
-                    Color color = tile.Type == TileType.Water ? Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(Time + tile.Location.X + tile.Location.Y)) : (tile.Marked ? Color.Red : Color.White);
-                    tile.Marked = false; // Reset marked state for next frame
-                    TryDraw(texture, new Rectangle(dest.ToPoint(), Constants.TileSize.ToPoint()), TileTextureSource(tile), color, 0f, Vector2.Zero, Constants.TileSizeScale);
+                    tile.Draw(this);
                 }
             }
             FrameTimes["TileDraws"] = Watch.Elapsed.TotalMilliseconds;
@@ -176,7 +183,7 @@ namespace Quest
             if (!CollideCheck()) CameraDest -= new Vector2(0, finalMove.Y);
 
             // On tile enter
-            Coord = Vector2.Floor((new Vector2(CameraDest.X, CameraDest.Y + Window.MageHalfSize.Y) / Constants.TileSize));
+            Coord = Vector2.Floor((new Vector2(CameraDest.X, CameraDest.Y + MageHalfSize.Y) / Constants.TileSize));
             TileBelow = GetTile((int)Coord.X, (int)Coord.Y);
             if (TileBelow == null) return;
             TileBelow.OnPlayerEnter(this);
@@ -200,6 +207,15 @@ namespace Quest
                     TileTextures[filename] = texture;
                 }
             }
+
+            // Characters textures
+            WhiteMage = content.Load<Texture2D>("Images/Characters/WhiteMage");
+            BlueMage = content.Load<Texture2D>("Images/Characters/BlueMage");
+            MageSize = new(BlueMage.Width / 4, BlueMage.Height / 5);
+            MageHalfSize = new(MageSize.X / 2, MageSize.Y / 2);
+
+            // NPCS
+            NPCs = [new(this, WhiteMage, new(131, 131), "Saruman the White", "Against the power of Mordor there can be no victory. ... We must join with Sauron.", scale:2f)];
 
             // Load gui
             Gui.LoadContent(content);
@@ -377,6 +393,30 @@ namespace Quest
             if (up?.Type == tile.Type) mask |= 8; // up
 
             return mask;
+        }
+        public void DrawPlayerHitbox()
+        {
+            Vector2[] points = new Vector2[4];
+            for (int c = 0; c < Constants.PlayerCorners.Length; c++)
+                points[c] = Constants.Middle + Constants.PlayerCorners[c];
+            Batch.DrawLine(points[0], points[1], Color.Lime, 1); // Top line
+            Batch.DrawLine(points[2], points[3], Color.Lime, 1); // Bottom line
+            Batch.DrawLine(points[0], points[2], Color.Lime, 1); // Left line
+            Batch.DrawLine(points[1], points[3], Color.Lime, 1); // Right line
+            Batch.DrawLine(points[0], points[3], Color.Lime, 1); // Top left to bottom right
+            Batch.DrawLine(points[1], points[2], Color.Lime, 1); // Top right to bottom left
+        }
+        public void DrawPlayer()
+        {
+            int sourceRow = 0;
+            if (Window.moveX == 0 && Window.moveY == 0) sourceRow = 0;
+            else if (Window.moveX < 0) sourceRow = 1;
+            else if (Window.moveX > 0) sourceRow = 3;
+            else if (Window.moveY > 0) sourceRow = 2;
+            else if (Window.moveY < 0) sourceRow = 4;
+            Rectangle source = new((int)(Time * (sourceRow == 0 ? 1.5f : 6)) % 4 * MageSize.X, sourceRow * MageSize.Y, MageSize.X, MageSize.Y);
+            Rectangle rect = new(Constants.Middle.ToPoint() - MageHalfSize, MageSize);
+            TryDraw(BlueMage, rect, sourceRect: source);
         }
     }
 }

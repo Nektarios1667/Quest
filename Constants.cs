@@ -43,6 +43,7 @@ namespace Quest
         public static readonly Xna.Vector2 PlayerBox = new(PlayerCorners[1].X - PlayerCorners[0].X, PlayerCorners[2].Y - PlayerCorners[1].Y);
 
         // Utility
+        public static readonly Xna.Vector2 HalfVec = new(0.5f, 0.5f);
         public static readonly Xna.Point NegOne = new(-1, -1); // Flipping vector
 
         // Colors
