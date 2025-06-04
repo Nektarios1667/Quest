@@ -6,56 +6,61 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Xna = Microsoft.Xna.Framework;
 using Quest.Gui;
-using System.Collections.Generic;
-using MonoGame.Extended;
-using System.IO;
 using Quest.Tiles;
-using MonoGUI;
-using System.IO.Compression;
-using System.Threading.Tasks;
+using MonoGame.Extended;
+using System.Collections.Generic;
 using static Quest.TextureManager;
+using System.IO.Compression;
+using System.IO;
 
 namespace Quest.Editor
 {
     public class EditorWindow : Game
     {
-        // Debug
-        private int TilesDrawn;
-
-        // Consts/readonlys
-        private Xna.Vector2 MiddleCoord => Xna.Vector2.Ceiling((Constants.Window / 2) / Constants.TileSize);
-
         // Inputs
         private KeyboardState keyState;
         private KeyboardState previousKeyState;
         private MouseState mouseState;
         private MouseState previousMouseState;
-        private Point mouseCoord;
-
+        public bool LMouseClick => mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Released;
+        public bool LMouseDown => mouseState.LeftButton == ButtonState.Pressed;
+        public bool LMouseRelease => mouseState.LeftButton == ButtonState.Released && previousMouseState.LeftButton == ButtonState.Pressed;
+        public bool RMouseClick => mouseState.RightButton == ButtonState.Pressed && previousMouseState.RightButton == ButtonState.Released;
+        public bool RMouseDown => mouseState.RightButton == ButtonState.Pressed;
+        public bool RMouseRelease => mouseState.RightButton == ButtonState.Released && previousMouseState.RightButton == ButtonState.Pressed;
         // Editing
-        private Tile[] Tiles;
-        private Xna.Vector2 Camera;
-        private Xna.Vector2 tileSize = Constants.TileSize;
-        private Xna.Vector2 tileSize2D = new(Constants.TileSize.X, Constants.TileSize.Y);
-        private Dictionary<string, Texture2D> TileTextures = new();
         private TileType Material;
         private int Selection;
+        private Point mouseCoord;
+        private string LevelName;
+        private Point Spawn;
         private readonly Color highlightColor = new(1, 1, 1, .8f);
-        private float modifier;
-        private string LevelName = "new_level";
-        private float time = 0;
-        private Xna.Point Spawn = Constants.MapSize / new Point(2, 2);
-
-        // Deltatime
+        // Debug
         private float delta;
+        private Dictionary<string, double> frameTimes;
         // Devices
         private GraphicsDeviceManager graphics;
-        private SpriteBatch spriteBatch;
+        protected SpriteBatch spriteBatch;
+        public Editor.GameManager GameManager;
 
         // Fonts
         public SpriteFont Arial { get; private set; }
         public SpriteFont ArialSmall { get; private set; }
         public SpriteFont ArialLarge { get; private set; }
+        public SpriteFont PixelOperator { get; private set; }
+        // Movements
+        public int moveX;
+        public int moveY;
+
+        // Debug
+        private static readonly Color[] colors = {
+            Color.Purple, new Color(255, 128, 128), new Color(128, 255, 128), new Color(255, 255, 180), new Color(128, 255, 255),
+            Color.Brown, Color.Gray, new Color(192, 128, 64), new Color(64, 128, 192), new Color(192, 192, 64),
+            new Color(64, 192, 128), new Color(192, 64, 128), new Color(160, 80, 0), new Color(80, 160, 0), new Color(0, 160, 80),
+            new Color(160, 0, 80), new Color(96, 96, 192), new Color(192, 96, 96), new Color(96, 192, 96), new Color(192, 192, 96)
+        };
+        private float debugUpdateTime;
+        private float cacheDelta;
         public EditorWindow()
         {
             graphics = new GraphicsDeviceManager(this)
@@ -65,13 +70,11 @@ namespace Quest.Editor
                 PreferredBackBufferWidth = (int)Constants.Window.X,
                 PreferredBackBufferHeight = (int)Constants.Window.Y,
                 IsFullScreen = false,
-                SynchronizeWithVerticalRetrace = true,
+                SynchronizeWithVerticalRetrace = Constants.VSYNC,
             };
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
             IsFixedTimeStep = false;
-
-            Logger.Log("Created EditorWindow.");
         }
 
         protected override void Initialize()
@@ -80,18 +83,10 @@ namespace Quest.Editor
             keyState = Keyboard.GetState();
             previousKeyState = keyState;
             mouseState = Mouse.GetState();
-            previousMouseState = mouseState;
-            Tiles = new Tile[Constants.MapSize.X * Constants.MapSize.Y];
-            for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++)
-            {
-                Tile tile = new Sky(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
-                SetTile(tile);
-            }
-            Camera = new Xna.Vector2(128 * Constants.TileSize.X, 128 * Constants.TileSize.Y) - Constants.Middle;
-            Material = TileType.Water;
-            Selection = (int)Material;
+            frameTimes = [];
+            debugUpdateTime = 0;
+            cacheDelta = 0f;
 
-            Logger.Log("Initialized EditorWindow.");
             base.Initialize();
         }
 
@@ -103,38 +98,42 @@ namespace Quest.Editor
             Arial = Content.Load<SpriteFont>("Fonts/Arial");
             ArialSmall = Content.Load<SpriteFont>("Fonts/ArialSmall");
             ArialLarge = Content.Load<SpriteFont>("Fonts/ArialLarge");
-            Logger.Log("Loaded fonts.");
+            PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");
+
+            // Textures
+            LoadTextures(Content);
+
+            // Managers
+            GameManager = new(this, spriteBatch);
         }
 
         protected override void Update(GameTime gameTime)
         {
+            GameManager.Watch.Restart();
+
             // Inputs
             keyState = Keyboard.GetState();
             mouseState = Mouse.GetState();
-            mouseCoord = Vector2.Floor((mouseState.Position.ToVector2() + Camera) / tileSize2D).ToPoint();
+            mouseCoord = Vector2.Floor((mouseState.Position.ToVector2() + GameManager.Camera - Constants.Middle) / Constants.TileSize).ToPoint();
 
             // Exit
-            if (IsKeyDown(Keys.Escape))
-            {
-                Logger.Log($"Program closed.");
-                Exit();
-            }
+            if (IsKeyDown(Keys.Escape)) Exit();
 
-            // Delta time
+            // Delta debugUpdateTime
             delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            // Time
-            time += delta;
 
             // Movement
-            if (IsKeyDown(Keys.LeftShift)) modifier = 0.5f;
-            else if (IsKeyDown(Keys.LeftControl)) modifier = 2f;
-            else modifier = 1f;
+            int speedup = IsKeyDown(Keys.LeftAlt) ? 5 : 1;
+            moveX = 0; moveY = 0;
+            moveX += IsAnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : 0;
+            moveX += IsAnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0;
+            moveY += IsAnyKeyDown(Keys.W, Keys.Up) ? -Constants.PlayerSpeed : 0;
+            moveY += IsAnyKeyDown(Keys.S, Keys.Down) ? Constants.PlayerSpeed : 0;
+            GameManager.Camera += new Vector2(moveX, moveY) * delta * speedup;
 
-            if (IsAnyKeyDown(Keys.A, Keys.Left)) Camera.X -= 600 * delta * modifier;
-            if (IsAnyKeyDown(Keys.D, Keys.Right)) Camera.X += 600 * delta * modifier;
-            if (IsAnyKeyDown(Keys.S, Keys.Down)) Camera.Y += 600 * delta * modifier;
-            if (IsAnyKeyDown(Keys.W, Keys.Up)) Camera.Y -= 600 * delta * modifier;
-            Camera = Vector2.Clamp(Camera, new Xna.Vector2(0, 0), (tileSize * Constants.MapSize.ToVector2()) - Constants.Window);
+            // Time
+            GameManager.FrameTimes["InputUpdate"] = GameManager.Watch.Elapsed.TotalMilliseconds;
+            GameManager.Update(delta, previousMouseState, mouseState);
 
             // Open file
             if (IsAllKeysDown(Keys.O, Keys.LeftControl))
@@ -172,7 +171,7 @@ namespace Quest.Editor
             }
 
             // Draw
-            if (mouseState.LeftButton == ButtonState.Pressed)
+            if (LMouseDown)
             {
                 if (GetTile(mouseCoord).Type != Material)
                 {
@@ -188,9 +187,9 @@ namespace Quest.Editor
                 }
             }
             // Edit options
-            if (mouseState.RightButton == ButtonState.Pressed)
+            if (RMouseDown)
             {
-                Tile tileBelow = Tiles[mouseCoord.X + mouseCoord.Y * Constants.MapSize.X];
+                Tile tileBelow = GameManager.Tiles[mouseCoord.X + mouseCoord.Y * Constants.MapSize.X];
                 EditTile(tileBelow);
             }
             // Erase (set to sky)
@@ -204,65 +203,129 @@ namespace Quest.Editor
                     Logger.Log($"Set tile to '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}.");
                 }
             }
+            // NPCs
+            if (HotKeyPressed(Keys.LeftControl, Keys.N))
+            {
+                EditNPCs();
+            }
+
 
             // Save
-            if (IsKeyPressed(Keys.E) && IsKeyDown(Keys.LeftControl)) SaveLevel(this);
+            if (HotKeyPressed(Keys.LeftControl, Keys.E)) SaveLevel(this);
 
             // Level info
-            if (IsKeyPressed(Keys.L) && IsKeyDown(Keys.LeftControl))
-            {
-                SetSpawn();
-            }
+            if (HotKeyPressed(Keys.LeftControl, Keys.L)) SetSpawn();
 
             // Set previous key state
             previousKeyState = keyState;
             previousMouseState = mouseState;
 
+            // Set previous key state
+            GameManager.Watch.Restart();
+            previousKeyState = keyState;
+            previousMouseState = mouseState;
+
             // Final
+            debugUpdateTime += delta;
+            GameManager.FrameTimes["OtherUpdates"] = GameManager.Watch.Elapsed.TotalMilliseconds;
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            // Clear
+            // Clear and start shader gui
             GraphicsDevice.Clear(Color.Magenta);
-            spriteBatch.Begin(samplerState:SamplerState.PointClamp);
+            spriteBatch.Begin(blendState: BlendState.NonPremultiplied, samplerState: SamplerState.PointClamp);
 
-            // Tiles
-            TilesDrawn = 0;
-            for (int t = 0; t < Tiles.Length; t++)
-            {
-                Tile tile = Tiles[t];
-                // Draw each tile using the sprite batch
-                Xna.Vector2 dest = tile.Location.ToVector2() * tileSize - Camera;
-                // Check x in bounds
-                if (dest.X + Constants.TileSize.X < 0 || dest.X > Constants.Window.X) continue;
-                if (dest.Y + Constants.TileSize.Y * 2 < 0 || dest.Y > Constants.Window.Y) continue;
-                dest.Round();
-                // Draw
-                TextureID texture = (TextureID)(Enum.TryParse(typeof(TextureID), tile.GetType().ToString(), out var tileTex) ? tileTex : TextureID.Null);
-                Color color = tile.Type == TileType.Water ? Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(time + tile.Location.X + tile.Location.Y)) : Color.White;
-                Rectangle rect = new((int)dest.X, (int)dest.Y, (int)tileSize.X, (int)tileSize.Y);
-                DrawTexture(spriteBatch, texture, rect, source:TileTextureSource(tile), scale: new(4));
-                TilesDrawn++;
-            }
-
-            // Spawn
-            Xna.Vector2 spawnPos = Spawn.ToVector2() * tileSize - Camera;
-            spriteBatch.FillRectangle(new(spawnPos + tileSize/4, tileSize / 2), Color.Magenta);
+            // Draw game
+            GameManager.Draw();
 
             // Cursor
-            Vector2 cursorPos = mouseCoord.ToVector2() * tileSize - Camera;
-            spriteBatch.FillRectangle(new(cursorPos, tileSize), Color.White);
+            Vector2 cursorPos = mouseCoord.ToVector2() * Constants.TileSize - GameManager.Camera + Constants.Middle;
+            spriteBatch.FillRectangle(new(cursorPos, Constants.TileSize), Color.White);
             TextureID ghostTile = (TextureID)(Enum.TryParse(typeof(TextureID), Material.ToString(), out var tex) ? tex : TextureID.Null);
-            DrawTexture(spriteBatch, ghostTile, new(cursorPos.ToPoint(), Constants.TileSize.ToPoint()), source:Constants.ZeroSource, color:highlightColor, scale:new(4));
+            DrawTexture(spriteBatch, ghostTile, new Rectangle(cursorPos.ToPoint(), Constants.TileSize.ToPoint()), source: Constants.ZeroSource, color: highlightColor, scale: new Vector2(4));
 
-            // Text gui
-            spriteBatch.DrawString(Arial, $"FPS: {1f / delta:0.0}\nCamera: {Camera}\nMaterial: {Material} [{Selection}]\nTiles Drawn: {TilesDrawn}\nCoord: {mouseCoord}", new Vector2(10, 10), Color.Black);
+            // Text info
+            GameManager.Watch.Restart();
+            if (Constants.TEXT_INFO)
+            {
+                // Background
+                spriteBatch.FillRectangle(new(0, 0, 200, 140), Color.Black * .8f);
+                spriteBatch.DrawString(Arial, $"FPS: {(cacheDelta != 0 ? 1f / cacheDelta : 0):0.0}\nTime: {GameManager.Time:0.00}\nCamera: {GameManager.Camera.X:0.0},{GameManager.Camera.Y:0.0}\nMouseCoord: {mouseCoord.X},{mouseCoord.Y}", new Vector2(10, 10), Color.White);
+            }
+
+            // Frame info
+            if (Constants.FRAME_INFO)
+            {
+                spriteBatch.FillRectangle(new(Constants.Window.X - 190, 0, 190, GameManager.FrameTimes.Count * 20), Color.Black * .8f);
+                string frameString = string.Join("\n", frameTimes.Select(kv => $"{kv.Key}: {kv.Value:0.0}ms"));
+                spriteBatch.DrawString(Arial, frameString, new Vector2(Constants.Window.X - 180, 10), Color.White);
+            }
+            GameManager.FrameTimes["DebugTextDraw"] = GameManager.Watch.Elapsed.TotalMilliseconds;
+
+            // Frame bar
+            GameManager.Watch.Restart();
+            if (Constants.FRAME_BAR)
+                DrawFrameBar();
+            GameManager.FrameTimes["FrameBarDraw"] = GameManager.Watch.Elapsed.TotalMilliseconds;
+
+            // Cursor
+            Rectangle rect = new(mouseState.Position.X, mouseState.Position.Y, 30, 30);
+            DrawTexture(spriteBatch, TextureID.CursorArrow, rect);
 
             // Final
             spriteBatch.End();
             base.Draw(gameTime);
+        }
+        // Key presses
+        public bool HotKeyPressed(Keys modifier, Keys key) { return IsKeyDown(modifier) && IsKeyPressed(key); }
+        public bool IsKeyDown(Keys key) => keyState.IsKeyDown(key);
+        public bool IsAnyKeyDown(params Keys[] keys)
+        {
+            foreach (Keys key in keys) { if (keyState.IsKeyDown(key)) return true; }
+            return false;
+        }
+        public bool IsAllKeysDown(params Keys[] keys)
+        {
+            foreach (Keys key in keys) { if (!keyState.IsKeyDown(key)) return false; }
+            return true;
+        }
+        public bool IsKeyPressed(Keys key) => keyState.IsKeyDown(key) && !previousKeyState.IsKeyDown(key);
+        public bool IsAnyKeyPressed(params Keys[] keys)
+        {
+            foreach (Keys key in keys) { if (keyState.IsKeyDown(key) && !previousKeyState.IsKeyDown(key)) return true; }
+            return false;
+        }
+        public bool IsAllKeysPressed(params Keys[] keys)
+        {
+            foreach (Keys key in keys) { if (!(keyState.IsKeyDown(key) && !previousKeyState.IsKeyDown(key))) return false; }
+            return true;
+        }
+        // For cleaner code
+        public void DrawFrameBar()
+        {
+            // Update info twice a second
+            if (debugUpdateTime >= .5)
+            {
+                cacheDelta = delta;
+                frameTimes = new Dictionary<string, double>(GameManager.FrameTimes);
+                debugUpdateTime = 0;
+            }
+            // Background
+            spriteBatch.FillRectangle(new(Constants.Window.X - 320, Constants.Window.Y - frameTimes.Count * 20 - 50, 320, 1000), Color.Black * .8f);
+
+            // Labels and bars
+            int start = 0;
+            int c = 0;
+            spriteBatch.FillRectangle(new(Constants.Window.X - 310, Constants.Window.Y - 40, 300, 25), Color.White);
+            foreach (KeyValuePair<string, double> process in frameTimes)
+            {
+                spriteBatch.DrawString(Arial, process.Key, new(Constants.Window.X - Arial.MeasureString(process.Key).X - 5, Constants.Window.Y - 20 * c - 60), colors[c]);
+                spriteBatch.FillRectangle(new(Constants.Window.X - 310 + start, Constants.Window.Y - 40, (int)(process.Value / (cacheDelta * 1000) * 300), 25), colors[c]);
+                start += (int)(process.Value / (cacheDelta * 1000)) * 300;
+                c++;
+            }
         }
         public void ReadLevel(string filename)
         {
@@ -270,21 +333,18 @@ namespace Quest.Editor
             if (!File.Exists($"Levels/{filename}.lvl"))
                 throw new FileNotFoundException("Level file not found.", filename);
 
-            // Get data
-            string data = File.ReadAllText($"Levels/{filename}.lvl");
-            string[] lines = data.Split('\n');
-
             // Parse
             Tile[] tilesBuffer;
             using FileStream fileStream = File.OpenRead($"Levels/{filename}.lvl");
             using GZipStream gzipStream = new(fileStream, CompressionMode.Decompress);
             using BinaryReader reader = new(gzipStream);
-            // Make buffer
+            // Make buffers
             tilesBuffer = new Tile[Constants.MapSize.X * Constants.MapSize.Y];
+            List<NPC> npcBuffer = [];
 
             // Spawn
             Spawn = new(reader.ReadByte(), reader.ReadByte());
-            Camera = (Spawn - Constants.MiddleCoord).ToVector2() * tileSize;
+            GameManager.Camera = Spawn.ToVector2() * Constants.TileSize;
 
             // Tiles
             for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
@@ -304,6 +364,18 @@ namespace Quest.Editor
                 tilesBuffer[idx] = tile;
             }
 
+            // NPCs
+            int npcCount = reader.ReadByte();
+            for (int n = 0; n < npcCount; n++)
+            {
+                string name = reader.ReadString();
+                string dialog = reader.ReadString();
+                Point location = new(reader.ReadByte(), reader.ReadByte());
+                int scale = reader.ReadByte();
+                Color color = new(reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
+                npcBuffer.Add(new NPC(GameManager, TextureID.GrayMage, location, name, dialog, color, scale / 10f));
+            }
+
             // Check null
             if (tilesBuffer == null)
                 throw new ArgumentException("No tiles found in level file.");
@@ -312,11 +384,12 @@ namespace Quest.Editor
                 throw new ArgumentException($"Invalid level size - expected {Constants.MapSize.X}x{Constants.MapSize.X} tiles.");
 
             // Make and add the level
-            Tiles = tilesBuffer;
+            GameManager.NPCs = npcBuffer;
+            GameManager.Tiles = tilesBuffer;
         }
         public void SetTile(Tile tile)
         {
-            Tiles[tile.Location.X + tile.Location.Y * Constants.MapSize.X] = tile;
+            GameManager.Tiles[tile.Location.X + tile.Location.Y * Constants.MapSize.X] = tile;
         }
         public static void EditTile(Tile tile)
         {
@@ -358,6 +431,37 @@ namespace Quest.Editor
                     Logger.Error("Invalid position format - use 'x,y'.");
             }
         }
+        public void EditNPCs()
+        {
+            if (IsKeyDown(Keys.LeftShift)) // Delete
+            {
+                Logger.Print("__Delete NPC__");
+                string name = Logger.Input("Name: ");
+                foreach (NPC npc in GameManager.NPCs)
+                {
+                    if (npc.Name == name)
+                    {
+                        GameManager.NPCs.Remove(npc);
+                        Logger.Log($"Deleted NPC '{npc.Name}'.");
+                        break;
+                    }
+                }
+            }
+            else // New
+            {
+                Logger.Print("__NPC__");
+                string name = Logger.Input("Name: ");
+                string dialog = Logger.Input("Dialog: ");
+                int scale = Logger.InputInt("Size: ", fallback: 1);
+                if (scale <= 0 || scale > 25.5)
+                {
+                    Logger.Warning("Scale must be between 1 and 25.5- setting to 1");
+                    scale = 1;
+                }
+                Color color = Logger.InputColor("Color: ", fallback: Color.White);
+                GameManager.NPCs.Add(new NPC(GameManager, TextureID.GrayMage, mouseCoord, name, dialog, color, scale));
+            }
+        }
         public static void SaveLevel(EditorWindow editor)
         {
             // Input
@@ -373,12 +477,11 @@ namespace Quest.Editor
             writer.Write(IntToByte(editor.Spawn.X));
             writer.Write(IntToByte(editor.Spawn.Y));
 
-            // Dimensions
+            // Tiles
             for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
             {
-                Tile tile = editor.Tiles[i];
+                Tile tile = editor.GameManager.Tiles[i];
                 // Write tile data
-
                 writer.Write(IntToByte((int)tile.Type));
                 // Extra properties
                 if (tile is Stairs stairs)
@@ -389,6 +492,32 @@ namespace Quest.Editor
                     writer.Write(IntToByte(stairs.DestPosition.Y));
                 }
             }
+
+            // NPCs
+            writer.Write((byte)editor.GameManager.NPCs.Count);
+            for (int n = 0; n < editor.GameManager.NPCs.Count; n++)
+            {
+                NPC npc = editor.GameManager.NPCs[n];
+                // Write NPC data
+                writer.Write(npc.Name);
+                writer.Write(npc.Dialog);
+                writer.Write(IntToByte(npc.Location.X));
+                writer.Write(IntToByte(npc.Location.Y));
+                writer.Write(IntToByte((int)(npc.Scale * 10)));
+                writer.Write(npc.TextureColor.R);
+                writer.Write(npc.TextureColor.G);
+                writer.Write(npc.TextureColor.B);
+            }
+        }
+        public Tile GetTile(Xna.Point coord)
+        {
+            if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
+                throw new ArgumentOutOfRangeException(nameof(coord), "Coordinates are out of bounds of the level.");
+            return GameManager.Tiles[coord.X + coord.Y * Constants.MapSize.X];
+        }
+        public Tile GetTile(int x, int y)
+        {
+            return GetTile(new Point(x, y));
         }
         // Key presses
         public static byte IntToByte(int value)
@@ -396,61 +525,6 @@ namespace Quest.Editor
             if (value < 0 || value > 255)
                 throw new ArgumentOutOfRangeException(nameof(value), "Value must be between 0 and 255.");
             return (byte)value;
-        }
-        public bool IsKeyDown(Keys key) => keyState.IsKeyDown(key);
-        public bool IsAnyKeyDown(params Keys[] keys)
-        {
-            foreach (Keys key in keys) { if (keyState.IsKeyDown(key)) return true; }
-            return false;
-        }
-        public bool IsAllKeysDown(params Keys[] keys)
-        {
-            foreach (Keys key in keys) { if (!keyState.IsKeyDown(key)) return false; }
-            return true;
-        }
-        public bool IsKeyPressed(Keys key) => keyState.IsKeyDown(key) && !previousKeyState.IsKeyDown(key);
-        public bool IsAnyKeyPressed(params Keys[] keys)
-        {
-            foreach (Keys key in keys) { if (keyState.IsKeyDown(key) && !previousKeyState.IsKeyDown(key)) return true; }
-            return false;
-        }
-        public bool IsAllKeysPressed(params Keys[] keys)
-        {
-            foreach (Keys key in keys) { if (!(keyState.IsKeyDown(key) && !previousKeyState.IsKeyDown(key))) return false; }
-            return true;
-        }
-        public Rectangle TileTextureSource(Tile tile)
-        {
-
-            int mask = TileConnectionsMask(tile);
-
-            int srcX = (mask % Constants.TileMapDim.X) * (int)Constants.TilePixelSize.X;
-            int srcY = (mask / Constants.TileMapDim.X) * (int)Constants.TilePixelSize.Y;
-
-            return new(srcX, srcY, (int)Constants.TilePixelSize.X, (int)Constants.TilePixelSize.Y);
-        }
-        public int TileConnectionsMask(Tile tile)
-        {
-            int mask = 0;
-            int x = tile.Location.X;
-            int y = tile.Location.Y;
-
-            if (x > 0 && GetTile(x - 1, y).Type == tile.Type) mask |= 1; // left
-            if (y < Constants.MapSize.Y - 1 && GetTile(x, y + 1).Type == tile.Type) mask |= 2; // down
-            if (x < Constants.MapSize.X - 1 && GetTile(x + 1, y).Type == tile.Type) mask |= 4; // right
-            if (y > 0 && GetTile(x, y - 1).Type == tile.Type) mask |= 8; // up
-
-            return mask;
-        }
-        public Tile GetTile(Xna.Point coord)
-        {
-            if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
-                throw new ArgumentOutOfRangeException(nameof(coord), "Coordinates are out of bounds of the level.");
-            return Tiles[coord.X + coord.Y * Constants.MapSize.X];
-        }
-        public Tile GetTile(int x, int y)
-        {
-            return GetTile(new Point(x, y));
         }
     }
 }

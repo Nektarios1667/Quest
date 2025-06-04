@@ -32,7 +32,7 @@ namespace Quest
         private Dictionary<string, double> frameTimes;
         // Devices
         private GraphicsDeviceManager graphics;
-        private SpriteBatch spriteBatch;
+        protected SpriteBatch spriteBatch;
         public GameManager GameManager;
         // Textures
         public Texture2D CursorArrow { get; private set; }
@@ -101,8 +101,9 @@ namespace Quest
 
             // Managers
             GameManager = new GameManager(this, spriteBatch);
-            GameManager.ReadLevel("island_house");
-            GameManager.ReadLevel("island_house_basement");
+            //GameManager.ReadLevel("island_house");
+            //GameManager.ReadLevel("island_house_basement");
+            GameManager.ReadLevel("saruman");
             GameManager.LoadLevel(0);
 
             // Shaders
@@ -259,6 +260,19 @@ namespace Quest
                 start += (int)(process.Value / (cacheDelta * 1000)) * 300;
                 c++;
             }
+        }
+        // Editor
+        protected void BaseUpdate(GameTime gameTime)
+        {
+            base.Update(gameTime);
+        }
+        protected void BaseDraw(GameTime gameTime)
+        {
+            base.Draw(gameTime);
+        }
+        protected void BaseInitialize()
+        {
+            base.Initialize();
         }
     }
 }

@@ -10,6 +10,7 @@ using Quest.Gui;
 using System.Security.Policy;
 using static Quest.TextureManager;
 using MonoGame.Extended;
+using MonoGUI;
 
 namespace Quest
 {
@@ -18,14 +19,14 @@ namespace Quest
         public bool HasTalked { get; set; }
         public bool IsTalking { get; set; }
         public Dialog DialogBox { get; private set; }
-        public GameManager Game { get; private set; }
+        public IGameManager Game { get; private set; }
         public Point Location { get; set; }
         public string Name { get; set; }
         public string Dialog { get; set; }
         public TextureID Texture { get; set; }
         public Color TextureColor { get; set; }
         public float Scale { get; set; }
-        public NPC(GameManager game, TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1)
+        public NPC(IGameManager game, TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1)
         {
             IsTalking = false;
             HasTalked = false;
@@ -36,13 +37,13 @@ namespace Quest
             Dialog = dialog;
             TextureColor = textureColor == default ? Color.White : textureColor;
             Scale = scale;
-            DialogBox = new Dialog(game.Gui, new(Constants.Middle.X - 600, Constants.Window.Y - 190), new(1200, 100), new(194, 125, 64), Color.Black, $"[{name}] {dialog}", Game.Window.PixelOperator, borderColor: new(36, 19, 4)) { IsVisible = false };
+            DialogBox = new Dialog(game.Gui, new(Constants.Middle.X - 600, Constants.Window.Y - 190), new(1200, 100), new(194, 125, 64), Color.Black, $"[{name}] {dialog}", Game.PixelOperator, borderColor: new(36, 19, 4)) { IsVisible = false };
             game.Gui.Widgets.Add(DialogBox);
         }
         public void Draw()
         {
             // Npc
-            Rectangle source = new(new((int)(Game.Time * 3) % 4 * Game.MageSize.X, 0), Game.MageSize);
+            Rectangle source = new(new((int)(Game.Time * 3) % 4 * Constants.MageSize.X, 0), Constants.MageSize);
             Vector2 size = new Vector2(80, 80) * Scale;
             Vector2 origin = new(size.X / (2 * Scale), size.Y / Scale);
             Rectangle rect = new(((Location.ToVector2() + Constants.HalfVec) * Constants.TileSize - Game.Camera + Constants.Middle).ToPoint(), size.ToPoint());

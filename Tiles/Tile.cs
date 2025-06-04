@@ -31,7 +31,7 @@ namespace Quest.Tiles
         // Properties - protected setter
         public bool IsWalkable { get; protected set; }
         public TileType Type { get; protected set; }
-        public Tile(Xna.Point location)
+        public Tile(Point location)
         {
             // Initialize the tile
             Location = location;
@@ -39,19 +39,19 @@ namespace Quest.Tiles
             Type = (TileType)Enum.Parse(typeof(TileType), GetType().Name);
             Marked = false;
         }
-        public virtual void Draw(GameManager game)
+        public virtual void Draw(IGameManager game)
         {
             // Draw
-            Xna.Vector2 dest = Location.ToVector2() * Constants.TileSize - game.Camera + Constants.Middle;
+            Vector2 dest = Location.ToVector2() * Constants.TileSize - game.Camera + Constants.Middle;
             TextureID texture = (TextureID)(Enum.TryParse(typeof(TextureID), Type.ToString(), out var tex) ? tex : TextureID.Null);
             Color color = Marked ? Color.Red : Color.White;
             Rectangle rect = new((int)dest.X, (int)dest.Y, (int)Constants.TileSize.X, (int)Constants.TileSize.Y);
             DrawTexture(game.Batch, texture, rect, source:game.TileTextureSource(this), scale: new(4), color:color);
             Marked = false;
         }
-        public virtual void OnPlayerEnter(GameManager game) { }
-        public virtual void OnPlayerExit(GameManager game) { }
-        public virtual void OnPlayerInteract(GameManager game) { }
+        public virtual void OnPlayerEnter(IGameManager game) { }
+        public virtual void OnPlayerExit(IGameManager game) { }
+        public virtual void OnPlayerInteract(IGameManager game) { }
 
     }
 }

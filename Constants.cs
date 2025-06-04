@@ -40,6 +40,8 @@ namespace Quest
         public static readonly Xna.Rectangle ZeroSource = new(0, 0, (int)TilePixelSize.X, (int)TilePixelSize.Y); // Default tile source rect
         public static readonly Xna.Vector2[] PlayerCorners = [new(-23, 12), new(23, 12), new(-23, 45), new(23, 45)]; // Player bounding box corners, tl, tr, bl, br
         public static readonly Xna.Vector2 PlayerBox = new(PlayerCorners[1].X - PlayerCorners[0].X, PlayerCorners[2].Y - PlayerCorners[1].Y);
+        public static readonly Xna.Point MageSize = new(80, 80); // Size of the mage sprite in pixels
+        public static readonly Xna.Point MageHalfSize = new(MageSize.X / 2, MageSize.Y / 2); // Half size of the mage sprite in pixels
 
         // Utility
         public static readonly Xna.Vector2 HalfVec = new(0.5f, 0.5f);

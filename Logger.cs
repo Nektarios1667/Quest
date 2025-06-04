@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Quest
 {
@@ -28,6 +30,31 @@ namespace Quest
             }
             else
                 Console.WriteLine($"[Unknown] {message}");
+        }
+        public static int InputInt(string message, int fallback = 0)
+        {
+            string resp = Input(message);
+            if (int.TryParse(resp, out int result))
+                return result;
+            else
+            {
+                Error("Invalid input- expected an integer.");
+                return fallback; // Default value or handle as needed
+            }
+        }
+        public static Color InputColor(string message, Color fallback = default)
+        {
+            string resp = Input(message);
+            string[] parts = resp.Split(',');
+            if (parts.Length != 3) return fallback;
+            int r, g, b;
+            if (int.TryParse(parts[0], out r) && int.TryParse(parts[1], out g) && int.TryParse(parts[2], out b))
+                return new Color(r, g, b);
+            else
+            {
+                Error("Invalid input- expected r,g,b color");
+                return fallback;
+            }
         }
         public static string Input(string message)
         {

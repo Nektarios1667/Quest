@@ -16,7 +16,7 @@ namespace Quest.Tiles
         {
             IsWalkable = false;
         }
-        public override void Draw(GameManager game)
+        public override void Draw(IGameManager game)
         {
             // Draw each tile using the sprite batch
             Vector2 dest = Location.ToVector2() * Constants.TileSize - game.Camera;

@@ -27,10 +27,21 @@ namespace Quest
     }
     public class Inventory
     {
-        public GameManager Game { get; private set; }
+        // Input generators
+        public bool LMouseClick => MouseState.LeftButton == ButtonState.Pressed && PreviousMouseState.LeftButton == ButtonState.Released;
+        public bool LMouseDown => MouseState.LeftButton == ButtonState.Pressed;
+        public bool LMouseRelease => MouseState.LeftButton == ButtonState.Released && PreviousMouseState.LeftButton == ButtonState.Pressed;
+        public bool RMouseClick => MouseState.RightButton == ButtonState.Pressed && PreviousMouseState.RightButton == ButtonState.Released;
+        public bool RMouseDown => MouseState.RightButton == ButtonState.Pressed;
+        public bool RMouseRelease => MouseState.RightButton == ButtonState.Released && PreviousMouseState.RightButton == ButtonState.Pressed;
+        private MouseState MouseState { get; set; }
+        private MouseState PreviousMouseState { get; set; }
+
+        //
+        public IGameManager Game { get; private set; }
         public Item?[,] Items { get; private set; }
         public bool Opened { get; set; } = false;
-        private SpriteFont PressStart { get; set; }
+        private SpriteFont PixelOperator { get; set; }
         public int EquippedSlot { get; set; }
         public int SelectedSlot { get; set; }
         public int HoverSlot { get; set; }
@@ -38,7 +49,7 @@ namespace Quest
         public int Height { get; }
         private readonly Xna.Point itemOffset = new(8, 8);
         private readonly Vector2 itemScale = new(3, 3);
-        public Inventory(GameManager game, int width, int height)
+        public Inventory(IGameManager game, int width, int height)
         {
             Game = game;
             Items = new Item?[width, height];
@@ -46,23 +57,27 @@ namespace Quest
             Height = height;
             SelectedSlot = width * height - 1;
             HoverSlot = 0;
-            PressStart = Game.Window.Content.Load<SpriteFont>("Fonts/PressStart");
+            PixelOperator = Game.Content.Load<SpriteFont>("Fonts/PixelOperator");
         }
-        public void Update(MouseState previousMouseState, MouseState mouseState)
+        public void Update(MouseState PreviousMouseState, MouseState MouseState)
         {
+            // Inputs
+            PreviousMouseState = PreviousMouseState;
+            MouseState = MouseState;
+
             // Scroll slot
-            if (mouseState.ScrollWheelValue > previousMouseState.ScrollWheelValue)
+            if (MouseState.ScrollWheelValue > PreviousMouseState.ScrollWheelValue)
             {
                 EquippedSlot = (EquippedSlot + 1) % Width;
             }
-            if (mouseState.ScrollWheelValue < previousMouseState.ScrollWheelValue)
+            if (MouseState.ScrollWheelValue < PreviousMouseState.ScrollWheelValue)
             {
                 EquippedSlot -= 1;
                 if (EquippedSlot < 0) EquippedSlot += Width;
             }
 
             // Handle slot interactions
-            SlotInteractions(previousMouseState, mouseState);
+            SlotInteractions(PreviousMouseState, MouseState);
         }
         public void Draw()
         {
@@ -82,21 +97,21 @@ namespace Quest
                     DrawTexture(Game.Batch, textureId, new(itemDest.ToPoint() + itemOffset, Constants.ItemTextureSize), scale:itemScale);
 
                     // Text
-                    Vector2 textDest = itemDest + Constants.SlotTextureSize.ToVector2() - new Vector2(PressStart.MeasureString($"{item.Amount}").X + 8, 30);
-                    Game.Batch.DrawString(PressStart, $"{item.Amount}", textDest, Color.Black);
+                    Vector2 textDest = itemDest + Constants.SlotTextureSize.ToVector2() - new Vector2(PixelOperator.MeasureString($"{item.Amount}").X + 8, 30);
+                    Game.Batch.DrawString(PixelOperator, $"{item.Amount}", textDest, Color.Black);
                 }
             }
         }
-        public void SlotInteractions(MouseState previousMouseState, MouseState mouseState)
+        public void SlotInteractions(MouseState PreviousMouseState, MouseState MouseState)
         {
             // Get
-            int mouseSlot = Flatten(GetMouseSlot(mouseState));
+            int mouseSlot = Flatten(GetMouseSlot(MouseState));
 
             // Hover slot
             HoverSlot = mouseSlot;
 
             // Swap items
-            if (Opened && Game.Window.LMouseRelease)
+            if (Opened && LMouseRelease)
             {
                 if (mouseSlot >= 0 && mouseSlot != SelectedSlot)
                 {
@@ -115,7 +130,7 @@ namespace Quest
             }
 
             // Spread items
-            if (Opened && Game.Window.RMouseRelease)
+            if (Opened && RMouseRelease)
             {
                 if (mouseSlot >= 0 && mouseSlot != SelectedSlot)
                 {
@@ -143,11 +158,11 @@ namespace Quest
             }
 
             // Select slot
-            if (Opened && (Game.Window.LMouseClick || Game.Window.RMouseClick) && mouseSlot >= 0)
+            if (Opened && (LMouseClick || RMouseClick) && mouseSlot >= 0)
                 SelectedSlot = mouseSlot;
 
             // Deselect
-            if (Game.Window.LMouseDown && (mouseSlot < 0 || mouseSlot > Items.Length)) SelectedSlot = -1;
+            if (LMouseDown && (mouseSlot < 0 || mouseSlot > Items.Length)) SelectedSlot = -1;
         }
         // Slot interactions
         private Color SlotColor(int x, int y)
@@ -216,16 +231,16 @@ namespace Quest
                 SetSlot(pos.X, pos.Y, item);
             }
         }
-        public Xna.Point GetMouseSlot(MouseState mouseState)
+        public Xna.Point GetMouseSlot(MouseState MouseState)
         {
             // x coord
             int left = (int)Constants.Middle.X - (Constants.SlotTextureSize.X * Width / 2);
-            int x = (mouseState.Position.X - left) / (Constants.SlotTextureSize.X + 4);
+            int x = (MouseState.Position.X - left) / (Constants.SlotTextureSize.X + 4);
             if (x < 0 || x >= Width) return Constants.NegOne; // Out of bounds
 
             // y coord
             int top = (int)Constants.Window.Y - (GetTexture(TextureID.Slot).Texture.Height + 8) * (Height + 1) - (Height != 0 ? 20 : 0);
-            int y = (mouseState.Position.Y - top) / (Constants.SlotTextureSize.Y + 8);
+            int y = (MouseState.Position.Y - top) / (Constants.SlotTextureSize.Y + 8);
             y = Height - y; // Flip y axis
             if (y < 0 || y >= Height) return Constants.NegOne; // Out of bounds
 
