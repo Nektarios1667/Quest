@@ -275,6 +275,9 @@ namespace Quest.Editor
                 DrawFrameBar();
             GameManager.FrameTimes["FrameBarDraw"] = GameManager.Watch.Elapsed.TotalMilliseconds;
 
+            // Minimap
+            DrawMiniMap();
+
             // Cursor
             Rectangle rect = new(mouseState.Position.X, mouseState.Position.Y, 30, 30);
             DrawTexture(spriteBatch, TextureID.CursorArrow, rect);
@@ -335,6 +338,34 @@ namespace Quest.Editor
                 }
                 Logger.Log($"Filled {count} tiles with '{Material}' starting from {mouseCoord.X}, {mouseCoord.Y}.");
             }
+        }
+        public void DrawMiniMap()
+        {
+            spriteBatch.DrawRectangle(new(7, Constants.Window.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
+            for (int y = 0; y < Constants.MapSize.Y; y++)
+            {
+                for (int x = 0; x < Constants.MapSize.X; x++)
+                {
+                    // Get tile
+                    Tile tile = GetTile(new Point(x, y));
+                    Color color = tile.Type switch
+                    {
+                        TileType.Sky => Constants.MinimapSky,
+                        TileType.Grass => Constants.MinimapGrass,
+                        TileType.Water => Constants.MinimapWater,
+                        TileType.StoneWall => Constants.MinimapStoneWall,
+                        TileType.Stairs => Constants.MinimapStairs,
+                        TileType.Flooring => Constants.MinimapFlooring,
+                        TileType.Sand => Constants.MinimapSand,
+                        TileType.Dirt => Constants.MinimapDirt,
+                        _ => Color.White
+                    };
+                    spriteBatch.DrawPoint(new(10 + x, Constants.Window.Y - Constants.MapSize.Y - 10 + y), color);
+                }
+            }
+            // Player
+            Point dest = GameManager.Coord + new Point(10, (int)(Constants.Window.Y - Constants.MapSize.Y - 10));
+            spriteBatch.DrawPoint(dest.ToVector2(), Color.Red, size: 2);
         }
         public void DrawFrameBar()
         {

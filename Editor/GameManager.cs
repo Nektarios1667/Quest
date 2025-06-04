@@ -23,6 +23,7 @@ namespace Quest.Editor
         public Stopwatch Watch { get; private set; }
         public Dictionary<string, double> FrameTimes { get; private set; }
         // Properties
+        public Point Coord => (Camera / Constants.TileSize).ToPoint();
         public ContentManager Content => Window.Content;
         public GuiManager Gui { get; private set; } // GUI handler
         public EditorWindow Window { get; private set; }
@@ -54,9 +55,6 @@ namespace Quest.Editor
             }
             Camera = new Vector2(128 * Constants.TileSize.X, 128 * Constants.TileSize.Y) - Constants.Middle;
             Gui = new();
-            Gui.Widgets = [
-                new StatusBar(new(10, Constants.Window.Y - 35), new(300, 25), Color.Green, Color.Red, 100, 100),
-            ];
             Watch = new();
             FrameTimes = [];
             NPCs = [];

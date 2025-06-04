@@ -180,6 +180,10 @@ namespace Quest
             // Gui
             GameManager.DrawGui();
 
+            // Minimap
+            if (GameManager.Inventory.Opened)
+                DrawMiniMap();
+
             // Text info
             GameManager.Watch.Restart();
             if (Constants.TEXT_INFO)
@@ -237,6 +241,36 @@ namespace Quest
             return true;
         }
         // For cleaner code
+        public void DrawMiniMap()
+        {
+            // Frame
+            spriteBatch.DrawRectangle(new(7, Constants.Window.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
+            // Pixels
+            for (int y = 0; y < Constants.MapSize.Y; y++)
+            {
+                for (int x = 0; x < Constants.MapSize.X; x++)
+                {
+                    // Get tile
+                    Tile tile = GameManager.GetTile(new Point(x, y))!;
+                    Color color = tile.Type switch
+                    {
+                        TileType.Sky => Constants.MinimapSky,
+                        TileType.Grass => Constants.MinimapGrass,
+                        TileType.Water => Constants.MinimapWater,
+                        TileType.StoneWall => Constants.MinimapStoneWall,
+                        TileType.Stairs => Constants.MinimapStairs,
+                        TileType.Flooring => Constants.MinimapFlooring,
+                        TileType.Sand => Constants.MinimapSand,
+                        TileType.Dirt => Constants.MinimapDirt,
+                        _ => Color.White
+                    };
+                    spriteBatch.DrawPoint(new(10 + x, Constants.Window.Y - Constants.MapSize.Y - 10 + y), color);
+                }
+            }
+            // Player
+            Vector2 dest = GameManager.Coord + new Vector2(10, Constants.Window.Y - Constants.MapSize.Y - 10);
+            spriteBatch.DrawPoint(dest, Color.Red, size:2);
+        }
         public void DrawFrameBar()
         {
             // Update info twice a second

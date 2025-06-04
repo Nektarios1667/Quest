@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SharpDX.MediaFoundation.DirectX;
 using Xna = Microsoft.Xna.Framework;
 namespace Quest
 {
@@ -58,5 +57,15 @@ namespace Quest
         // Texture default sizes
         public static readonly Xna.Point SlotTextureSize = new(80, 80); // Default size for item slots
         public static readonly Xna.Point ItemTextureSize = new(60, 60); // Default size for items
+
+        // Minimap pixel colors
+        public static readonly Xna.Color MinimapSky = new(92, 221, 241);
+        public static readonly Xna.Color MinimapGrass = Xna.Color.Green;
+        public static readonly Xna.Color MinimapWater = Xna.Color.Blue;
+        public static readonly Xna.Color MinimapStoneWall = Xna.Color.Gray;
+        public static readonly Xna.Color MinimapStairs = new(117, 66, 13);
+        public static readonly Xna.Color MinimapFlooring = new(155, 155, 195);
+        public static readonly Xna.Color MinimapSand = Xna.Color.Yellow;
+        public static readonly Xna.Color MinimapDirt = new(48, 25, 0);
     }
 }
