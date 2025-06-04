@@ -24,7 +24,7 @@ namespace Quest
         public Widget[] Widgets { get; private set; }
         // Debug
         public Stopwatch Watch { get; private set; }
-        public Tile TileBelow { get; private set; }
+        public Tile? TileBelow { get; private set; }
         public Xna.Vector2 Coord { get; private set; }
         public Dictionary<string, double> FrameTimes { get; private set; }
         // Properties
@@ -136,9 +136,11 @@ namespace Quest
             Point start = ((Camera - Constants.Middle) / Constants.TileSize).ToPoint();
             Point end = ((Camera + Constants.Middle) / Constants.TileSize).ToPoint();
 
+            // Iterate
             for (int y = start.Y; y <= end.Y; y++) {
                 for (int x = start.X; x <= end.X; x++) {
-                    Tile tile = GetTile(x, y);
+                    Tile? tile = GetTile(x, y);
+                    if (tile == null) continue;
                     // Draw each tile using the sprite batch
                     Xna.Vector2 dest = tile.Location.ToVector2() * tileSize - Camera;
                     dest += Constants.Middle;
@@ -174,9 +176,11 @@ namespace Quest
             if (!CollideCheck()) CameraDest -= new Vector2(0, finalMove.Y);
 
             // On tile enter
-            Coord = Vector2.Round(CameraDest / Constants.TileSize);
+            Coord = Vector2.Floor((new Vector2(CameraDest.X, CameraDest.Y + Window.MageHalfSize.Y) / Constants.TileSize));
             TileBelow = GetTile((int)Coord.X, (int)Coord.Y);
+            if (TileBelow == null) return;
             TileBelow.OnPlayerEnter(this);
+            TileBelow.Marked = true;
             // Debug
             if (Constants.COLLISION_DEBUG) TileBelow.Marked = true;
         }
@@ -291,7 +295,6 @@ namespace Quest
                 // Check if the player collides with a tile
                 Vector2 coord = (CameraDest + Constants.PlayerCorners[o]) / Constants.TileSize;
                 TileBelow = GetTile((int)Math.Floor(coord.X), (int)Math.Floor(coord.Y));
-                TileBelow.Marked = true;
                 if (TileBelow == null || !TileBelow.IsWalkable) return false;
             }
             return true;
@@ -337,13 +340,13 @@ namespace Quest
             Batch.Draw(texture, rect.Location.ToVector2(), sourceRect, color, rotation, origin, scale, spriteEffect, depth);
             return true;
         }
-        public Tile GetTile(Xna.Point coord)
+        public Tile? GetTile(Xna.Point coord)
         {
             if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
-                throw new ArgumentOutOfRangeException(nameof(coord), "Coordinates are out of bounds of the level.");
+                return null;
             return Tiles[coord.X + coord.Y * Constants.MapSize.X];
         }
-        public Tile GetTile(int x, int y)
+        public Tile? GetTile(int x, int y)
         {
             return GetTile(new Point(x, y));
         }
@@ -363,10 +366,15 @@ namespace Quest
             int x = tile.Location.X;
             int y = tile.Location.Y;
 
-            if (x > 0 && GetTile(x - 1, y).Type == tile.Type) mask |= 1; // left
-            if (y < Constants.MapSize.Y - 1 && GetTile(x, y + 1).Type == tile.Type) mask |= 2; // down
-            if (x < Constants.MapSize.X - 1 && GetTile(x + 1, y).Type == tile.Type) mask |= 4; // right
-            if (y > 0 && GetTile(x, y - 1).Type == tile.Type) mask |= 8; // up
+            Tile? left = GetTile(x - 1, y);
+            Tile? right = GetTile(x + 1, y);
+            Tile? down = GetTile(x, y + 1);
+            Tile? up = GetTile(x, y - 1);
+
+            if (left?.Type == tile.Type) mask |= 1; // left
+            if (down?.Type == tile.Type) mask |= 2; // down
+            if (right?.Type == tile.Type) mask |= 4; // right
+            if (up?.Type == tile.Type) mask |= 8; // up
 
             return mask;
         }

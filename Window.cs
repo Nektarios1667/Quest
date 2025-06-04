@@ -9,8 +9,7 @@ using Quest.Gui;
 using Quest.Tiles;
 using MonoGame.Extended;
 using System.Collections.Generic;
-using System.Security.Policy;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
+
 
 namespace Quest
 {
@@ -45,8 +44,8 @@ namespace Quest
         public SpriteFont PixelOperator { get; private set; }
         // Robot sprites
         public Texture2D BlueMage { get; private set; }
-        public Point BlueMageSize { get; private set; }
-        public Point BlueMageHalfSize { get; private set; }
+        public Point MageSize { get; private set; }
+        public Point MageHalfSize { get; private set; }
         // Movements
         private int moveX;
         private int moveY;
@@ -110,8 +109,8 @@ namespace Quest
 
             // Characters
             BlueMage = Content.Load<Texture2D>("Images/Characters/BlueMage");
-            BlueMageSize = new(BlueMage.Width / 4, BlueMage.Height / 5);
-            BlueMageHalfSize = new(BlueMageSize.X / 2, BlueMageSize.Y / 2);
+            MageSize = new(BlueMage.Width / 4, BlueMage.Height / 5);
+            MageHalfSize = new(MageSize.X / 2, MageSize.Y / 2);
 
             // Shaders
             Grayscale = Content.Load<Effect>("Shaders/Grayscale");
@@ -317,8 +316,9 @@ namespace Quest
             else if (moveX > 0) sourceRow = 3;
             else if (moveY > 0) sourceRow = 2;
             else if (moveY < 0) sourceRow = 4;
-            Rectangle source = new((int)(GameHandler.Time * (sourceRow == 0 ? 1.5f : 6)) % 4 * BlueMageSize.X, sourceRow * BlueMageSize.Y, BlueMageSize.X, BlueMageSize.Y);
-            TryDraw(BlueMage, new(Constants.Middle.ToPoint() - BlueMageHalfSize, BlueMageSize), sourceRect: source);
+            Rectangle source = new((int)(GameHandler.Time * (sourceRow == 0 ? 1.5f : 6)) % 4 * MageSize.X, sourceRow * MageSize.Y, MageSize.X, MageSize.Y);
+            Rectangle rect = new(Constants.Middle.ToPoint() - MageHalfSize, MageSize);
+            TryDraw(BlueMage, rect, sourceRect: source);
         }
     }
 }

@@ -39,7 +39,8 @@ namespace Quest
 
         // Rendering and positioning
         public static readonly Xna.Rectangle ZeroSource = new(0, 0, (int)TilePixelSize.X, (int)TilePixelSize.Y); // Default tile source rect
-        public static readonly Xna.Vector2[] PlayerCorners = [new(-23, 12), new(23, 12), new(-23, 45), new(23, 45)]; // Player bounding box corners
+        public static readonly Xna.Vector2[] PlayerCorners = [new(-23, 12), new(23, 12), new(-23, 45), new(23, 45)]; // Player bounding box corners, tl, tr, bl, br
+        public static readonly Xna.Vector2 PlayerBox = new(PlayerCorners[1].X - PlayerCorners[0].X, PlayerCorners[2].Y - PlayerCorners[1].Y);
 
         // Utility
         public static readonly Xna.Point NegOne = new(-1, -1); // Flipping vector
