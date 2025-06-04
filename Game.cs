@@ -215,7 +215,7 @@ namespace Quest
             MageHalfSize = new(MageSize.X / 2, MageSize.Y / 2);
 
             // NPCS
-            NPCs = [new(this, WhiteMage, new(131, 131), "Saruman the White", "Against the power of Mordor there can be no victory. ... We must join with Sauron.", scale:2f)];
+            NPCs = [new(this, WhiteMage, new(131, 131), "Saruman the White", " I have looked upon the Eye of Sauron. It is too strong for us. We cannot hope to match him. ... We must join with Sauron.", scale:2f)];
 
             // Load gui
             Gui.LoadContent(content);
