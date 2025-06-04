@@ -28,6 +28,7 @@ namespace Quest
             // Items
             Pickaxe,
             Sword,
+            Palantir,
             // Tiles
             Dirt,
             Flooring,
@@ -40,7 +41,7 @@ namespace Quest
             Water,
         }
 
-
+        private static List<string> errors = [];
         public static Dictionary<TextureID, Texture2D> Textures { get; private set; } = new();
         private static Texture2D? MissingTexture { get; set; } = null;
         private static ContentManager? Content { get; set; }
@@ -72,10 +73,15 @@ namespace Quest
         }
         public static (Texture2D Texture, bool Found) GetTexture(TextureID id)
         {
+            // Found
             if (Textures.TryGetValue(id, out var texture))
                 return (texture, true);
 
-            Logger.Error($"Texture with name '{id}' not found.");
+            // Missing
+            if (!errors.Contains($"getfail-{id}")) {
+                Logger.Error($"Texture with name '{id}' not found.");
+                errors.Add($"getfail-{id}");
+            }
             if (MissingTexture == null)
             {
                 if (Content == null)
@@ -92,31 +98,24 @@ namespace Quest
             if (color == default) color = Color.White;
             if (origin == default) origin = Vector2.Zero;
             // If scale is not set, default to 1, unless its missing then stretch to texture size
-            if (scale == default) scale = found ? Vector2.One : (tex.Bounds.Size / rect.Size).ToVector2();
+            if (scale == default && found) scale = Vector2.One;
+            else if (!found) scale = (rect.Size / tex.Bounds.Size).ToVector2();
+
             batch.Draw(tex, rect.Location.ToVector2(), source, color, rotation, origin, scale, effects, layerDepth);
         }
         public static void UnloadTexture(TextureID id)
         {
-            if (!Textures.Remove(id))
-                throw new KeyNotFoundException($"Texture with name '{id}' not found.");
+            if (!Textures.Remove(id) && !errors.Contains($"unloadfail-{id}"))
+            {
+                Logger.Error($"Texture with name '{id}' not found.");
+                errors.Add($"unloadfail-{id}");
+            }
         }
-
 
         private static Texture2D GenerateMissingTexture(GraphicsDevice gfx)
         {
-            int size = 32;
-            var tex = new Texture2D(gfx, size, size);
-            Color[] data = new Color[size * size];
-
-            for (int y = 0; y < size; y++)
-            {
-                for (int x = 0; x < size; x++)
-                {
-                    bool isMagenta = ((x + y) / 16) % 2 == 0;
-                    data[y * size + x] = isMagenta ? Color.Magenta : Color.Black;
-                }
-            }
-
+            var tex = new Texture2D(gfx, 2, 2);
+            Color[] data = [Color.Magenta, Color.Black, Color.Black, Color.Magenta];
             tex.SetData(data);
             return tex;
         }
