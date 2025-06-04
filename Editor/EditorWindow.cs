@@ -203,6 +203,11 @@ namespace Quest.Editor
                     Logger.Log($"Set tile to '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}.");
                 }
             }
+
+            // Fill
+            if (IsKeyPressed(Keys.F))
+                FloodFill();
+
             // NPCs
             if (HotKeyPressed(Keys.LeftControl, Keys.N))
             {
@@ -303,6 +308,34 @@ namespace Quest.Editor
             return true;
         }
         // For cleaner code
+        public void FloodFill()
+        {
+            // Fill with current material
+            int count = 0;
+            Tile tileBelow = GetTile(mouseCoord);
+            if (tileBelow.Type != Material)
+            {
+                Queue<Tile> queue = new();
+                queue.Enqueue(tileBelow);
+                while (queue.Count > 0 && count < 10000)
+                {
+                    Tile current = queue.Dequeue();
+                    if (current.Type == Material) continue; // Skip if already set
+                    SetTile(GameManager.TileFromId(Selection, current.Location));
+                    count++;
+                    // Check neighbors
+                    foreach (Point neighbor in Constants.NeighborTiles)
+                    {
+                        Point neighborCoord = current.Location + neighbor;
+                        if (neighborCoord.X < 0 || neighborCoord.X >= Constants.MapSize.X || neighborCoord.Y < 0 || neighborCoord.Y >= Constants.MapSize.Y) continue;
+                        Tile neighborTile = GetTile(neighborCoord);
+                        if (neighborTile.Type == tileBelow.Type && neighborTile.Type != Material)
+                            queue.Enqueue(neighborTile);
+                    }
+                }
+                Logger.Log($"Filled {count} tiles with '{Material}' starting from {mouseCoord.X}, {mouseCoord.Y}.");
+            }
+        }
         public void DrawFrameBar()
         {
             // Update info twice a second

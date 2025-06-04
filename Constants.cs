@@ -23,6 +23,7 @@ namespace Quest
         public static readonly Xna.Point TileMapDim = new(4, 4); // Dimensions of the connected texture map
         public static readonly Xna.Point MapSize = new(256, 256); // Map size in tiles - can not be above 256x256 because of save file
         public static readonly Xna.Vector2 TileSizeScale = TileSize / TilePixelSize; // Scale factor from tile pixel size to in-game tile size
+        public static readonly List<Xna.Point> NeighborTiles = [new(0, 1), new(1, 0), new(0, -1), new(-1, 0)];
 
         // Screen
         public static readonly Xna.Vector2 Window = new(1400, 900); // Game window resolution
