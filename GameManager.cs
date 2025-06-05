@@ -14,7 +14,6 @@ using System.IO.Compression;
 using MonoGame.Extended;
 using Microsoft.Xna.Framework.Input;
 using static Quest.TextureManager;
-using MonoGUI;
 
 namespace Quest {
 

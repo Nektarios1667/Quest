@@ -10,7 +10,6 @@ using Quest.Gui;
 using System.Security.Policy;
 using static Quest.TextureManager;
 using MonoGame.Extended;
-using MonoGUI;
 
 namespace Quest
 {
