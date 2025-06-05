@@ -532,8 +532,8 @@ namespace Quest.Editor
             string name = Logger.Input("Export file name: ");
 
             // Parse
-            Directory.CreateDirectory("Levels");
-            using FileStream fileStream = File.Create($"Levels/{name}.lvl");
+            Directory.CreateDirectory("..\\..\\..\\Levels");
+            using FileStream fileStream = File.Create($"..\\..\\..\\Levels/{name}.lvl");
             using GZipStream gzipStream = new(fileStream, CompressionLevel.Optimal);
             using BinaryWriter writer = new(gzipStream);
 
