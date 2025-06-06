@@ -169,9 +169,7 @@ namespace Quest {
             // Iterate
             for (int y = start.Y; y <= end.Y; y++) {
                 for (int x = start.X; x <= end.X; x++) {
-                    Tile? tile = GetTile(x, y);
-                    if (tile == null) continue;
-                    tile.Draw(this);
+                    GetTile(x, y)?.Draw(this);
                 }
             }
             FrameTimes["TileDraws"] = Watch.Elapsed.TotalMilliseconds;

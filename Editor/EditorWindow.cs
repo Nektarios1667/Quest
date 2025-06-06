@@ -154,13 +154,13 @@ namespace Quest.Editor
             }
 
             // Change material
-            if (mouseState.ScrollWheelValue > previousMouseState.ScrollWheelValue)
+            if (mouseState.ScrollWheelValue > previousMouseState.ScrollWheelValue || IsKeyPressed(Keys.OemCloseBrackets))
             {
                 Selection = (Selection + 1) % Constants.TileNames.Length;
                 Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileNames[Selection]);
                 Logger.Log($"Material set to '{Material}'.");
             }
-            if (mouseState.ScrollWheelValue < previousMouseState.ScrollWheelValue)
+            if (mouseState.ScrollWheelValue < previousMouseState.ScrollWheelValue || IsKeyPressed(Keys.OemCloseBrackets))
             {
                 Selection = (Selection - 1) % Constants.TileNames.Length;
                 if (Selection < 0) Selection += Constants.TileNames.Length;

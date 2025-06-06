@@ -10,11 +10,13 @@ using Quest.Tiles;
 using MonoGame.Extended;
 using System.Collections.Generic;
 using static Quest.TextureManager;
+using System.Text;
 
 namespace Quest
 {
     public class Window : Game
     {
+        static readonly StringBuilder debugSb = new StringBuilder();
         // Inputs
         private KeyboardState keyState;
         private KeyboardState previousKeyState;
@@ -186,20 +188,11 @@ namespace Quest
             // Text info
             GameManager.Watch.Restart();
             if (Constants.TEXT_INFO)
-            {
-                // Background
-                spriteBatch.FillRectangle(new(0, 0, 200, 140), Color.Black * .8f);
-                spriteBatch.DrawString(Arial, $"FPS: {(cacheDelta != 0 ? 1f / cacheDelta : 0):0.0}\nTime: {GameManager.Time:0.00}\nCamera: {GameManager.Camera.X:0.0},{GameManager.Camera.Y:0.0}\nTile Below: {(GameManager.TileBelow == null ? "none" : GameManager.TileBelow.Type)}\nCoord: {GameManager.Coord}\nLevel: {GameManager.Level.Name}" +
-                    $"\nInventory: {GameManager.Inventory.Opened}", new Vector2(10, 10), Color.White);
-            }
+                DrawTextInfo();
 
             // Frame info
             if (Constants.FRAME_INFO)
-            {
-                spriteBatch.FillRectangle(new(Constants.Window.X - 190, 0, 190, GameManager.FrameTimes.Count * 20), Color.Black * .8f);
-                string frameString = string.Join("\n", frameTimes.Select(kv => $"{kv.Key}: {kv.Value:0.0}ms"));
-                spriteBatch.DrawString(Arial, frameString, new Vector2(Constants.Window.X - 180, 10), Color.White);
-            }
+                DrawFrameInfo();
             GameManager.FrameTimes["DebugTextDraw"] = GameManager.Watch.Elapsed.TotalMilliseconds;
 
             // Frame bar
@@ -240,6 +233,44 @@ namespace Quest
             return true;
         }
         // For cleaner code
+        public void DrawFrameInfo()
+        {
+            float boxHeight = GameManager.FrameTimes.Count * 20;
+            spriteBatch.FillRectangle(new(Constants.Window.X - 190, 0, 190, boxHeight), Color.Black * 0.8f);
+
+            debugSb.Clear();
+            foreach (var kv in frameTimes)
+            {
+                debugSb.Append(kv.Key);
+                debugSb.Append(": ");
+                debugSb.AppendFormat("{0:0.0}ms", kv.Value);
+                debugSb.Append('\n');
+            }
+
+            spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.Window.X - 180, 10), Color.White);
+        }
+        public void DrawTextInfo()
+        {
+            spriteBatch.FillRectangle(new(0, 0, 200, 140), Color.Black * 0.8f);
+
+            debugSb.Clear();
+            debugSb.Append("FPS: ");
+            debugSb.AppendFormat("{0:0.0}", cacheDelta != 0 ? 1f / cacheDelta : 0);
+            debugSb.Append("\nTime: ");
+            debugSb.AppendFormat("{0:0.00}", GameManager.Time);
+            debugSb.Append("\nCamera: ");
+            debugSb.AppendFormat("{0:0.0},{1:0.0}", GameManager.Camera.X, GameManager.Camera.Y);
+            debugSb.Append("\nTile Below: ");
+            debugSb.Append(GameManager.TileBelow == null ? "none" : GameManager.TileBelow.Type);
+            debugSb.Append("\nCoord: ");
+            debugSb.AppendFormat("{0:0.0},{1:0.0}", GameManager.Coord.X, GameManager.Coord.Y);
+            debugSb.Append("\nLevel: ");
+            debugSb.Append(GameManager.Level?.Name);
+            debugSb.Append("\nInventory: ");
+            debugSb.Append(GameManager.Inventory.Opened);
+
+            spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);
+        }
         public void DrawMiniMap()
         {
             // Frame

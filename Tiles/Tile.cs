@@ -11,6 +11,7 @@ using static Quest.TextureManager;
 
 namespace Quest.Tiles
 {
+
     public enum TileType
     {
         Sky = 0,
@@ -24,6 +25,12 @@ namespace Quest.Tiles
     }
     public class Tile
     {
+        protected static readonly Dictionary<TileType, TextureID> TileToTexture = Enum.GetValues<TileType>()
+        .ToDictionary(
+            tileType => tileType,
+            tileType => Enum.TryParse<TextureID>(tileType.ToString(), out var texture) ? texture : TextureID.Null
+        );
+
         // Debug
         public bool Marked { get; set; }
         // Auto generated - no setter
@@ -43,7 +50,7 @@ namespace Quest.Tiles
         {
             // Draw
             Vector2 dest = Location.ToVector2() * Constants.TileSize - game.Camera + Constants.Middle;
-            TextureID texture = (TextureID)(Enum.TryParse(typeof(TextureID), Type.ToString(), out var tex) ? tex : TextureID.Null);
+            TextureID texture = TileToTexture[Type];
             Color color = Marked ? Color.Red : Color.White;
             Rectangle rect = new((int)dest.X, (int)dest.Y, (int)Constants.TileSize.X, (int)Constants.TileSize.Y);
             DrawTexture(game.Batch, texture, rect, source:game.TileTextureSource(this), scale: new(4), color:color);
