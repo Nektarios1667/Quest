@@ -54,7 +54,7 @@ namespace Quest
         public void Draw()
         {
             // Npc
-            Rectangle source = new(new((int)(Game.Time * 3) % tilemap.X * tilesize.X, 0), tilesize);
+            Rectangle source = new(new((int)(Game.Time * 2) % tilemap.X * tilesize.X, 0), tilesize);
             Vector2 origin = new(tilesize.X / 2, tilesize.Y);
             Rectangle rect = new(((Location.ToVector2() + Constants.HalfVec) * Constants.TileSize - Game.Camera + Constants.Middle).ToPoint(), tilesize);
             DrawTexture(Game.Batch, Texture, rect, color: TextureColor, scale: new(Scale), source:source, origin:origin);

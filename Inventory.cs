@@ -59,11 +59,11 @@ namespace Quest
             HoverSlot = 0;
             PixelOperator = Game.Content.Load<SpriteFont>("Fonts/PixelOperator");
         }
-        public void Update(MouseState PreviousMouseState, MouseState MouseState)
+        public void Update(MouseState previousMouseState, MouseState mouseState)
         {
             // Inputs
-            PreviousMouseState = PreviousMouseState;
-            MouseState = MouseState;
+            PreviousMouseState = previousMouseState;
+            MouseState = mouseState;
 
             // Scroll slot
             if (MouseState.ScrollWheelValue > PreviousMouseState.ScrollWheelValue)
