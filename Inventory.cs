@@ -49,6 +49,7 @@ namespace Quest
         public int Height { get; }
         private readonly Xna.Point itemOffset = new(8, 8);
         private readonly Vector2 itemScale = new(3, 3);
+        private readonly Point slotSize = TextureManager.Metadata[TextureID.Slot].Size;
         public Inventory(IGameManager game, int width, int height)
         {
             Game = game;
@@ -88,17 +89,17 @@ namespace Quest
                     Item? item = Items[x, y];
 
                     // Draw inventory slots
-                    Vector2 itemDest = new(Constants.Middle.X - (Constants.SlotTextureSize.X * Width / 2) + (Constants.SlotTextureSize.X + 4) * x, Constants.Window.Y - (GetTexture(TextureID.Slot).Texture.Height + 8) * (y + 1) - (y != 0 ? 20 : 0));
-                    DrawTexture(Game.Batch, TextureID.Slot, new(itemDest.ToPoint(), Constants.SlotTextureSize), color:SlotColor(x, y));
+                    Vector2 itemDest = new(Constants.Middle.X - (slotSize.X * Width / 2) + (slotSize.X + 4) * x, Constants.Window.Y - (GetTexture(TextureID.Slot).Texture.Height + 8) * (y + 1) - (y != 0 ? 20 : 0));
+                    DrawTexture(Game.Batch, TextureID.Slot, new(itemDest.ToPoint(), slotSize), color:SlotColor(x, y));
 
                     // Draw inventory items
                     if (item == null) continue;
                     TextureID textureId = (TextureID)(Enum.TryParse(typeof(TextureID), item.Name, out var tex) ? tex : TextureID.Null);
-                    DrawTexture(Game.Batch, textureId, new(itemDest.ToPoint() + itemOffset, Constants.ItemTextureSize), scale:itemScale);
+                    DrawTexture(Game.Batch, textureId, new(itemDest.ToPoint() + itemOffset, slotSize - new Point(16)), scale:itemScale);
 
                     // Text
                     if (item.Amount <= 1) continue; // Don't draw amount text for single items
-                    Vector2 textDest = itemDest + Constants.SlotTextureSize.ToVector2() - new Vector2(PixelOperator.MeasureString($"{item.Amount}").X + 6, 36);
+                    Vector2 textDest = itemDest + slotSize.ToVector2() - new Vector2(PixelOperator.MeasureString($"{item.Amount}").X + 6, 36);
                     Game.Batch.DrawString(PixelOperator, $"{item.Amount}", textDest, Color.Black);
                 }
             }
@@ -235,13 +236,13 @@ namespace Quest
         public Xna.Point GetMouseSlot(MouseState MouseState)
         {
             // x coord
-            int left = (int)Constants.Middle.X - (Constants.SlotTextureSize.X * Width / 2);
-            int x = (MouseState.Position.X - left) / (Constants.SlotTextureSize.X + 4);
+            int left = (int)Constants.Middle.X - (slotSize.X * Width / 2);
+            int x = (MouseState.Position.X - left) / (slotSize.X + 4);
             if (x < 0 || x >= Width) return Constants.NegOne; // Out of bounds
 
             // y coord
             int top = (int)Constants.Window.Y - (GetTexture(TextureID.Slot).Texture.Height + 8) * (Height + 1) - (Height != 0 ? 20 : 0);
-            int y = (MouseState.Position.Y - top) / (Constants.SlotTextureSize.Y + 8);
+            int y = (MouseState.Position.Y - top) / (slotSize.Y + 8);
             y = Height - y; // Flip y axis
             if (y < 0 || y >= Height) return Constants.NegOne; // Out of bounds
 

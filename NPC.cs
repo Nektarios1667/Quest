@@ -16,8 +16,8 @@ namespace Quest
 {
     public class NPC
     {
-        public bool HasTalked { get; set; }
-        public bool IsTalking { get; set; }
+        public bool HasSpoken { get; set; }
+        public bool IsTalking => DialogBox.IsVisible && DialogBox.IsSpeaking;
         public Dialog DialogBox { get; private set; }
         public IGameManager Game { get; private set; }
         public Point Location { get; set; }
@@ -26,22 +26,25 @@ namespace Quest
         public TextureID Texture { get; set; }
         public Color TextureColor { get; set; }
         public float Scale { get; set; }
+        public bool Important { get; set; }
         // Private
         private Point textureSize { get; set; }
         private Point tilemap { get; set; }
         private Point tilesize { get; set; }
+        private Point speechsize { get; set; }
 
-        public NPC(IGameManager game, TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1)
+        public NPC(IGameManager game, TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1, bool important = true)
         {
-            IsTalking = false;
-            HasTalked = false;
+            HasSpoken = false;
             Game = game;
+            Important = important;
             Texture = texture;
 
             // Private
             textureSize = TextureManager.Metadata[Texture].Size;
             tilemap = TextureManager.Metadata[Texture].TileMap;
             tilesize = (textureSize / tilemap);
+            speechsize = TextureManager.Metadata[TextureID.Speech].Size;
 
             Location = location;
             Name = name;
@@ -58,28 +61,26 @@ namespace Quest
             Vector2 origin = new(tilesize.X / 2, tilesize.Y);
             Rectangle rect = new(((Location.ToVector2() + Constants.HalfVec) * Constants.TileSize - Game.Camera + Constants.Middle).ToPoint(), tilesize);
             DrawTexture(Game.Batch, Texture, rect, color: TextureColor, scale: new(Scale), source:source, origin:origin);
-            Game.Batch.FillRectangle(new((rect.Location - tilesize).ToVector2(), source.Size.ToVector2() * Scale), Constants.DebugPinkTint);
+            // Debug
+            if (Constants.DRAW_HITBOXES)
+                Game.Batch.FillRectangle(new((rect.Location - tilesize).ToVector2(), source.Size.ToVector2() * Scale), Constants.DebugPinkTint);
+            // Speech bubble
+            // DrawTexture(Game.Batch, TextureID.Speech, new(rect.X - (int)(speechsize.X*Scale*2), rect.Y - (int)(tilesize.Y*Scale) - (int)(speechsize.Y/4 * Scale) - (int)(Game.Time % 2)*2, 40, 20), source: new(0, speechsize.Y/4 * ((HasSpoken ? 2 : 0) + (Important ? 1 : 0)), speechsize.X, speechsize.Y/4), scale:new(Scale*1.5f));
         }
         public void Update()
         {
-            // State
-            if (DialogBox.Displayed == Dialog) HasTalked = true;
-
+            if (DialogBox.HasSpoken) HasSpoken = true;
             // Speaking
             if (!Game.Inventory.Opened && Vector2.DistanceSquared(Game.Camera / Constants.TileSize, Location.ToVector2()) <= 4)
             {
                 if (!IsTalking)
-                {
                     DialogBox.IsVisible = true;
-                    DialogBox.Displayed = "";
-                    IsTalking = true;
-                }
             }
             // Hiding if away
             else
             {
                 DialogBox.IsVisible = false;
-                IsTalking = false;
+                DialogBox.Displayed = "";
             }
         }
     }

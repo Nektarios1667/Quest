@@ -54,10 +54,6 @@ namespace Quest
         public static readonly Xna.Color DarkenScreen = new(0, 0, 0, 188);
         public static readonly Xna.Color DebugPinkTint = new(255, 0, 255, 128);
 
-        // Texture default sizes
-        public static readonly Xna.Point SlotTextureSize = new(80, 80); // Default size for item slots
-        public static readonly Xna.Point ItemTextureSize = new(60, 60); // Default size for items
-
         // Minimap pixel colors
         public static readonly Xna.Color MinimapSky = new(92, 221, 241);
         public static readonly Xna.Color MinimapGrass = Xna.Color.Green;

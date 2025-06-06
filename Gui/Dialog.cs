@@ -10,6 +10,8 @@ namespace Quest.Gui
 {
     public class Dialog : Widget
     {
+        public bool HasSpoken => Displayed == Text;
+        public bool IsSpeaking => Displayed != "" && Displayed != Text;
         public GuiManager Gui { get; private set; }
         public Xna.Vector2 Dimensions { get; private set; }
         public Rectangle Rect { get; private set; }
