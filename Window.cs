@@ -104,7 +104,7 @@ namespace Quest
             // Managers
             GameManager = new GameManager(this, spriteBatch);
             GameManager.ReadLevel("island_house");
-            GameManager.ReadLevel("island_house_basement");
+            //GameManager.ReadLevel("island_house_basement");
             GameManager.LoadLevel(0);
 
             // Shaders

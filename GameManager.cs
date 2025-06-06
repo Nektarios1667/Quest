@@ -232,14 +232,19 @@ namespace Quest {
                     return;
                 }
             }
-            // If not found, throw an error
+            // If not found throw an error
             throw new ArgumentException($"Level '{levelName}' not found in stored levels. Make sure the level file has been read before loading.");
         }
         public void ReadLevel(string filename)
         {
-            // Check exists
+            // Check file exists
             if (!File.Exists($"Levels/{filename}.lvl"))
                 throw new FileNotFoundException("Level file not found.", filename);
+
+            // Check if already read
+            foreach (Level level in Levels)
+                if (level.Name == filename)
+                    return;
 
             // Get data
             string data = File.ReadAllText($"Levels/{filename}.lvl");
