@@ -77,7 +77,8 @@ namespace Quest {
             Inventory = new(this, 6, 4);
             Inventory.SetSlot(0, new Item("Sword", "A sharp, pointy sword", max:1));
             Inventory.SetSlot(1, new Item("Pickaxe", "Sturdy iron pickaxe for mining", max:1));
-            Inventory.SetSlot(2, new Item("Palantir", "A seeing stone, used to communicate with Sauron", max:1));
+            Inventory.SetSlot(2, new Item("Palantir", "A seeing stone, used to communicate with Sauron", 10));
+            Inventory.SetSlot(3, new Item("Palantir", "A seeing stone, used to communicate with Sauron", 10));
 
             // Loading
             PixelOperator = window.Content.Load<SpriteFont>("Fonts/PixelOperator");

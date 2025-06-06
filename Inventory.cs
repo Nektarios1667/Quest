@@ -97,7 +97,8 @@ namespace Quest
                     DrawTexture(Game.Batch, textureId, new(itemDest.ToPoint() + itemOffset, Constants.ItemTextureSize), scale:itemScale);
 
                     // Text
-                    Vector2 textDest = itemDest + Constants.SlotTextureSize.ToVector2() - new Vector2(PixelOperator.MeasureString($"{item.Amount}").X + 8, 30);
+                    if (item.Amount <= 1) continue; // Don't draw amount text for single items
+                    Vector2 textDest = itemDest + Constants.SlotTextureSize.ToVector2() - new Vector2(PixelOperator.MeasureString($"{item.Amount}").X + 6, 36);
                     Game.Batch.DrawString(PixelOperator, $"{item.Amount}", textDest, Color.Black);
                 }
             }
