@@ -233,7 +233,7 @@ namespace Quest {
                 }
             }
             // If not found throw an error
-            throw new ArgumentException($"Level '{levelName}' not found in stored levels. Make sure the level file has been read before loading.");
+            Logger.Error($"Level '{levelName}' not found in stored levels. Make sure the level file has been read before loading.", true);
         }
         public void ReadLevel(string filename)
         {
@@ -385,8 +385,8 @@ namespace Quest {
         {
             Vector2[] points = new Vector2[4];
             for (int c = 0; c < Constants.PlayerCorners.Length; c++)
-                points[c] = Constants.Middle + Constants.PlayerCorners[c];
-            Batch.FillRectangle(new Rectangle((int)points[0].X, (int)points[0].Y, (int)(points[2].X - points[0].X), (int)(points[2].Y - points[0].Y)), Constants.DebugPinkTint);
+                points[c] = Constants.Middle + Constants.PlayerCorners[c] + CameraDest - Camera;
+            Batch.FillRectangle(new Rectangle((int)points[0].X, (int)points[0].Y, (int)(points[1].X - points[0].X), (int)(points[2].Y - points[1].Y)), Constants.DebugPinkTint);
         }
         public void DrawPlayer()
         {
