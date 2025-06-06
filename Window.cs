@@ -44,11 +44,14 @@ namespace Quest
         public SpriteFont ArialSmall { get; private set; }
         public SpriteFont ArialLarge { get; private set; }
         public SpriteFont PixelOperator { get; private set; }
+        public SpriteFont PixelOperatorBold { get; private set; }
         // Movements
         public int moveX;
         public int moveY;
         // Shaders
         public Effect Grayscale { get; private set; }
+        // Render targets
+        public RenderTarget2D? Minimap { get; set; }
 
         // Debug
         private static readonly Color[] colors = {
@@ -97,6 +100,7 @@ namespace Quest
             ArialSmall = Content.Load<SpriteFont>("Fonts/ArialSmall");
             ArialLarge = Content.Load<SpriteFont>("Fonts/ArialLarge");
             PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");
+            PixelOperatorBold = Content.Load<SpriteFont>("Fonts/PixelOperatorBold");
 
             // Textures
             LoadTextures(Content);
@@ -151,7 +155,7 @@ namespace Quest
                 // Update
                 GameManager.Update(delta, previousMouseState, mouseState);
             else // Only update gui
-                GameManager.Update(delta, previousMouseState, mouseState);
+                GameManager.UpdateGui(delta, previousMouseState, mouseState);
 
             // Set previous key state
             GameManager.Watch.Restart();
@@ -168,7 +172,7 @@ namespace Quest
         {
             // Clear and start shader gui
             GraphicsDevice.Clear(Color.Magenta);
-            spriteBatch.Begin(blendState: BlendState.NonPremultiplied, samplerState: SamplerState.PointClamp);
+            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
             // Draw game
             GameManager.DrawTiles();
@@ -273,33 +277,42 @@ namespace Quest
         }
         public void DrawMiniMap()
         {
+            GameManager.Watch.Restart();
             // Frame
             spriteBatch.DrawRectangle(new(7, Constants.Window.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
-            // Pixels
-            for (int y = 0; y < Constants.MapSize.Y; y++)
+
+            // Create render if not done already
+            if (Minimap == null)
             {
-                for (int x = 0; x < Constants.MapSize.X; x++)
-                {
-                    // Get tile
-                    Tile tile = GameManager.GetTile(new Point(x, y))!;
-                    Color color = tile.Type switch
-                    {
-                        TileType.Sky => Constants.MinimapSky,
-                        TileType.Grass => Constants.MinimapGrass,
-                        TileType.Water => Constants.MinimapWater,
-                        TileType.StoneWall => Constants.MinimapStoneWall,
-                        TileType.Stairs => Constants.MinimapStairs,
-                        TileType.Flooring => Constants.MinimapFlooring,
-                        TileType.Sand => Constants.MinimapSand,
-                        TileType.Dirt => Constants.MinimapDirt,
-                        _ => Color.White
-                    };
-                    spriteBatch.DrawPoint(new(10 + x, Constants.Window.Y - Constants.MapSize.Y - 10 + y), color);
+                // Setup target
+                Minimap = new RenderTarget2D(GraphicsDevice, Constants.MapSize.X, Constants.MapSize.Y);
+                GraphicsDevice.SetRenderTarget(Minimap);
+                GraphicsDevice.Clear(Color.Transparent);
+                spriteBatch.End();
+                spriteBatch.Begin();
+
+                // Pixels
+                for (int y = 0; y < Constants.MapSize.Y; y++) {
+                    for (int x = 0; x < Constants.MapSize.X; x++) {
+                        // Get tile
+                        Tile tile = GameManager.GetTile(new Point(x, y))!;
+                        spriteBatch.DrawPoint(new(x, y), Constants.MiniMapColors[(int)tile.Type]);
+                    }
                 }
-            }
+
+                // Resume normal render
+                spriteBatch.End();
+                GraphicsDevice.SetRenderTarget(null);
+                spriteBatch.Begin();
+
+            } else
+                spriteBatch.Draw(Minimap, new Rectangle(10, (int)(Constants.Window.Y - Constants.MapSize.Y - 10), Constants.MapSize.X, Constants.MapSize.Y), Color.White);
+
             // Player
             Vector2 dest = GameManager.Coord + new Vector2(10, Constants.Window.Y - Constants.MapSize.Y - 10);
             spriteBatch.DrawPoint(dest, Color.Red, size:2);
+
+            GameManager.FrameTimes["DrawMinimap"] = GameManager.Watch.Elapsed.TotalMilliseconds;
         }
         public void DrawFrameBar()
         {

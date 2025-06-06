@@ -36,7 +36,11 @@ namespace Quest
             // Items
             Pickaxe,
             Sword,
-            Palantir,
+            PhiCoin,
+            DeltaCoin,
+            GammaCoin,
+            ActivePalantir,
+            InactivePalantir,
             // Tiles
             Dirt,
             Flooring,
@@ -72,6 +76,11 @@ namespace Quest
             Textures[TextureID.Speech] = content.Load<Texture2D>($"Images/Gui/Speech");
             Textures[TextureID.Pickaxe] = content.Load<Texture2D>($"Images/Items/Pickaxe");
             Textures[TextureID.Sword] = content.Load<Texture2D>($"Images/Items/Sword");
+            Textures[TextureID.PhiCoin] = content.Load<Texture2D>($"Images/Items/PhiCoin");
+            Textures[TextureID.DeltaCoin] = content.Load<Texture2D>($"Images/Items/DeltaCoin");
+            Textures[TextureID.GammaCoin] = content.Load<Texture2D>($"Images/Items/GammaCoin");
+            Textures[TextureID.ActivePalantir] = content.Load<Texture2D>($"Images/Items/ActivePalantir");
+            Textures[TextureID.InactivePalantir] = content.Load<Texture2D>($"Images/Items/InactivePalantir");
             Textures[TextureID.Dirt] = content.Load<Texture2D>($"Images/Tiles/Dirt");
             Textures[TextureID.Flooring] = content.Load<Texture2D>($"Images/Tiles/Flooring");
             Textures[TextureID.Grass] = content.Load<Texture2D>($"Images/Tiles/Grass");
@@ -96,6 +105,11 @@ namespace Quest
             Metadata[TextureID.Speech] = new(Textures[TextureID.Speech].Bounds.Size, new(1, 4), "gui");
             Metadata[TextureID.Pickaxe] = new(Textures[TextureID.Pickaxe].Bounds.Size, new(1, 1), "item");
             Metadata[TextureID.Sword] = new(Textures[TextureID.Sword].Bounds.Size, new(1, 1), "item");
+            Metadata[TextureID.PhiCoin] = new(Textures[TextureID.PhiCoin].Bounds.Size, new(1, 1), "item");
+            Metadata[TextureID.DeltaCoin] = new(Textures[TextureID.DeltaCoin].Bounds.Size, new(1, 1), "item");
+            Metadata[TextureID.GammaCoin] = new(Textures[TextureID.GammaCoin].Bounds.Size, new(1, 1), "item");
+            Metadata[TextureID.ActivePalantir] = new(Textures[TextureID.ActivePalantir].Bounds.Size, new(1, 1), "item");
+            Metadata[TextureID.InactivePalantir] = new(Textures[TextureID.InactivePalantir].Bounds.Size, new(1, 1), "item");
             Metadata[TextureID.Dirt] = new(Textures[TextureID.Dirt].Bounds.Size, new(4, 4), "tile");
             Metadata[TextureID.Flooring] = new(Textures[TextureID.Flooring].Bounds.Size, new(4, 4), "tile");
             Metadata[TextureID.Grass] = new(Textures[TextureID.Grass].Bounds.Size, new(4, 4), "tile");

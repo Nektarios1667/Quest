@@ -33,7 +33,6 @@ namespace Quest {
     }
     public class GameManager : IGameManager
     {
-        public NPC[] NPCs { get; private set; }
         // Debug
         public Stopwatch Watch { get; private set; }
         public Tile? TileBelow { get; private set; }
@@ -47,10 +46,10 @@ namespace Quest {
         public float Delta { get; private set; }
         public SpriteBatch Batch { get; private set; }
         public List<Level> Levels { get; private set; }
-        public Level? Level { get; private set; }
+        public Level Level { get; private set; }
         public Dictionary<string, Texture2D> TileTextures { get; private set; }
-        public Tile[] Tiles { get; private set; }
         public SpriteFont PixelOperator { get; private set; }
+        public SpriteFont PixelOperatorBold { get; private set; }
         public ContentManager Content => Window.Content;
         // Inventory
         public Inventory Inventory { get; set; }
@@ -65,7 +64,6 @@ namespace Quest {
             tileSize = Constants.TileSize;
             Levels = [];
             TileTextures = [];
-            Tiles = [];
             Camera = new Vector2(128 * Constants.TileSize.X, 128 * Constants.TileSize.Y) - Constants.Middle;
             CameraDest = Camera;
             Gui = new();
@@ -74,17 +72,23 @@ namespace Quest {
             ];
             Watch = new();
             FrameTimes = [];
+
+            // Inventory
             Inventory = new(this, 6, 4);
             Inventory.SetSlot(0, new Item("Sword", "A sharp, pointy sword", max:1));
             Inventory.SetSlot(1, new Item("Pickaxe", "Sturdy iron pickaxe for mining", max:1));
-            Inventory.SetSlot(2, new Item("Palantir", "A seeing stone, used to communicate with Sauron", 10));
-            Inventory.SetSlot(3, new Item("Palantir", "A seeing stone, used to communicate with Sauron", 10));
+            Inventory.SetSlot(2, new Item("ActivePalantir", "A seeing stone, used to communicate with Sauron", 1, max:1));
+            Inventory.SetSlot(3, new Item("InactivePalantir", "A seeing stone, used to communicate with Sauron", 1, max:1));
+            Inventory.SetSlot(4, new Item("PhiCoin", "A small copper coin", 20, max: 20));
+            Inventory.SetSlot(5, new Item("DeltaCoin", "A shiny gold coin", 10, max: 20));
+            Inventory.SetSlot(6, new Item("GammaCoin", "A rare diamond coin", 5, max: 20));
 
             // Loading
-            PixelOperator = window.Content.Load<SpriteFont>("Fonts/PixelOperator");
-
-            // NPCS
-            NPCs = [];
+            PixelOperator = window.PixelOperator;
+            PixelOperatorBold = window.PixelOperatorBold;
+            
+            // Level
+            Level = new("null", [], new(0, 0), []); // Default level
         }
         public void Update(float deltaTime, MouseState previousMouseState, MouseState mouseState)
         {
@@ -103,7 +107,7 @@ namespace Quest {
         }
         public void UpdateCharacters(float deltaTime)
         {
-            foreach (NPC npc in NPCs) npc.Update();
+            foreach (NPC npc in Level.NPCs) npc.Update();
         }
         public void UpdateCamera(float deltaTime)
         {
@@ -154,14 +158,14 @@ namespace Quest {
             DrawPlayer();
             if (Constants.DRAW_HITBOXES)
                 DrawPlayerHitbox();
-            foreach (NPC npc in NPCs) npc.Draw();
+            foreach (NPC npc in Level.NPCs) npc.Draw();
             FrameTimes["CharacterDraws"] = Watch.Elapsed.TotalMilliseconds;
         }
         public void DrawTiles()
         {
             // Tiles
             Watch.Restart();
-            if (Tiles == null || Tiles.Length == 0) return;
+            if (Level.Tiles == null || Level.Tiles.Length == 0) return;
 
             // Get bounds
             Point start = ((Camera - Constants.Middle) / Constants.TileSize).ToPoint();
@@ -212,16 +216,19 @@ namespace Quest {
         // Levels
         public void LoadLevel(int levelIndex)
         {
-            // Load the level
+            // Check index
             if (levelIndex < 0 || levelIndex >= Levels.Count)
                 throw new ArgumentOutOfRangeException(nameof(levelIndex), "Invalid level index.");
+
             // Load the level data
-            Tiles = Levels[levelIndex].Tiles;
-            NPCs = Levels[levelIndex].NPCs;
             Level = Levels[levelIndex];
+
             // Spawn
             CameraDest = Level.Spawn.ToVector2() * tileSize;
             Camera = CameraDest;
+
+            // Reset minimap for redraw
+            Window.Minimap = null;
         }
         public void LoadLevel(string levelName)
         {
@@ -348,7 +355,7 @@ namespace Quest {
         {
             if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
                 return null;
-            return Tiles[coord.X + coord.Y * Constants.MapSize.X];
+            return Level.Tiles[coord.X + coord.Y * Constants.MapSize.X];
         }
         public Tile? GetTile(int x, int y)
         {

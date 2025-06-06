@@ -346,19 +346,7 @@ namespace Quest.Editor
                 {
                     // Get tile
                     Tile tile = GetTile(new Point(x, y));
-                    Color color = tile.Type switch
-                    {
-                        TileType.Sky => Constants.MinimapSky,
-                        TileType.Grass => Constants.MinimapGrass,
-                        TileType.Water => Constants.MinimapWater,
-                        TileType.StoneWall => Constants.MinimapStoneWall,
-                        TileType.Stairs => Constants.MinimapStairs,
-                        TileType.Flooring => Constants.MinimapFlooring,
-                        TileType.Sand => Constants.MinimapSand,
-                        TileType.Dirt => Constants.MinimapDirt,
-                        _ => Color.White
-                    };
-                    spriteBatch.DrawPoint(new(10 + x, Constants.Window.Y - Constants.MapSize.Y - 10 + y), color);
+                    spriteBatch.DrawPoint(new(10 + x, Constants.Window.Y - Constants.MapSize.Y - 10 + y), Constants.MiniMapColors[(int)tile.Type]);
                 }
             }
             // Player

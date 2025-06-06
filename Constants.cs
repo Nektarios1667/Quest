@@ -52,16 +52,18 @@ namespace Quest
         public static readonly Xna.Color FocusBlue = new(174, 200, 209);
         public static readonly Xna.Color CottonCandy = new(242, 182, 240);
         public static readonly Xna.Color DarkenScreen = new(0, 0, 0, 188);
-        public static readonly Xna.Color DebugPinkTint = new(255, 0, 255, 128);
+        public static readonly Xna.Color DebugPinkTint = new Xna.Color(255, 0, 255) * .4f;
 
         // Minimap pixel colors
-        public static readonly Xna.Color MinimapSky = new(92, 221, 241);
-        public static readonly Xna.Color MinimapGrass = Xna.Color.Green;
-        public static readonly Xna.Color MinimapWater = Xna.Color.Blue;
-        public static readonly Xna.Color MinimapStoneWall = Xna.Color.Gray;
-        public static readonly Xna.Color MinimapStairs = new(117, 66, 13);
-        public static readonly Xna.Color MinimapFlooring = new(155, 155, 195);
-        public static readonly Xna.Color MinimapSand = Xna.Color.Yellow;
-        public static readonly Xna.Color MinimapDirt = new(48, 25, 0);
+        public static readonly Xna.Color[] MiniMapColors = [
+            new(92, 221, 241), // Sky
+            Xna.Color.Green, // Grass
+            Xna.Color.Blue, // Water
+            Xna.Color.Gray, // StoneWall
+            new(117, 66, 13), // Stairs
+            new(155, 155, 195), // Flooring
+            Xna.Color.Yellow, // Sand
+            new(48, 25, 0) // Dirt
+        ];
     }
 }

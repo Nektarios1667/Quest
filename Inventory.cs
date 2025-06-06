@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using static Quest.TextureManager;
+using MonoGame.Extended;
 namespace Quest
 {
     public class Item
@@ -42,14 +43,16 @@ namespace Quest
         public Item?[,] Items { get; private set; }
         public bool Opened { get; set; } = false;
         private SpriteFont PixelOperator { get; set; }
+        private SpriteFont PixelOperatorBold { get; set; }
         public int EquippedSlot { get; set; }
         public int SelectedSlot { get; set; }
         public int HoverSlot { get; set; }
         public int Width { get; }
         public int Height { get; }
-        private readonly Xna.Point itemOffset = new(8, 8);
+        private readonly Xna.Point itemOffset = new(14, 14);
         private readonly Vector2 itemScale = new(3, 3);
         private readonly Point slotSize = TextureManager.Metadata[TextureID.Slot].Size;
+        private readonly Point itemStart;
         public Inventory(IGameManager game, int width, int height)
         {
             Game = game;
@@ -59,6 +62,9 @@ namespace Quest
             SelectedSlot = width * height - 1;
             HoverSlot = 0;
             PixelOperator = Game.Content.Load<SpriteFont>("Fonts/PixelOperator");
+            PixelOperatorBold = Game.Content.Load<SpriteFont>("Fonts/PixelOperatorBold");
+
+            itemStart = new((int)Constants.Middle.X - (slotSize.X * Width / 2), (int)Constants.Window.Y - slotSize.Y - 8);
         }
         public void Update(MouseState previousMouseState, MouseState mouseState)
         {
@@ -89,7 +95,7 @@ namespace Quest
                     Item? item = Items[x, y];
 
                     // Draw inventory slots
-                    Vector2 itemDest = new(Constants.Middle.X - (slotSize.X * Width / 2) + (slotSize.X + 4) * x, Constants.Window.Y - (GetTexture(TextureID.Slot).Texture.Height + 8) * (y + 1) - (y != 0 ? 20 : 0));
+                    Vector2 itemDest = new(itemStart.X + (slotSize.X + 4) * x, itemStart.Y - (slotSize.Y + 8) * y - (y != 0 ? 20 : 0));
                     DrawTexture(Game.Batch, TextureID.Slot, new(itemDest.ToPoint(), slotSize), color:SlotColor(x, y));
 
                     // Draw inventory items
@@ -97,17 +103,29 @@ namespace Quest
                     TextureID textureId = (TextureID)(Enum.TryParse(typeof(TextureID), item.Name, out var tex) ? tex : TextureID.Null);
                     DrawTexture(Game.Batch, textureId, new(itemDest.ToPoint() + itemOffset, slotSize - new Point(16)), scale:itemScale);
 
-                    // Text
+                    // Amount text
                     if (item.Amount <= 1) continue; // Don't draw amount text for single items
                     Vector2 textDest = itemDest + slotSize.ToVector2() - new Vector2(PixelOperator.MeasureString($"{item.Amount}").X + 6, 36);
-                    Game.Batch.DrawString(PixelOperator, $"{item.Amount}", textDest, Color.Black);
+                    Game.Batch.DrawString(PixelOperatorBold, $"{item.Amount}", textDest, Color.White);
                 }
             }
+
+            // Item label
+            Point hoverCoord = Expand(HoverSlot);
+            if (Opened && hoverCoord.X != -1 && Items[hoverCoord.X, hoverCoord.Y] is Item hovered)
+            {
+                string display = Tools.FillCamelSpaces(hovered.Name);
+                Point textSize = PixelOperator.MeasureString(display).ToPoint();
+                Vector2 labelPos = new(itemStart.X + (slotSize.X - textSize.X)/2 + (slotSize.X + 4) * hoverCoord.X - 4, itemStart.Y - (slotSize.Y + 8) * hoverCoord.Y - textSize.Y/2 - 10 - (hoverCoord.Y != 0 ? 20 : 0));
+                Game.Batch.FillRectangle(labelPos + new Vector2(4, -8), new Vector2(textSize.X + 4, 30), Color.Black * 0.7f);
+                Game.Batch.DrawRectangle(labelPos + new Vector2(2, -10), new Vector2(textSize.X + 8, 34), Color.Blue * 0.7f, 2);
+                Game.Batch.DrawString(PixelOperator, display, labelPos + new Vector2(8, -8), Color.White);
+            }
         }
-        public void SlotInteractions(MouseState PreviousMouseState, MouseState MouseState)
+        public void SlotInteractions(MouseState previousMouseState, MouseState mouseState)
         {
             // Get
-            int mouseSlot = Flatten(GetMouseSlot(MouseState));
+            int mouseSlot = Flatten(GetMouseSlot(mouseState));
 
             // Hover slot
             HoverSlot = mouseSlot;
