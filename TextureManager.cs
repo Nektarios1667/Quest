@@ -11,6 +11,12 @@ using MonoGame.Extended.Content;
 
 namespace Quest
 {
+    public class Metadata(Point size, Point tileMap, string type)
+    {
+        public Point Size { get; private set; } = size;
+        public Point TileMap { get; private set; } = tileMap;
+        public string Type { get; private set; } = type;
+    }
     public static class TextureManager
     {
         public enum TextureID {
@@ -19,6 +25,8 @@ namespace Quest
             BlueMage,
             GrayMage,
             WhiteMage,
+            PurpleWizard,
+            WhiteWizard,
             // Gui
             CursorArrow,
             DialogBox,
@@ -42,7 +50,9 @@ namespace Quest
         }
 
         private static List<string> errors = [];
-        public static Dictionary<TextureID, Texture2D> Textures { get; private set; } = new();
+        public static Dictionary<TextureID, Texture2D> Textures { get; private set; } = [];
+        public static Dictionary<TextureID, Metadata> Metadata { get; private set; } = [];
+        
         private static Texture2D? MissingTexture { get; set; } = null;
         private static ContentManager? Content { get; set; }
         public static void LoadTextures(ContentManager content)
@@ -53,6 +63,8 @@ namespace Quest
             Textures[TextureID.BlueMage] = content.Load<Texture2D>($"Images/Characters/BlueMage");
             Textures[TextureID.GrayMage] = content.Load<Texture2D>($"Images/Characters/GrayMage");
             Textures[TextureID.WhiteMage] = content.Load<Texture2D>($"Images/Characters/WhiteMage");
+            Textures[TextureID.PurpleWizard] = content.Load<Texture2D>($"Images/Characters/PurpleWizard");
+            Textures[TextureID.WhiteWizard] = content.Load<Texture2D>($"Images/Characters/WhiteWizard");
             Textures[TextureID.CursorArrow] = content.Load<Texture2D>($"Images/Gui/CursorArrow");
             Textures[TextureID.DialogBox] = content.Load<Texture2D>($"Images/Gui/DialogBox");
             Textures[TextureID.GuiBackground] = content.Load<Texture2D>($"Images/Gui/GuiBackground");
@@ -70,6 +82,30 @@ namespace Quest
             Textures[TextureID.Template] = content.Load<Texture2D>($"Images/Tiles/Template");
             Textures[TextureID.Water] = content.Load<Texture2D>($"Images/Tiles/Water");
             Logger.Log("Textures loaded successfully.");
+
+            // Metadata
+            Metadata[TextureID.BlueMage] = new(Textures[TextureID.BlueMage].Bounds.Size, new(4, 5), "character");
+            Metadata[TextureID.GrayMage] = new(Textures[TextureID.GrayMage].Bounds.Size, new(4, 5), "character");
+            Metadata[TextureID.WhiteMage] = new(Textures[TextureID.WhiteMage].Bounds.Size, new(4, 5), "character");
+            Metadata[TextureID.PurpleWizard] = new(Textures[TextureID.PurpleWizard].Bounds.Size, new(4, 1), "character");
+            Metadata[TextureID.WhiteWizard] = new(Textures[TextureID.WhiteWizard].Bounds.Size, new(4, 1), "character");
+            Metadata[TextureID.CursorArrow] = new(Textures[TextureID.CursorArrow].Bounds.Size, new(1, 1), "gui");
+            Metadata[TextureID.DialogBox] = new(Textures[TextureID.DialogBox].Bounds.Size, new(1, 1), "gui");
+            Metadata[TextureID.GuiBackground] = new(Textures[TextureID.GuiBackground].Bounds.Size, new(1, 1), "gui");
+            Metadata[TextureID.Slot] = new(Textures[TextureID.Slot].Bounds.Size, new(1, 1), "gui");
+            Metadata[TextureID.Speech] = new(Textures[TextureID.Speech].Bounds.Size, new(1, 4), "gui");
+            Metadata[TextureID.Pickaxe] = new(Textures[TextureID.Pickaxe].Bounds.Size, new(1, 1), "item");
+            Metadata[TextureID.Sword] = new(Textures[TextureID.Sword].Bounds.Size, new(1, 1), "item");
+            Metadata[TextureID.Dirt] = new(Textures[TextureID.Dirt].Bounds.Size, new(4, 4), "tile");
+            Metadata[TextureID.Flooring] = new(Textures[TextureID.Flooring].Bounds.Size, new(4, 4), "tile");
+            Metadata[TextureID.Grass] = new(Textures[TextureID.Grass].Bounds.Size, new(4, 4), "tile");
+            Metadata[TextureID.Sand] = new(Textures[TextureID.Sand].Bounds.Size, new(4, 4), "tile");
+            Metadata[TextureID.Sky] = new(Textures[TextureID.Sky].Bounds.Size, new(4, 1), "tile");
+            Metadata[TextureID.Stairs] = new(Textures[TextureID.Stairs].Bounds.Size, new(4, 1), "tile");
+            Metadata[TextureID.StoneWall] = new(Textures[TextureID.StoneWall].Bounds.Size, new(4, 4), "tile");
+            Metadata[TextureID.Template] = new(Textures[TextureID.Template].Bounds.Size, new(4, 4), "tile");
+            Metadata[TextureID.Water] = new(Textures[TextureID.Water].Bounds.Size, new(4, 4), "tile");
+            Logger.Log("Metadata loaded successfully.");
         }
         public static (Texture2D Texture, bool Found) GetTexture(TextureID id)
         {

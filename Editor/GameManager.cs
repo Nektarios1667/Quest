@@ -99,8 +99,10 @@ namespace Quest.Editor
         }
         public void DrawNPCs()
         {
+            Watch.Restart();
             foreach (NPC npc in NPCs)
                 npc.Draw();
+            FrameTimes["NPCDraws"] = Watch.Elapsed.TotalMilliseconds;
         }
         public void DrawGui()
         {

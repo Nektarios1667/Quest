@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using static Quest.TextureManager;
 
 namespace Quest
 {
@@ -40,6 +41,17 @@ namespace Quest
             {
                 Error("Invalid input- expected an integer.");
                 return fallback; // Default value or handle as needed
+            }
+        }
+        public static TextureID InputTexture(string message, TextureID fallback = TextureID.Null)
+        {
+            string resp = Input(message);
+            if (Enum.TryParse<TextureID>(resp, true, out TextureID texture) && TextureManager.Metadata[texture].Type == "character")
+                return texture;
+            else
+            {
+                Error("Invalid input- expected a valid character texture name.");
+                return fallback;
             }
         }
         public static Color InputColor(string message, Color fallback = default)

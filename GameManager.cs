@@ -83,7 +83,7 @@ namespace Quest {
             PixelOperator = window.Content.Load<SpriteFont>("Fonts/PixelOperator");
 
             // NPCS
-            NPCs = [new(this, TextureID.WhiteMage, new(128, 131), "Saruman", " I have looked upon the Eye of Sauron. It is too strong for us. We cannot hope to match him. ... We must join with Sauron.", scale: 2)];
+            NPCs = [];
         }
         public void Update(float deltaTime, MouseState previousMouseState, MouseState mouseState)
         {
@@ -149,10 +149,12 @@ namespace Quest {
         }
         public void DrawCharacters()
         {
+            Watch.Restart();
             DrawPlayer();
             if (Constants.DRAW_HITBOXES)
                 DrawPlayerHitbox();
             foreach (NPC npc in NPCs) npc.Draw();
+            FrameTimes["CharacterDraws"] = Watch.Elapsed.TotalMilliseconds;
         }
         public void DrawTiles()
         {
@@ -284,9 +286,10 @@ namespace Quest {
                 string name = reader.ReadString();
                 string dialog = reader.ReadString();
                 Point location = new(reader.ReadByte(), reader.ReadByte());
-                int scale = reader.ReadByte();
-                Color color = new(reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
-                npcBuffer.Add(new NPC(this, TextureID.GrayMage, location, name, dialog, color, scale / 10f));
+                byte scale = reader.ReadByte();
+                int texId = reader.ReadByte();
+                TextureID texture = (TextureID)texId;
+                npcBuffer.Add(new NPC(this, texture, location, name, dialog, Color.White, scale / 10f));
             }
 
             // Check null

@@ -32,7 +32,6 @@ namespace Quest.Editor
         private TileType Material;
         private int Selection;
         private Point mouseCoord;
-        private string LevelName;
         private Point Spawn;
         private readonly Color highlightColor = new(1, 1, 1, .8f);
         // Debug
@@ -41,7 +40,7 @@ namespace Quest.Editor
         // Devices
         private GraphicsDeviceManager graphics;
         protected SpriteBatch spriteBatch;
-        public Editor.GameManager GameManager;
+        public GameManager GameManager;
 
         // Fonts
         public SpriteFont Arial { get; private set; }
@@ -145,7 +144,6 @@ namespace Quest.Editor
                     try
                     {
                         ReadLevel(filename);
-                        LevelName = filename;
                         Logger.Log($"Opened level '{filename}'.");
                     }
                     catch (Exception ex)
@@ -436,8 +434,8 @@ namespace Quest.Editor
                 string dialog = reader.ReadString();
                 Point location = new(reader.ReadByte(), reader.ReadByte());
                 int scale = reader.ReadByte();
-                Color color = new(reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
-                npcBuffer.Add(new NPC(GameManager, TextureID.GrayMage, location, name, dialog, color, scale / 10f));
+                TextureID texture = (TextureID)reader.ReadByte();
+                npcBuffer.Add(new NPC(GameManager, texture, location, name, dialog, Color.White, scale / 10f));
             }
 
             // Check null
@@ -450,6 +448,51 @@ namespace Quest.Editor
             // Make and add the level
             GameManager.NPCs = npcBuffer;
             GameManager.Tiles = tilesBuffer;
+        }
+        public static void SaveLevel(EditorWindow editor)
+        {
+            // Input
+            string name = Logger.Input("Export file name: ");
+
+            // Parse
+            Directory.CreateDirectory("..\\..\\..\\Levels");
+            using FileStream fileStream = File.Create($"..\\..\\..\\Levels/{name}.lvl");
+            using GZipStream gzipStream = new(fileStream, CompressionLevel.Optimal);
+            using BinaryWriter writer = new(gzipStream);
+
+            // Write spawn
+            writer.Write(IntToByte(editor.Spawn.X));
+            writer.Write(IntToByte(editor.Spawn.Y));
+
+            // Tiles
+            for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
+            {
+                Tile tile = editor.GameManager.Tiles[i];
+                // Write tile data
+                writer.Write(IntToByte((int)tile.Type));
+                // Extra properties
+                if (tile is Stairs stairs)
+                {
+                    // Write destination
+                    writer.Write(stairs.DestLevel);
+                    writer.Write(IntToByte(stairs.DestPosition.X));
+                    writer.Write(IntToByte(stairs.DestPosition.Y));
+                }
+            }
+
+            // NPCs
+            writer.Write((byte)editor.GameManager.NPCs.Count);
+            for (int n = 0; n < editor.GameManager.NPCs.Count; n++)
+            {
+                NPC npc = editor.GameManager.NPCs[n];
+                // Write NPC data
+                writer.Write(npc.Name);
+                writer.Write(npc.Dialog);
+                writer.Write(IntToByte(npc.Location.X));
+                writer.Write(IntToByte(npc.Location.Y));
+                writer.Write(IntToByte((int)(npc.Scale * 10)));
+                writer.Write(IntToByte((int)npc.Texture));
+            }
         }
         public void SetTile(Tile tile)
         {
@@ -499,14 +542,12 @@ namespace Quest.Editor
         {
             if (IsKeyDown(Keys.LeftShift)) // Delete
             {
-                Logger.Print("__Delete NPC__");
-                string name = Logger.Input("Name: ");
                 foreach (NPC npc in GameManager.NPCs)
                 {
-                    if (npc.Name == name)
+                    if (npc.Location == mouseCoord)
                     {
                         GameManager.NPCs.Remove(npc);
-                        Logger.Log($"Deleted NPC '{npc.Name}'.");
+                        Logger.Log($"Deleted NPC '{npc.Name}' @ {mouseCoord.X}, {mouseCoord.Y}.");
                         break;
                     }
                 }
@@ -522,55 +563,8 @@ namespace Quest.Editor
                     Logger.Warning("Scale must be between 1 and 25.5- setting to 1");
                     scale = 1;
                 }
-                Color color = Logger.InputColor("Color: ", fallback: Color.White);
-                GameManager.NPCs.Add(new NPC(GameManager, TextureID.GrayMage, mouseCoord, name, dialog, color, scale));
-            }
-        }
-        public static void SaveLevel(EditorWindow editor)
-        {
-            // Input
-            string name = Logger.Input("Export file name: ");
-
-            // Parse
-            Directory.CreateDirectory("..\\..\\..\\Levels");
-            using FileStream fileStream = File.Create($"..\\..\\..\\Levels/{name}.lvl");
-            using GZipStream gzipStream = new(fileStream, CompressionLevel.Optimal);
-            using BinaryWriter writer = new(gzipStream);
-
-            // Write spawn
-            writer.Write(IntToByte(editor.Spawn.X));
-            writer.Write(IntToByte(editor.Spawn.Y));
-
-            // Tiles
-            for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
-            {
-                Tile tile = editor.GameManager.Tiles[i];
-                // Write tile data
-                writer.Write(IntToByte((int)tile.Type));
-                // Extra properties
-                if (tile is Stairs stairs)
-                {
-                    // Write destination
-                    writer.Write(stairs.DestLevel);
-                    writer.Write(IntToByte(stairs.DestPosition.X));
-                    writer.Write(IntToByte(stairs.DestPosition.Y));
-                }
-            }
-
-            // NPCs
-            writer.Write((byte)editor.GameManager.NPCs.Count);
-            for (int n = 0; n < editor.GameManager.NPCs.Count; n++)
-            {
-                NPC npc = editor.GameManager.NPCs[n];
-                // Write NPC data
-                writer.Write(npc.Name);
-                writer.Write(npc.Dialog);
-                writer.Write(IntToByte(npc.Location.X));
-                writer.Write(IntToByte(npc.Location.Y));
-                writer.Write(IntToByte((int)(npc.Scale * 10)));
-                writer.Write(npc.TextureColor.R);
-                writer.Write(npc.TextureColor.G);
-                writer.Write(npc.TextureColor.B);
+                TextureID texture = Logger.InputTexture("Texture: ", fallback: TextureID.PurpleWizard);
+                GameManager.NPCs.Add(new NPC(GameManager, texture, mouseCoord, name, dialog, Color.White, scale));
             }
         }
         public Tile GetTile(Xna.Point coord)

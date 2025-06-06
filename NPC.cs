@@ -10,6 +10,7 @@ using Quest.Gui;
 using System.Security.Policy;
 using static Quest.TextureManager;
 using MonoGame.Extended;
+using SharpDX.Direct3D11;
 
 namespace Quest
 {
@@ -25,12 +26,23 @@ namespace Quest
         public TextureID Texture { get; set; }
         public Color TextureColor { get; set; }
         public float Scale { get; set; }
+        // Private
+        private Point textureSize { get; set; }
+        private Point tilemap { get; set; }
+        private Point tilesize { get; set; }
+
         public NPC(IGameManager game, TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1)
         {
             IsTalking = false;
             HasTalked = false;
             Game = game;
             Texture = texture;
+
+            // Private
+            textureSize = TextureManager.Metadata[Texture].Size;
+            tilemap = TextureManager.Metadata[Texture].TileMap;
+            tilesize = (textureSize / tilemap);
+
             Location = location;
             Name = name;
             Dialog = dialog;
@@ -42,12 +54,11 @@ namespace Quest
         public void Draw()
         {
             // Npc
-            Rectangle source = new(new((int)(Game.Time * 3) % 4 * Constants.MageSize.X, 0), Constants.MageSize);
-            Vector2 size = new Vector2(80, 80) * Scale;
-            Vector2 origin = new(size.X / (2 * Scale), size.Y / Scale);
-            Rectangle rect = new(((Location.ToVector2() + Constants.HalfVec) * Constants.TileSize - Game.Camera + Constants.Middle).ToPoint(), size.ToPoint());
+            Rectangle source = new(new((int)(Game.Time * 3) % tilemap.X * tilesize.X, 0), tilesize);
+            Vector2 origin = new(tilesize.X / 2, tilesize.Y);
+            Rectangle rect = new(((Location.ToVector2() + Constants.HalfVec) * Constants.TileSize - Game.Camera + Constants.Middle).ToPoint(), tilesize);
             DrawTexture(Game.Batch, Texture, rect, color: TextureColor, scale: new(Scale), source:source, origin:origin);
-            Game.Batch.FillRectangle(new(rect.X - origin.X*2, rect.Y - origin.Y*2, rect.Width, rect.Height), Constants.DebugPinkTint);
+            Game.Batch.FillRectangle(new((rect.Location - tilesize).ToVector2(), source.Size.ToVector2() * Scale), Constants.DebugPinkTint);
         }
         public void Update()
         {
@@ -62,7 +73,6 @@ namespace Quest
                     DialogBox.IsVisible = true;
                     DialogBox.Displayed = "";
                     IsTalking = true;
-                    Logger.Log($"Talking to {Name}");
                 }
             }
             // Hiding if away

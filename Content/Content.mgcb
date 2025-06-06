@@ -13,13 +13,6 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin Arial.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:Arial.spritefont
-
 #begin Fonts/Arial.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -60,18 +53,6 @@
 /processorParam:TextureFormat=Color
 /build:Images/Characters/BlueMage.png
 
-#begin Images/Characters/BlueMage.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Characters/BlueMage.png
-
 #begin Images/Characters/GrayMage.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -84,7 +65,7 @@
 /processorParam:TextureFormat=Color
 /build:Images/Characters/GrayMage.png
 
-#begin Images/Characters/WhiteMage.png
+#begin Images/Characters/PurpleWizard.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -94,7 +75,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Characters/WhiteMage.png
+/build:Images/Characters/PurpleWizard.png
 
 #begin Images/Characters/WhiteMage.png
 /importer:TextureImporter
@@ -107,6 +88,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Characters/WhiteMage.png
+
+#begin Images/Characters/WhiteWizard.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Characters/WhiteWizard.png
 
 #begin Images/Gui/CursorArrow.png
 /importer:TextureImporter
