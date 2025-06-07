@@ -16,7 +16,7 @@ namespace Quest.Gui
         public Xna.Point Size { get; set; }
         public Xna.Color Foreground { get; set; }
         public Xna.Color Background { get; set; }
-        public StatusBar(Xna.Vector2 location, Xna.Point size, Xna.Color foreground, Xna.Color background, int currentValue, int maxValue) : base(location)
+        public StatusBar(Xna.Point location, Xna.Point size, Xna.Color foreground, Xna.Color background, int currentValue, int maxValue) : base(location)
         {
             Size = size;
             CurrentValue = currentValue;
@@ -26,7 +26,7 @@ namespace Quest.Gui
         }
         public override void Draw(SpriteBatch batch)
         {
-            batch.FillRectangle(new(Location, Size), Background); // Background
+            batch.FillRectangle(new(Location.ToVector2(), Size), Background); // Background
             batch.FillRectangle(new(Location.X, Location.Y, Size.X * CurrentValue / MaxValue, Size.Y), Foreground); // Foreground
         }
     }

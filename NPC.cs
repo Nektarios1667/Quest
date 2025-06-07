@@ -59,7 +59,7 @@ namespace Quest
             // Npc
             Rectangle source = new(new((int)(Game.Time * 2) % tilemap.X * tilesize.X, 0), tilesize);
             Vector2 origin = new(tilesize.X / 2, tilesize.Y);
-            Rectangle rect = new(((Location.ToVector2() + Constants.HalfVec) * Constants.TileSize - Game.Camera + Constants.Middle).ToPoint(), tilesize);
+            Rectangle rect = new(Location * Constants.TileSize - Game.Camera.ToPoint() + Constants.Middle + tilesize / Constants.TwoPoint, tilesize);
             DrawTexture(Game.Batch, Texture, rect, color: TextureColor, scale: new(Scale), source:source, origin:origin);
             // Debug
             if (Constants.DRAW_HITBOXES)
@@ -71,7 +71,7 @@ namespace Quest
         {
             if (DialogBox.HasSpoken) HasSpoken = true;
             // Speaking
-            if (!Game.Playing && Vector2.DistanceSquared(Game.PlayerFoot / Constants.TileSize, Location.ToVector2() + Constants.HalfVec) <= 4)
+            if (Game.Playing && Vector2.DistanceSquared(Game.PlayerFoot.ToVector2() / Constants.TileSize.ToVector2(), Location.ToVector2() + Constants.HalfVec) <= 4)
             {
                 if (!IsTalking)
                     DialogBox.IsVisible = true;

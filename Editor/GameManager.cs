@@ -24,8 +24,8 @@ namespace Quest.Editor
         public Dictionary<string, double> FrameTimes { get; private set; }
         // Properties
         public bool Playing => true;
-        public Vector2 PlayerFoot => CameraDest + Constants.MageDrawShift + new Vector2(0, Constants.MageHalfSize.Y);
-        public Point Coord => (Camera / Constants.TileSize).ToPoint();
+        public Point PlayerFoot => CameraDest.ToPoint() + Constants.MageDrawShift + new Point(0, Constants.MageHalfSize.Y);
+        public Point Coord => Camera.ToPoint() / Constants.TileSize;
         public ContentManager Content => Window.Content;
         public GuiManager Gui { get; private set; } // GUI handler
         public EditorWindow Window { get; private set; }
@@ -36,10 +36,8 @@ namespace Quest.Editor
         public Tile[] Tiles { get; set; }
         public List<NPC> NPCs { get; set; }
         public SpriteFont PixelOperator { get; private set; }
-        // Throwaway
-        //public Inventory Inventory { get; set; }
         // Private
-        private Xna.Vector2 tileSize;
+        private Point tileSize;
         public float Time { get; private set; }
         public GameManager(EditorWindow window, SpriteBatch spriteBatch)
         {
@@ -55,7 +53,7 @@ namespace Quest.Editor
                     Tiles[x + y * Constants.MapSize.X] = new Sky(new Xna.Point(x, y));
                 }
             }
-            Camera = new Vector2(128 * Constants.TileSize.X, 128 * Constants.TileSize.Y) - Constants.Middle;
+            Camera = new Vector2(128 * Constants.TileSize.X, 128 * Constants.TileSize.Y) - Constants.Middle.ToVector2();
             Gui = new();
             Watch = new();
             FrameTimes = [];
@@ -120,8 +118,8 @@ namespace Quest.Editor
             if (Tiles == null || Tiles.Length == 0) return;
 
             // Get bounds
-            Point start = ((Camera - Constants.Middle) / Constants.TileSize).ToPoint();
-            Point end = ((Camera + Constants.Middle) / Constants.TileSize).ToPoint();
+            Point start = (Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
+            Point end = (Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
 
             // Iterate
             for (int y = start.Y; y <= end.Y; y++) {
@@ -153,8 +151,8 @@ namespace Quest.Editor
             List<NPC> npcBuffer = new();
 
             // Spawn
-            Xna.Point spawn = new(reader.ReadByte(), reader.ReadByte());
-            Camera = (spawn - Constants.MiddleCoord).ToVector2() * tileSize;
+            Point spawn = new(reader.ReadByte(), reader.ReadByte());
+            Camera = ((spawn - Constants.MiddleCoord) * tileSize).ToVector2();
 
             // Tiles
             for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)

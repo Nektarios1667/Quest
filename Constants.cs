@@ -17,17 +17,17 @@ namespace Quest
         public static bool DRAW_HITBOXES = true; // Draw hitboxes for entities
 
         // Tile and map
-        public static readonly Xna.Vector2 TileSize = new(64, 64); // In-game tile size
-        public static readonly Xna.Vector2 TilePixelSize = new(16, 16); // Native resolution of tile images
+        public static readonly Xna.Point TileSize = new(64, 64); // In-game tile size
+        public static readonly Xna.Point TilePixelSize = new(16, 16); // Native resolution of tile images
         public static readonly Xna.Point TileMapDim = new(4, 4); // Dimensions of the connected texture map
         public static readonly Xna.Point MapSize = new(256, 256); // Map size in tiles - can not be above 256x256 because of save file
-        public static readonly Xna.Vector2 TileSizeScale = TileSize / TilePixelSize; // Scale factor from tile pixel size to in-game tile size
+        public static readonly Xna.Point TileSizeScale = TileSize / TilePixelSize; // Scale factor from tile pixel size to in-game tile size
         public static readonly List<Xna.Point> NeighborTiles = [new(0, 1), new(1, 0), new(0, -1), new(-1, 0)];
 
         // Screen
-        public static readonly Xna.Vector2 Window = new(1400, 900); // Game window resolution
-        public static readonly Xna.Vector2 Middle = new(Window.X / 2, Window.Y / 2); // Center of the screen
-        public static readonly Xna.Point MiddleCoord = (Middle / TileSize).ToPoint(); // Center tile coordinate
+        public static readonly Xna.Point Window = new(1400, 900); // Game window resolution
+        public static readonly Xna.Point Middle = new(Window.X / 2, Window.Y / 2); // Center of the screen
+        public static readonly Xna.Point MiddleCoord = Middle / TileSize; // Center tile coordinate
         public static readonly float CameraRigidity = .07f; // Camera smoothing weight
         public const bool VSYNC = false;
 
@@ -38,15 +38,17 @@ namespace Quest
 
         // Rendering and positioning
         public static readonly Xna.Rectangle ZeroSource = new(0, 0, (int)TilePixelSize.X, (int)TilePixelSize.Y); // Default tile source rect
-        public static readonly Xna.Vector2[] PlayerCorners = [new(-20, -20), new(20, -20), new(-20, 0), new(20, 0)]; // Player bounding box corners, tl, tr, bl, br
-        public static readonly Xna.Vector2 PlayerBox = new(PlayerCorners[1].X - PlayerCorners[0].X, PlayerCorners[2].Y - PlayerCorners[1].Y);
+        public static readonly Xna.Point[] PlayerCorners = [new(-20, -20), new(20, -20), new(-20, 0), new(20, 0)]; // Player bounding box corners, tl, tr, bl, br
+        public static readonly Xna.Point PlayerBox = new(PlayerCorners[1].X - PlayerCorners[0].X, PlayerCorners[2].Y - PlayerCorners[1].Y);
         public static readonly Xna.Point MageSize = new(80, 80); // Size of the mage sprite in pixels
         public static readonly Xna.Point MageHalfSize = new(20, 40); // Half size of the mage sprite in pixels
-        public static readonly Xna.Vector2 MageDrawShift = new(MageHalfSize.X, 0); // Used for center aligning mages
+        public static readonly Xna.Point MageDrawShift = new(MageHalfSize.X, 0); // Used for center aligning mages
 
         // Utility
         public static readonly Xna.Vector2 HalfVec = new(0.5f, 0.5f);
-        public static readonly Xna.Point NegOne = new(-1, -1); // Flipping vector
+        public static readonly Xna.Point NegativePoint = new(-1, -1);
+        public static readonly Xna.Point OnePoint = new(1, 1);
+        public static readonly Xna.Point TwoPoint = new(2, 2);
 
         // Colors
         public static readonly Xna.Color NearBlack = new(85, 85, 85);

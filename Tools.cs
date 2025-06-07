@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using Xna = Microsoft.Xna.Framework;
 
 namespace Quest
 {
@@ -79,6 +79,16 @@ namespace Quest
         public static bool IsVowel(char c)
         {
             return "aeiou".Contains(c);
+        }
+        public static float PointDistanceSquared(Xna.Point a, Xna.Point b)
+        {
+            int dx = a.X - b.X;
+            int dy = a.Y - b.Y;
+            return dx * dx + dy * dy;
+        }
+        public static float PointDistance(Xna.Point a, Xna.Point b)
+        {
+            return (float)Math.Sqrt(PointDistanceSquared(a, b));
         }
     }
 }

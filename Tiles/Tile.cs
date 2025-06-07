@@ -34,7 +34,7 @@ namespace Quest.Tiles
         // Debug
         public bool Marked { get; set; }
         // Auto generated - no setter
-        public Xna.Point Location { get;}
+        public Point Location { get;}
         // Properties - protected setter
         public bool IsWalkable { get; protected set; }
         public TileType Type { get; protected set; }
@@ -49,7 +49,7 @@ namespace Quest.Tiles
         public virtual void Draw(IGameManager game)
         {
             // Draw
-            Vector2 dest = Location.ToVector2() * Constants.TileSize - game.Camera + Constants.Middle;
+            Point dest = Location * Constants.TileSize - game.Camera.ToPoint() + Constants.Middle;
             TextureID texture = TileToTexture[Type];
             Color color = Marked ? Color.Red : Color.White;
             Rectangle rect = new((int)dest.X, (int)dest.Y, (int)Constants.TileSize.X, (int)Constants.TileSize.Y);

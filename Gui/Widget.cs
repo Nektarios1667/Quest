@@ -11,9 +11,9 @@ namespace Quest.Gui
     public abstract class Widget
     {
         public bool Expired { get; protected set; } = false;
-        public Xna.Vector2 Location { get; set; }
+        public Xna.Point Location { get; set; }
         public bool IsVisible { get; set; } = true;
-        public Widget(Xna.Vector2 location)
+        public Widget(Xna.Point location)
         {
             Location = location;
         }

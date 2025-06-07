@@ -19,11 +19,11 @@ namespace Quest.Tiles
         public override void Draw(IGameManager game)
         {
             // Draw each tile using the sprite batch
-            Vector2 dest = Location.ToVector2() * Constants.TileSize - game.Camera;
+            Point dest = Location * Constants.TileSize - game.Camera.ToPoint();
             dest += Constants.Middle;
             // Draw
             Color color = Marked ? Color.Red : Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(game.Time + Location.X + Location.Y));
-            DrawTexture(game.Batch, TextureID.Water, new Rectangle(dest.ToPoint(), Constants.TileSize.ToPoint()), source:game.TileTextureSource(this), color:color, scale:Constants.TileSizeScale);
+            DrawTexture(game.Batch, TextureID.Water, new Rectangle(dest, Constants.TileSize), source:game.TileTextureSource(this), color:color, scale:Constants.TileSizeScale.ToVector2());
             Marked = false; // Reset marked state for next frame
         }
     }

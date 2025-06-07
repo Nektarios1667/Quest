@@ -127,7 +127,7 @@ namespace Quest
             // Inputs
             keyState = Keyboard.GetState();
             mouseState = Mouse.GetState();
-            MouseCoord = (mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle.ToPoint()) / Constants.TileSize.ToPoint();
+            MouseCoord = (mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
             // Exit
             if (IsKeyDown(Keys.Escape)) Exit();
 
@@ -154,7 +154,7 @@ namespace Quest
             if (IsKeyPressed(Keys.F11))
                 GameManager.LootNotifications.AddNotification("Debug notif!", color:Color.Magenta);
             if (IsKeyPressed(Keys.F12))
-                GameManager.Level.Loot.Add(new Loot(new("PhiCoin", "Copper coin", amount:GameManager.Rand.Next(1, 10)), mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle.ToPoint(), GameManager.Time));
+                GameManager.Level.Loot.Add(new Loot(new("PhiCoin", "Copper coin", amount:GameManager.Rand.Next(1, 10)), mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle, GameManager.Time));
 
             // Movement
             if (!GameManager.Inventory.Opened)
@@ -333,8 +333,8 @@ namespace Quest
                 spriteBatch.Draw(Minimap, new Rectangle(10, (int)(Constants.Window.Y - Constants.MapSize.Y - 10), Constants.MapSize.X, Constants.MapSize.Y), Color.White);
 
             // Player
-            Vector2 dest = GameManager.TileCoord + new Vector2(10, Constants.Window.Y - Constants.MapSize.Y - 10);
-            spriteBatch.DrawPoint(dest, Color.Red, size:2);
+            Point dest = GameManager.TileCoord + new Point(10, Constants.Window.Y - Constants.MapSize.Y - 10);
+            spriteBatch.DrawPoint(dest.ToVector2(), Color.Red, size:2);
 
             GameManager.FrameTimes["DrawMinimap"] = GameManager.Watch.Elapsed.TotalMilliseconds;
         }

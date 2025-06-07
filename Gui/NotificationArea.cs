@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Quest.Gui
 {
 
-    public class NotificationArea(Vector2 location, int height, SpriteFont font, Color? color = null) : Widget(location)
+    public class NotificationArea(Point location, int height, SpriteFont font, Color? color = null) : Widget(location)
     {
         private class Notification(string text, Color color, float duration = 2f)
         {
@@ -51,8 +51,8 @@ namespace Quest.Gui
             for (int n = 0; n < Notifications.Count; n++)
             {
                 Notification notif = Notifications[n];
-                Vector2 dest = Location + Offset.ToVector2() - new Vector2(0, Font.MeasureString(notif.Text).Y * n / 2);
-                batch.DrawString(Font, notif.Text, dest, notif.Color, 0f, Vector2.Zero, .5f, SpriteEffects.None, 0f);
+                Point dest = Location + Offset - new Point(0, (int)Font.MeasureString(notif.Text).Y * n / 2);
+                batch.DrawString(Font, notif.Text, dest.ToVector2(), notif.Color, 0f, Vector2.Zero, .5f, SpriteEffects.None, 0f);
             }
         }
         public void AddNotification(string text, Color? color = null, float duration = 4f)

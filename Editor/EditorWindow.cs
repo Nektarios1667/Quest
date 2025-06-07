@@ -113,7 +113,7 @@ namespace Quest.Editor
             // Inputs
             keyState = Keyboard.GetState();
             mouseState = Mouse.GetState();
-            mouseCoord = Vector2.Floor((mouseState.Position.ToVector2() + GameManager.Camera - Constants.Middle) / Constants.TileSize).ToPoint();
+            mouseCoord = (mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
 
             // Exit
             if (IsKeyDown(Keys.Escape)) Exit();
@@ -242,10 +242,10 @@ namespace Quest.Editor
             GameManager.Draw();
 
             // Cursor
-            Vector2 cursorPos = mouseCoord.ToVector2() * Constants.TileSize - GameManager.Camera + Constants.Middle;
-            spriteBatch.FillRectangle(new(cursorPos, Constants.TileSize), Color.White);
+            Point cursorPos = mouseCoord * Constants.TileSize - GameManager.Camera.ToPoint() + Constants.Middle;
+            spriteBatch.FillRectangle(new(cursorPos.ToVector2(), Constants.TileSize), Color.White);
             TextureID ghostTile = (TextureID)(Enum.TryParse(typeof(TextureID), Material.ToString(), out var tex) ? tex : TextureID.Null);
-            DrawTexture(spriteBatch, ghostTile, new Rectangle(cursorPos.ToPoint(), Constants.TileSize.ToPoint()), source: Constants.ZeroSource, color: highlightColor, scale: new Vector2(4));
+            DrawTexture(spriteBatch, ghostTile, new Rectangle(cursorPos, Constants.TileSize), source: Constants.ZeroSource, color: highlightColor, scale: new Vector2(4));
 
             // Text info
             GameManager.Watch.Restart();
@@ -392,7 +392,7 @@ namespace Quest.Editor
 
             // Spawn
             Spawn = new(reader.ReadByte(), reader.ReadByte());
-            GameManager.Camera = Spawn.ToVector2() * Constants.TileSize;
+            GameManager.Camera = (Spawn * Constants.TileSize).ToVector2();
 
             // Tiles
             for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)

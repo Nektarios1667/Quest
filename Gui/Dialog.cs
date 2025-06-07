@@ -26,7 +26,7 @@ namespace Quest.Gui
         public float CharDelay { get; set; } = .05f;
         public float charWait { get; set; } = 0;
         // Private
-        public Dialog(GuiManager gui, Xna.Vector2 location, Xna.Vector2 dimensions, Color color, Color foreground, string text, SpriteFont font, int border = 6, Color? borderColor = null) : base(location)
+        public Dialog(GuiManager gui, Xna.Point location, Xna.Vector2 dimensions, Color color, Color foreground, string text, SpriteFont font, int border = 6, Color? borderColor = null) : base(location)
         {
             Gui = gui;
             Dimensions = dimensions;

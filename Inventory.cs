@@ -205,7 +205,7 @@ namespace Quest
                 Item? item = GetItem(HoverSlot);
                 if (item != null)
                 {
-                    Game.Level.Loot.Add(new Loot(item, Game.PlayerFoot.ToPoint() + Constants.MageHalfSize, Game.Time));
+                    Game.Level.Loot.Add(new Loot(item, Game.PlayerFoot + Constants.MageHalfSize, Game.Time));
                     SetSlot(HoverSlot, null);
                 }
             }
@@ -305,13 +305,13 @@ namespace Quest
             // x coord
             int left = (int)Constants.Middle.X - (slotSize.X * Width / 2);
             int x = (MouseState.Position.X - left) / (slotSize.X + 4);
-            if (x < 0 || x >= Width) return Constants.NegOne; // Out of bounds
+            if (x < 0 || x >= Width) return Constants.NegativePoint; // Out of bounds
 
             // y coord
             int top = (int)Constants.Window.Y - (GetTexture(TextureID.Slot).Texture.Height + 8) * (Height + 1) - (Height != 0 ? 20 : 0);
             int y = (MouseState.Position.Y - top) / (slotSize.Y + 8);
             y = Height - y; // Flip y axis
-            if (y < 0 || y >= Height) return Constants.NegOne; // Out of bounds
+            if (y < 0 || y >= Height) return Constants.NegativePoint; // Out of bounds
 
             return new(x, y);
         }

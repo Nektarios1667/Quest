@@ -26,7 +26,7 @@ namespace Quest {
     public interface IGameManager
     {
         bool Playing { get; }
-        Vector2 PlayerFoot { get; }
+        Point PlayerFoot { get; }
         ContentManager Content { get; }
         SpriteFont PixelOperator { get; }
         float Time { get; }
@@ -44,10 +44,11 @@ namespace Quest {
         // Debug
         public Stopwatch Watch { get; private set; }
         public Tile? TileBelow { get; private set; }
-        public Xna.Vector2 TileCoord { get; private set; }
-        public Vector2 PlayerFoot { get; private set; }
+        public Point TileCoord { get; private set; }
+        public Point PlayerFoot { get; private set; }
         public Dictionary<string, double> FrameTimes { get; private set; }
         // Properties
+        public Point CameraOffset => (CameraDest - Camera).ToPoint();
         public bool Playing => !Inventory.Opened;
         public Random Rand { get; private set; }
         public GuiManager Gui { get; private set; } // GUI handler
@@ -66,8 +67,7 @@ namespace Quest {
         // Inventory
         public Inventory Inventory { get; set; }
         // Private
-        private float lootPickupNotifY = 0f;
-        private Vector2 tileSize;
+        private Point tileSize;
         public float Time { get; private set; }
         public static readonly Point lootStackOffset = new(4, 4);
         public GameManager(Window window, SpriteBatch spriteBatch)
@@ -78,7 +78,7 @@ namespace Quest {
             tileSize = Constants.TileSize;
             Levels = [];
             TileTextures = [];
-            Camera = new Vector2(128 * Constants.TileSize.X, 128 * Constants.TileSize.Y) - Constants.Middle;
+            Camera = (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2();
             CameraDest = Camera;
             Gui = new();
             Watch = new();
@@ -102,7 +102,7 @@ namespace Quest {
             // Widgets
             Gui.Widgets = [
                 new StatusBar(new(10, Constants.Window.Y - 35), new(300, 25), Color.Green, Color.Red, 100, 100),
-                LootNotifications = new NotificationArea(Constants.Middle - Constants.MageHalfSize.ToVector2(), 5, PixelOperatorBold)
+                LootNotifications = new NotificationArea(Constants.Middle - Constants.MageHalfSize, 5, PixelOperatorBold)
             ];
 
             // Level
@@ -135,8 +135,8 @@ namespace Quest {
             if (Level.Tiles == null || Level.Tiles.Length == 0) return;
 
             // Get bounds
-            Point start = ((Camera - Constants.Middle) / Constants.TileSize).ToPoint();
-            Point end = ((Camera + Constants.Middle) / Constants.TileSize).ToPoint();
+            Point start = (Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
+            Point end = (Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
 
             // Iterate
             for (int y = start.Y; y <= end.Y; y++)
@@ -160,7 +160,7 @@ namespace Quest {
             Inventory.Draw();
             FrameTimes["InventoryDraw"] = Watch.Elapsed.TotalMilliseconds;
             // Debug
-            Batch.DrawPoint(PlayerFoot - Camera, Constants.DebugGreenTint, 3);
+            Batch.DrawPoint(PlayerFoot.ToVector2() - Camera, Constants.DebugGreenTint, 3);
         }
         public void DrawLoot()
         {
@@ -169,7 +169,7 @@ namespace Quest {
             for (int l = 0; l < Level.Loot.Count; l++)
             {
                 Loot loot = Level.Loot[l];
-                Rectangle rect = new((loot.Location.ToVector2() - Camera + Constants.Middle).ToPoint(), new(32, 32));
+                Rectangle rect = new(loot.Location - Camera.ToPoint() + Constants.Middle, new(32, 32));
                 rect.Y += (int)(Math.Sin((Time - loot.Birth) * 2 % (Math.PI * 2)) * 6); // Bob up and down
                 DrawTexture(Batch, loot.Texture, rect, scale: new(2));
                 // Draw stacks if multiple
@@ -201,15 +201,15 @@ namespace Quest {
             else if (Window.moveY > 0) sourceRow = 2;
             else if (Window.moveY < 0) sourceRow = 4;
             Rectangle source = new((int)(Time * (sourceRow == 0 ? 1.5f : 6)) % 4 * Constants.MageSize.X, sourceRow * Constants.MageSize.Y, Constants.MageSize.X, Constants.MageSize.Y);
-            Rectangle rect = new((Constants.Middle - Constants.MageHalfSize.ToVector2() + CameraDest - Camera).ToPoint(), Constants.MageSize);
+            Rectangle rect = new(Constants.Middle - Constants.MageHalfSize + CameraOffset, Constants.MageSize);
             DrawTexture(Batch, TextureID.BlueMage, rect, source: source);
         }
         public void DrawPlayerHitbox()
         {
-            Vector2[] points = new Vector2[4];
+            Point[] points = new Point[4];
             for (int c = 0; c < Constants.PlayerCorners.Length; c++)
-                points[c] = PlayerFoot + Constants.PlayerCorners[c] - Camera + Constants.Middle;
-            Batch.FillRectangle(new Rectangle((int)points[0].X, (int)points[0].Y, (int)(points[1].X - points[0].X), (int)(points[2].Y - points[1].Y)), Constants.DebugPinkTint);
+                points[c] = PlayerFoot + Constants.PlayerCorners[c] - Camera.ToPoint() + Constants.Middle;
+            Batch.FillRectangle(new Rectangle(points[0].X, points[0].Y, points[1].X - points[0].X, points[2].Y - points[1].Y), Constants.DebugPinkTint);
         }
         #endregion
         // Update split up methods
@@ -217,9 +217,9 @@ namespace Quest {
         public void UpdatePositions()
         {
             // Update player position
-            PlayerFoot = CameraDest + Constants.MageDrawShift + new Vector2(0, Constants.MageHalfSize.Y);
-            TileCoord = Vector2.Floor(PlayerFoot / Constants.TileSize);
-            TileBelow = GetTile((int)TileCoord.X, (int)TileCoord.Y);
+            PlayerFoot = CameraDest.ToPoint() + Constants.MageDrawShift + new Point(0, Constants.MageHalfSize.Y);
+            TileCoord = PlayerFoot / Constants.TileSize;
+            TileBelow = GetTile(TileCoord);
         }
         public void UpdateCharacters(float deltaTime)
         {
@@ -234,7 +234,7 @@ namespace Quest {
             {
                 Loot loot = Level.Loot[l];
                 // Pick up loot
-                if (Vector2.DistanceSquared(PlayerFoot, loot.Location.ToVector2() + new Vector2(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
+                if (Tools.PointDistanceSquared(PlayerFoot, loot.Location + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
                 {
                     // Print notif before adding since amount will change
                     LootNotifications.AddNotification($"+{loot.Item.DisplayText}");
@@ -289,10 +289,6 @@ namespace Quest {
             // On tile enter
             UpdatePositions();
             if (TileBelow == null) return;
-            if (TileBelow.Type == TileType.Stairs)
-            {
-                Console.WriteLine("");
-            }
             TileBelow.OnPlayerEnter(this);
             // Debug
             if (Constants.COLLISION_DEBUG) TileBelow.Marked = true;
@@ -308,7 +304,7 @@ namespace Quest {
             Level = Levels[levelIndex];
 
             // Spawn
-            CameraDest = Level.Spawn.ToVector2() * tileSize;
+            CameraDest = (Level.Spawn * tileSize).ToVector2();
             Camera = CameraDest;
 
             // Reset minimap for redraw
@@ -352,8 +348,8 @@ namespace Quest {
             List<NPC> npcBuffer = [];
 
             // Spawn
-            Xna.Point spawn = new(reader.ReadByte(), reader.ReadByte());
-            CameraDest = (spawn - Constants.MiddleCoord).ToVector2() * tileSize;
+            Point spawn = new(reader.ReadByte(), reader.ReadByte());
+            CameraDest = ((spawn - Constants.MiddleCoord) * tileSize).ToVector2();
             Camera = CameraDest;
 
             // Tiles
@@ -409,8 +405,8 @@ namespace Quest {
             for (int o = 0; o < Constants.PlayerCorners.Length; o++)
             {
                 // Check if the player collides with a tile
-                Vector2 coord = (PlayerFoot + Constants.PlayerCorners[o]) / Constants.TileSize;
-                TileBelow = GetTile((int)Math.Floor(coord.X), (int)Math.Floor(coord.Y));
+                Point coord = (PlayerFoot + Constants.PlayerCorners[o]) / Constants.TileSize;
+                TileBelow = GetTile(coord);
                 if (TileBelow == null || !TileBelow.IsWalkable) return true;
             }
             return false;
