@@ -208,9 +208,7 @@ namespace Quest.Editor
 
             // NPCs
             if (HotKeyPressed(Keys.LeftControl, Keys.N))
-            {
                 EditNPCs();
-            }
 
 
             // Save

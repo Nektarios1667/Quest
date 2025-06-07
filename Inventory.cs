@@ -12,6 +12,22 @@ using static Quest.TextureManager;
 using MonoGame.Extended;
 namespace Quest
 {
+    public struct Loot
+    {
+        public Item Item { get; private set; }
+        public Point Location { get; private set; }
+        public int Amount { get; private set; }
+        public TextureID Texture { get; private set; }
+        public float Birth { get; private set; }
+        public Loot(Item item, Point location, float time, int amount = 1)
+        {
+            Item = item;
+            Location = location;
+            Amount = amount;
+            Texture = ParseTextureString(item.Name);
+            Birth = time;
+        }
+    }
     public class Item
     {
         public string Name { get; private set; }
@@ -204,6 +220,29 @@ namespace Quest
                     SetSlot(SelectedSlot, null);
             }
         }
+        // AddItem
+        public void AddItem(Item item)
+        {
+            if (item == null || IsFull()) return;
+            for (int y = Height - 1; y >= 0; y--)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    Item? current = Items[x, y];
+                    if (current == null) {
+                        SetSlot(Flatten(x, y), item);
+                        return;
+                    }
+                    if (SameItem(current, item))
+                    {
+                        int moved = Math.Min(item.Amount, current.Max - current.Amount);
+                        current!.Amount += moved; // Add to existing item
+                        item.Amount -= moved; // Reduce amount of new item
+                        if (item.Amount < 1) return; // If item is fully added exit
+                    }
+                }
+            }
+        }
         // SameItem
         public static bool SameItem(Item? item1, Item? item2)
         {
@@ -280,9 +319,9 @@ namespace Quest
         // Booleans
         public bool IsFull()
         {
-            for (int y = 0; y < Items.GetLength(0); y++) {
-                for (int x = 0; x < Items.GetLength(1); x++) {
-                    if (Items[y, x] == null) return false;
+            for (int x = 0; x < Items.GetLength(0); x++) {
+                for (int y = 0; y < Items.GetLength(1); y++) {
+                    if (Items[x, y] == null) return false;
                 }
             }
             return true;

@@ -15,10 +15,17 @@ using MonoGame.Extended;
 using Microsoft.Xna.Framework.Input;
 using static Quest.TextureManager;
 
+// TODO
+// Check inventory placement when picking up items - DONE
+// Lower range of item pickup - DONE
+// Add debug toggle hotkeys f1-f6
+// Add messages when items picked up
+
 namespace Quest {
 
     public interface IGameManager
     {
+        Vector2 PlayerFoot { get; }
         ContentManager Content { get; }
         SpriteFont PixelOperator { get; }
         float Time { get; }
@@ -36,13 +43,14 @@ namespace Quest {
         // Debug
         public Stopwatch Watch { get; private set; }
         public Tile? TileBelow { get; private set; }
-        public Xna.Vector2 Coord { get; private set; }
+        public Xna.Vector2 TileCoord { get; private set; }
+        public Vector2 PlayerFoot { get; private set; }
         public Dictionary<string, double> FrameTimes { get; private set; }
         // Properties
         public GuiManager Gui { get; private set; } // GUI handler
         public Window Window { get; private set; }
-        public Xna.Vector2 Camera { get; set; } // Current camera position w/ smooth movement
-        public Xna.Vector2 CameraDest { get; set; } // Where the camera is going
+        public Vector2 Camera { get; set; } // Current camera position w/ smooth movement
+        public Vector2 CameraDest { get; set; } // Where the camera is going
         public float Delta { get; private set; }
         public SpriteBatch Batch { get; private set; }
         public List<Level> Levels { get; private set; }
@@ -88,27 +96,135 @@ namespace Quest {
             PixelOperatorBold = window.PixelOperatorBold;
             
             // Level
-            Level = new("null", [], new(0, 0), []); // Default level
+            Level = new("null", [], new(0, 0), [], []); // Default level
         }
         public void Update(float deltaTime, MouseState previousMouseState, MouseState mouseState)
         {
-            // Update the game state
             Delta = deltaTime;
             Time += deltaTime;
 
-            // Characters
+            UpdatePositions();
             UpdateCharacters(deltaTime);
-
-            // Camera
+            UpdateLoot(deltaTime);
             UpdateCamera(deltaTime);
-
-            // Gui
             UpdateGui(deltaTime, previousMouseState, mouseState);
+        }
+        public void Draw()
+        {
+            DrawTiles();
+            DrawGui();
+            DrawLoot();
+            DrawCharacters();
+        }
+        // Draw split up methods
+        #region
+        public void DrawTiles()
+        {
+            // Tiles
+            Watch.Restart();
+            if (Level.Tiles == null || Level.Tiles.Length == 0) return;
+
+            // Get bounds
+            Point start = ((Camera - Constants.Middle) / Constants.TileSize).ToPoint();
+            Point end = ((Camera + Constants.Middle) / Constants.TileSize).ToPoint();
+
+            // Iterate
+            for (int y = start.Y; y <= end.Y; y++)
+            {
+                for (int x = start.X; x <= end.X; x++)
+                {
+                    GetTile(x, y)?.Draw(this);
+                }
+            }
+            FrameTimes["TileDraws"] = Watch.Elapsed.TotalMilliseconds;
+        }
+        public void DrawGui()
+        {
+            // Widgets
+            Watch.Restart();
+            Gui.Draw(Batch);
+            FrameTimes["GuiDraw"] = Watch.Elapsed.TotalMilliseconds;
+            // Inventory
+            Watch.Restart();
+            Inventory.Draw();
+            FrameTimes["InventoryDraw"] = Watch.Elapsed.TotalMilliseconds;
+            // Debug
+            Batch.DrawPoint(PlayerFoot - Camera, Constants.DebugGreenTint, 3);
+        }
+        public void DrawLoot()
+        {
+            Watch.Restart();
+            // Draw each
+            for (int l = 0; l < Level.Loot.Count; l++)
+            {
+                Loot loot = Level.Loot[l];
+                Rectangle rect = new((loot.Location.ToVector2() - Camera + Constants.Middle).ToPoint(), new(32, 32));
+                rect.Y += (int)(Math.Sin((Time - loot.Birth) * 2 % (Math.PI * 2)) * 6); // Bob up and down
+                DrawTexture(Batch, loot.Texture, rect, scale: new(2));
+                if (Constants.DRAW_HITBOXES)
+                    Batch.FillRectangle(rect, Constants.DebugPinkTint);
+            }
+            FrameTimes["DrawLoot"] = Watch.Elapsed.TotalMilliseconds;
+        }
+        public void DrawCharacters()
+        {
+            Watch.Restart();
+            DrawPlayer();
+            if (Constants.DRAW_HITBOXES)
+                DrawPlayerHitbox();
+            foreach (NPC npc in Level.NPCs) npc.Draw();
+            FrameTimes["CharacterDraws"] = Watch.Elapsed.TotalMilliseconds;
+        }
+        public void DrawPlayer()
+        {
+            int sourceRow = 0;
+            if (Window.moveX == 0 && Window.moveY == 0) sourceRow = 0;
+            else if (Window.moveX < 0) sourceRow = 1;
+            else if (Window.moveX > 0) sourceRow = 3;
+            else if (Window.moveY > 0) sourceRow = 2;
+            else if (Window.moveY < 0) sourceRow = 4;
+            Rectangle source = new((int)(Time * (sourceRow == 0 ? 1.5f : 6)) % 4 * Constants.MageSize.X, sourceRow * Constants.MageSize.Y, Constants.MageSize.X, Constants.MageSize.Y);
+            Rectangle rect = new((Constants.Middle - Constants.MageHalfSize.ToVector2() + CameraDest - Camera).ToPoint(), Constants.MageSize);
+            DrawTexture(Batch, TextureID.BlueMage, rect, source: source);
+        }
+        public void DrawPlayerHitbox()
+        {
+            Vector2[] points = new Vector2[4];
+            for (int c = 0; c < Constants.PlayerCorners.Length; c++)
+                points[c] = PlayerFoot + Constants.PlayerCorners[c] - Camera + Constants.Middle;
+            Batch.FillRectangle(new Rectangle((int)points[0].X, (int)points[0].Y, (int)(points[1].X - points[0].X), (int)(points[2].Y - points[1].Y)), Constants.DebugPinkTint);
+        }
+        #endregion
+        // Update split up methods
+        #region
+        public void UpdatePositions()
+        {
+            // Update player position
+            PlayerFoot = CameraDest + Constants.MageDrawShift + new Vector2(0, Constants.MageHalfSize.Y);
+            TileCoord = Vector2.Floor(PlayerFoot / Constants.TileSize);
+            TileBelow = GetTile((int)TileCoord.X, (int)TileCoord.Y);
         }
         public void UpdateCharacters(float deltaTime)
         {
             foreach (NPC npc in Level.NPCs) npc.Update();
         }
+        public void UpdateLoot(float deltaTime)
+        {
+            Watch.Restart();
+            // Check if can pick up and search
+            if (Inventory.IsFull()) return;
+            for (int l = 0; l < Level.Loot.Count; l++)
+            {
+                Loot loot = Level.Loot[l];
+                if (Vector2.DistanceSquared(PlayerFoot, loot.Location.ToVector2() + new Vector2(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
+                {
+                    Inventory.AddItem(loot.Item);
+                    Level.Loot.RemoveAt(l);
+                }
+            }
+            FrameTimes["UpdateLoot"] = Watch.Elapsed.TotalMilliseconds;
+        }
+
         public void UpdateCamera(float deltaTime)
         {
             // Lerp camera
@@ -130,88 +246,36 @@ namespace Quest {
             Inventory.Update(previousMouseState, mouseState);
             FrameTimes["InventoryUpdate"] = Watch.Elapsed.TotalMilliseconds;
         }
-        public void Draw()
-        {
-            // Tiles
-            DrawTiles();
+        #endregion
 
-            // Gui
-            DrawGui();
-
-            // Characters
-            DrawCharacters();
-        }
-        public void DrawGui()
-        {
-            // Widgets
-            Watch.Restart();
-            Gui.Draw(Batch);
-            FrameTimes["GuiDraw"] = Watch.Elapsed.TotalMilliseconds;
-            // Inventory
-            Watch.Restart();
-            Inventory.Draw();
-            FrameTimes["InventoryDraw"] = Watch.Elapsed.TotalMilliseconds;
-        }
-        public void DrawCharacters()
-        {
-            Watch.Restart();
-            DrawPlayer();
-            if (Constants.DRAW_HITBOXES)
-                DrawPlayerHitbox();
-            foreach (NPC npc in Level.NPCs) npc.Draw();
-            FrameTimes["CharacterDraws"] = Watch.Elapsed.TotalMilliseconds;
-        }
-        public void DrawTiles()
-        {
-            // Tiles
-            Watch.Restart();
-            if (Level.Tiles == null || Level.Tiles.Length == 0) return;
-
-            // Get bounds
-            Point start = ((Camera - Constants.Middle) / Constants.TileSize).ToPoint();
-            Point end = ((Camera + Constants.Middle) / Constants.TileSize).ToPoint();
-
-            // Iterate
-            for (int y = start.Y; y <= end.Y; y++) {
-                for (int x = start.X; x <= end.X; x++) {
-                    GetTile(x, y)?.Draw(this);
-                }
-            }
-            FrameTimes["TileDraws"] = Watch.Elapsed.TotalMilliseconds;
-        }
         // Movements
         public void Move(Xna.Vector2 move)
         {
             // Move
             if (move == Vector2.Zero) return;
-            Xna.Vector2 finalMove = Vector2.Normalize(move) * Delta * Constants.PlayerSpeed;
+            Vector2 finalMove = Vector2.Normalize(move) * Delta * Constants.PlayerSpeed;
 
-            // Allow escaping
-            if (!CollideCheck())
-            {
-                CameraDest += finalMove;
-                TileBelow?.OnPlayerEnter(this);
+            // Stuck in block
+            if (IsColliding())
                 return;
-            }
 
             // Check collision for x
             CameraDest += new Vector2(finalMove.X, 0);
-            if (!CollideCheck()) CameraDest -= new Vector2(finalMove.X, 0);
+            if (IsColliding()) CameraDest -= new Vector2(finalMove.X, 0);
             // Check collision for y
             CameraDest += new Vector2(0, finalMove.Y);
-            if (!CollideCheck()) CameraDest -= new Vector2(0, finalMove.Y);
+            if (IsColliding()) CameraDest -= new Vector2(0, finalMove.Y);
 
             // On tile enter
-            Coord = Vector2.Floor((new Vector2(CameraDest.X, CameraDest.Y + Constants.MageHalfSize.Y) / Constants.TileSize));
-            TileBelow = GetTile((int)Coord.X, (int)Coord.Y);
+            UpdatePositions();
             if (TileBelow == null) return;
+            if (TileBelow.Type == TileType.Stairs)
+            {
+                Console.WriteLine("");
+            }
             TileBelow.OnPlayerEnter(this);
             // Debug
             if (Constants.COLLISION_DEBUG) TileBelow.Marked = true;
-        }
-        public void Move(float x, float y)
-        {
-            Move(new Xna.Vector2(x, y));
         }
         // Levels
         public void LoadLevel(int levelIndex)
@@ -311,24 +375,25 @@ namespace Quest {
                 throw new ArgumentException($"Invalid level size - expected {Constants.MapSize.X}x{Constants.MapSize.X} tiles.");
 
             // Make and add the level
-            Level created = new(filename, tilesBuffer, spawn, [.. npcBuffer]);
+            Level created = new(filename, tilesBuffer, spawn, [.. npcBuffer], []);
             Levels.Add(created);
         }
         // Utilities
-        public bool CollideCheck()
+        #region
+        public bool IsColliding()
         {
             // Check if level loaded
             if (Level == null) return false;
             // Check 4 corners
-            Coord = Vector2.Round(CameraDest / Constants.TileSize);
+            UpdatePositions();
             for (int o = 0; o < Constants.PlayerCorners.Length; o++)
             {
                 // Check if the player collides with a tile
-                Vector2 coord = (CameraDest + Constants.PlayerCorners[o]) / Constants.TileSize;
+                Vector2 coord = (PlayerFoot + Constants.PlayerCorners[o]) / Constants.TileSize;
                 TileBelow = GetTile((int)Math.Floor(coord.X), (int)Math.Floor(coord.Y));
-                if (TileBelow == null || !TileBelow.IsWalkable) return false;
+                if (TileBelow == null || !TileBelow.IsWalkable) return true;
             }
-            return true;
+            return false;
         }
         public static Tile TileFromId(int id, Xna.Point location)
         {
@@ -347,7 +412,6 @@ namespace Quest {
                 _ => new Tile(location), // Default tile
             };
         }
-        // Utilities
         public int Flatten(Xna.Point pos) { return pos.X + pos.Y * Constants.MapSize.X; }
         public int Flatten(int x, int y) { return x + y * Constants.MapSize.X; }
         public int Flatten(Xna.Vector2 pos) { return Flatten((int)pos.X, (int)pos.Y); }
@@ -389,24 +453,6 @@ namespace Quest {
 
             return mask;
         }
-        public void DrawPlayerHitbox()
-        {
-            Vector2[] points = new Vector2[4];
-            for (int c = 0; c < Constants.PlayerCorners.Length; c++)
-                points[c] = Constants.Middle + Constants.PlayerCorners[c] + CameraDest - Camera;
-            Batch.FillRectangle(new Rectangle((int)points[0].X, (int)points[0].Y, (int)(points[1].X - points[0].X), (int)(points[2].Y - points[1].Y)), Constants.DebugPinkTint);
-        }
-        public void DrawPlayer()
-        {
-            int sourceRow = 0;
-            if (Window.moveX == 0 && Window.moveY == 0) sourceRow = 0;
-            else if (Window.moveX < 0) sourceRow = 1;
-            else if (Window.moveX > 0) sourceRow = 3;
-            else if (Window.moveY > 0) sourceRow = 2;
-            else if (Window.moveY < 0) sourceRow = 4;
-            Rectangle source = new((int)(Time * (sourceRow == 0 ? 1.5f : 6)) % 4 * Constants.MageSize.X, sourceRow * Constants.MageSize.Y, Constants.MageSize.X, Constants.MageSize.Y);
-            Rectangle rect = new((Constants.Middle - Constants.MageHalfSize.ToVector2() + CameraDest - Camera).ToPoint(), Constants.MageSize);
-            DrawTexture(Batch, TextureID.BlueMage, rect, source: source);
-        }
+        #endregion
     }
 }

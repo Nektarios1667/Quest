@@ -11,6 +11,7 @@ using MonoGame.Extended;
 using System.Collections.Generic;
 using static Quest.TextureManager;
 using System.Text;
+using System.Security.Policy;
 
 namespace Quest
 {
@@ -22,6 +23,7 @@ namespace Quest
         private KeyboardState previousKeyState;
         private MouseState mouseState;
         private MouseState previousMouseState;
+        public Point MouseCoord { get; private set; }
         public bool LMouseClick => mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Released;
         public bool LMouseDown => mouseState.LeftButton == ButtonState.Pressed;
         public bool LMouseRelease => mouseState.LeftButton == ButtonState.Released && previousMouseState.LeftButton == ButtonState.Pressed;
@@ -125,15 +127,22 @@ namespace Quest
             // Inputs
             keyState = Keyboard.GetState();
             mouseState = Mouse.GetState();
+            MouseCoord = (mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle.ToPoint()) / Constants.TileSize.ToPoint();
             // Exit
             if (IsKeyDown(Keys.Escape)) Exit();
 
-            // Delta debugUpdateTime
+            // Delta
             delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             // Inventory
             if (IsKeyPressed(Keys.I))
                 GameManager.Inventory.Opened = !GameManager.Inventory.Opened;
+
+            // Debug
+            if (IsKeyPressed(Keys.F12))
+            {
+                GameManager.Level.Loot.Add(new Loot(new("PhiCoin", "Copper coin"), mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle.ToPoint(), GameManager.Time));
+            }
 
             // Movement
             if (!GameManager.Inventory.Opened)
@@ -144,7 +153,7 @@ namespace Quest
                 moveX += IsAnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0;
                 moveY += IsAnyKeyDown(Keys.W, Keys.Up) ? -Constants.PlayerSpeed : 0;
                 moveY += IsAnyKeyDown(Keys.S, Keys.Down) ? Constants.PlayerSpeed : 0;
-                GameManager.Move(moveX, moveY);
+                GameManager.Move(new(moveX, moveY));
             }
 
             // Time
@@ -177,6 +186,7 @@ namespace Quest
             // Draw game
             GameManager.DrawTiles();
             GameManager.DrawCharacters();
+            GameManager.DrawLoot();
 
             // Inventory darkening
             if (GameManager.Inventory.Opened)
@@ -267,7 +277,7 @@ namespace Quest
             debugSb.Append("\nTile Below: ");
             debugSb.Append(GameManager.TileBelow == null ? "none" : GameManager.TileBelow.Type);
             debugSb.Append("\nCoord: ");
-            debugSb.AppendFormat("{0:0.0},{1:0.0}", GameManager.Coord.X, GameManager.Coord.Y);
+            debugSb.AppendFormat("{0:0.0},{1:0.0}", GameManager.TileCoord.X, GameManager.TileCoord.Y);
             debugSb.Append("\nLevel: ");
             debugSb.Append(GameManager.Level?.Name);
             debugSb.Append("\nInventory: ");
@@ -309,7 +319,7 @@ namespace Quest
                 spriteBatch.Draw(Minimap, new Rectangle(10, (int)(Constants.Window.Y - Constants.MapSize.Y - 10), Constants.MapSize.X, Constants.MapSize.Y), Color.White);
 
             // Player
-            Vector2 dest = GameManager.Coord + new Vector2(10, Constants.Window.Y - Constants.MapSize.Y - 10);
+            Vector2 dest = GameManager.TileCoord + new Vector2(10, Constants.Window.Y - Constants.MapSize.Y - 10);
             spriteBatch.DrawPoint(dest, Color.Red, size:2);
 
             GameManager.FrameTimes["DrawMinimap"] = GameManager.Watch.Elapsed.TotalMilliseconds;

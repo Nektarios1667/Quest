@@ -20,15 +20,17 @@ namespace Quest {
     {
         public NPC[] NPCs { get; private set; }
         public string Name { get; private set; }
+        public List<Loot> Loot { get; private set; }
         public Tile[] Tiles { get; private set; }
         public Xna.Point Spawn { get; private set; }
-        public Level(string name, Tile[] tiles, Xna.Point spawn, NPC[] npcs)
+        public Level(string name, Tile[] tiles, Xna.Point spawn, NPC[] npcs, Loot[] loot)
         {
             // Initialize the level
             Name = name;
             Tiles = tiles;
             Spawn = spawn;
             NPCs = npcs;
+            Loot = [.. loot];
         }
     }
 }

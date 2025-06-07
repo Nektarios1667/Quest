@@ -23,6 +23,7 @@ namespace Quest.Editor
         public Stopwatch Watch { get; private set; }
         public Dictionary<string, double> FrameTimes { get; private set; }
         // Properties
+        public Vector2 PlayerFoot => CameraDest + Constants.MageDrawShift + new Vector2(0, Constants.MageHalfSize.Y);
         public Point Coord => (Camera / Constants.TileSize).ToPoint();
         public ContentManager Content => Window.Content;
         public GuiManager Gui { get; private set; } // GUI handler

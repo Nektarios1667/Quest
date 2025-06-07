@@ -38,10 +38,11 @@ namespace Quest
 
         // Rendering and positioning
         public static readonly Xna.Rectangle ZeroSource = new(0, 0, (int)TilePixelSize.X, (int)TilePixelSize.Y); // Default tile source rect
-        public static readonly Xna.Vector2[] PlayerCorners = [new(-20, 12), new(20, 12), new(-20, 40), new(20, 40)]; // Player bounding box corners, tl, tr, bl, br
+        public static readonly Xna.Vector2[] PlayerCorners = [new(-20, -20), new(20, -20), new(-20, 0), new(20, 0)]; // Player bounding box corners, tl, tr, bl, br
         public static readonly Xna.Vector2 PlayerBox = new(PlayerCorners[1].X - PlayerCorners[0].X, PlayerCorners[2].Y - PlayerCorners[1].Y);
         public static readonly Xna.Point MageSize = new(80, 80); // Size of the mage sprite in pixels
-        public static readonly Xna.Point MageHalfSize = new(MageSize.X / 2, MageSize.Y / 2); // Half size of the mage sprite in pixels
+        public static readonly Xna.Point MageHalfSize = new(20, 40); // Half size of the mage sprite in pixels
+        public static readonly Xna.Vector2 MageDrawShift = new(MageHalfSize.X, 0); // Used for center aligning mages
 
         // Utility
         public static readonly Xna.Vector2 HalfVec = new(0.5f, 0.5f);
@@ -53,6 +54,7 @@ namespace Quest
         public static readonly Xna.Color CottonCandy = new(242, 182, 240);
         public static readonly Xna.Color DarkenScreen = new(0, 0, 0, 188);
         public static readonly Xna.Color DebugPinkTint = new Xna.Color(255, 0, 255) * .4f;
+        public static readonly Xna.Color DebugGreenTint = new Xna.Color(55, 255, 55) * .4f;
 
         // Minimap pixel colors
         public static readonly Xna.Color[] MiniMapColors = [

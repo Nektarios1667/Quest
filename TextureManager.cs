@@ -121,6 +121,10 @@ namespace Quest
             Metadata[TextureID.Water] = new(Textures[TextureID.Water].Bounds.Size, new(4, 4), "tile");
             Logger.Log("Metadata loaded successfully.");
         }
+        public static TextureID ParseTextureString(string textureName)
+        {
+            return Enum.TryParse<TextureID>(textureName, false, out TextureID tex) ? tex : TextureID.Null;
+        }
         public static (Texture2D Texture, bool Found) GetTexture(TextureID id)
         {
             // Found
