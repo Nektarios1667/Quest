@@ -20,19 +20,22 @@ namespace Quest.Gui
         {
             // Update all widgets
             foreach (Widget widget in Widgets)
-            {
                 widget.Update(deltaTime);
+
+            // Remove expired widgets
+            for (int w = 0; w < Widgets.Count; w++) {
+                if (Widgets[w].Expired) {
+                    Widgets.RemoveAt(w);
+                    w--;
+                }
             }
         }
         public void Draw(SpriteBatch batch)
         {
             // Draw all widgets
-            foreach (Widget widget in Widgets)
-            {
+            foreach (Widget widget in Widgets) {
                 if (widget.IsVisible)
-                {
                     widget.Draw(batch);
-                }
             }
         }
     }

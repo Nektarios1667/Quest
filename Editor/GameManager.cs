@@ -23,6 +23,7 @@ namespace Quest.Editor
         public Stopwatch Watch { get; private set; }
         public Dictionary<string, double> FrameTimes { get; private set; }
         // Properties
+        public bool Playing => true;
         public Vector2 PlayerFoot => CameraDest + Constants.MageDrawShift + new Vector2(0, Constants.MageHalfSize.Y);
         public Point Coord => (Camera / Constants.TileSize).ToPoint();
         public ContentManager Content => Window.Content;
@@ -36,7 +37,7 @@ namespace Quest.Editor
         public List<NPC> NPCs { get; set; }
         public SpriteFont PixelOperator { get; private set; }
         // Throwaway
-        public Inventory Inventory { get; set; }
+        //public Inventory Inventory { get; set; }
         // Private
         private Xna.Vector2 tileSize;
         public float Time { get; private set; }
@@ -59,7 +60,7 @@ namespace Quest.Editor
             Watch = new();
             FrameTimes = [];
             NPCs = [];
-            Inventory = new(this, 0, 0);
+            //Inventory = new(null, 0, 0);
 
             // Load
             PixelOperator = window.Content.Load<SpriteFont>("Fonts/PixelOperator");

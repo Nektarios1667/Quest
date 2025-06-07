@@ -15,21 +15,20 @@ namespace Quest
     public struct Loot
     {
         public Item Item { get; private set; }
-        public Point Location { get; private set; }
-        public int Amount { get; private set; }
+        public Point Location { get; set; }
         public TextureID Texture { get; private set; }
         public float Birth { get; private set; }
-        public Loot(Item item, Point location, float time, int amount = 1)
+        public Loot(Item item, Point location, float time)
         {
             Item = item;
             Location = location;
-            Amount = amount;
             Texture = ParseTextureString(item.Name);
             Birth = time;
         }
     }
     public class Item
     {
+        public string DisplayText => $"{Amount} {(Amount != 1 ? Tools.Pluralize(Name) : Name)}";
         public string Name { get; private set; }
         public string Description { get; private set; }
         public int Amount { get; set; }
@@ -55,7 +54,7 @@ namespace Quest
         private MouseState PreviousMouseState { get; set; }
 
         //
-        public IGameManager Game { get; private set; }
+        public GameManager Game { get; private set; }
         public Item?[,] Items { get; private set; }
         public bool Opened { get; set; } = false;
         private SpriteFont PixelOperator { get; set; }
@@ -69,7 +68,7 @@ namespace Quest
         private readonly Vector2 itemScale = new(3, 3);
         private readonly Point slotSize = TextureManager.Metadata[TextureID.Slot].Size;
         private readonly Point itemStart;
-        public Inventory(IGameManager game, int width, int height)
+        public Inventory(GameManager game, int width, int height)
         {
             Game = game;
             Items = new Item?[width, height];
@@ -199,6 +198,17 @@ namespace Quest
 
             // Deselect
             if (LMouseDown && (mouseSlot < 0 || mouseSlot > Items.Length)) SelectedSlot = -1;
+
+            // Drop items
+            if (Opened && HoverSlot >= 0 && Game.Window.IsAnyKeyDown(Keys.D))
+            {
+                Item? item = GetItem(HoverSlot);
+                if (item != null)
+                {
+                    Game.Level.Loot.Add(new Loot(item, Game.PlayerFoot.ToPoint() + Constants.MageHalfSize, Game.Time));
+                    SetSlot(HoverSlot, null);
+                }
+            }
         }
         // Slot interactions
         private Color SlotColor(int x, int y)
@@ -224,7 +234,7 @@ namespace Quest
         public void AddItem(Item item)
         {
             if (item == null || IsFull()) return;
-            for (int y = Height - 1; y >= 0; y--)
+            for (int y = 0; y < Height; y++)
             {
                 for (int x = 0; x < Width; x++)
                 {

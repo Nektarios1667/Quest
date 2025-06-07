@@ -25,12 +25,13 @@ namespace Quest {
 
     public interface IGameManager
     {
+        bool Playing { get; }
         Vector2 PlayerFoot { get; }
         ContentManager Content { get; }
         SpriteFont PixelOperator { get; }
         float Time { get; }
         GuiManager Gui { get; }
-        Inventory Inventory { get; set; }
+        //Inventory Inventory { get; set; }
         Vector2 Camera { get; set; }
         Vector2 CameraDest { get; set; }
         SpriteBatch Batch { get; }
@@ -47,7 +48,10 @@ namespace Quest {
         public Vector2 PlayerFoot { get; private set; }
         public Dictionary<string, double> FrameTimes { get; private set; }
         // Properties
+        public bool Playing => !Inventory.Opened;
+        public Random Rand { get; private set; }
         public GuiManager Gui { get; private set; } // GUI handler
+        public NotificationArea LootNotifications { get; private set; } // Loot pickup notifications
         public Window Window { get; private set; }
         public Vector2 Camera { get; set; } // Current camera position w/ smooth movement
         public Vector2 CameraDest { get; set; } // Where the camera is going
@@ -62,8 +66,10 @@ namespace Quest {
         // Inventory
         public Inventory Inventory { get; set; }
         // Private
-        private Xna.Vector2 tileSize;
+        private float lootPickupNotifY = 0f;
+        private Vector2 tileSize;
         public float Time { get; private set; }
+        public static readonly Point lootStackOffset = new(4, 4);
         public GameManager(Window window, SpriteBatch spriteBatch)
         {
             // Initialize the game
@@ -75,11 +81,9 @@ namespace Quest {
             Camera = new Vector2(128 * Constants.TileSize.X, 128 * Constants.TileSize.Y) - Constants.Middle;
             CameraDest = Camera;
             Gui = new();
-            Gui.Widgets = [
-                new StatusBar(new(10, Constants.Window.Y - 35), new(300, 25), Color.Green, Color.Red, 100, 100),
-            ];
             Watch = new();
             FrameTimes = [];
+            Rand = new();
 
             // Inventory
             Inventory = new(this, 6, 4);
@@ -94,7 +98,13 @@ namespace Quest {
             // Loading
             PixelOperator = window.PixelOperator;
             PixelOperatorBold = window.PixelOperatorBold;
-            
+
+            // Widgets
+            Gui.Widgets = [
+                new StatusBar(new(10, Constants.Window.Y - 35), new(300, 25), Color.Green, Color.Red, 100, 100),
+                LootNotifications = new NotificationArea(Constants.Middle - Constants.MageHalfSize.ToVector2(), 5, PixelOperatorBold)
+            ];
+
             // Level
             Level = new("null", [], new(0, 0), [], []); // Default level
         }
@@ -142,6 +152,7 @@ namespace Quest {
         {
             // Widgets
             Watch.Restart();
+            LootNotifications.Offset = (CameraDest - Camera).ToPoint();
             Gui.Draw(Batch);
             FrameTimes["GuiDraw"] = Watch.Elapsed.TotalMilliseconds;
             // Inventory
@@ -161,6 +172,12 @@ namespace Quest {
                 Rectangle rect = new((loot.Location.ToVector2() - Camera + Constants.Middle).ToPoint(), new(32, 32));
                 rect.Y += (int)(Math.Sin((Time - loot.Birth) * 2 % (Math.PI * 2)) * 6); // Bob up and down
                 DrawTexture(Batch, loot.Texture, rect, scale: new(2));
+                // Draw stacks if multiple
+                if (loot.Item.Amount > 1)
+                   DrawTexture(Batch, loot.Texture, new(rect.Location + lootStackOffset, rect.Size), scale: new(2));
+                if (loot.Item.Amount > 2)
+                    DrawTexture(Batch, loot.Texture, new(rect.Location + lootStackOffset + lootStackOffset, rect.Size), scale: new(2));
+                // Draw hitbox if enabled
                 if (Constants.DRAW_HITBOXES)
                     Batch.FillRectangle(rect, Constants.DebugPinkTint);
             }
@@ -216,8 +233,11 @@ namespace Quest {
             for (int l = 0; l < Level.Loot.Count; l++)
             {
                 Loot loot = Level.Loot[l];
+                // Pick up loot
                 if (Vector2.DistanceSquared(PlayerFoot, loot.Location.ToVector2() + new Vector2(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
                 {
+                    // Print notif before adding since amount will change
+                    LootNotifications.AddNotification($"+{loot.Item.DisplayText}");
                     Inventory.AddItem(loot.Item);
                     Level.Loot.RemoveAt(l);
                 }

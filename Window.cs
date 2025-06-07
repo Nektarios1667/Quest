@@ -151,8 +151,10 @@ namespace Quest
                 Constants.FRAME_BAR = !Constants.FRAME_BAR;
             if (IsKeyPressed(Keys.F6))
                 Constants.DRAW_HITBOXES = !Constants.DRAW_HITBOXES;
+            if (IsKeyPressed(Keys.F11))
+                GameManager.LootNotifications.AddNotification("Debug notif!", color:Color.Magenta);
             if (IsKeyPressed(Keys.F12))
-                GameManager.Level.Loot.Add(new Loot(new("PhiCoin", "Copper coin"), mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle.ToPoint(), GameManager.Time));
+                GameManager.Level.Loot.Add(new Loot(new("PhiCoin", "Copper coin", amount:GameManager.Rand.Next(1, 10)), mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle.ToPoint(), GameManager.Time));
 
             // Movement
             if (!GameManager.Inventory.Opened)
@@ -275,7 +277,7 @@ namespace Quest
         }
         public void DrawTextInfo()
         {
-            spriteBatch.FillRectangle(new(0, 0, 200, 140), Color.Black * 0.8f);
+            spriteBatch.FillRectangle(new(0, 0, 200, 180), Color.Black * 0.8f);
 
             debugSb.Clear();
             debugSb.Append("FPS: ");
@@ -292,6 +294,8 @@ namespace Quest
             debugSb.Append(GameManager.Level?.Name);
             debugSb.Append("\nInventory: ");
             debugSb.Append(GameManager.Inventory.Opened);
+            debugSb.Append("\nGUI: ");
+            debugSb.Append(GameManager.Gui.Widgets.Count);
 
             spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);
         }

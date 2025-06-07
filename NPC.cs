@@ -71,7 +71,7 @@ namespace Quest
         {
             if (DialogBox.HasSpoken) HasSpoken = true;
             // Speaking
-            if (!Game.Inventory.Opened && Vector2.DistanceSquared(Game.PlayerFoot / Constants.TileSize, Location.ToVector2() + Constants.HalfVec) <= 4)
+            if (!Game.Playing && Vector2.DistanceSquared(Game.PlayerFoot / Constants.TileSize, Location.ToVector2() + Constants.HalfVec) <= 4)
             {
                 if (!IsTalking)
                     DialogBox.IsVisible = true;
