@@ -9,12 +9,12 @@ namespace Quest
     public static class Constants
     {
         // Debug
-        public static readonly bool COLLISION_DEBUG = true; // Enable collision debug mode
-        public static readonly bool TEXT_INFO = true; // Show text info on screen
-        public static readonly bool FRAME_INFO = true; // Show frame info on screen
-        public static readonly bool LOG_INFO = true; // Log game info
-        public static readonly bool FRAME_BAR = true; // Frame time graphical bar
-        public static readonly bool DRAW_HITBOXES = true; // Draw hitboxes for entities
+        public static bool COLLISION_DEBUG = true; // Enable collision debug mode
+        public static bool TEXT_INFO = true; // Show text info on screen
+        public static bool FRAME_INFO = true; // Show frame info on screen
+        public static bool LOG_INFO = true; // Log game info
+        public static bool FRAME_BAR = true; // Frame time graphical bar
+        public static bool DRAW_HITBOXES = true; // Draw hitboxes for entities
 
         // Tile and map
         public static readonly Xna.Vector2 TileSize = new(64, 64); // In-game tile size

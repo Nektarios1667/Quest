@@ -139,10 +139,20 @@ namespace Quest
                 GameManager.Inventory.Opened = !GameManager.Inventory.Opened;
 
             // Debug
+            if (IsKeyPressed(Keys.F1))
+                Constants.COLLISION_DEBUG = !Constants.COLLISION_DEBUG;
+            if (IsKeyPressed(Keys.F2))
+                Constants.TEXT_INFO = !Constants.TEXT_INFO;
+            if (IsKeyPressed(Keys.F3))
+                Constants.FRAME_INFO = !Constants.FRAME_INFO;
+            if (IsKeyPressed(Keys.F4))
+                Constants.LOG_INFO = !Constants.LOG_INFO;
+            if (IsKeyPressed(Keys.F5))
+                Constants.FRAME_BAR = !Constants.FRAME_BAR;
+            if (IsKeyPressed(Keys.F6))
+                Constants.DRAW_HITBOXES = !Constants.DRAW_HITBOXES;
             if (IsKeyPressed(Keys.F12))
-            {
                 GameManager.Level.Loot.Add(new Loot(new("PhiCoin", "Copper coin"), mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle.ToPoint(), GameManager.Time));
-            }
 
             // Movement
             if (!GameManager.Inventory.Opened)
