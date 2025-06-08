@@ -127,7 +127,7 @@ public static class TextureManager
     }
     public static TextureID ParseTextureString(string textureName)
     {
-        return Enum.TryParse<TextureID>(textureName, false, out TextureID tex) ? tex : TextureID.Null;
+        return Enum.TryParse<TextureID>(textureName, true, out var tex) ? tex : TextureID.Null;
     }
     public static (Texture2D Texture, bool Found) GetTexture(TextureID id)
     {

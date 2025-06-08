@@ -167,7 +167,7 @@ public class Window : Game
         if (IsKeyPressed(Keys.F11))
             GameManager.LootNotifications.AddNotification("Debug notif!", color: Color.Magenta);
         if (IsKeyPressed(Keys.F12))
-            GameManager.Level.Loot.Add(new Loot(new("PhiCoin", "Copper coin", amount: GameManager.Rand.Next(1, 10)), mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle, GameManager.Time));
+            GameManager.Level.Loot.Add(new Loot(new("PhiCoin", "Copper coin", amount: (byte)GameManager.Rand.Next(1, 10)), mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle, GameManager.Time));
 
         // Movement
         if (!GameManager.Inventory.Opened)

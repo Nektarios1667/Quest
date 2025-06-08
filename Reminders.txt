@@ -1,26 +1,41 @@
 ﻿When adding a new material:
-1. Make new 4x4 tilemap
-2. Add the tilemap to the `Content/Images/Tiles` folder
-3. Add to Content.mgcb and build
-4. Add tile name to Constants.TileNames
-5. Add to the TileType enum in Tile.cs
-6. Make new class for tile in Tiles folder, inheriting from Tile
-7. Add tile type and generator to TileFromId method in Game.cs
+	1. Make new 4x4 tilemap
+	2. Add the tilemap to the `Content/Images/Tiles` folder
+	3. Add to Content.mgcb and build
+	4. Add tile name to Constants.TileNames
+	5. Add to the TileType enum in Tile.cs
+	6. Make new class for tile in Tiles folder, inheriting from Tile
+	7. Add tile type and generator to TileFromId method in Game.cs
 
 Save file data:
-spawnX - byte
-spawnY - byte
+	spawnX - byte
+	spawnY - byte
 
-[for each tile (65536)]
-tileId - byte
+	[for each tile (65536)]
+		tileId - byte
 
-npcNumber - byte
-[for each npc (<256)]
-npcName - string
-npcDialog - string
-npcX - byte
-npcY - byte
-npcSize - byte (x10)
-npcColorR - byte
-npcColorG - byte
-npcColorB - byte
+	npcNumber - byte
+	[for each npc (<256)]
+		npcName - string
+		npcDialog - string
+		npcX - byte
+		npcY - byte
+		npcSize - byte (x10)
+		npcColorR - byte
+		npcColorG - byte
+		npcColorB - byte
+
+	lootNumber - byte
+	[for each loot (<256)]
+		lootItemName - string
+		lootItemDescription - string
+		lootItemAmount - byte
+		lootItemMax - byte
+		lootX - byte
+		lootY - byte
+
+	decalNumber - byte
+	[for each decal (<256)]
+		decalType - byte
+		decalX - byte
+		decalY - byte

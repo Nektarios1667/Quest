@@ -118,7 +118,7 @@ public class EditorWindow : Game
         delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
         // Movement
-        int speedup = IsKeyDown(Keys.LeftAlt) ? 5 : 1;
+        int speedup = IsKeyDown(Keys.LeftAlt) ? 5 : 2;
         moveX = 0; moveY = 0;
         moveX += IsAnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : 0;
         moveX += IsAnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0;
@@ -206,12 +206,51 @@ public class EditorWindow : Game
         if (HotKeyPressed(Keys.LeftControl, Keys.N))
             EditNPCs();
 
+        // Loot
+        if (HotKeyPressed(Keys.LeftControl, Keys.L))
+            EditLoot();
+
+        // Decals
+        if (HotKeyPressed(Keys.LeftControl, Keys.D))
+            EditDecals();
 
         // Save
         if (HotKeyPressed(Keys.LeftControl, Keys.E)) SaveLevel(this);
 
         // Level info
-        if (HotKeyPressed(Keys.LeftControl, Keys.L)) SetSpawn();
+        if (HotKeyPressed(Keys.LeftControl, Keys.I)) SetSpawn();
+
+        // Debug
+        if (IsKeyPressed(Keys.F1))
+        {
+            Constants.COLLISION_DEBUG = !Constants.COLLISION_DEBUG;
+            Logger.System($"COLLISION_DEBUG set to: {Constants.COLLISION_DEBUG}");
+        }
+        if (IsKeyPressed(Keys.F2))
+        {
+            Constants.TEXT_INFO = !Constants.TEXT_INFO;
+            Logger.System($"TEXT_INFO set to: {Constants.TEXT_INFO}");
+        }
+        if (IsKeyPressed(Keys.F3))
+        {
+            Constants.FRAME_INFO = !Constants.FRAME_INFO;
+            Logger.System($"FRAME_INFO set to: {Constants.FRAME_INFO}");
+        }
+        if (IsKeyPressed(Keys.F4))
+        {
+            Constants.LOG_INFO = !Constants.LOG_INFO;
+            Logger.System($"LOG_INFO set to: {Constants.LOG_INFO}");
+        }
+        if (IsKeyPressed(Keys.F5))
+        {
+            Constants.FRAME_BAR = !Constants.FRAME_BAR;
+            Logger.System($"FRAME_BAR set to: {Constants.FRAME_BAR}");
+        }
+        if (IsKeyPressed(Keys.F6))
+        {
+            Constants.DRAW_HITBOXES = !Constants.DRAW_HITBOXES;
+            Logger.System($"DRAW_HITBOXES set to: {Constants.DRAW_HITBOXES}");
+        }
 
         // Set previous key state
         previousKeyState = keyState;
@@ -385,6 +424,8 @@ public class EditorWindow : Game
         // Make buffers
         tilesBuffer = new Tile[Constants.MapSize.X * Constants.MapSize.Y];
         List<NPC> npcBuffer = [];
+        List<Loot> lootBuffer = [];
+        List<Decal> decalBuffer = [];
 
         // Spawn
         Spawn = new(reader.ReadByte(), reader.ReadByte());
@@ -409,7 +450,7 @@ public class EditorWindow : Game
         }
 
         // NPCs
-        int npcCount = reader.ReadByte();
+        byte npcCount = reader.ReadByte();
         for (int n = 0; n < npcCount; n++)
         {
             string name = reader.ReadString();
@@ -418,6 +459,27 @@ public class EditorWindow : Game
             int scale = reader.ReadByte();
             TextureID texture = (TextureID)reader.ReadByte();
             npcBuffer.Add(new NPC(GameManager, texture, location, name, dialog, Color.White, scale / 10f));
+        }
+
+        // Loot
+        byte lootCount = reader.ReadByte();
+        for (int n = 0; n < lootCount; n++)
+        {
+            string name = reader.ReadString();
+            string description = reader.ReadString();
+            byte amount = reader.ReadByte();
+            byte max = reader.ReadByte();
+            Point location = new(reader.ReadByte(), reader.ReadByte());
+            lootBuffer.Add(new Loot(new Item(name, description, amount, max), location, GameManager.Time));
+        }
+
+        // Decals
+        byte decalCount = reader.ReadByte();
+        for (int n = 0; n < decalCount; n++)
+        {
+            DecalType type = (DecalType)reader.ReadByte();
+            Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
+            decalBuffer.Add(GameManager.DecalFromId(reader.ReadByte(), location));
         }
 
         // Check null
@@ -463,8 +525,8 @@ public class EditorWindow : Game
         }
 
         // NPCs
-        writer.Write((byte)editor.GameManager.NPCs.Count);
-        for (int n = 0; n < editor.GameManager.NPCs.Count; n++)
+        writer.Write((byte)Math.Min(editor.GameManager.NPCs.Count, 255));
+        for (int n = 0; n < Math.Min(editor.GameManager.NPCs.Count, 255); n++)
         {
             NPC npc = editor.GameManager.NPCs[n];
             // Write NPC data
@@ -474,6 +536,31 @@ public class EditorWindow : Game
             writer.Write(IntToByte(npc.Location.Y));
             writer.Write(IntToByte((int)(npc.Scale * 10)));
             writer.Write(IntToByte((int)npc.Texture));
+        }
+
+        // Floor loot
+        writer.Write((byte)Math.Min(editor.GameManager.Loot.Count, 255));
+        for (int n = 0; n < Math.Min(editor.GameManager.Loot.Count, 255); n++)
+        {
+            Loot loot = editor.GameManager.Loot[n];
+            // Write NPC data
+            writer.Write(loot.Item.Name);
+            writer.Write(loot.Item.Description);
+            writer.Write(loot.Item.Amount);
+            writer.Write(loot.Item.Max);
+            writer.Write((UInt16)loot.Location.X);
+            writer.Write((UInt16)loot.Location.Y);
+        }
+
+        // Decals
+        writer.Write((byte)Math.Min(editor.GameManager.Decals.Count, 255));
+        for (int n = 0; n < Math.Min(editor.GameManager.Decals.Count, 255); n++)
+        {
+            Decal decal = editor.GameManager.Decals[n];
+            // Write decal data
+            writer.Write((byte)decal.Type);
+            writer.Write(IntToByte(decal.Location.X));
+            writer.Write(IntToByte(decal.Location.Y));
         }
     }
     public void SetTile(Tile tile)
@@ -547,6 +634,52 @@ public class EditorWindow : Game
             }
             TextureID texture = Logger.InputTexture("Texture: ", fallback: TextureID.PurpleWizard);
             GameManager.NPCs.Add(new NPC(GameManager, texture, mouseCoord, name, dialog, Color.White, scale));
+        }
+    }
+    public void EditDecals()
+    {
+        if (IsKeyDown(Keys.LeftShift)) // Delete
+        {
+            foreach (Decal decal in GameManager.Decals)
+            {
+                if (decal.Location == mouseCoord)
+                {
+                    GameManager.Decals.Remove(decal);
+                    Logger.Log($"Deleted decal  @ {mouseCoord.X}, {mouseCoord.Y}.");
+                    break;
+                }
+            }
+        }
+        else // New
+        {
+            Logger.Print("__Decal__");
+            string name = Logger.Input("Decal: ");
+            int decal = (int)(Enum.TryParse<DecalType>(name, true, out var dec) ? dec : DecalType.Torch);
+            GameManager.Decals.Add(GameManager.DecalFromId(decal, mouseCoord));
+        }
+    }
+    public void EditLoot()
+    {
+        if (IsKeyDown(Keys.LeftShift)) // Delete
+        {
+            foreach (Loot loot in GameManager.Loot)
+            {
+                if (loot.Location == mouseCoord)
+                {
+                    GameManager.Loot.Remove(loot);
+                    Logger.Log($"Deleted loot '{loot.Item.DisplayText}' @ {mouseCoord.X}, {mouseCoord.Y}.");
+                    break;
+                }
+            }
+        }
+        else // New
+        {
+            Logger.Print("__Loot__");
+            string name = Logger.Input("Name: ");
+            string description = Logger.Input("Description: ");
+            byte amount = Logger.InputByte("Amount: ", fallback: 1);
+            byte max = Logger.InputByte("Max: ", fallback: Constants.MaxStack);
+            GameManager.Loot.Add(new Loot(new Item(name, description, amount, max), mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle, GameManager.Time));
         }
     }
     public Tile GetTile(Xna.Point coord)

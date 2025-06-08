@@ -37,6 +37,12 @@ public static class Logger
             return fallback; // Default value or handle as needed
         }
     }
+    public static byte InputByte(string message, byte fallback = 0)
+    {
+        int resp = InputInt(message);
+        if (resp < 0 || resp > 255) return fallback;
+        return (byte)resp;
+    }
     public static TextureID InputTexture(string message, TextureID fallback = TextureID.Null)
     {
         string resp = Input(message);

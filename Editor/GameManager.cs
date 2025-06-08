@@ -6,6 +6,7 @@ using System.IO.Compression;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
 using Quest.Gui;
 using Quest.Tiles;
 using Xna = Microsoft.Xna.Framework;
@@ -29,11 +30,14 @@ public class GameManager : IGameManager
     public float Delta { get; private set; }
     public SpriteBatch Batch { get; private set; }
     public Tile[] Tiles { get; set; }
+    public List<Decal> Decals { get; set; }
+    public List<Loot> Loot { get; set; }
     public List<NPC> NPCs { get; set; }
     public SpriteFont PixelOperator { get; private set; }
+    public float Time { get; private set; }
     // Private
     private Point tileSize;
-    public float Time { get; private set; }
+    public static readonly Point lootStackOffset = new(4, 4);
     public GameManager(EditorWindow window, SpriteBatch spriteBatch)
     {
         // Initialize the game
@@ -53,7 +57,8 @@ public class GameManager : IGameManager
         Watch = new();
         FrameTimes = [];
         NPCs = [];
-        //Inventory = new(null, 0, 0);
+        Decals = [];
+        Loot = [];
 
         // Load
         PixelOperator = window.Content.Load<SpriteFont>("Fonts/PixelOperator");
@@ -70,6 +75,7 @@ public class GameManager : IGameManager
         // Gui
         UpdateGui(deltaTime, previousMouseState, mouseState);
     }
+
     public void UpdateGui(float deltaTime, MouseState previousMouseState, MouseState mouseState)
     {
         // Gui
@@ -86,12 +92,40 @@ public class GameManager : IGameManager
         // Tiles
         DrawTiles();
 
+        // Decals
+        DrawDecals();
+
         // Gui
         DrawGui();
+
+        // Loot
+        DrawLoot();
 
         // NPCs
         DrawNPCs();
     }
+    public void DrawLoot()
+    {
+        Watch.Restart();
+        // Draw each
+        for (int l = 0; l < Loot.Count; l++)
+        {
+            Loot loot = Loot[l];
+            Rectangle rect = new(loot.Location - Camera.ToPoint() + Constants.Middle, new(32, 32));
+            rect.Y += (int)(Math.Sin((Time - loot.Birth) * 2 % (Math.PI * 2)) * 6); // Bob up and down
+            DrawTexture(Batch, loot.Texture, rect, scale: new(2));
+            // Draw stacks if multiple
+            if (loot.Item.Amount > 1)
+                DrawTexture(Batch, loot.Texture, new(rect.Location + lootStackOffset, rect.Size), scale: new(2));
+            if (loot.Item.Amount > 2)
+                DrawTexture(Batch, loot.Texture, new(rect.Location + lootStackOffset + lootStackOffset, rect.Size), scale: new(2));
+            // Draw hitbox if enabled
+            if (Constants.DRAW_HITBOXES)
+                Batch.FillRectangle(rect, Constants.DebugPinkTint);
+        }
+        FrameTimes["DrawLoot"] = Watch.Elapsed.TotalMilliseconds;
+    }
+
     public void DrawNPCs()
     {
         Watch.Restart();
@@ -99,6 +133,15 @@ public class GameManager : IGameManager
             npc.Draw();
         FrameTimes["NPCDraws"] = Watch.Elapsed.TotalMilliseconds;
     }
+    public void DrawDecals()
+    {
+        Watch.Restart();
+        // Draw each decal
+        foreach (Decal decal in Decals)
+            decal.Draw(this);
+        FrameTimes["DecalDraws"] = Watch.Elapsed.TotalMilliseconds;
+    }
+
     public void DrawGui()
     {
         // Widgets
@@ -191,7 +234,7 @@ public class GameManager : IGameManager
         NPCs = npcBuffer;
         Tiles = [.. tilesBuffer];
     }
-    public static Tile TileFromId(int id, Xna.Point location)
+    public static Tile TileFromId(int id, Point location)
     {
         // Create a tile from an id
         TileType type = (TileType)id;
@@ -206,6 +249,16 @@ public class GameManager : IGameManager
             TileType.Sand => new Sand(location),
             TileType.Dirt => new Dirt(location),
             _ => new Tile(location), // Default tile
+        };
+    }
+    public static Decal DecalFromId(int id, Point location)
+    {
+        // Create a decal from an id
+        DecalType type = (DecalType)id;
+        return type switch
+        {
+            DecalType.Torch => new Torch(location),
+            _ => new Decal(location), // Default tile
         };
     }
     // Utilities

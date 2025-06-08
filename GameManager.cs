@@ -305,6 +305,13 @@ public class GameManager : IGameManager
         if (levelIndex < 0 || levelIndex >= Levels.Count)
             throw new ArgumentOutOfRangeException(nameof(levelIndex), "Invalid level index.");
 
+        // Close dialogs
+        foreach (NPC npc in Level.NPCs)
+        {
+            npc.DialogBox.IsVisible = false;
+            npc.DialogBox.Displayed = "";
+        }
+
         // Load the level data
         Level = Levels[levelIndex];
 
@@ -351,6 +358,8 @@ public class GameManager : IGameManager
         // Make buffers
         tilesBuffer = new Tile[Constants.MapSize.X * Constants.MapSize.Y];
         List<NPC> npcBuffer = [];
+        List<Loot> lootBuffer = [];
+        List<Decal> decalBuffer = [];
 
         // Spawn
         Point spawn = new(reader.ReadByte(), reader.ReadByte());
@@ -388,6 +397,27 @@ public class GameManager : IGameManager
             npcBuffer.Add(new NPC(this, texture, location, name, dialog, Color.White, scale / 10f));
         }
 
+        // Loot
+        byte lootCount = reader.ReadByte();
+        for (int n = 0; n < lootCount; n++)
+        {
+            string name = reader.ReadString();
+            string description = reader.ReadString();
+            byte amount = reader.ReadByte();
+            byte max = reader.ReadByte();
+            Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
+            lootBuffer.Add(new Loot(new Item(name, description, amount, max), location, Time));
+        }
+
+        // Decals
+        byte decalCount = reader.ReadByte();
+        for (int n = 0; n < decalCount; n++)
+        {
+            DecalType type = (DecalType)reader.ReadByte();
+            Point location = new(reader.ReadByte(), reader.ReadByte());
+            decalBuffer.Add(DecalFromId(reader.ReadByte(), location));
+        }
+
         // Check null
         if (tilesBuffer == null)
             throw new ArgumentException("No tiles found in level file.");
@@ -396,7 +426,7 @@ public class GameManager : IGameManager
             throw new ArgumentException($"Invalid level size - expected {Constants.MapSize.X}x{Constants.MapSize.X} tiles.");
 
         // Make and add the level
-        Level created = new(filename, tilesBuffer, spawn, [.. npcBuffer], [], []);
+        Level created = new(filename, tilesBuffer, spawn, [.. npcBuffer], [.. lootBuffer], [.. decalBuffer]);
         Levels.Add(created);
     }
     // Utilities
@@ -431,6 +461,16 @@ public class GameManager : IGameManager
             TileType.Sand => new Sand(location),
             TileType.Dirt => new Dirt(location),
             _ => new Tile(location), // Default tile
+        };
+    }
+    public static Decal DecalFromId(int id, Point location)
+    {
+        // Create a decal from an id
+        DecalType type = (DecalType)id;
+        return type switch
+        {
+            DecalType.Torch => new Torch(location),
+            _ => new Decal(location), // Default tile
         };
     }
     public int Flatten(Point pos) { return pos.X + pos.Y * Constants.MapSize.X; }

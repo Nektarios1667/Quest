@@ -10,9 +10,9 @@ public class Item
     public string DisplayText => $"{Amount} {(Amount != 1 ? StringTools.Pluralize(Name) : Name)}";
     public string Name { get; private set; }
     public string Description { get; private set; }
-    public int Amount { get; set; }
-    public int Max { get; private set; }
-    public Item(string name, string description, int amount = 1, int max = Constants.MaxStack)
+    public byte Amount { get; set; }
+    public byte Max { get; private set; }
+    public Item(string name, string description, byte amount = 1, byte max = Constants.MaxStack)
     {
         Name = name;
         Description = description;
@@ -155,10 +155,10 @@ public class Inventory
                 Item? selectedItem = GetItem(SelectedSlot);
                 if (selectedItem != null)
                 {
-                    int move = (int)Math.Ceiling(selectedItem!.Amount / 2f);
+                    byte move = (byte)Math.Ceiling(selectedItem!.Amount / 2f);
                     if (SameItem(mouseItem, selectedItem))
                     {
-                        move = Math.Min(move, mouseItem!.Max - mouseItem.Amount);
+                        move = (byte)Math.Min(move, mouseItem!.Max - mouseItem.Amount);
                         mouseItem!.Amount += move;
                         selectedItem.Amount -= move;
                     }
@@ -204,7 +204,7 @@ public class Inventory
     {
         if (from != null && dest != null)
         {
-            int moved = Math.Min(from.Amount, dest.Max - dest.Amount);
+            byte moved = (byte)Math.Min(from.Amount, dest.Max - dest.Amount);
             dest.Amount += moved;
             from.Amount -= moved;
             if (from.Amount < 1)
@@ -227,7 +227,7 @@ public class Inventory
                 }
                 if (SameItem(current, item))
                 {
-                    int moved = Math.Min(item.Amount, current.Max - current.Amount);
+                    byte moved = (byte)Math.Min(item.Amount, current.Max - current.Amount);
                     current!.Amount += moved; // Add to existing item
                     item.Amount -= moved; // Reduce amount of new item
                     if (item.Amount < 1) return; // If item is fully added exit
