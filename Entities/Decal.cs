@@ -2,53 +2,42 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Quest.Tiles;
-
-
-public enum TileType
+namespace Quest.Entities;
+public enum DecalType
 {
-    Sky = 0,
-    Grass = 1,
-    Water = 2,
-    StoneWall = 3,
-    Stairs = 4,
-    Flooring = 5,
-    Sand = 6,
-    Dirt = 7,
+    Footprint = 0,
+    Torch = 1,
+    BlueTorch = 2,
+    Sign = 3,
 }
-public class Tile
+public class Decal
 {
-    protected static readonly Dictionary<TileType, TextureID> TileToTexture = Enum.GetValues<TileType>()
+    protected static readonly Dictionary<DecalType, TextureID> TileToTexture = Enum.GetValues<DecalType>()
     .ToDictionary(
         tileType => tileType,
         tileType => Enum.TryParse<TextureID>(tileType.ToString(), out var texture) ? texture : TextureID.Null
     );
-
-    // Debug
-    public bool Marked { get; set; }
     // Auto generated - no setter
-    public Point Location { get; }
     public TextureID Texture { get; }
+    public Point Location { get; }
     // Properties - protected setter
-    public bool IsWalkable { get; protected set; }
-    public TileType Type { get; protected set; }
-    public Tile(Point location)
+    public Color Tint { get; protected set; } = Color.White;
+    public DecalType Type { get; protected set; }
+    public Decal(Point location)
     {
         // Initialize the tile
         Location = location;
-        IsWalkable = true;
-        Type = (TileType)Enum.Parse(typeof(TileType), GetType().Name);
+        Type = (DecalType)Enum.Parse(typeof(DecalType), GetType().Name);
         Texture = TileToTexture[Type];
-        Marked = false;
     }
     public virtual void Draw(IGameManager game)
     {
         // Draw
         Point dest = Location * Constants.TileSize - game.Camera.ToPoint() + Constants.Middle;
-        Color color = Marked ? Color.Red : Color.White;
         Rectangle rect = new(dest.X, dest.Y, Constants.TileSize.X, Constants.TileSize.Y);
-        DrawTexture(game.Batch, Texture, rect, source: game.TileTextureSource(this), scale: new(4), color: color);
-        Marked = false;
+        Point size = TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap;
+        Rectangle source = new((int)((game.Time % .75) * TextureManager.Metadata[Texture].TileMap.X * 4 / 3) * size.X, 0, size.X, size.Y);
+        DrawTexture(game.Batch, Texture, rect, source: source, scale: new(4), color: Tint);
     }
     public virtual void OnPlayerEnter(IGameManager game) { }
     public virtual void OnPlayerExit(IGameManager game) { }

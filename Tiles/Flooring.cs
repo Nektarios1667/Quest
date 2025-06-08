@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xna = Microsoft.Xna.Framework;
+﻿using Xna = Microsoft.Xna.Framework;
 
-namespace Quest.Tiles
+namespace Quest.Tiles;
+
+public class Flooring : Tile
 {
-    public class Flooring : Tile
+    public Flooring(Xna.Point location) : base(location)
     {
-        public Flooring(Xna.Point location) : base(location)
-        {
-            IsWalkable = true;
-        }
+        IsWalkable = true;
     }
 }

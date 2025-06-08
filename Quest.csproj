@@ -22,6 +22,9 @@
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Reminders.txt" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="TextureManager.cs" />
   </ItemGroup>
   <ItemGroup>

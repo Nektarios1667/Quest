@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xna = Microsoft.Xna.Framework;
+﻿using Xna = Microsoft.Xna.Framework;
 
-namespace Quest.Tiles
+namespace Quest.Tiles;
+
+public class Dirt : Tile
 {
-    public class Dirt : Tile
+    public Dirt(Xna.Point location) : base(location)
     {
-        public Dirt(Xna.Point location) : base(location)
-        {
-            IsWalkable = true;
-        }
+        IsWalkable = true;
     }
 }
