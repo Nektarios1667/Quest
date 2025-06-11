@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -137,15 +139,16 @@ public class EditorWindow : Game
             string filename = Logger.Input("Open level file: ");
             if (!string.IsNullOrEmpty(filename))
             {
-                try
-                {
+                //try
+                //{
                     ReadLevel(filename);
                     Logger.Log($"Opened level '{filename}'.");
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error($"Failed to open level '{filename}': {ex.Message}");
-                }
+                //}
+                //catch (Exception ex)
+                //{
+                //    Logger.Error($"Failed to open level '{filename}': {ex.Message}");
+                //    throw ex;
+                //}
             }
         }
 
@@ -449,6 +452,8 @@ public class EditorWindow : Game
             Tile tile;
             if (type == (int)TileType.Stairs)
                 tile = new Stairs(new(i % Constants.MapSize.X, i / Constants.MapSize.X), reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
+            else if (type == (int)TileType.Door)
+                tile = new Door(new(i % Constants.MapSize.X, i / Constants.MapSize.X), new Item(reader.ReadString(), reader.ReadString(), 1, 1));
             else // Regular tile
                 tile = Quest.GameManager.TileFromId(type, new(i % Constants.MapSize.X, i / Constants.MapSize.X));
             int idx = tile.Location.X + tile.Location.Y * Constants.MapSize.X;

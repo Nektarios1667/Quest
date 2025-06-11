@@ -233,8 +233,9 @@ public class GameManager : IGameManager
             Batch.FillRectangle(new(Vector2.Zero, Constants.Window), Level.Tint);
         if (Constants.DRAW_HITBOXES)
         {
-            Batch.DrawCircle(new(Constants.Middle.ToVector2(), 3), 10, Constants.DebugGreenTint);
-            Batch.DrawCircle(new(Constants.Middle.ToVector2() - new Vector2(0, Constants.MageHalfSize.Y + 12), 2), 10, Constants.DebugGreenTint);
+            Batch.DrawPoint(Constants.Middle.ToVector2(), Constants.DebugPinkTint, 5);
+            Batch.DrawPoint(Constants.Middle.ToVector2() - new Vector2(0, Constants.MageHalfSize.Y + 12), Constants.DebugPinkTint, 5);
+            Batch.DrawPoint(Constants.Middle.ToVector2() + CameraDest - Camera, Constants.DebugGreenTint, 5);
         }
     }
     #endregion

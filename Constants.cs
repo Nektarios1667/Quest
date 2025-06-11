@@ -54,8 +54,8 @@ public static class Constants
     public static readonly Color FocusBlue = new(174, 200, 209);
     public static readonly Color CottonCandy = new(242, 182, 240);
     public static readonly Color DarkenScreen = new(0, 0, 0, 188);
-    public static readonly Color DebugPinkTint = new Color(255, 0, 255) * .4f;
-    public static readonly Color DebugGreenTint = new Color(55, 255, 55) * .4f;
+    public static readonly Color DebugPinkTint = new Color(255, 0, 255) * .5f;
+    public static readonly Color DebugGreenTint = new Color(55, 255, 55) * .5f;
 
     // Minimap pixel colors
     public static readonly Xna.Color[] MiniMapColors = [
