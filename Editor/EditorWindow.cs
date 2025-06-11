@@ -173,8 +173,10 @@ public class EditorWindow : Game
                 Tile tile;
                 if (Selection == (int)TileType.Stairs)
                     tile = new Stairs(mouseCoord, "_null", Constants.MiddleCoord);
+                else if (Selection == (int)TileType.Door)
+                    tile = new Door(mouseCoord, Constants.Key);
                 else
-                    tile = GameManager.TileFromId(Selection, mouseCoord);
+                    tile = Quest.GameManager.TileFromId(Selection, mouseCoord);
 
                 SetTile(tile);
                 Logger.Log($"Set tile to '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}.");
@@ -350,13 +352,16 @@ public class EditorWindow : Game
         if (tileBelow.Type != Material)
         {
             Queue<Tile> queue = new();
+            HashSet<Point> visited = []; // Track visited tiles
             queue.Enqueue(tileBelow);
-            while (queue.Count > 0 && count < 10000)
+            count++;
+            while (queue.Count > 0)
             {
                 Tile current = queue.Dequeue();
-                if (current.Type == Material) continue; // Skip if already set
-                SetTile(GameManager.TileFromId(Selection, current.Location));
+                if (current.Type == Material || visited.Contains(current.Location)) continue; // Skip if already filled
                 count++;
+                SetTile(Quest.GameManager.TileFromId(Selection, current.Location));
+                visited.Add(current.Location); // Mark as visited
                 // Check neighbors
                 foreach (Point neighbor in Constants.NeighborTiles)
                 {
@@ -364,7 +369,9 @@ public class EditorWindow : Game
                     if (neighborCoord.X < 0 || neighborCoord.X >= Constants.MapSize.X || neighborCoord.Y < 0 || neighborCoord.Y >= Constants.MapSize.Y) continue;
                     Tile neighborTile = GetTile(neighborCoord);
                     if (neighborTile.Type == tileBelow.Type && neighborTile.Type != Material)
+                    {
                         queue.Enqueue(neighborTile);
+                    }
                 }
             }
             Logger.Log($"Filled {count} tiles with '{Material}' starting from {mouseCoord.X}, {mouseCoord.Y}.");
@@ -444,7 +451,7 @@ public class EditorWindow : Game
             if (type == (int)TileType.Stairs)
                 tile = new Stairs(new(i % Constants.MapSize.X, i / Constants.MapSize.X), reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
             else // Regular tile
-                tile = GameManager.TileFromId(type, new(i % Constants.MapSize.X, i / Constants.MapSize.X));
+                tile = Quest.GameManager.TileFromId(type, new(i % Constants.MapSize.X, i / Constants.MapSize.X));
             int idx = tile.Location.X + tile.Location.Y * Constants.MapSize.X;
             tilesBuffer[idx] = tile;
         }
@@ -469,7 +476,7 @@ public class EditorWindow : Game
             string description = reader.ReadString();
             byte amount = reader.ReadByte();
             byte max = reader.ReadByte();
-            Point location = new(reader.ReadByte(), reader.ReadByte());
+            Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
             lootBuffer.Add(new Loot(new Item(name, description, amount, max), location, GameManager.Time));
         }
 
@@ -521,6 +528,11 @@ public class EditorWindow : Game
                 writer.Write(stairs.DestLevel);
                 writer.Write(IntToByte(stairs.DestPosition.X));
                 writer.Write(IntToByte(stairs.DestPosition.Y));
+            } else if (tile is Door door)
+            {
+                // Write door key
+                writer.Write(door.Key.Name);
+                writer.Write(door.Key.Description);
             }
         }
 
@@ -589,6 +601,13 @@ public class EditorWindow : Game
                 else
                     Logger.Error("Invalid position format - use 'x,y'.");
             }
+        }
+        else if (tile is Door door)
+        {
+            Logger.Print("__Editing Door__");
+            string name = Logger.Input($"Key name [{door.Key.Name}]: ");
+            string description = Logger.Input($"Key description [{door.Key.Description[..Math.Min(12, door.Key.Description.Length - 1)]}...]: ");
+            door.Key = new Item(name, description, 1, 1);
         }
     }
     public void SetSpawn()

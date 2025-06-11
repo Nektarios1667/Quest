@@ -17,10 +17,8 @@ public class NPC
     public float Scale { get; set; }
     public bool Important { get; set; }
     // Private
-    private Point textureSize { get; set; }
     private Point tilemap { get; set; }
     private Point tilesize { get; set; }
-    private Point speechsize { get; set; }
 
     public NPC(IGameManager game, TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1, bool important = true)
     {
@@ -30,17 +28,15 @@ public class NPC
         Texture = texture;
 
         // Private
-        textureSize = TextureManager.Metadata[Texture].Size;
         tilemap = TextureManager.Metadata[Texture].TileMap;
-        tilesize = textureSize / tilemap;
-        speechsize = TextureManager.Metadata[TextureID.Speech].Size;
+        tilesize = TextureManager.Metadata[Texture].Size / tilemap;
 
         Location = location;
         Name = name;
         Dialog = dialog;
         TextureColor = textureColor == default ? Color.White : textureColor;
         Scale = scale;
-        DialogBox = new Dialog(game.Gui, new(Constants.Middle.X - 600, Constants.Window.Y - 190), new(1200, 100), new(194, 125, 64), Color.Black, $"[{name}] {dialog}", Game.PixelOperator, borderColor: new(36, 19, 4)) { IsVisible = false };
+        DialogBox = new Dialog(game.Gui, new(Constants.Middle.X - 600, Constants.Window.Y - 190), new(1200, 100), new(100, 100, 100), Color.Black, $"[{name}] {dialog}", Game.PixelOperator, borderColor: new(40, 40, 40)) { IsVisible = false };
         game.Gui.Widgets.Add(DialogBox);
     }
     public void Draw()
@@ -53,8 +49,6 @@ public class NPC
         // Debug
         if (Constants.DRAW_HITBOXES)
             Game.Batch.FillRectangle(new((rect.Location - tilesize).ToVector2(), source.Size.ToVector2() * Scale), Constants.DebugPinkTint);
-        // Speech bubble
-        // DrawTexture(Game.Batch, TextureID.Speech, new(rect.X - (int)(speechsize.X*Scale*2), rect.Y - (int)(tilesize.Y*Scale) - (int)(speechsize.Y/4 * Scale) - (int)(Game.Time % 2)*2, 40, 20), source: new(0, speechsize.Y/4 * ((HasSpoken ? 2 : 0) + (Important ? 1 : 0)), speechsize.X, speechsize.Y/4), scale:new(Scale*1.5f));
     }
     public void Update()
     {

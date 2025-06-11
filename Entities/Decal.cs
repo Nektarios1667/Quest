@@ -39,8 +39,4 @@ public class Decal
         Rectangle source = new((int)((game.Time % .75) * TextureManager.Metadata[Texture].TileMap.X * 4 / 3) * size.X, 0, size.X, size.Y);
         DrawTexture(game.Batch, Texture, rect, source: source, scale: new(4), color: Tint);
     }
-    public virtual void OnPlayerEnter(IGameManager game) { }
-    public virtual void OnPlayerExit(IGameManager game) { }
-    public virtual void OnPlayerInteract(IGameManager game) { }
-
 }

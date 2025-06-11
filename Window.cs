@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -44,6 +45,7 @@ public class Window : Game
     public int moveY;
     // Shaders
     public Effect Grayscale { get; private set; }
+    public Effect Light { get; private set; }
     // Render targets
     public RenderTarget2D? Minimap { get; set; }
 
@@ -163,7 +165,7 @@ public class Window : Game
         }
 
         if (IsKeyPressed(Keys.F10))
-            GameManager.Level.Decals = [new Torch(MouseCoord)];
+            GameManager.Level.Decals = [new BlueTorch(MouseCoord)];
         if (IsKeyPressed(Keys.F11))
             GameManager.LootNotifications.AddNotification("Debug notif!", color: Color.Magenta);
         if (IsKeyPressed(Keys.F12))
@@ -191,6 +193,19 @@ public class Window : Game
         else // Only update gui
             GameManager.UpdateGui(delta, previousMouseState, mouseState);
 
+        // Shaders
+        if (GameManager.Level != null && GameManager.Level.Decals.Length > 0)
+        {
+            foreach (Decal decal in GameManager.Level.Decals)
+            {
+                if (decal is Torch torch)
+                {
+                    // Update light shader
+                    Light.Parameters["lightSource"].SetValue((torch.Location * Constants.TileSize - GameManager.Camera.ToPoint() + Constants.Middle).ToVector2());
+                }
+            }
+        }
+
         // Set previous key state
         GameManager.Watch.Restart();
         previousKeyState = keyState;
@@ -206,7 +221,7 @@ public class Window : Game
     {
         // Clear and start shader gui
         GraphicsDevice.Clear(Color.Magenta);
-        spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        spriteBatch.Begin(samplerState: SamplerState.PointClamp, effect:Light);
 
         // Draw game
         GameManager.DrawTiles();
@@ -220,6 +235,7 @@ public class Window : Game
 
         // Gui
         GameManager.DrawGui();
+        GameManager.DrawPostProcessing();
 
         // Minimap
         if (GameManager.Inventory.Opened)

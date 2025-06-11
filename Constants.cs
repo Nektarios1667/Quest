@@ -27,8 +27,14 @@ public static class Constants
     public static readonly float CameraRigidity = .07f; // Camera smoothing weight
     public const bool VSYNC = false;
 
+    // Utility
+    public static readonly Vector2 HalfVec = new(0.5f, 0.5f);
+    public static readonly Point NegativePoint = new(-1, -1);
+    public static readonly Point OnePoint = new(1, 1);
+    public static readonly Point TwoPoint = new(2, 2);
+
     // Game
-    public static readonly string[] TileNames = ["Sky", "Grass", "Water", "StoneWall", "Stairs", "Flooring", "Sand", "Dirt"];
+    public static readonly string[] TileNames = ["Sky", "Grass", "Water", "StoneWall", "Stairs", "Flooring", "Sand", "Dirt", "Darkness", "Door"];
     public const int PlayerSpeed = 200;
     public const int MaxStack = 10;
 
@@ -37,32 +43,31 @@ public static class Constants
     public static readonly Point[] PlayerCorners = [new(-20, -20), new(20, -20), new(-20, 0), new(20, 0)]; // Player bounding box corners, tl, tr, bl, br
     public static readonly Point PlayerBox = new(PlayerCorners[1].X - PlayerCorners[0].X, PlayerCorners[2].Y - PlayerCorners[1].Y);
     public static readonly Point MageSize = new(80, 80); // Size of the mage sprite in pixels
-    public static readonly Point MageHalfSize = new(20, 40); // Half size of the mage sprite in pixels
+    public static readonly Point MageHalfSize = new(40, 40); // Half size of the mage sprite in pixels
     public static readonly Point MageDrawShift = new(MageHalfSize.X, 0); // Used for center aligning mages
 
-    // Utility
-    public static readonly Vector2 HalfVec = new(0.5f, 0.5f);
-    public static readonly Point NegativePoint = new(-1, -1);
-    public static readonly Point OnePoint = new(1, 1);
-    public static readonly Point TwoPoint = new(2, 2);
+    // Items
+    public static readonly Item Key = new("Key", "A key used to unlock doors.", 1, 1);
 
     // Colors
     public static readonly Color NearBlack = new(85, 85, 85);
     public static readonly Color FocusBlue = new(174, 200, 209);
     public static readonly Color CottonCandy = new(242, 182, 240);
     public static readonly Color DarkenScreen = new(0, 0, 0, 188);
-    public static readonly Color DebugPinkTint = new Xna.Color(255, 0, 255) * .4f;
-    public static readonly Color DebugGreenTint = new Xna.Color(55, 255, 55) * .4f;
+    public static readonly Color DebugPinkTint = new Color(255, 0, 255) * .4f;
+    public static readonly Color DebugGreenTint = new Color(55, 255, 55) * .4f;
 
     // Minimap pixel colors
     public static readonly Xna.Color[] MiniMapColors = [
         new(92, 221, 241), // Sky
-        Xna.Color.Green, // Grass
-        Xna.Color.Blue, // Water
-        Xna.Color.Gray, // StoneWall
+        Color.Green, // Grass
+        Color.Blue, // Water
+        Color.Gray, // StoneWall
         new(117, 66, 13), // Stairs
         new(155, 155, 195), // Flooring
-        Xna.Color.Yellow, // Sand
-        new(48, 25, 0) // Dirt
+        Color.Yellow, // Sand
+        new(48, 25, 0), // Dirt
+        new(18, 18, 18), // Darkness
+        new(41, 15, 0), // Door
     ];
 }

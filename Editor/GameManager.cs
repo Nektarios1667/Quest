@@ -19,6 +19,9 @@ public class GameManager : IGameManager
     public Stopwatch Watch { get; private set; }
     public Dictionary<string, double> FrameTimes { get; private set; }
     // Properties
+    public void AddLoot(Loot loot) => Loot.Add(loot);
+    public bool IsKeyDown(Keys key) => Window.IsKeyDown(key);
+    public bool IsKeyPressed(Keys key) => Window.IsKeyPressed(key);
     public bool Playing => true;
     public Point PlayerFoot => CameraDest.ToPoint() + Constants.MageDrawShift + new Point(0, Constants.MageHalfSize.Y);
     public Point Coord => Camera.ToPoint() / Constants.TileSize;
@@ -34,7 +37,10 @@ public class GameManager : IGameManager
     public List<Loot> Loot { get; set; }
     public List<NPC> NPCs { get; set; }
     public SpriteFont PixelOperator { get; private set; }
+    public Inventory Inventory { get; set; }
     public float Time { get; private set; }
+    // Thowaways for IGameManager interface
+    public void Notification(string message, Color? color = null, float duration = 4) { }
     // Private
     private Point tileSize;
     public static readonly Point lootStackOffset = new(4, 4);
@@ -59,6 +65,7 @@ public class GameManager : IGameManager
         NPCs = [];
         Decals = [];
         Loot = [];
+        Inventory = new(this, 0, 0);
 
         // Load
         PixelOperator = window.Content.Load<SpriteFont>("Fonts/PixelOperator");
@@ -207,7 +214,7 @@ public class GameManager : IGameManager
             if (type == (int)TileType.Stairs)
                 tile = new Stairs(new(i % Constants.MapSize.X, i / Constants.MapSize.X), reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
             else // Regular tile
-                tile = TileFromId(type, new(i % Constants.MapSize.X, i / Constants.MapSize.X));
+                tile = Quest.GameManager.TileFromId(type, new(i % Constants.MapSize.X, i / Constants.MapSize.X));
             int idx = tile.Location.X + tile.Location.Y * Constants.MapSize.X;
             tilesBuffer[idx] = tile;
         }
@@ -234,23 +241,7 @@ public class GameManager : IGameManager
         NPCs = npcBuffer;
         Tiles = [.. tilesBuffer];
     }
-    public static Tile TileFromId(int id, Point location)
-    {
-        // Create a tile from an id
-        TileType type = (TileType)id;
-        return type switch
-        {
-            TileType.Sky => new Sky(location),
-            TileType.Grass => new Grass(location),
-            TileType.Water => new Water(location),
-            TileType.StoneWall => new StoneWall(location),
-            TileType.Stairs => new Stairs(location, "_null", Constants.MiddleCoord),
-            TileType.Flooring => new Flooring(location),
-            TileType.Sand => new Sand(location),
-            TileType.Dirt => new Dirt(location),
-            _ => new Tile(location), // Default tile
-        };
-    }
+    public void DropLoot(Loot loot) { Loot.Add(loot); }
     public static Decal DecalFromId(int id, Point location)
     {
         // Create a decal from an id

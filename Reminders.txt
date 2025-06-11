@@ -5,7 +5,8 @@
 	4. Add tile name to Constants.TileNames
 	5. Add to the TileType enum in Tile.cs
 	6. Make new class for tile in Tiles folder, inheriting from Tile
-	7. Add tile type and generator to TileFromId method in Game.cs
+	7. Add tile type and generator to TileFromId method in GameManager.cs
+	8. Add minimap tile color in DrawMiniMap in GameManager.cs
 
 Save file data:
 	spawnX - byte
@@ -37,5 +38,5 @@ Save file data:
 	decalNumber - byte
 	[for each decal (<256)]
 		decalType - byte
-		decalX - byte
-		decalY - byte
+		decalX - uint16
+		decalY - uint16

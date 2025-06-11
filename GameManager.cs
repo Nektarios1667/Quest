@@ -21,13 +21,19 @@ namespace Quest;
 
 public interface IGameManager
 {
+    void DropLoot(Loot loot);
+    float Delta { get; }
+    void Notification(string message, Color? color = null, float duration = 4f);
+    void AddLoot(Loot loot);
+    bool IsKeyDown(Keys key);
+    bool IsKeyPressed(Keys key);
+    Inventory Inventory { get; }
     bool Playing { get; }
     Point PlayerFoot { get; }
     ContentManager Content { get; }
     SpriteFont PixelOperator { get; }
     float Time { get; }
     GuiManager Gui { get; }
-    //Inventory Inventory { get; set; }
     Vector2 Camera { get; set; }
     Vector2 CameraDest { get; set; }
     SpriteBatch Batch { get; }
@@ -44,6 +50,9 @@ public class GameManager : IGameManager
     public Point PlayerFoot { get; private set; }
     public Dictionary<string, double> FrameTimes { get; private set; }
     // Properties
+    public void AddLoot(Loot loot) => Level.Loot.Add(loot);
+    public bool IsKeyDown(Keys key) => Window.IsKeyDown(key);
+    public bool IsKeyPressed(Keys key) => Window.IsKeyPressed(key);
     public Point CameraOffset => (CameraDest - Camera).ToPoint();
     public bool Playing => !Inventory.Opened;
     public Random Rand { get; private set; }
@@ -98,7 +107,7 @@ public class GameManager : IGameManager
         // Widgets
         Gui.Widgets = [
             new StatusBar(new(10, Constants.Window.Y - 35), new(300, 25), Color.Green, Color.Red, 100, 100),
-            LootNotifications = new NotificationArea(Constants.Middle - Constants.MageHalfSize, 5, PixelOperatorBold)
+            LootNotifications = new NotificationArea(Constants.Middle - new Point(0, Constants.MageHalfSize.Y + 15), 5, PixelOperatorBold)
         ];
 
         // Level
@@ -122,6 +131,7 @@ public class GameManager : IGameManager
         DrawGui();
         DrawLoot();
         DrawCharacters();
+        DrawPostProcessing();
     }
     // Draw split up methods
     #region
@@ -216,13 +226,24 @@ public class GameManager : IGameManager
             points[c] = PlayerFoot + Constants.PlayerCorners[c] - Camera.ToPoint() + Constants.Middle;
         Batch.FillRectangle(new Rectangle(points[0].X, points[0].Y, points[1].X - points[0].X, points[2].Y - points[1].Y), Constants.DebugPinkTint);
     }
+    public void DrawPostProcessing()
+    {
+        Watch.Restart();
+        if (Level != null)
+            Batch.FillRectangle(new(Vector2.Zero, Constants.Window), Level.Tint);
+        if (Constants.DRAW_HITBOXES)
+        {
+            Batch.DrawCircle(new(Constants.Middle.ToVector2(), 3), 10, Constants.DebugGreenTint);
+            Batch.DrawCircle(new(Constants.Middle.ToVector2() - new Vector2(0, Constants.MageHalfSize.Y + 12), 2), 10, Constants.DebugGreenTint);
+        }
+    }
     #endregion
     // Update split up methods
     #region
     public void UpdatePositions()
     {
         // Update player position
-        PlayerFoot = CameraDest.ToPoint() + Constants.MageDrawShift + new Point(0, Constants.MageHalfSize.Y);
+        PlayerFoot = CameraDest.ToPoint() + new Point(0, Constants.MageHalfSize.Y);
         TileCoord = PlayerFoot / Constants.TileSize;
         TileBelow = GetTile(TileCoord);
     }
@@ -272,7 +293,11 @@ public class GameManager : IGameManager
         FrameTimes["InventoryUpdate"] = Watch.Elapsed.TotalMilliseconds;
     }
     #endregion
-
+    public void Notification(string message, Color? color = null, float duration = 4f)
+    {
+        // Add a notification to the loot notifications area
+        LootNotifications.AddNotification(message, color ?? Color.White, duration);
+    }
     // Movements
     public void Move(Vector2 move)
     {
@@ -281,8 +306,13 @@ public class GameManager : IGameManager
         Vector2 finalMove = Vector2.Normalize(move) * Delta * Constants.PlayerSpeed;
 
         // Stuck in block
-        if (IsColliding())
-            return;
+        if (IsColliding()) return;
+
+        // Check bump
+        Point nextPoint = (CameraDest + finalMove).ToPoint();
+        Tile? nextTile = GetTile(nextPoint / Constants.TileSize);
+        if (nextTile != null && !nextTile.IsWalkable)
+            nextTile.OnPlayerCollide(this);
 
         // Check collision for x
         CameraDest += new Vector2(finalMove.X, 0);
@@ -295,9 +325,11 @@ public class GameManager : IGameManager
         UpdatePositions();
         if (TileBelow == null) return;
         TileBelow.OnPlayerEnter(this);
+
         // Debug
         if (Constants.COLLISION_DEBUG) TileBelow.Marked = true;
     }
+    public void DropLoot(Loot loot) { Level.Loot.Add(loot); }
     // Levels
     public void LoadLevel(int levelIndex)
     {
@@ -378,6 +410,8 @@ public class GameManager : IGameManager
             Tile tile;
             if (type == (int)TileType.Stairs)
                 tile = new Stairs(new(i % Constants.MapSize.X, i / Constants.MapSize.X), reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
+            else if (type == (int)TileType.Door)
+                tile = new Door(new(i % Constants.MapSize.X, i / Constants.MapSize.X), new Item(reader.ReadString(), reader.ReadString(), 1, 1));
             else // Regular tile
                 tile = TileFromId(type, new(i % Constants.MapSize.X, i / Constants.MapSize.X));
             int idx = tile.Location.X + tile.Location.Y * Constants.MapSize.X;
@@ -460,6 +494,7 @@ public class GameManager : IGameManager
             TileType.Flooring => new Flooring(location),
             TileType.Sand => new Sand(location),
             TileType.Dirt => new Dirt(location),
+            TileType.Darkness => new Darkness(location),
             _ => new Tile(location), // Default tile
         };
     }

@@ -15,6 +15,8 @@ public enum TileType
     Flooring = 5,
     Sand = 6,
     Dirt = 7,
+    Darkness = 8,
+    Door = 9,
 }
 public class Tile
 {
@@ -34,7 +36,6 @@ public class Tile
     public TileType Type { get; protected set; }
     public Tile(Point location)
     {
-        // Initialize the tile
         Location = location;
         IsWalkable = true;
         Type = (TileType)Enum.Parse(typeof(TileType), GetType().Name);
@@ -53,5 +54,5 @@ public class Tile
     public virtual void OnPlayerEnter(IGameManager game) { }
     public virtual void OnPlayerExit(IGameManager game) { }
     public virtual void OnPlayerInteract(IGameManager game) { }
-
+    public virtual void OnPlayerCollide(IGameManager game) { }
 }

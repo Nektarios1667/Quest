@@ -11,8 +11,9 @@ public class Level
     public string Name { get; private set; }
     public List<Loot> Loot { get; private set; }
     public Tile[] Tiles { get; private set; }
-    public Xna.Point Spawn { get; private set; }
-    public Level(string name, Tile[] tiles, Xna.Point spawn, NPC[] npcs, Loot[] loot, Decal[] decals)
+    public Point Spawn { get; private set; }
+    public Color Tint { get; private set; }
+    public Level(string name, Tile[] tiles, Point spawn, NPC[] npcs, Loot[] loot, Decal[] decals, Color? tint = null)
     {
         // Initialize the level
         Name = name;
@@ -21,5 +22,6 @@ public class Level
         NPCs = npcs;
         Loot = [.. loot];
         Decals = decals;
+        Tint = tint ?? Color.Transparent;
     }
 }

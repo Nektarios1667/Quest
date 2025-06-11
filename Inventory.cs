@@ -7,7 +7,7 @@ namespace Quest;
 
 public class Item
 {
-    public string DisplayText => $"{Amount} {(Amount != 1 ? StringTools.Pluralize(Name) : Name)}";
+    public string DisplayText => $"{Amount} {StringTools.FillCamelSpaces(Amount != 1 ? StringTools.Pluralize(Name) : Name)}";
     public string Name { get; private set; }
     public string Description { get; private set; }
     public byte Amount { get; set; }
@@ -18,6 +18,11 @@ public class Item
         Description = description;
         Amount = amount;
         Max = max;
+    }
+    public bool IsSameItemType(Item? other)
+    {
+        if (other == null) return false;
+        return Name == other.Name && Description == other.Description;
     }
 }
 public class Inventory
@@ -33,12 +38,13 @@ public class Inventory
     private MouseState PreviousMouseState { get; set; }
 
     //
-    public GameManager Game { get; private set; }
+    public IGameManager Game { get; private set; }
     public Item?[,] Items { get; private set; }
     public bool Opened { get; set; } = false;
     private SpriteFont PixelOperator { get; set; }
     private SpriteFont PixelOperatorBold { get; set; }
     public int EquippedSlot { get; set; }
+    public Item? Equipped => Items[EquippedSlot, 0];
     public int SelectedSlot { get; set; }
     public int HoverSlot { get; set; }
     public int Width { get; }
@@ -47,7 +53,7 @@ public class Inventory
     private readonly Vector2 itemScale = new(3, 3);
     private readonly Point slotSize = TextureManager.Metadata[TextureID.Slot].Size;
     private readonly Point itemStart;
-    public Inventory(GameManager game, int width, int height)
+    public Inventory(IGameManager game, int width, int height)
     {
         Game = game;
         Items = new Item?[width, height];
@@ -181,17 +187,23 @@ public class Inventory
         if (LMouseDown && (mouseSlot < 0 || mouseSlot > Items.Length)) SelectedSlot = -1;
 
         // Drop items
-        if (Opened && HoverSlot >= 0 && Game.Window.IsAnyKeyDown(Keys.D))
+        if (Opened && HoverSlot >= 0 && Game.IsKeyDown(Keys.D))
         {
             Item? item = GetItem(HoverSlot);
-            if (item != null)
-            {
-                Game.Level.Loot.Add(new Loot(item, Game.PlayerFoot + Constants.MageHalfSize, Game.Time));
-                SetSlot(HoverSlot, null);
-            }
+            if (item != null) Game.DropLoot(new Loot(item, Game.PlayerFoot + Constants.MageHalfSize, Game.Time));
+            SetSlot(HoverSlot, null);
         }
     }
     // Slot interactions
+    public void DrawSlot(int slot)
+    {
+        Item? item = GetItem(slot);
+        if (item != null)
+        {
+            Game.AddLoot(new Loot(item, Game.PlayerFoot + Constants.MageHalfSize, Game.Time));
+            SetSlot(HoverSlot, null);
+        }
+    }
     private Color SlotColor(int x, int y)
     {
         int slot = Flatten(x, y);
@@ -241,6 +253,21 @@ public class Inventory
         if (item1 == null || item2 == null) return false;
         return item1.Name == item2.Name && item1.Description == item2.Description;
     }
+    // Contains
+    public bool Contains(Item item)
+    {
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                // Item
+                Item? currentItem = Items[x, y];
+                if (currentItem == null) continue; // Skip empty slots
+                if (currentItem.Name == item.Name && currentItem.Description == item.Description) return true;
+            }
+        }
+        return false;
+    }
     // GetItem
     public Item? GetItem(Xna.Point pos)
     {
@@ -282,6 +309,31 @@ public class Inventory
             SetSlot(pos.X, pos.Y, item);
         }
     }
+    // Consume
+    public void Consume(int idx) {
+        Point expanded = Expand(idx);
+        if (expanded.X < 0 || expanded.X >= Width || expanded.Y < 0 || expanded.Y >= Height) return; // Out of bounds
+        Items[expanded.X, expanded.Y] = null; // Remove item from inventory
+    }
+    public void Consume(Point slot)
+    {
+        if (slot.X < 0 || slot.X >= Width || slot.Y < 0 || slot.Y >= Height) return; // Out of bounds
+        Items[slot.X, slot.Y] = null; // Remove item from inventory
+    }
+    public void Consume(Item item)
+    {
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                // Item
+                Item? currentItem = Items[x, y];
+                if (currentItem == null) continue; // Skip empty slots
+                if (currentItem.Name == item.Name && currentItem.Description == item.Description) Items[x, y] = null;
+            }
+        }
+    }
+    // MouseSlot
     public Xna.Point GetMouseSlot(MouseState MouseState)
     {
         // x coord
