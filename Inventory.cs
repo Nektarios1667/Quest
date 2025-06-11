@@ -98,12 +98,12 @@ public class Inventory
 
                 // Draw inventory slots
                 Vector2 itemDest = new(itemStart.X + (slotSize.X + 4) * x, itemStart.Y - (slotSize.Y + 8) * y - (y != 0 ? 20 : 0));
-                DrawTexture(Game.Batch, TextureID.Slot, new(itemDest.ToPoint(), slotSize), color: SlotColor(x, y));
+                DrawTexture(Game.Batch, TextureID.Slot, itemDest.ToPoint(), color: SlotColor(x, y));
 
                 // Draw inventory items
                 if (item == null) continue;
                 TextureID textureId = (TextureID)(Enum.TryParse(typeof(TextureID), item.Name, out var tex) ? tex : TextureID.Null);
-                DrawTexture(Game.Batch, textureId, new(itemDest.ToPoint() + itemOffset, slotSize - new Point(16)), scale: itemScale);
+                DrawTexture(Game.Batch, textureId, itemDest.ToPoint() + itemOffset, scale: itemScale);
 
                 // Amount text
                 if (item.Amount <= 1) continue; // Don't draw amount text for single items
@@ -342,7 +342,7 @@ public class Inventory
         if (x < 0 || x >= Width) return Constants.NegativePoint; // Out of bounds
 
         // y coord
-        int top = Constants.Window.Y - (GetTexture(TextureID.Slot).Texture.Height + 8) * (Height + 1) - (Height != 0 ? 20 : 0);
+        int top = Constants.Window.Y - (GetTexture(TextureID.Slot).Height + 8) * (Height + 1) - (Height != 0 ? 20 : 0);
         int y = (MouseState.Position.Y - top) / (slotSize.Y + 8);
         y = Height - y; // Flip y axis
         if (y < 0 || y >= Height) return Constants.NegativePoint; // Out of bounds

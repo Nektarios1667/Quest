@@ -47,8 +47,7 @@ public class Tile
         // Draw
         Point dest = Location * Constants.TileSize - game.Camera.ToPoint() + Constants.Middle;
         Color color = Marked ? Color.Red : Color.White;
-        Rectangle rect = new(dest.X, dest.Y, Constants.TileSize.X, Constants.TileSize.Y);
-        DrawTexture(game.Batch, Texture, rect, source: game.TileTextureSource(this), scale: new(4), color: color);
+        DrawTexture(game.Batch, Texture, dest, source: game.TileTextureSource(this), scale: new(4), color: color);
         Marked = false;
     }
     public virtual void OnPlayerEnter(IGameManager game) { }

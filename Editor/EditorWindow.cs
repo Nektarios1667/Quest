@@ -282,7 +282,7 @@ public class EditorWindow : Game
         Point cursorPos = mouseCoord * Constants.TileSize - GameManager.Camera.ToPoint() + Constants.Middle;
         spriteBatch.FillRectangle(new(cursorPos.ToVector2(), Constants.TileSize), Color.White);
         TextureID ghostTile = (TextureID)(Enum.TryParse(typeof(TextureID), Material.ToString(), out var tex) ? tex : TextureID.Null);
-        DrawTexture(spriteBatch, ghostTile, new Rectangle(cursorPos, Constants.TileSize), source: Constants.ZeroSource, color: highlightColor, scale: new Vector2(4));
+        DrawTexture(spriteBatch, ghostTile, cursorPos, source: Constants.ZeroSource, color: highlightColor, scale: new Vector2(4));
 
         // Text info
         GameManager.Watch.Restart();
@@ -312,8 +312,7 @@ public class EditorWindow : Game
         DrawMiniMap();
 
         // Cursor
-        Rectangle rect = new(mouseState.Position.X, mouseState.Position.Y, 30, 30);
-        DrawTexture(spriteBatch, TextureID.CursorArrow, rect);
+        DrawTexture(spriteBatch, TextureID.CursorArrow, mouseState.Position);
 
         // Final
         spriteBatch.End();

@@ -18,9 +18,8 @@ public class Door : Tile
         // Draw
         Point dest = Location * Constants.TileSize - game.Camera.ToPoint() + Constants.Middle;
         Color color = Marked ? Color.Red : Color.White;
-        Rectangle rect = new(dest.X, dest.Y, Constants.TileSize.X, Constants.TileSize.Y);
         Rectangle source = new(IsWalkable ? 16 : 0, 0, 16, 16);
-        DrawTexture(game.Batch, TextureID.Door, rect, source: source, scale: new(4), color: color);
+        DrawTexture(game.Batch, TextureID.Door, dest, source: source, scale: new(4), color: color);
         
         // Handling
         Marked = false;

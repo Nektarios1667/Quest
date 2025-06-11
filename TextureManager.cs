@@ -60,13 +60,12 @@ public static class TextureManager
     public static Dictionary<TextureID, Texture2D> Textures { get; private set; } = [];
     public static Dictionary<TextureID, Metadata> Metadata { get; private set; } = [];
 
-    private static Texture2D? MissingTexture { get; set; } = null;
     private static ContentManager? Content { get; set; }
     public static void LoadTextures(ContentManager content)
     {
         Content = content;
-        MissingTexture = GenerateMissingTexture(content.GetGraphicsDevice());
         // Load all
+        Textures[TextureID.Null] = content.Load<Texture2D>($"Images/Null");
         Textures[TextureID.BlueMage] = content.Load<Texture2D>($"Images/Characters/BlueMage");
         Textures[TextureID.GrayMage] = content.Load<Texture2D>($"Images/Characters/GrayMage");
         Textures[TextureID.WhiteMage] = content.Load<Texture2D>($"Images/Characters/WhiteMage");
@@ -101,6 +100,7 @@ public static class TextureManager
         Logger.Log("Textures loaded successfully.");
 
         // Metadata
+        Metadata[TextureID.Null] = new(Textures[TextureID.Null].Bounds.Size, new(1, 1), "null");
         Metadata[TextureID.BlueMage] = new(Textures[TextureID.BlueMage].Bounds.Size, new(4, 5), "character");
         Metadata[TextureID.GrayMage] = new(Textures[TextureID.GrayMage].Bounds.Size, new(4, 5), "character");
         Metadata[TextureID.WhiteMage] = new(Textures[TextureID.WhiteMage].Bounds.Size, new(4, 5), "character");
@@ -138,38 +138,20 @@ public static class TextureManager
     {
         return Enum.TryParse<TextureID>(textureName, true, out var tex) ? tex : TextureID.Null;
     }
-    public static (Texture2D Texture, bool Found) GetTexture(TextureID id)
+    public static Texture2D GetTexture(TextureID id)
     {
         // Found
-        if (Textures.TryGetValue(id, out var texture))
-            return (texture, true);
-
-        // Missing
-        if (!errors.Contains($"getfail-{id}"))
-        {
-            Logger.Error($"Texture with name '{id}' not found.");
-            errors.Add($"getfail-{id}");
-        }
-        if (MissingTexture == null)
-        {
-            if (Content == null)
-                Logger.Error("ContentManager is not initialized.", exit: true);
-
-            Logger.Log("Generating missing texture.");
-            MissingTexture = GenerateMissingTexture(Content.GetGraphicsDevice());
-        }
-        return (MissingTexture, false);
+        return Textures.GetValueOrDefault(id, Textures[TextureID.Null]);
     }
-    public static void DrawTexture(SpriteBatch batch, TextureID id, Rectangle rect, Rectangle? source = null, Color color = default, float rotation = 0f, Vector2 origin = default, Vector2 scale = default, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+    public static void DrawTexture(SpriteBatch batch, TextureID id, Point pos, Rectangle? source = null, Color color = default, float rotation = 0f, Vector2 origin = default, Vector2 scale = default, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
     {
-        (Texture2D tex, bool found) = GetTexture(id);
+        Texture2D tex = GetTexture(id);
         if (color == default) color = Color.White;
         if (origin == default) origin = Vector2.Zero;
         // If scale is not set, default to 1, unless its missing then stretch to texture size
-        if (scale == default && found) scale = Vector2.One;
-        else if (!found) scale = (rect.Size / tex.Bounds.Size).ToVector2();
+        if (scale == default) scale = Vector2.One;
 
-        batch.Draw(tex, rect.Location.ToVector2(), source, color, rotation, origin, scale, effects, layerDepth);
+        batch.Draw(tex, pos.ToVector2(), source, color, rotation, origin, scale, effects, layerDepth);
     }
     public static void UnloadTexture(TextureID id)
     {
@@ -178,13 +160,5 @@ public static class TextureManager
             Logger.Error($"Texture with name '{id}' not found.");
             errors.Add($"unloadfail-{id}");
         }
-    }
-
-    private static Texture2D GenerateMissingTexture(GraphicsDevice gfx)
-    {
-        var tex = new Texture2D(gfx, 2, 2);
-        Color[] data = [Color.Magenta, Color.Black, Color.Black, Color.Magenta];
-        tex.SetData(data);
-        return tex;
     }
 }

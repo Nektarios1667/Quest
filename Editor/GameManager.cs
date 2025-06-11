@@ -118,17 +118,17 @@ public class GameManager : IGameManager
         for (int l = 0; l < Loot.Count; l++)
         {
             Loot loot = Loot[l];
-            Rectangle rect = new(loot.Location - Camera.ToPoint() + Constants.Middle, new(32, 32));
-            rect.Y += (int)(Math.Sin((Time - loot.Birth) * 2 % (Math.PI * 2)) * 6); // Bob up and down
-            DrawTexture(Batch, loot.Texture, rect, scale: new(2));
+            Point pos = loot.Location - Camera.ToPoint() + Constants.Middle;
+            pos.Y += (int)(Math.Sin((Time - loot.Birth) * 2 % (Math.PI * 2)) * 6); // Bob up and down
+            DrawTexture(Batch, loot.Texture, pos, scale: new(2));
             // Draw stacks if multiple
             if (loot.Item.Amount > 1)
-                DrawTexture(Batch, loot.Texture, new(rect.Location + lootStackOffset, rect.Size), scale: new(2));
+                DrawTexture(Batch, loot.Texture, pos + lootStackOffset, scale: new(2));
             if (loot.Item.Amount > 2)
-                DrawTexture(Batch, loot.Texture, new(rect.Location + lootStackOffset + lootStackOffset, rect.Size), scale: new(2));
+                DrawTexture(Batch, loot.Texture, pos + lootStackOffset + lootStackOffset, scale: new(2));
             // Draw hitbox if enabled
             if (Constants.DRAW_HITBOXES)
-                Batch.FillRectangle(rect, Constants.DebugPinkTint);
+                Batch.FillRectangle(new(pos.ToVector2(), new(32, 32)), Constants.DebugPinkTint);
         }
         FrameTimes["DrawLoot"] = Watch.Elapsed.TotalMilliseconds;
     }

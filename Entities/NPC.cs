@@ -44,11 +44,11 @@ public class NPC
         // Npc
         Rectangle source = new(new((int)(Game.Time * 2) % tilemap.X * tilesize.X, 0), tilesize);
         Vector2 origin = new(tilesize.X / 2, tilesize.Y);
-        Rectangle rect = new(Location * Constants.TileSize - Game.Camera.ToPoint() + Constants.Middle + tilesize / Constants.TwoPoint, tilesize);
-        DrawTexture(Game.Batch, Texture, rect, color: TextureColor, scale: new(Scale), source: source, origin: origin);
+        Point pos = Location * Constants.TileSize - Game.Camera.ToPoint() + Constants.Middle + tilesize / Constants.TwoPoint;
+        DrawTexture(Game.Batch, Texture, pos, color: TextureColor, scale: new(Scale), source: source, origin: origin);
         // Debug
         if (Constants.DRAW_HITBOXES)
-            Game.Batch.FillRectangle(new((rect.Location - tilesize).ToVector2(), source.Size.ToVector2() * Scale), Constants.DebugPinkTint);
+            Game.Batch.FillRectangle(new((pos - tilesize).ToVector2(), source.Size.ToVector2() * Scale), Constants.DebugPinkTint);
     }
     public void Update()
     {

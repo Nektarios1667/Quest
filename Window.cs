@@ -258,8 +258,7 @@ public class Window : Game
         GameManager.FrameTimes["FrameBarDraw"] = GameManager.Watch.Elapsed.TotalMilliseconds;
 
         // Cursor
-        Rectangle rect = new(mouseState.Position.X, mouseState.Position.Y, 30, 30);
-        DrawTexture(spriteBatch, TextureID.CursorArrow, rect);
+        DrawTexture(spriteBatch, TextureID.CursorArrow, mouseState.Position);
 
         // Final
         spriteBatch.End();
