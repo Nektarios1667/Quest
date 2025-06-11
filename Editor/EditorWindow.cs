@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -224,6 +222,7 @@ public class EditorWindow : Game
 
         // Level info
         if (HotKeyPressed(Keys.LeftControl, Keys.I)) SetSpawn();
+        if (HotKeyPressed(Keys.LeftControl, Keys.T)) SetTint();
 
         // Debug
         if (IsKeyPressed(Keys.F1))
@@ -436,6 +435,9 @@ public class EditorWindow : Game
         List<Loot> lootBuffer = [];
         List<Decal> decalBuffer = [];
 
+        // Tint
+        GameManager.Tint = new(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
+
         // Spawn
         Spawn = new(reader.ReadByte(), reader.ReadByte());
         GameManager.Camera = (Spawn * Constants.TileSize).ToVector2();
@@ -514,6 +516,12 @@ public class EditorWindow : Game
         using FileStream fileStream = File.Create($"..\\..\\..\\Levels/{name}.lvl");
         using GZipStream gzipStream = new(fileStream, CompressionLevel.Optimal);
         using BinaryWriter writer = new(gzipStream);
+
+        // Write tint
+        writer.Write(editor.GameManager.Tint.R);
+        writer.Write(editor.GameManager.Tint.G);
+        writer.Write(editor.GameManager.Tint.B);
+        writer.Write(editor.GameManager.Tint.A);
 
         // Write spawn
         writer.Write(IntToByte(editor.Spawn.X));
@@ -629,6 +637,12 @@ public class EditorWindow : Game
             else
                 Logger.Error("Invalid position format - use 'x,y'.");
         }
+    }
+    public void SetTint()
+    {
+        Color current = GameManager.Tint;
+        Color tint = Logger.InputColor($"Tint (R,G,B,A) [{current.R},{current.G},{current.B},{current.A}]: ", Color.Transparent);
+        GameManager.Tint = tint;
     }
     public void EditNPCs()
     {

@@ -38,6 +38,7 @@ public class GameManager : IGameManager
     public List<NPC> NPCs { get; set; }
     public SpriteFont PixelOperator { get; private set; }
     public Inventory Inventory { get; set; }
+    public Color Tint { get; set; }
     public float Time { get; private set; }
     // Thowaways for IGameManager interface
     public void Notification(string message, Color? color = null, float duration = 4) { }
@@ -110,6 +111,9 @@ public class GameManager : IGameManager
 
         // NPCs
         DrawNPCs();
+
+        // Draw post
+        DrawPostProcessing();
     }
     public void DrawLoot()
     {
@@ -177,6 +181,11 @@ public class GameManager : IGameManager
             }
         }
         FrameTimes["TileDraws"] = Watch.Elapsed.TotalMilliseconds;
+    }
+    public void DrawPostProcessing()
+    {
+        Watch.Restart();
+        Batch.FillRectangle(new Rectangle(0, 0, Constants.Window.X, Constants.Window.Y), Tint);
     }
     public void ReadLevel(string filename)
     {
@@ -249,6 +258,7 @@ public class GameManager : IGameManager
         return type switch
         {
             DecalType.Torch => new Torch(location),
+            DecalType.BlueTorch => new BlueTorch(location),
             _ => new Decal(location), // Default tile
         };
     }

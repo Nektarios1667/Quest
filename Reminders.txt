@@ -9,6 +9,11 @@
 	8. Add minimap tile color in DrawMiniMap in GameManager.cs
 
 Save file data:
+	tintR - byte
+	tintG - byte
+	tintB - byte
+	tintA - byte
+
 	spawnX - byte
 	spawnY - byte
 

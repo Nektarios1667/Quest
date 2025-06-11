@@ -58,15 +58,19 @@ public static class Logger
     {
         string resp = Input(message);
         string[] parts = resp.Split(',');
-        if (parts.Length != 3) return fallback;
-        int r, g, b;
-        if (int.TryParse(parts[0], out r) && int.TryParse(parts[1], out g) && int.TryParse(parts[2], out b))
-            return new Color(r, g, b);
-        else
+        if (parts.Length == 3)
         {
-            Error("Invalid input- expected r,g,b color");
-            return fallback;
+            int r, g, b;
+            if (int.TryParse(parts[0], out r) && int.TryParse(parts[1], out g) && int.TryParse(parts[2], out b))
+                return new Color(r, g, b);
+        } else if (parts.Length == 4)
+        {
+            int r, g, b, a;
+            if (int.TryParse(parts[0], out r) && int.TryParse(parts[1], out g) && int.TryParse(parts[2], out b) && int.TryParse(parts[3], out a))
+                return new Color(r, g, b, a);
         }
+        Error("Invalid input- expected r,g,b or r,g,b,a color");
+        return fallback;
     }
     public static string Input(string message)
     {

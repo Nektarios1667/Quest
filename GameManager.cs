@@ -394,6 +394,9 @@ public class GameManager : IGameManager
         List<Loot> lootBuffer = [];
         List<Decal> decalBuffer = [];
 
+        // Tint
+        Color tint = new(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
+
         // Spawn
         Point spawn = new(reader.ReadByte(), reader.ReadByte());
         CameraDest = ((spawn - Constants.MiddleCoord) * tileSize).ToVector2();
@@ -461,7 +464,7 @@ public class GameManager : IGameManager
             throw new ArgumentException($"Invalid level size - expected {Constants.MapSize.X}x{Constants.MapSize.X} tiles.");
 
         // Make and add the level
-        Level created = new(filename, tilesBuffer, spawn, [.. npcBuffer], [.. lootBuffer], [.. decalBuffer]);
+        Level created = new(filename, tilesBuffer, spawn, [.. npcBuffer], [.. lootBuffer], [.. decalBuffer], tint);
         Levels.Add(created);
     }
     // Utilities
@@ -506,6 +509,7 @@ public class GameManager : IGameManager
         return type switch
         {
             DecalType.Torch => new Torch(location),
+            DecalType.BlueTorch => new BlueTorch(location),
             _ => new Decal(location), // Default tile
         };
     }
