@@ -251,17 +251,6 @@ public class GameManager : IGameManager
         Tiles = [.. tilesBuffer];
     }
     public void DropLoot(Loot loot) { Loot.Add(loot); }
-    public static Decal DecalFromId(int id, Point location)
-    {
-        // Create a decal from an id
-        DecalType type = (DecalType)id;
-        return type switch
-        {
-            DecalType.Torch => new Torch(location),
-            DecalType.BlueTorch => new BlueTorch(location),
-            _ => new Decal(location), // Default tile
-        };
-    }
     // Utilities
     public int Flatten(Xna.Point pos) { return pos.X + pos.Y * Constants.MapSize.X; }
     public int Flatten(int x, int y) { return x + y * Constants.MapSize.X; }

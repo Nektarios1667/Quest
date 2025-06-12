@@ -492,7 +492,7 @@ public class EditorWindow : Game
         {
             DecalType type = (DecalType)reader.ReadByte();
             Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
-            decalBuffer.Add(GameManager.DecalFromId(reader.ReadByte(), location));
+            decalBuffer.Add(Quest.GameManager.DecalFromId(reader.ReadByte(), location));
         }
 
         // Check null
@@ -692,7 +692,7 @@ public class EditorWindow : Game
             Logger.Print("__Decal__");
             string name = Logger.Input("Decal: ");
             int decal = (int)(Enum.TryParse<DecalType>(name, true, out var dec) ? dec : DecalType.Torch);
-            GameManager.Decals.Add(GameManager.DecalFromId(decal, mouseCoord));
+            GameManager.Decals.Add(Quest.GameManager.DecalFromId(decal, mouseCoord));
         }
     }
     public void EditLoot()
