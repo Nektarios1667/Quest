@@ -172,7 +172,7 @@ public class EditorWindow : Game
                 // Add tile
                 Tile tile;
                 if (Selection == (int)TileType.Stairs)
-                    tile = new Stairs(mouseCoord, "_null", Constants.MiddleCoord);
+                    tile = new Stairs(mouseCoord, "null", Constants.MiddleCoord);
                 else if (Selection == (int)TileType.Door)
                     tile = new Door(mouseCoord, Constants.Key);
                 else

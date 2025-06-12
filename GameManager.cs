@@ -494,7 +494,7 @@ public class GameManager : IGameManager
             TileType.Grass => new Grass(location),
             TileType.Water => new Water(location),
             TileType.StoneWall => new StoneWall(location),
-            TileType.Stairs => new Stairs(location, "_null", Constants.MiddleCoord),
+            TileType.Stairs => new Stairs(location, "null", Constants.MiddleCoord),
             TileType.Flooring => new Flooring(location),
             TileType.Sand => new Sand(location),
             TileType.Dirt => new Dirt(location),
@@ -513,9 +513,6 @@ public class GameManager : IGameManager
             _ => new Decal(location), // Default tile
         };
     }
-    public int Flatten(Point pos) { return pos.X + pos.Y * Constants.MapSize.X; }
-    public int Flatten(int x, int y) { return x + y * Constants.MapSize.X; }
-    public int Flatten(Vector2 pos) { return Flatten((int)pos.X, (int)pos.Y); }
     public Tile? GetTile(Point coord)
     {
         if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
@@ -524,7 +521,9 @@ public class GameManager : IGameManager
     }
     public Tile? GetTile(int x, int y)
     {
-        return GetTile(new Point(x, y));
+        if (x < 0 || x >= Constants.MapSize.X || y < 0 || y >= Constants.MapSize.Y)
+            return null;
+        return Level.Tiles[x + y * Constants.MapSize.X];
     }
     public Rectangle TileTextureSource(Tile tile)
     {
