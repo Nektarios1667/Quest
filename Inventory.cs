@@ -191,7 +191,7 @@ public class Inventory
         if (Opened && HoverSlot >= 0 && Game.IsKeyDown(Keys.D))
         {
             Item? item = GetItem(HoverSlot);
-            if (item != null) Game.DropLoot(new Loot(item, Game.PlayerFoot + Constants.MageHalfSize, Game.Time));
+            if (item != null) Game.DropLoot(new Loot(item, Game.PlayerFoot + Constants.MageDrawShift, Game.Time));
             SetSlot(HoverSlot, null);
         }
     }
