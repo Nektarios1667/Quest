@@ -201,14 +201,15 @@ public class GameManager : IGameManager
     public void DrawCharacters()
     {
         Watch.Restart();
+        foreach (NPC npc in Level.NPCs) npc.Draw();
         DrawPlayer();
         if (Constants.DRAW_HITBOXES)
             DrawPlayerHitbox();
-        foreach (NPC npc in Level.NPCs) npc.Draw();
         FrameTimes["CharacterDraws"] = Watch.Elapsed.TotalMilliseconds;
     }
     public void DrawPlayer()
     {
+        // Get image source
         int sourceRow = 0;
         if (Window.moveX == 0 && Window.moveY == 0) sourceRow = 0;
         else if (Window.moveX < 0) sourceRow = 1;
@@ -216,8 +217,15 @@ public class GameManager : IGameManager
         else if (Window.moveY > 0) sourceRow = 2;
         else if (Window.moveY < 0) sourceRow = 4;
         Rectangle source = new((int)(Time * (sourceRow == 0 ? 1.5f : 6)) % 4 * Constants.MageSize.X, sourceRow * Constants.MageSize.Y, Constants.MageSize.X, Constants.MageSize.Y);
+        // Draw player
         Point pos = Constants.Middle - Constants.MageHalfSize + CameraOffset;
-        DrawTexture(Batch, TextureID.BlueMage, pos, source: source);
+        DrawTexture(Batch, TextureID.BlueMage, pos, source: source, layerDepth:.4f);
+        // Draw equipped item
+        if (Inventory.Equipped != null)
+        {
+            Point itemPos = Constants.Middle + CameraOffset - (Window.moveX < 0 ? Constants.MageDrawShift : Point.Zero);
+            DrawTexture(Batch, Inventory.Equipped.Texture, itemPos, scale:new(2), effects:Window.moveX < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+        }
     }
     public void DrawPlayerHitbox()
     {

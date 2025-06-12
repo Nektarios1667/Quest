@@ -144,7 +144,7 @@ public static class TextureManager
         // Found
         return Textures.GetValueOrDefault(id, Textures[TextureID.Null]);
     }
-    public static void DrawTexture(SpriteBatch batch, TextureID id, Point pos, Rectangle? source = null, Color color = default, float rotation = 0f, Vector2 origin = default, Vector2 scale = default, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+    public static void DrawTexture(SpriteBatch batch, TextureID id, Point pos, Rectangle? source = null, Color color = default, float rotation = 0f, Vector2 origin = default, Vector2 scale = default, SpriteEffects effects = SpriteEffects.None, float layerDepth = .5f)
     {
         Texture2D tex = GetTexture(id);
         if (color == default) color = Color.White;

@@ -12,12 +12,14 @@ public class Item
     public string Description { get; private set; }
     public byte Amount { get; set; }
     public byte Max { get; private set; }
+    public TextureID Texture { get; private set; }
     public Item(string name, string description, byte amount = 1, byte max = Constants.MaxStack)
     {
         Name = name;
         Description = description;
         Amount = amount;
         Max = max;
+        Texture = (TextureID)(Enum.TryParse(typeof(TextureID), Name, out var tex) ? tex : TextureID.Null);
     }
     public bool IsSameItemType(Item? other)
     {
@@ -102,8 +104,7 @@ public class Inventory
 
                 // Draw inventory items
                 if (item == null) continue;
-                TextureID textureId = (TextureID)(Enum.TryParse(typeof(TextureID), item.Name, out var tex) ? tex : TextureID.Null);
-                DrawTexture(Game.Batch, textureId, itemDest.ToPoint() + itemOffset, scale: itemScale);
+                DrawTexture(Game.Batch, item.Texture, itemDest.ToPoint() + itemOffset, scale: itemScale);
 
                 // Amount text
                 if (item.Amount <= 1) continue; // Don't draw amount text for single items

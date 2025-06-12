@@ -219,9 +219,9 @@ public class Window : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        // Clear and start shader gui
+        // Clear and start
         GraphicsDevice.Clear(Color.Magenta);
-        spriteBatch.Begin(samplerState: SamplerState.PointClamp, effect:Light);
+        spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
         // Draw game
         GameManager.DrawTiles();
