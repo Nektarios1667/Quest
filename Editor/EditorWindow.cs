@@ -137,16 +137,15 @@ public class EditorWindow : Game
             string filename = Logger.Input("Open level file: ");
             if (!string.IsNullOrEmpty(filename))
             {
-                //try
-                //{
+                try
+                {
                     ReadLevel(filename);
                     Logger.Log($"Opened level '{filename}'.");
-                //}
-                //catch (Exception ex)
-                //{
-                //    Logger.Error($"Failed to open level '{filename}': {ex.Message}");
-                //    throw ex;
-                //}
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"Failed to open level '{filename}': {ex.Message}");
+                }
             }
         }
 
