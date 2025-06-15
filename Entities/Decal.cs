@@ -35,7 +35,7 @@ public class Decal
         // Draw
         Point dest = Location * Constants.TileSize - game.Camera.ToPoint() + Constants.Middle;
         Point size = TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap;
-        Rectangle source = new((int)((game.Time % .75) * TextureManager.Metadata[Texture].TileMap.X * 4 / 3) * size.X, 0, size.X, size.Y);
+        Rectangle source = GetAnimationSource(Texture, game.Time, duration:.75f);
         DrawTexture(game.Batch, Texture, dest, source: source, scale: new(4), color: Tint);
     }
 }

@@ -8,10 +8,10 @@ public class StatusBar : Widget
 {
     public int MaxValue { get; set; }
     public int CurrentValue { get; set; }
-    public Xna.Point Size { get; set; }
-    public Xna.Color Foreground { get; set; }
-    public Xna.Color Background { get; set; }
-    public StatusBar(Xna.Point location, Xna.Point size, Xna.Color foreground, Xna.Color background, int currentValue, int maxValue) : base(location)
+    public Point Size { get; set; }
+    public Color Foreground { get; set; }
+    public Color Background { get; set; }
+    public StatusBar(Point location, Point size, Color foreground, Color background, int currentValue, int maxValue) : base(location)
     {
         Size = size;
         CurrentValue = currentValue;

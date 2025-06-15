@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.Content;
+using MonoGame.Extended.Tiled;
 
 namespace Quest;
 
@@ -24,6 +25,7 @@ public static class TextureManager
         WhiteMage,
         PurpleWizard,
         WhiteWizard,
+        Ghost,
         // Gui
         CursorArrow,
         DialogBox,
@@ -72,6 +74,7 @@ public static class TextureManager
         Textures[TextureID.WhiteMage] = content.Load<Texture2D>($"Images/Characters/WhiteMage");
         Textures[TextureID.PurpleWizard] = content.Load<Texture2D>($"Images/Characters/PurpleWizard");
         Textures[TextureID.WhiteWizard] = content.Load<Texture2D>($"Images/Characters/WhiteWizard");
+        Textures[TextureID.Ghost] = content.Load<Texture2D>($"Images/Characters/Ghost");
         Textures[TextureID.CursorArrow] = content.Load<Texture2D>($"Images/Gui/CursorArrow");
         Textures[TextureID.DialogBox] = content.Load<Texture2D>($"Images/Gui/DialogBox");
         Textures[TextureID.GuiBackground] = content.Load<Texture2D>($"Images/Gui/GuiBackground");
@@ -105,8 +108,9 @@ public static class TextureManager
         Metadata[TextureID.BlueMage] = new(Textures[TextureID.BlueMage].Bounds.Size, new(4, 5), "character");
         Metadata[TextureID.GrayMage] = new(Textures[TextureID.GrayMage].Bounds.Size, new(4, 5), "character");
         Metadata[TextureID.WhiteMage] = new(Textures[TextureID.WhiteMage].Bounds.Size, new(4, 5), "character");
-        Metadata[TextureID.PurpleWizard] = new(Textures[TextureID.PurpleWizard].Bounds.Size, new(4, 1), "character");
-        Metadata[TextureID.WhiteWizard] = new(Textures[TextureID.WhiteWizard].Bounds.Size, new(4, 1), "character");
+        Metadata[TextureID.PurpleWizard] = new(Textures[TextureID.PurpleWizard].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.WhiteWizard] = new(Textures[TextureID.WhiteWizard].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.Ghost] = new(Textures[TextureID.Ghost].Bounds.Size, new(4, 1), "character");
         Metadata[TextureID.CursorArrow] = new(Textures[TextureID.CursorArrow].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.DialogBox] = new(Textures[TextureID.DialogBox].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.GuiBackground] = new(Textures[TextureID.GuiBackground].Bounds.Size, new(1, 1), "gui");
@@ -161,5 +165,19 @@ public static class TextureManager
             Logger.Error($"Texture with name '{id}' not found.");
             errors.Add($"unloadfail-{id}");
         }
+    }
+    public static Rectangle GetAnimationSource(TextureID texture, float time, float duration = 1, float start = 0, int row = 0)
+    {
+        // Get the texture ID from the content manager
+        if (!Metadata.TryGetValue(texture, out Metadata? meta))
+        {
+            Logger.Error($"Metadata for texture '{texture}' not found.");
+            return new(0, 0, 64, 64);
+        }
+
+        Point frameSize = meta.Size / meta.TileMap;
+        float invDuration = 1 / duration;
+        int frame = (int)((time - start) * invDuration) % meta.TileMap.X;
+        return new Rectangle(frame * frameSize.X, row * frameSize.Y, frameSize.X, frameSize.Y);
     }
 }

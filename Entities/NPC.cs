@@ -42,9 +42,9 @@ public class NPC
     public void Draw()
     {
         // Npc
-        Rectangle source = new(new((int)(Game.Time * 2) % tilemap.X * tilesize.X, 0), tilesize);
         Vector2 origin = new(tilesize.X / 2, tilesize.Y);
         Point pos = Location * Constants.TileSize - Game.Camera.ToPoint() + Constants.Middle + tilesize / Constants.TwoPoint;
+        Rectangle source = GetAnimationSource(Texture, Game.Time);
         DrawTexture(Game.Batch, Texture, pos, color: TextureColor, scale: new(Scale), source: source, origin: origin);
         // Debug
         if (Constants.DRAW_HITBOXES)

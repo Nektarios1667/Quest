@@ -40,8 +40,9 @@ public class GameManager : IGameManager
     public Inventory Inventory { get; set; }
     public Color Tint { get; set; }
     public float Time { get; private set; }
-    // Thowaways for IGameManager interface
+    // Throwaways for IGameManager interface
     public void Notification(string message, Color? color = null, float duration = 4) { }
+    public void DamagePlayer(int amount) { }
     // Private
     private Point tileSize;
     public static readonly Point lootStackOffset = new(4, 4);

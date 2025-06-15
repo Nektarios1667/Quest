@@ -10,17 +10,16 @@ using MonoGame.Extended;
 using Quest.Gui;
 using Quest.Tiles;
 
-// TODO
-// Check inventory placement when picking up items - DONE
-// Lower range of item pickup - DONE
-// Add debug toggle hotkeys f1-f6
-// Add messages when items picked up
-
 namespace Quest;
 
-
+public enum Screen
+{
+    MainMenu,
+    Game,
+}
 public interface IGameManager
 {
+    void DamagePlayer(int damage);
     void DropLoot(Loot loot);
     float Delta { get; }
     void Notification(string message, Color? color = null, float duration = 4f);
@@ -58,6 +57,7 @@ public class GameManager : IGameManager
     public Random Rand { get; private set; }
     public GuiManager Gui { get; private set; } // GUI handler
     public NotificationArea LootNotifications { get; private set; } // Loot pickup notifications
+    public StatusBar HealthBar { get; private set; }
     public Window Window { get; private set; }
     public Vector2 Camera { get; set; } // Current camera position w/ smooth movement
     public Vector2 CameraDest { get; set; } // Where the camera is going
@@ -69,6 +69,8 @@ public class GameManager : IGameManager
     public SpriteFont PixelOperator { get; private set; }
     public SpriteFont PixelOperatorBold { get; private set; }
     public ContentManager Content => Window.Content;
+    public Screen Screen { get; set; } = Screen.MainMenu;
+    public void DamagePlayer(int amount) => HealthBar.CurrentValue -= amount;
     // Inventory
     public Inventory Inventory { get; set; }
     // Private
@@ -106,12 +108,12 @@ public class GameManager : IGameManager
 
         // Widgets
         Gui.Widgets = [
-            new StatusBar(new(10, Constants.Window.Y - 35), new(300, 25), Color.Green, Color.Red, 100, 100),
+            HealthBar = new StatusBar(new(10, Constants.Window.Y - 35), new(300, 25), Color.Green, Color.Red, 100, 100),
             LootNotifications = new NotificationArea(Constants.Middle - new Point(0, Constants.MageHalfSize.Y + 15), 5, PixelOperatorBold)
         ];
 
         // Level
-        Level = new("null", [], new(0, 0), [], [], []); // Default level
+        Level = new("null", [], new(0, 0), [], [], [], []); // Default level
     }
     public void Update(float deltaTime, MouseState previousMouseState, MouseState mouseState)
     {
@@ -126,12 +128,17 @@ public class GameManager : IGameManager
     }
     public void Draw()
     {
-        DrawTiles();
-        DrawDecals();
-        DrawGui();
-        DrawLoot();
-        DrawCharacters();
-        DrawPostProcessing();
+        if (Screen == Screen.Game) {
+            DrawTiles();
+            DrawDecals();
+            DrawLoot();
+            DrawCharacters();
+            DrawGui();
+            DrawPostProcessing();
+        } else if (Screen == Screen.MainMenu)
+        {
+            DrawMenu();
+        }
     }
     // Draw split up methods
     #region
@@ -165,8 +172,11 @@ public class GameManager : IGameManager
     }
     public void DrawGui()
     {
-        // Widgets
         Watch.Restart();
+        // Darkening
+        if (Inventory.Opened)
+            Batch.FillRectangle(new Rectangle(Point.Zero, Constants.Window), Constants.DarkenScreen);
+        // Widgets
         LootNotifications.Offset = (CameraDest - Camera).ToPoint();
         Gui.Draw(Batch);
         FrameTimes["GuiDraw"] = Watch.Elapsed.TotalMilliseconds;
@@ -202,6 +212,7 @@ public class GameManager : IGameManager
     {
         Watch.Restart();
         foreach (NPC npc in Level.NPCs) npc.Draw();
+        foreach (Enemy enemy in Level.Enemies) enemy.Draw();
         DrawPlayer();
         if (Constants.DRAW_HITBOXES)
             DrawPlayerHitbox();
@@ -216,9 +227,9 @@ public class GameManager : IGameManager
         else if (Window.moveX > 0) sourceRow = 3;
         else if (Window.moveY > 0) sourceRow = 2;
         else if (Window.moveY < 0) sourceRow = 4;
-        Rectangle source = new((int)(Time * (sourceRow == 0 ? 1.5f : 6)) % 4 * Constants.MageSize.X, sourceRow * Constants.MageSize.Y, Constants.MageSize.X, Constants.MageSize.Y);
         // Draw player
         Point pos = Constants.Middle - Constants.MageHalfSize + CameraOffset;
+        Rectangle source = GetAnimationSource(TextureID.BlueMage, Time, duration: sourceRow == 0 ? .5f : .25f, row: sourceRow);
         DrawTexture(Batch, TextureID.BlueMage, pos, source: source, layerDepth:.4f);
         // Draw equipped item
         if (Inventory.Equipped != null)
@@ -246,6 +257,24 @@ public class GameManager : IGameManager
             Batch.DrawPoint(Constants.Middle.ToVector2() + CameraDest - Camera, Constants.DebugGreenTint, 5);
         }
     }
+    public void DrawMenu()
+    {
+        // Draw the menu screen
+        Watch.Restart();
+        Batch.FillRectangle(new Rectangle(Point.Zero, Constants.Window), Color.Black);
+        Batch.DrawString(PixelOperator, "Quest", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Quest") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
+        Batch.DrawString(PixelOperator, "Press space to start", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to start") / 2 + new Vector2(0, 80), Color.White);
+        FrameTimes["MenuDraw"] = Watch.Elapsed.TotalMilliseconds;
+
+        // Check start game
+        Watch.Restart();
+        if (Window.IsKeyDown(Keys.Space))
+        {
+            Screen = Screen.Game;
+            Window.Minimap = null; // Reset minimap for redraw
+        }
+        FrameTimes["MenuUpdate"] = Watch.Elapsed.TotalMilliseconds;
+    }
     #endregion
     // Update split up methods
     #region
@@ -259,6 +288,7 @@ public class GameManager : IGameManager
     public void UpdateCharacters(float deltaTime)
     {
         foreach (NPC npc in Level.NPCs) npc.Update();
+        foreach (Enemy enemy in Level.Enemies) enemy.Update();
     }
     public void UpdateLoot(float deltaTime)
     {
@@ -472,7 +502,7 @@ public class GameManager : IGameManager
             throw new ArgumentException($"Invalid level size - expected {Constants.MapSize.X}x{Constants.MapSize.X} tiles.");
 
         // Make and add the level
-        Level created = new(filename, tilesBuffer, spawn, [.. npcBuffer], [.. lootBuffer], [.. decalBuffer], tint);
+        Level created = new(filename, tilesBuffer, spawn, [.. npcBuffer], [.. lootBuffer], [.. decalBuffer], [], tint);
         Levels.Add(created);
     }
     // Utilities

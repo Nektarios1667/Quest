@@ -7,7 +7,6 @@ using MonoGame.Extended;
 using Quest.Tiles;
 
 namespace Quest;
-
 public class Window : Game
 {
     static readonly StringBuilder debugSb = new();
@@ -128,84 +127,76 @@ public class Window : Game
         // Delta
         delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-        // Inventory
-        if (IsKeyPressed(Keys.I))
-            GameManager.Inventory.Opened = !GameManager.Inventory.Opened;
+        // Game
+        if (GameManager.Screen == Screen.Game)
+        {
+            // Inventory
+            if (IsKeyPressed(Keys.I))
+                GameManager.Inventory.Opened = !GameManager.Inventory.Opened;
 
-        // Debug
-        if (IsKeyPressed(Keys.F1))
-        {
-            Constants.COLLISION_DEBUG = !Constants.COLLISION_DEBUG;
-            Logger.System($"COLLISION_DEBUG set to: {Constants.COLLISION_DEBUG}");
-        }
-        if (IsKeyPressed(Keys.F2))
-        {
-            Constants.TEXT_INFO = !Constants.TEXT_INFO;
-            Logger.System($"TEXT_INFO set to: {Constants.TEXT_INFO}");
-        }
-        if (IsKeyPressed(Keys.F3))
-        {
-            Constants.FRAME_INFO = !Constants.FRAME_INFO;
-            Logger.System($"FRAME_INFO set to: {Constants.FRAME_INFO}");
-        }
-        if (IsKeyPressed(Keys.F4))
-        {
-            Constants.LOG_INFO = !Constants.LOG_INFO;
-            Logger.System($"LOG_INFO set to: {Constants.LOG_INFO}");
-        }
-        if (IsKeyPressed(Keys.F5))
-        {
-            Constants.FRAME_BAR = !Constants.FRAME_BAR;
-            Logger.System($"FRAME_BAR set to: {Constants.FRAME_BAR}");
-        }
-        if (IsKeyPressed(Keys.F6))
-        {
-            Constants.DRAW_HITBOXES = !Constants.DRAW_HITBOXES;
-            Logger.System($"DRAW_HITBOXES set to: {Constants.DRAW_HITBOXES}");
-        }
-
-        if (IsKeyPressed(Keys.F10))
-            GameManager.Level.Decals = [new BlueTorch(MouseCoord)];
-        if (IsKeyPressed(Keys.F11))
-            GameManager.LootNotifications.AddNotification("Debug notif!", color: Color.Magenta);
-        if (IsKeyPressed(Keys.F12))
-            GameManager.Level.Loot.Add(new Loot(new("PhiCoin", "Copper coin", amount: (byte)GameManager.Rand.Next(1, 10)), mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle, GameManager.Time));
-
-        // Movement
-        if (!GameManager.Inventory.Opened)
-        {
-            // Movement
-            moveX = 0; moveY = 0;
-            moveX += IsAnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : 0;
-            moveX += IsAnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0;
-            moveY += IsAnyKeyDown(Keys.W, Keys.Up) ? -Constants.PlayerSpeed : 0;
-            moveY += IsAnyKeyDown(Keys.S, Keys.Down) ? Constants.PlayerSpeed : 0;
-            GameManager.Move(new(moveX, moveY));
-        }
-
-        // Time
-        GameManager.FrameTimes["InputUpdate"] = GameManager.Watch.Elapsed.TotalMilliseconds;
-
-        // Game updates
-        if (!GameManager.Inventory.Opened)
-            // Update
-            GameManager.Update(delta, previousMouseState, mouseState);
-        else // Only update gui
-            GameManager.UpdateGui(delta, previousMouseState, mouseState);
-
-        // Shaders
-        if (GameManager.Level != null && GameManager.Level.Decals.Length > 0)
-        {
-            foreach (Decal decal in GameManager.Level.Decals)
+            // Debug
+            if (IsKeyPressed(Keys.F1))
             {
-                if (decal is Torch torch)
-                {
-                    // Update light shader
-                    Light.Parameters["lightSource"].SetValue((torch.Location * Constants.TileSize - GameManager.Camera.ToPoint() + Constants.Middle).ToVector2());
-                }
+                Constants.COLLISION_DEBUG = !Constants.COLLISION_DEBUG;
+                Logger.System($"COLLISION_DEBUG set to: {Constants.COLLISION_DEBUG}");
             }
-        }
+            if (IsKeyPressed(Keys.F2))
+            {
+                Constants.TEXT_INFO = !Constants.TEXT_INFO;
+                Logger.System($"TEXT_INFO set to: {Constants.TEXT_INFO}");
+            }
+            if (IsKeyPressed(Keys.F3))
+            {
+                Constants.FRAME_INFO = !Constants.FRAME_INFO;
+                Logger.System($"FRAME_INFO set to: {Constants.FRAME_INFO}");
+            }
+            if (IsKeyPressed(Keys.F4))
+            {
+                Constants.LOG_INFO = !Constants.LOG_INFO;
+                Logger.System($"LOG_INFO set to: {Constants.LOG_INFO}");
+            }
+            if (IsKeyPressed(Keys.F5))
+            {
+                Constants.FRAME_BAR = !Constants.FRAME_BAR;
+                Logger.System($"FRAME_BAR set to: {Constants.FRAME_BAR}");
+            }
+            if (IsKeyPressed(Keys.F6))
+            {
+                Constants.DRAW_HITBOXES = !Constants.DRAW_HITBOXES;
+                Logger.System($"DRAW_HITBOXES set to: {Constants.DRAW_HITBOXES}");
+            }
 
+            if (IsKeyPressed(Keys.F9))
+                GameManager.Level.Enemies = [new Enemy(GameManager, "Ghost", 100, mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle, 50, 1, 0, 200, 500, 100, TextureID.Ghost)];
+            if (IsKeyPressed(Keys.F10))
+                GameManager.Level.Decals = [new BlueTorch(MouseCoord)];
+            if (IsKeyPressed(Keys.F11))
+                GameManager.LootNotifications.AddNotification("Debug notif!", color: Color.Magenta);
+            if (IsKeyPressed(Keys.F12))
+                GameManager.Level.Loot.Add(new Loot(new("PhiCoin", "Copper coin", amount: (byte)GameManager.Rand.Next(1, 10)), mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle, GameManager.Time));
+
+            // Movement
+            if (!GameManager.Inventory.Opened)
+            {
+                // Movement
+                moveX = 0; moveY = 0;
+                moveX += IsAnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : 0;
+                moveX += IsAnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0;
+                moveY += IsAnyKeyDown(Keys.W, Keys.Up) ? -Constants.PlayerSpeed : 0;
+                moveY += IsAnyKeyDown(Keys.S, Keys.Down) ? Constants.PlayerSpeed : 0;
+                GameManager.Move(new(moveX, moveY));
+            }
+
+            // Time
+            GameManager.FrameTimes["InputUpdate"] = GameManager.Watch.Elapsed.TotalMilliseconds;
+
+            // Game updates
+            if (!GameManager.Inventory.Opened)
+                // Update
+                GameManager.Update(delta, previousMouseState, mouseState);
+            else // Only update gui
+                GameManager.UpdateGui(delta, previousMouseState, mouseState);
+        }
         // Set previous key state
         GameManager.Watch.Restart();
         previousKeyState = keyState;
@@ -224,18 +215,7 @@ public class Window : Game
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
         // Draw game
-        GameManager.DrawTiles();
-        GameManager.DrawDecals();
-        GameManager.DrawCharacters();
-        GameManager.DrawLoot();
-
-        // Inventory darkening
-        if (GameManager.Inventory.Opened)
-            spriteBatch.FillRectangle(new(Vector2.Zero, Constants.Window), Constants.DarkenScreen, layerDepth: 1);
-
-        // Gui
-        GameManager.DrawGui();
-        GameManager.DrawPostProcessing();
+        GameManager.Draw();
 
         // Minimap
         if (GameManager.Inventory.Opened)
