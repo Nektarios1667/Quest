@@ -67,6 +67,7 @@ public class Window : Game
             PreferredBackBufferHeight = Constants.Window.Y,
             IsFullScreen = false,
             SynchronizeWithVerticalRetrace = Constants.VSYNC,
+            PreferHalfPixelOffset = false,
         };
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
@@ -102,9 +103,6 @@ public class Window : Game
 
         // Managers
         GameManager = new GameManager(this, spriteBatch);
-        GameManager.ReadLevel("island_house");
-        GameManager.ReadLevel("island_house_basement");
-        GameManager.LoadLevel(0);
 
         // Shaders
         Grayscale = Content.Load<Effect>("Shaders/Grayscale");
@@ -189,14 +187,18 @@ public class Window : Game
 
             // Time
             GameManager.FrameTimes["InputUpdate"] = GameManager.Watch.Elapsed.TotalMilliseconds;
-
-            // Game updates
-            if (!GameManager.Inventory.Opened)
-                // Update
-                GameManager.Update(delta, previousMouseState, mouseState);
-            else // Only update gui
-                GameManager.UpdateGui(delta, previousMouseState, mouseState);
         }
+
+        // Game updates
+        if (!GameManager.Inventory.Opened && GameManager.Screen == Screen.Game)
+            // Update
+            GameManager.Update(delta, previousMouseState, mouseState);
+        else
+        { // Only update gui
+            GameManager.UpdateTimes(delta);
+            GameManager.UpdateGui(delta, previousMouseState, mouseState);
+        }
+
         // Set previous key state
         GameManager.Watch.Restart();
         previousKeyState = keyState;

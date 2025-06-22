@@ -1,4 +1,7 @@
 ﻿global using Microsoft.Xna.Framework;
+global using Microsoft.Xna.Framework.Graphics;
+global using Microsoft.Xna.Framework.Input;
+
 global using Quest.Entities;
 global using Quest.Tools;
 global using static Quest.TextureManager;

@@ -16,6 +16,7 @@ public enum Screen
 {
     MainMenu,
     Game,
+    Death,
 }
 public interface IGameManager
 {
@@ -74,6 +75,7 @@ public class GameManager : IGameManager
     // Inventory
     public Inventory Inventory { get; set; }
     // Private
+    private float deathTime = -1;
     private Point tileSize;
     public float Time { get; private set; }
     public static readonly Point lootStackOffset = new(4, 4);
@@ -112,13 +114,45 @@ public class GameManager : IGameManager
             LootNotifications = new NotificationArea(Constants.Middle - new Point(0, Constants.MageHalfSize.Y + 15), 5, PixelOperatorBold)
         ];
 
+        // Levels
+        ReadLevel("island_house");
+        ReadLevel("island_house_basement");
+        LoadLevel(0);
+    }
+    public void Reset()
+    {
+        // Initialize the game
+        Camera = (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2();
+        CameraDest = Camera;
+
+        // Inventory
+        Inventory = new(this, 6, 4);
+        Inventory.SetSlot(0, new Item("Sword", "A sharp, pointy sword", max: 1));
+        Inventory.SetSlot(1, new Item("Pickaxe", "Sturdy iron pickaxe for mining", max: 1));
+        Inventory.SetSlot(2, new Item("ActivePalantir", "A seeing stone, used to communicate with Sauron", 1, max: 1));
+        Inventory.SetSlot(3, new Item("InactivePalantir", "A seeing stone, used to communicate with Sauron", 1, max: 1));
+        Inventory.SetSlot(4, new Item("PhiCoin", "A small copper coin", 20, max: 20));
+        Inventory.SetSlot(5, new Item("DeltaCoin", "A shiny gold coin", 10, max: 20));
+        Inventory.SetSlot(6, new Item("GammaCoin", "A rare diamond coin", 5, max: 20));
+
+        // Screen
+        Screen = Screen.Game;
+
+        // Widgets
+        Gui.Widgets = [
+            HealthBar = new StatusBar(new(10, Constants.Window.Y - 35), new(300, 25), Color.Green, Color.Red, 100, 100),
+            LootNotifications = new NotificationArea(Constants.Middle - new Point(0, Constants.MageHalfSize.Y + 15), 5, PixelOperatorBold)
+        ];
+
         // Level
-        Level = new("null", [], new(0, 0), [], [], [], []); // Default level
+        Levels = [];
+        ReadLevel("island_house");
+        ReadLevel("island_house_basement");
+        LoadLevel(0);
     }
     public void Update(float deltaTime, MouseState previousMouseState, MouseState mouseState)
     {
-        Delta = deltaTime;
-        Time += deltaTime;
+        UpdateTimes(deltaTime);
 
         UpdatePositions();
         UpdateCharacters(deltaTime);
@@ -128,13 +162,14 @@ public class GameManager : IGameManager
     }
     public void Draw()
     {
-        if (Screen == Screen.Game) {
+        if (Screen == Screen.Game || Screen == Screen.Death) {
             DrawTiles();
             DrawDecals();
             DrawLoot();
             DrawCharacters();
             DrawGui();
             DrawPostProcessing();
+
         } else if (Screen == Screen.MainMenu)
         {
             DrawMenu();
@@ -176,14 +211,17 @@ public class GameManager : IGameManager
         // Darkening
         if (Inventory.Opened)
             Batch.FillRectangle(new Rectangle(Point.Zero, Constants.Window), Constants.DarkenScreen);
+        
         // Widgets
         LootNotifications.Offset = (CameraDest - Camera).ToPoint();
         Gui.Draw(Batch);
         FrameTimes["GuiDraw"] = Watch.Elapsed.TotalMilliseconds;
+        
         // Inventory
         Watch.Restart();
         Inventory.Draw();
         FrameTimes["InventoryDraw"] = Watch.Elapsed.TotalMilliseconds;
+        
         // Debug
         Batch.DrawPoint(PlayerFoot.ToVector2() - Camera, Constants.DebugGreenTint, 3);
     }
@@ -248,13 +286,25 @@ public class GameManager : IGameManager
     public void DrawPostProcessing()
     {
         Watch.Restart();
+        
+        // Tint
         if (Level != null)
             Batch.FillRectangle(new(Vector2.Zero, Constants.Window), Level.Tint);
+        
+        // Hitboxes
         if (Constants.DRAW_HITBOXES)
         {
             Batch.DrawPoint(Constants.Middle.ToVector2(), Constants.DebugPinkTint, 5);
             Batch.DrawPoint(Constants.Middle.ToVector2() - new Vector2(0, Constants.MageHalfSize.Y + 12), Constants.DebugPinkTint, 5);
             Batch.DrawPoint(Constants.Middle.ToVector2() + CameraDest - Camera, Constants.DebugGreenTint, 5);
+        }
+
+        // Death
+        if (Screen == Screen.Death)
+        {
+            Batch.FillRectangle(new Rectangle(Point.Zero, Constants.Window), Color.Black * ((Time - deathTime) / 5));
+            Batch.DrawString(PixelOperator, "YOU DIED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("You died!") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
+            Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
         }
     }
     public void DrawMenu()
@@ -278,6 +328,11 @@ public class GameManager : IGameManager
     #endregion
     // Update split up methods
     #region
+    public void UpdateTimes(float deltaTime)
+    {
+        Delta = deltaTime;
+        Time += deltaTime;
+    }
     public void UpdatePositions()
     {
         // Update player position
@@ -289,6 +344,12 @@ public class GameManager : IGameManager
     {
         foreach (NPC npc in Level.NPCs) npc.Update();
         foreach (Enemy enemy in Level.Enemies) enemy.Update();
+
+        if (HealthBar.CurrentValue <= 0)
+        {
+            if (deathTime == -1) deathTime = Time;
+            Screen = Screen.Death;
+        }
     }
     public void UpdateLoot(float deltaTime)
     {
@@ -330,6 +391,10 @@ public class GameManager : IGameManager
         Watch.Restart();
         Inventory.Update(previousMouseState, mouseState);
         FrameTimes["InventoryUpdate"] = Watch.Elapsed.TotalMilliseconds;
+
+        // Respawn
+        if (Screen == Screen.Death && Window.IsKeyPressed(Keys.Space))
+            Reset();
     }
     #endregion
     public void Notification(string message, Color? color = null, float duration = 4f)
@@ -377,10 +442,13 @@ public class GameManager : IGameManager
             throw new ArgumentOutOfRangeException(nameof(levelIndex), "Invalid level index.");
 
         // Close dialogs
-        foreach (NPC npc in Level.NPCs)
+        if (Level != null)
         {
-            npc.DialogBox.IsVisible = false;
-            npc.DialogBox.Displayed = "";
+            foreach (NPC npc in Level.NPCs)
+            {
+                npc.DialogBox.IsVisible = false;
+                npc.DialogBox.Displayed = "";
+            }
         }
 
         // Load the level data
@@ -405,6 +473,29 @@ public class GameManager : IGameManager
         }
         // If not found throw an error
         Logger.Error($"Level '{levelName}' not found in stored levels. Make sure the level file has been read before loading.", true);
+    }
+    public void UnloadLevel(int levelIndex)
+    {
+        // Check index
+        if (levelIndex < 0 || levelIndex >= Levels.Count)
+            throw new ArgumentOutOfRangeException(nameof(levelIndex), "Invalid level index.");
+        // Unload the level
+        if (Level == Levels[levelIndex])
+            Level = new("null", [], new Point(128, 128), [], [], [], []);
+        Levels.RemoveAt(levelIndex);
+    }
+    public void UnloadLevel(string levelName)
+    {
+        for (int l = 0; l < Levels.Count; l++)
+        {
+            if (Levels[l].Name == levelName)
+            {
+                UnloadLevel(l);
+                return;
+            }
+        }
+        // If not found throw an error
+        Logger.Error($"Level '{levelName}' not found in stored levels. Make sure the level file has been read before unloading.", true);
     }
     public void ReadLevel(string filename)
     {
