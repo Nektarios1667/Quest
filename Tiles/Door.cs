@@ -1,7 +1,4 @@
-﻿using System;
-using Xna = Microsoft.Xna.Framework;
-
-namespace Quest.Tiles;
+﻿namespace Quest.Tiles;
 
 public class Door : Tile
 {
@@ -13,29 +10,29 @@ public class Door : Tile
         Key = key;
         ConsumeKey = consumeKey;
     }
-    public override void Draw(IGameManager game)
+    public override void Draw(GameManager game)
     {
         // Draw
-        Point dest = Location * Constants.TileSize - game.Camera.ToPoint() + Constants.Middle;
+        Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
         Color color = Marked ? Color.Red : Color.White;
         Rectangle source = new(IsWalkable ? 16 : 0, 0, 16, 16);
-        DrawTexture(game.Batch, TextureID.Door, dest, source: source, scale: new(4), color: color);
-        
+        TextureManager.DrawTexture(game.Batch, TextureManager.TextureID.Door, dest, source: source, scale: 4, color: color);
+
         // Handling
         Marked = false;
     }
-    public override void OnPlayerCollide(IGameManager game)
+    public override void OnPlayerCollide(GameManager game)
     {
-        if (game.Inventory.Contains(Key))
+        if (game.PlayerManager.Inventory.Contains(Key))
         {
             if (ConsumeKey)
             {
-                game.Inventory.Consume(Key);
-                game.Notification($"-1 {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
+                game.PlayerManager.Inventory.Consume(Key);
+                game.UIManager.Notification($"-1 {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
             }
             IsWalkable = true;
         }
         else
-            game.Notification($"{StringTools.FillCamelSpaces(Key.Name)} needed to unlock.", Color.Red, 5);
+            game.UIManager.Notification($"{StringTools.FillCamelSpaces(Key.Name)} needed to unlock.", Color.Red, 5);
     }
 }

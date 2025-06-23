@@ -26,7 +26,7 @@ public class GameManager : IGameManager
     public Point PlayerFoot => CameraDest.ToPoint() + Constants.MageDrawShift + new Point(0, Constants.MageHalfSize.Y);
     public Point Coord => Camera.ToPoint() / Constants.TileSize;
     public ContentManager Content => Window.Content;
-    public GuiManager Gui { get; private set; } // GUI handler
+    public Gui.Gui Gui { get; private set; } // GUI handler
     public EditorWindow Window { get; private set; }
     public Vector2 Camera { get; set; }
     public Vector2 CameraDest { get; set; }
@@ -265,34 +265,6 @@ public class GameManager : IGameManager
     public Tile? GetTile(int x, int y)
     {
         return GetTile(new Point(x, y));
-    }
-    public Rectangle TileTextureSource(Tile tile)
-    {
-
-        int mask = TileConnectionsMask(tile);
-
-        int srcX = (mask % Constants.TileMapDim.X) * Constants.TilePixelSize.X;
-        int srcY = (mask / Constants.TileMapDim.X) * Constants.TilePixelSize.Y;
-
-        return new(srcX, srcY, Constants.TilePixelSize.X, Constants.TilePixelSize.Y);
-    }
-    public int TileConnectionsMask(Tile tile)
-    {
-        int mask = 0;
-        int x = tile.Location.X;
-        int y = tile.Location.Y;
-
-        Tile? left = GetTile(x - 1, y);
-        Tile? right = GetTile(x + 1, y);
-        Tile? down = GetTile(x, y + 1);
-        Tile? up = GetTile(x, y - 1);
-
-        if (left?.Type == tile.Type) mask |= 1; // left
-        if (down?.Type == tile.Type) mask |= 2; // down
-        if (right?.Type == tile.Type) mask |= 4; // right
-        if (up?.Type == tile.Type) mask |= 8; // up
-
-        return mask;
     }
     // Throwaway
     public void LoadLevel(int levelIndex) { }

@@ -1,10 +1,8 @@
-﻿using Xna = Microsoft.Xna.Framework;
-
-namespace Quest.Tiles;
+﻿namespace Quest.Tiles;
 
 public class Grass : Tile
 {
-    public Grass(Xna.Point location) : base(location)
+    public Grass(Point location) : base(location)
     {
         IsWalkable = true;
     }

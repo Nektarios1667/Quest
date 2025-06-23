@@ -1,44 +1,28 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
-using Quest.Tiles;
+﻿using System.Text;
+
+// TODO Player not being drawn, dialog box not being drawn, update minimap on level change, inventory not being drawn
 
 namespace Quest;
 public class Window : Game
 {
     static readonly StringBuilder debugSb = new();
-    // Inputs
-    private KeyboardState keyState;
-    private KeyboardState previousKeyState;
-    private MouseState mouseState;
-    private MouseState previousMouseState;
-    public Point MouseCoord { get; private set; }
-    public bool LMouseClick => mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Released;
-    public bool LMouseDown => mouseState.LeftButton == ButtonState.Pressed;
-    public bool LMouseRelease => mouseState.LeftButton == ButtonState.Released && previousMouseState.LeftButton == ButtonState.Pressed;
-    public bool RMouseClick => mouseState.RightButton == ButtonState.Pressed && previousMouseState.RightButton == ButtonState.Released;
-    public bool RMouseDown => mouseState.RightButton == ButtonState.Pressed;
-    public bool RMouseRelease => mouseState.RightButton == ButtonState.Released && previousMouseState.RightButton == ButtonState.Pressed;
+    // Devices and managers
+    private GraphicsDeviceManager graphics;
+    private SpriteBatch spriteBatch;
+    private GameManager gameManager;
+    private TimerManager timerManager;
+    private PlayerManager playerManager;
+    private UIManager uiManager;
+    private LevelManager levelManager;
+    private MenuManager menuManager;
 
-    // DeltadebugUpdateTime
+    // Time
     private float delta;
     private Dictionary<string, double> frameTimes;
-    // Devices
-    private GraphicsDeviceManager graphics;
-    protected SpriteBatch spriteBatch;
-    public GameManager GameManager;
+
     // Textures
     public Texture2D CursorArrow { get; private set; }
 
-    // Fonts
-    public SpriteFont Arial { get; private set; }
-    public SpriteFont ArialSmall { get; private set; }
-    public SpriteFont ArialLarge { get; private set; }
-    public SpriteFont PixelOperator { get; private set; }
-    public SpriteFont PixelOperatorBold { get; private set; }
     // Movements
     public int moveX;
     public int moveY;
@@ -77,9 +61,6 @@ public class Window : Game
     protected override void Initialize()
     {
         // Defaults
-        keyState = Keyboard.GetState();
-        previousKeyState = keyState;
-        mouseState = Mouse.GetState();
         frameTimes = [];
         debugUpdateTime = 0;
         cacheDelta = 0f;
@@ -91,122 +72,55 @@ public class Window : Game
     {
         spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        // Fonts
-        Arial = Content.Load<SpriteFont>("Fonts/Arial");
-        ArialSmall = Content.Load<SpriteFont>("Fonts/ArialSmall");
-        ArialLarge = Content.Load<SpriteFont>("Fonts/ArialLarge");
-        PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");
-        PixelOperatorBold = Content.Load<SpriteFont>("Fonts/PixelOperatorBold");
-
         // Textures
-        LoadTextures(Content);
+        TextureManager.LoadTextures(Content);
 
         // Managers
-        GameManager = new GameManager(this, spriteBatch);
+        timerManager = new();
+        playerManager = new();
+        uiManager = new();
+        levelManager = new();
+        menuManager = new();
+        gameManager = new(spriteBatch, levelManager, uiManager, playerManager);
+
+        // Levels
+        levelManager.ReadLevel(gameManager.UIManager, "island_house");
+        levelManager.ReadLevel(gameManager.UIManager, "island_house_basement");
+        levelManager.LoadLevel(gameManager, 0);
 
         // Shaders
         Grayscale = Content.Load<Effect>("Shaders/Grayscale");
 
         // Other
         CursorArrow = Content.Load<Texture2D>("Images/Gui/CursorArrow");
+
+        // Timer
+        timerManager.NewTimer("frameTimeUpdate", 1, UpdateFrameTimes, int.MaxValue);
     }
 
     protected override void Update(GameTime gameTime)
     {
-        GameManager.Watch.Restart();
+        DebugManager.Watch.Restart();
 
-        // Inputs
-        keyState = Keyboard.GetState();
-        mouseState = Mouse.GetState();
-        MouseCoord = (mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
         // Exit
-        if (IsKeyDown(Keys.Escape)) Exit();
+        if (InputManager.KeyDown(Keys.Escape)) Exit();
 
         // Delta
         delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-        // Game
-        if (GameManager.Screen == Screen.Game)
-        {
-            // Inventory
-            if (IsKeyPressed(Keys.I))
-                GameManager.Inventory.Opened = !GameManager.Inventory.Opened;
+        // Managers
+        InputManager.Update();
+        DebugManager.Update();
+        CameraManager.Update(delta);
 
-            // Debug
-            if (IsKeyPressed(Keys.F1))
-            {
-                Constants.COLLISION_DEBUG = !Constants.COLLISION_DEBUG;
-                Logger.System($"COLLISION_DEBUG set to: {Constants.COLLISION_DEBUG}");
-            }
-            if (IsKeyPressed(Keys.F2))
-            {
-                Constants.TEXT_INFO = !Constants.TEXT_INFO;
-                Logger.System($"TEXT_INFO set to: {Constants.TEXT_INFO}");
-            }
-            if (IsKeyPressed(Keys.F3))
-            {
-                Constants.FRAME_INFO = !Constants.FRAME_INFO;
-                Logger.System($"FRAME_INFO set to: {Constants.FRAME_INFO}");
-            }
-            if (IsKeyPressed(Keys.F4))
-            {
-                Constants.LOG_INFO = !Constants.LOG_INFO;
-                Logger.System($"LOG_INFO set to: {Constants.LOG_INFO}");
-            }
-            if (IsKeyPressed(Keys.F5))
-            {
-                Constants.FRAME_BAR = !Constants.FRAME_BAR;
-                Logger.System($"FRAME_BAR set to: {Constants.FRAME_BAR}");
-            }
-            if (IsKeyPressed(Keys.F6))
-            {
-                Constants.DRAW_HITBOXES = !Constants.DRAW_HITBOXES;
-                Logger.System($"DRAW_HITBOXES set to: {Constants.DRAW_HITBOXES}");
-            }
+        timerManager.Update(gameManager);
+        gameManager.Update(delta);
+        playerManager.Update(gameManager);
+        levelManager.Update(gameManager);
+        uiManager.Update(gameManager);
 
-            if (IsKeyPressed(Keys.F9))
-                GameManager.Level.Enemies = [new Enemy(GameManager, "Ghost", 100, mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle, 50, 1, 0, 200, 500, 100, TextureID.Ghost)];
-            if (IsKeyPressed(Keys.F10))
-                GameManager.Level.Decals = [new BlueTorch(MouseCoord)];
-            if (IsKeyPressed(Keys.F11))
-                GameManager.LootNotifications.AddNotification("Debug notif!", color: Color.Magenta);
-            if (IsKeyPressed(Keys.F12))
-                GameManager.Level.Loot.Add(new Loot(new("PhiCoin", "Copper coin", amount: (byte)GameManager.Rand.Next(1, 10)), mouseState.Position + GameManager.Camera.ToPoint() - Constants.Middle, GameManager.Time));
-
-            // Movement
-            if (!GameManager.Inventory.Opened)
-            {
-                // Movement
-                moveX = 0; moveY = 0;
-                moveX += IsAnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : 0;
-                moveX += IsAnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0;
-                moveY += IsAnyKeyDown(Keys.W, Keys.Up) ? -Constants.PlayerSpeed : 0;
-                moveY += IsAnyKeyDown(Keys.S, Keys.Down) ? Constants.PlayerSpeed : 0;
-                GameManager.Move(new(moveX, moveY));
-            }
-
-            // Time
-            GameManager.FrameTimes["InputUpdate"] = GameManager.Watch.Elapsed.TotalMilliseconds;
-        }
-
-        // Game updates
-        if (!GameManager.Inventory.Opened && GameManager.Screen == Screen.Game)
-            // Update
-            GameManager.Update(delta, previousMouseState, mouseState);
-        else
-        { // Only update gui
-            GameManager.UpdateTimes(delta);
-            GameManager.UpdateGui(delta, previousMouseState, mouseState);
-        }
-
-        // Set previous key state
-        GameManager.Watch.Restart();
-        previousKeyState = keyState;
-        previousMouseState = mouseState;
 
         // Final
-        debugUpdateTime += delta;
-        GameManager.FrameTimes["OtherUpdates"] = GameManager.Watch.Elapsed.TotalMilliseconds;
         base.Update(gameTime);
     }
 
@@ -217,65 +131,38 @@ public class Window : Game
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
         // Draw game
-        GameManager.Draw();
-
-        // Minimap
-        if (GameManager.Inventory.Opened)
-            DrawMiniMap();
+        levelManager.Draw(gameManager);
+        playerManager.Draw(gameManager);
+        uiManager.Draw(GraphicsDevice, gameManager, playerManager.Inventory);
+        menuManager.Draw(gameManager);
 
         // Text info
-        GameManager.Watch.Restart();
+        DebugManager.StartBenchmark("DebugTextDraw");
         if (Constants.TEXT_INFO)
             DrawTextInfo();
 
         // Frame info
         if (Constants.FRAME_INFO)
             DrawFrameInfo();
-        GameManager.FrameTimes["DebugTextDraw"] = GameManager.Watch.Elapsed.TotalMilliseconds;
+        DebugManager.EndBenchmark("DebugTextDraw");
 
         // Frame bar
-        GameManager.Watch.Restart();
+        DebugManager.StartBenchmark("FrameBarDraw");
         if (Constants.FRAME_BAR)
             DrawFrameBar();
-        GameManager.FrameTimes["FrameBarDraw"] = GameManager.Watch.Elapsed.TotalMilliseconds;
+        DebugManager.EndBenchmark("FrameBarDraw");
 
         // Cursor
-        DrawTexture(spriteBatch, TextureID.CursorArrow, mouseState.Position);
+        TextureManager.DrawTexture(spriteBatch, TextureManager.TextureID.CursorArrow, InputManager.MousePosition);
 
         // Final
         spriteBatch.End();
         base.Draw(gameTime);
     }
-    // Key presses
-    #region
-    public bool IsKeyDown(Keys key) => keyState.IsKeyDown(key);
-    public bool IsAnyKeyDown(params Keys[] keys)
-    {
-        foreach (Keys key in keys) { if (keyState.IsKeyDown(key)) return true; }
-        return false;
-    }
-    public bool IsAllKeysDown(params Keys[] keys)
-    {
-        foreach (Keys key in keys) { if (!keyState.IsKeyDown(key)) return false; }
-        return true;
-    }
-    public bool IsKeyPressed(Keys key) => keyState.IsKeyDown(key) && !previousKeyState.IsKeyDown(key);
-    public bool IsAnyKeyPressed(params Keys[] keys)
-    {
-        foreach (Keys key in keys) { if (keyState.IsKeyDown(key) && !previousKeyState.IsKeyDown(key)) return true; }
-        return false;
-    }
-    public bool IsAllKeysPressed(params Keys[] keys)
-    {
-        foreach (Keys key in keys) { if (!(keyState.IsKeyDown(key) && !previousKeyState.IsKeyDown(key))) return false; }
-        return true;
-    }
-    #endregion
     // For cleaner code
-    #region
     public void DrawFrameInfo()
     {
-        float boxHeight = GameManager.FrameTimes.Count * 20;
+        float boxHeight = DebugManager.FrameTimes.Count * 20;
         spriteBatch.FillRectangle(new(Constants.Window.X - 190, 0, 190, boxHeight), Color.Black * 0.8f);
 
         debugSb.Clear();
@@ -287,7 +174,7 @@ public class Window : Game
             debugSb.Append('\n');
         }
 
-        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.Window.X - 180, 10), Color.White);
+        spriteBatch.DrawString(TextureManager.Arial, debugSb.ToString(), new Vector2(Constants.Window.X - 180, 10), Color.White);
     }
     public void DrawTextInfo()
     {
@@ -297,63 +184,21 @@ public class Window : Game
         debugSb.Append("FPS: ");
         debugSb.AppendFormat("{0:0.0}", cacheDelta != 0 ? 1f / cacheDelta : 0);
         debugSb.Append("\nTime: ");
-        debugSb.AppendFormat("{0:0.00}", GameManager.Time);
+        debugSb.AppendFormat("{0:0.00}", gameManager.TotalTime);
         debugSb.Append("\nCamera: ");
-        debugSb.AppendFormat("{0:0.0},{1:0.0}", GameManager.Camera.X, GameManager.Camera.Y);
+        debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.Camera.X, CameraManager.Camera.Y);
         debugSb.Append("\nTile Below: ");
-        debugSb.Append(GameManager.TileBelow == null ? "none" : GameManager.TileBelow.Type);
+        debugSb.Append(playerManager.TileBelow == null ? "none" : playerManager.TileBelow.Type);
         debugSb.Append("\nCoord: ");
-        debugSb.AppendFormat("{0:0.0},{1:0.0}", GameManager.TileCoord.X, GameManager.TileCoord.Y);
+        debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.TileCoord.X, CameraManager.TileCoord.Y);
         debugSb.Append("\nLevel: ");
-        debugSb.Append(GameManager.Level?.Name);
+        debugSb.Append(levelManager.Level?.Name);
         debugSb.Append("\nInventory: ");
-        debugSb.Append(GameManager.Inventory.Opened);
+        debugSb.Append(playerManager.Inventory.Opened);
         debugSb.Append("\nGUI: ");
-        debugSb.Append(GameManager.Gui.Widgets.Count);
+        debugSb.Append(uiManager.Gui.Widgets.Count);
 
-        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);
-    }
-    public void DrawMiniMap()
-    {
-        GameManager.Watch.Restart();
-        // Frame
-        spriteBatch.DrawRectangle(new(7, Constants.Window.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
-
-        // Create render if not done already
-        if (Minimap == null)
-        {
-            // Setup target
-            Minimap = new RenderTarget2D(GraphicsDevice, Constants.MapSize.X, Constants.MapSize.Y);
-            GraphicsDevice.SetRenderTarget(Minimap);
-            GraphicsDevice.Clear(Color.Transparent);
-            spriteBatch.End();
-            spriteBatch.Begin();
-
-            // Pixels
-            for (int y = 0; y < Constants.MapSize.Y; y++)
-            {
-                for (int x = 0; x < Constants.MapSize.X; x++)
-                {
-                    // Get tile
-                    Tile tile = GameManager.GetTile(new Point(x, y))!;
-                    spriteBatch.DrawPoint(new(x, y), Constants.MiniMapColors[(int)tile.Type]);
-                }
-            }
-
-            // Resume normal render
-            spriteBatch.End();
-            GraphicsDevice.SetRenderTarget(null);
-            spriteBatch.Begin();
-
-        }
-        else
-            spriteBatch.Draw(Minimap, new Rectangle(10, Constants.Window.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
-
-        // Player
-        Point dest = GameManager.TileCoord + new Point(10, Constants.Window.Y - Constants.MapSize.Y - 10);
-        spriteBatch.DrawPoint(dest.ToVector2(), Color.Red, size: 2);
-
-        GameManager.FrameTimes["DrawMinimap"] = GameManager.Watch.Elapsed.TotalMilliseconds;
+        spriteBatch.DrawString(TextureManager.Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);
     }
     public void DrawFrameBar()
     {
@@ -361,7 +206,7 @@ public class Window : Game
         if (debugUpdateTime >= .5)
         {
             cacheDelta = delta;
-            frameTimes = new Dictionary<string, double>(GameManager.FrameTimes);
+            frameTimes = new Dictionary<string, double>(DebugManager.FrameTimes);
             debugUpdateTime = 0;
         }
         // Background
@@ -373,11 +218,16 @@ public class Window : Game
         spriteBatch.FillRectangle(new(Constants.Window.X - 310, Constants.Window.Y - 40, 300, 25), Color.White);
         foreach (KeyValuePair<string, double> process in frameTimes)
         {
-            spriteBatch.DrawString(Arial, process.Key, new(Constants.Window.X - Arial.MeasureString(process.Key).X - 5, Constants.Window.Y - 20 * c - 60), colors[c]);
+            spriteBatch.DrawString(TextureManager.Arial, process.Key, new(Constants.Window.X - TextureManager.Arial.MeasureString(process.Key).X - 5, Constants.Window.Y - 20 * c - 60), colors[c]);
             spriteBatch.FillRectangle(new(Constants.Window.X - 310 + start, Constants.Window.Y - 40, (int)(process.Value / (cacheDelta * 1000) * 300), 25), colors[c]);
             start += (int)(process.Value / (cacheDelta * 1000)) * 300;
             c++;
         }
     }
-    #endregion
+    public void UpdateFrameTimes()
+    {
+        frameTimes.Clear();
+        frameTimes = new(DebugManager.FrameTimes);
+        cacheDelta = gameManager.DeltaTime;
+    }
 }

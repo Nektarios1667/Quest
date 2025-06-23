@@ -1,5 +1,4 @@
-﻿using System;
-using Xna = Microsoft.Xna.Framework;
+﻿using Xna = Microsoft.Xna.Framework;
 
 namespace Quest.Tiles;
 
@@ -9,14 +8,14 @@ public class Water : Tile
     {
         IsWalkable = false;
     }
-    public override void Draw(IGameManager game)
+    public override void Draw(GameManager gameManager)
     {
         // Draw each tile using the sprite batch
-        Point dest = Location * Constants.TileSize - game.Camera.ToPoint();
+        Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint();
         dest += Constants.Middle;
         // Draw
-        Color color = Marked ? Color.Red : Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(game.Time + Location.X + Location.Y));
-        DrawTexture(game.Batch, TextureID.Water, dest, source: game.TileTextureSource(this), color: color, scale: Constants.TileSizeScale.ToVector2());
+        Color color = Marked ? Color.Red : Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(gameManager.TotalTime + Location.X + Location.Y));
+        TextureManager.DrawTexture(gameManager.Batch, TextureManager.TextureID.Water, dest, source: gameManager.LevelManager.TileTextureSource(this), color: color, scale: Constants.TileSizeScale);
         Marked = false; // Reset marked state for next frame
     }
 }

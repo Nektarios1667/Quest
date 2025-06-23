@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Quest.Tools;
+﻿namespace Quest.Tools;
 
 public static class StringTools
 {

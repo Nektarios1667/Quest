@@ -1,10 +1,8 @@
-﻿using Xna = Microsoft.Xna.Framework;
-
-namespace Quest.Tiles;
+﻿namespace Quest.Tiles;
 
 public class Sky : Tile
 {
-    public Sky(Xna.Point location) : base(location)
+    public Sky(Point location) : base(location)
     {
         IsWalkable = false;
     }

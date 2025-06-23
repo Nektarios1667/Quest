@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using Quest.Tiles;
-using Xna = Microsoft.Xna.Framework;
-namespace Quest;
+﻿namespace Quest;
 
 
 public class Level

@@ -1,6 +1,5 @@
-﻿namespace Quest.Tools;
-
-public static class Logger
+﻿namespace Quest.Managers;
+public static class LogManager
 {
     private static readonly List<string> MessageLevels = ["Input", "Log", "System", "Warning", "Error"];
     private static readonly List<ConsoleColor> MessageColors = [ConsoleColor.Cyan, ConsoleColor.Blue, ConsoleColor.Green, ConsoleColor.Yellow, ConsoleColor.Red];
@@ -40,17 +39,6 @@ public static class Logger
         if (resp < 0 || resp > 255) return fallback;
         return (byte)resp;
     }
-    public static TextureManager.TextureID InputTexture(string message, TextureManager.TextureID fallback = TextureManager.TextureID.Null)
-    {
-        string resp = Input(message);
-        if (Enum.TryParse(resp, true, out TextureManager.TextureID texture) && TextureManager.Metadata[texture].Type == "character")
-            return texture;
-        else
-        {
-            Error("Invalid input- expected a valid character texture name.");
-            return fallback;
-        }
-    }
     public static Color InputColor(string message, Color fallback = default)
     {
         string resp = Input(message);
@@ -89,8 +77,6 @@ public static class Logger
     }
     public static void Log(string message)
     {
-        if (!Constants.LOG_INFO) return; // Skip logging if not enabled
-
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Log")];
         Console.WriteLine($"[Log] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color

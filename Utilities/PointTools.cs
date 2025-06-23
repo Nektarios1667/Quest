@@ -1,5 +1,4 @@
-﻿using System;
-using Xna = Microsoft.Xna.Framework;
+﻿using Xna = Microsoft.Xna.Framework;
 
 namespace Quest.Tools;
 

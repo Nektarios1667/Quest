@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
-
-namespace Quest.Gui;
+﻿namespace Quest.Gui;
 
 
 public class NotificationArea(Point location, int height, SpriteFont font, Color? color = null) : Widget(location)
@@ -55,7 +52,8 @@ public class NotificationArea(Point location, int height, SpriteFont font, Color
     public void AddNotification(string text, Color? color = null, float duration = 4f)
     {
         // Remove repeats
-        if (Notifications.Count > 0 && Notifications[0].Text == text) {
+        if (Notifications.Count > 0 && Notifications[0].Text == text)
+        {
             Notifications[0].Timer = 0f; // Reset timer
             return;
         }

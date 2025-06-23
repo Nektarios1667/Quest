@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 
 namespace Quest.Tiles;
 
@@ -20,17 +18,17 @@ public enum TileType
 }
 public class Tile
 {
-    protected static readonly Dictionary<TileType, TextureID> TileToTexture = Enum.GetValues<TileType>()
+    protected static readonly Dictionary<TileType, TextureManager.TextureID> TileToTexture = Enum.GetValues<TileType>()
     .ToDictionary(
         tileType => tileType,
-        tileType => Enum.TryParse<TextureID>(tileType.ToString(), out var texture) ? texture : TextureID.Null
+        tileType => Enum.TryParse<TextureManager.TextureID>(tileType.ToString(), out var texture) ? texture : TextureManager.TextureID.Null
     );
 
     // Debug
     public bool Marked { get; set; }
     // Auto generated - no setter
     public Point Location { get; }
-    public TextureID Texture { get; }
+    public TextureManager.TextureID Texture { get; }
     // Properties - protected setter
     public bool IsWalkable { get; protected set; }
     public TileType Type { get; protected set; }
@@ -42,16 +40,16 @@ public class Tile
         Texture = TileToTexture[Type];
         Marked = false;
     }
-    public virtual void Draw(IGameManager game)
+    public virtual void Draw(GameManager gameManager)
     {
         // Draw
-        Point dest = Location * Constants.TileSize - game.Camera.ToPoint() + Constants.Middle;
+        Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
         Color color = Marked ? Color.Red : Color.White;
-        DrawTexture(game.Batch, Texture, dest, source: game.TileTextureSource(this), scale: new(4), color: color);
+        TextureManager.DrawTexture(gameManager.Batch, Texture, dest, source: gameManager.LevelManager.TileTextureSource(this), scale: 4, color: color);
         Marked = false;
     }
-    public virtual void OnPlayerEnter(IGameManager game) { }
-    public virtual void OnPlayerExit(IGameManager game) { }
-    public virtual void OnPlayerInteract(IGameManager game) { }
-    public virtual void OnPlayerCollide(IGameManager game) { }
+    public virtual void OnPlayerEnter(GameManager game) { }
+    public virtual void OnPlayerExit(GameManager game) { }
+    public virtual void OnPlayerInteract(GameManager game) { }
+    public virtual void OnPlayerCollide(GameManager game) { }
 }

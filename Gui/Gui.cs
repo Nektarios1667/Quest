@@ -1,21 +1,18 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
+﻿namespace Quest.Gui;
 
-namespace Quest.Gui;
-
-public class GuiManager
+public class Gui
 {
     public List<Widget> Widgets { get; set; }
-    public GuiManager()
+    public Gui()
     {
         // Initialize the GUI handler
         Widgets = [];
     }
-    public void Update(float deltaTime)
+    public void Update(GameManager gameManager)
     {
         // Update all widgets
         foreach (Widget widget in Widgets)
-            widget.Update(deltaTime);
+            widget.Update(gameManager.DeltaTime);
 
         // Remove expired widgets
         for (int w = 0; w < Widgets.Count; w++)

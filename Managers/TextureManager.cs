@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended;
-using MonoGame.Extended.Content;
-using MonoGame.Extended.Tiled;
+﻿using Microsoft.Xna.Framework.Content;
 
-namespace Quest;
+namespace Quest.Managers;
 
 public class Metadata(Point size, Point tileMap, string type)
 {
@@ -62,6 +56,11 @@ public static class TextureManager
     private static List<string> errors = [];
     public static Dictionary<TextureID, Texture2D> Textures { get; private set; } = [];
     public static Dictionary<TextureID, Metadata> Metadata { get; private set; } = [];
+    // Fonts
+    public static SpriteFont PixelOperator { get; private set; }
+    public static SpriteFont PixelOperatorBold { get; private set; }
+    public static SpriteFont Arial { get; private set; }
+    public static SpriteFont ArialSmall { get; private set; }
 
     private static ContentManager? Content { get; set; }
     public static void LoadTextures(ContentManager content)
@@ -138,6 +137,12 @@ public static class TextureManager
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.Glow] = new(Textures[TextureID.Glow].Bounds.Size, new(1, 1), "effect");
         Logger.Log("Metadata loaded successfully.");
+
+        // Fonts
+        PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");
+        PixelOperatorBold = Content.Load<SpriteFont>("Fonts/PixelOperatorBold");
+        Arial = Content.Load<SpriteFont>("Fonts/Arial");
+        ArialSmall = Content.Load<SpriteFont>("Fonts/ArialSmall");
     }
     public static TextureID ParseTextureString(string textureName)
     {
@@ -148,15 +153,12 @@ public static class TextureManager
         // Found
         return Textures.GetValueOrDefault(id, Textures[TextureID.Null]);
     }
-    public static void DrawTexture(SpriteBatch batch, TextureID id, Point pos, Rectangle? source = null, Color color = default, float rotation = 0f, Vector2 origin = default, Vector2 scale = default, SpriteEffects effects = SpriteEffects.None, float layerDepth = .5f)
+    public static void DrawTexture(SpriteBatch batch, TextureID id, Point pos, Rectangle? source = null, Color color = default, float rotation = 0f, Vector2 origin = default, float scale = 1, SpriteEffects effects = SpriteEffects.None)
     {
         Texture2D tex = GetTexture(id);
         if (color == default) color = Color.White;
         if (origin == default) origin = Vector2.Zero;
-        // If scale is not set, default to 1, unless its missing then stretch to texture size
-        if (scale == default) scale = Vector2.One;
-
-        batch.Draw(tex, pos.ToVector2(), source, color, rotation, origin, scale, effects, layerDepth);
+        batch.Draw(tex, pos.ToVector2(), source, color, rotation, origin, scale, effects, 0f);
     }
     public static void UnloadTexture(TextureID id)
     {

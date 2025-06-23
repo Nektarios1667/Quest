@@ -1,8 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended;
-using Xna = Microsoft.Xna.Framework;
-
-namespace Quest.Gui;
+﻿namespace Quest.Gui;
 
 public class StatusBar : Widget
 {

@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended;
-using Xna = Microsoft.Xna.Framework;
+﻿using Xna = Microsoft.Xna.Framework;
 
 namespace Quest.Gui;
 
@@ -8,7 +6,7 @@ public class Dialog : Widget
 {
     public bool HasSpoken => Displayed == Text;
     public bool IsSpeaking => Displayed != "" && Displayed != Text;
-    public GuiManager Gui { get; private set; }
+    public Gui Gui { get; private set; }
     public Xna.Vector2 Dimensions { get; private set; }
     public Rectangle Rect { get; private set; }
     public Xna.Color Color { get; private set; }
@@ -22,7 +20,7 @@ public class Dialog : Widget
     public float CharDelay { get; set; } = .05f;
     public float charWait { get; set; } = 0;
     // Private
-    public Dialog(GuiManager gui, Xna.Point location, Xna.Vector2 dimensions, Color color, Color foreground, string text, SpriteFont font, int border = 6, Color? borderColor = null) : base(location)
+    public Dialog(Gui gui, Xna.Point location, Xna.Vector2 dimensions, Color color, Color foreground, string text, SpriteFont font, int border = 6, Color? borderColor = null) : base(location)
     {
         Gui = gui;
         Dimensions = dimensions;

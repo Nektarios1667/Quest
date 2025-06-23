@@ -1,10 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
-using Xna = Microsoft.Xna.Framework;
-namespace Quest;
-
+﻿namespace Quest;
 public class Item
 {
     public string DisplayText => $"{Amount} {StringTools.FillCamelSpaces(Amount != 1 ? StringTools.Pluralize(Name) : Name)}";
@@ -12,14 +6,14 @@ public class Item
     public string Description { get; private set; }
     public byte Amount { get; set; }
     public byte Max { get; private set; }
-    public TextureID Texture { get; private set; }
+    public TextureManager.TextureID Texture { get; private set; }
     public Item(string name, string description, byte amount = 1, byte max = Constants.MaxStack)
     {
         Name = name;
         Description = description;
         Amount = amount;
         Max = max;
-        Texture = (TextureID)(Enum.TryParse(typeof(TextureID), Name, out var tex) ? tex : TextureID.Null);
+        Texture = (TextureManager.TextureID)(Enum.TryParse(typeof(TextureManager.TextureID), Name, out var tex) ? tex : TextureManager.TextureID.Null);
     }
     public bool IsSameItemType(Item? other)
     {
@@ -29,66 +23,42 @@ public class Item
 }
 public class Inventory
 {
-    // Input generators
-    public bool LMouseClick => MouseState.LeftButton == ButtonState.Pressed && PreviousMouseState.LeftButton == ButtonState.Released;
-    public bool LMouseDown => MouseState.LeftButton == ButtonState.Pressed;
-    public bool LMouseRelease => MouseState.LeftButton == ButtonState.Released && PreviousMouseState.LeftButton == ButtonState.Pressed;
-    public bool RMouseClick => MouseState.RightButton == ButtonState.Pressed && PreviousMouseState.RightButton == ButtonState.Released;
-    public bool RMouseDown => MouseState.RightButton == ButtonState.Pressed;
-    public bool RMouseRelease => MouseState.RightButton == ButtonState.Released && PreviousMouseState.RightButton == ButtonState.Pressed;
-    private MouseState MouseState { get; set; }
-    private MouseState PreviousMouseState { get; set; }
-
-    //
-    public IGameManager Game { get; private set; }
     public Item?[,] Items { get; private set; }
     public bool Opened { get; set; } = false;
-    private SpriteFont PixelOperator { get; set; }
-    private SpriteFont PixelOperatorBold { get; set; }
+    private SpriteFont PixelOperator { get; } = TextureManager.PixelOperator;
+    private SpriteFont PixelOperatorBold { get; } = TextureManager.PixelOperator;
     public int EquippedSlot { get; set; }
     public Item? Equipped => Items[EquippedSlot, 0];
     public int SelectedSlot { get; set; }
     public int HoverSlot { get; set; }
     public int Width { get; }
     public int Height { get; }
-    private readonly Xna.Point itemOffset = new(14, 14);
-    private readonly Vector2 itemScale = new(3, 3);
-    private readonly Point slotSize = TextureManager.Metadata[TextureID.Slot].Size;
+    private readonly Point itemOffset = new(14, 14);
+    private readonly float itemScale = 3;
+    private readonly Point slotSize = TextureManager.Metadata[TextureManager.TextureID.Slot].Size;
     private readonly Point itemStart;
-    public Inventory(IGameManager game, int width, int height)
+    public Inventory(int width, int height)
     {
-        Game = game;
         Items = new Item?[width, height];
         Width = width;
         Height = height;
         SelectedSlot = width * height - 1;
         HoverSlot = 0;
-        PixelOperator = Game.Content.Load<SpriteFont>("Fonts/PixelOperator");
-        PixelOperatorBold = Game.Content.Load<SpriteFont>("Fonts/PixelOperatorBold");
-
         itemStart = new(Constants.Middle.X - (slotSize.X * Width / 2), Constants.Window.Y - slotSize.Y - 8);
     }
-    public void Update(MouseState previousMouseState, MouseState mouseState)
+    public void Update(GameManager gameManager)
     {
-        // Inputs
-        PreviousMouseState = previousMouseState;
-        MouseState = mouseState;
-
         // Scroll slot
-        if (MouseState.ScrollWheelValue > PreviousMouseState.ScrollWheelValue)
-        {
+        if (InputManager.ScrollWheelChange > 0)
             EquippedSlot = (EquippedSlot + 1) % Width;
-        }
-        if (MouseState.ScrollWheelValue < PreviousMouseState.ScrollWheelValue)
-        {
+        if (InputManager.ScrollWheelChange < 0)
             EquippedSlot -= 1;
-            if (EquippedSlot < 0) EquippedSlot += Width;
-        }
+        if (EquippedSlot < 0) EquippedSlot += Width;
 
         // Handle slot interactions
-        SlotInteractions(PreviousMouseState, MouseState);
+        SlotInteractions(gameManager);
     }
-    public void Draw()
+    public void Draw(GameManager gameManager)
     {
         // Draw
         for (int x = 0; x < Width; x++)
@@ -100,16 +70,16 @@ public class Inventory
 
                 // Draw inventory slots
                 Vector2 itemDest = new(itemStart.X + (slotSize.X + 4) * x, itemStart.Y - (slotSize.Y + 8) * y - (y != 0 ? 20 : 0));
-                DrawTexture(Game.Batch, TextureID.Slot, itemDest.ToPoint(), color: SlotColor(x, y));
+                TextureManager.DrawTexture(gameManager.Batch, TextureManager.TextureID.Slot, itemDest.ToPoint(), color: SlotColor(x, y));
 
                 // Draw inventory items
                 if (item == null) continue;
-                DrawTexture(Game.Batch, item.Texture, itemDest.ToPoint() + itemOffset, scale: itemScale);
+                TextureManager.DrawTexture(gameManager.Batch, item.Texture, itemDest.ToPoint() + itemOffset, scale: itemScale);
 
                 // Amount text
                 if (item.Amount <= 1) continue; // Don't draw amount text for single items
                 Vector2 textDest = itemDest + slotSize.ToVector2() - new Vector2(PixelOperator.MeasureString($"{item.Amount}").X + 6, 36);
-                Game.Batch.DrawString(PixelOperatorBold, $"{item.Amount}", textDest, Color.White);
+                gameManager.Batch.DrawString(PixelOperatorBold, $"{item.Amount}", textDest, Color.White);
             }
         }
 
@@ -120,21 +90,21 @@ public class Inventory
             string display = StringTools.FillCamelSpaces(hovered.Name);
             Point textSize = PixelOperator.MeasureString(display).ToPoint();
             Vector2 labelPos = new(itemStart.X + (slotSize.X - textSize.X) / 2 + (slotSize.X + 4) * hoverCoord.X - 4, itemStart.Y - (slotSize.Y + 8) * hoverCoord.Y - textSize.Y / 2 - 10 - (hoverCoord.Y != 0 ? 20 : 0));
-            Game.Batch.FillRectangle(labelPos + new Vector2(4, -8), new Vector2(textSize.X + 4, 30), Color.Black * 0.7f);
-            Game.Batch.DrawRectangle(labelPos + new Vector2(2, -10), new Vector2(textSize.X + 8, 34), Color.Blue * 0.7f, 2);
-            Game.Batch.DrawString(PixelOperator, display, labelPos + new Vector2(8, -8), Color.White);
+            gameManager.Batch.FillRectangle(labelPos + new Vector2(4, -8), new Vector2(textSize.X + 4, 30), Color.Black * 0.7f);
+            gameManager.Batch.DrawRectangle(labelPos + new Vector2(2, -10), new Vector2(textSize.X + 8, 34), Color.Blue * 0.7f, 2);
+            gameManager.Batch.DrawString(PixelOperator, display, labelPos + new Vector2(8, -8), Color.White);
         }
     }
-    public void SlotInteractions(MouseState previousMouseState, MouseState mouseState)
+    public void SlotInteractions(GameManager gameManager)
     {
         // Get
-        int mouseSlot = Flatten(GetMouseSlot(mouseState));
+        int mouseSlot = Flatten(GetMouseSlot());
 
         // Hover slot
         HoverSlot = mouseSlot;
 
         // Swap items
-        if (Opened && LMouseRelease)
+        if (Opened && InputManager.LMouseReleased)
         {
             if (mouseSlot >= 0 && mouseSlot != SelectedSlot)
             {
@@ -153,7 +123,7 @@ public class Inventory
         }
 
         // Spread items
-        if (Opened && RMouseRelease)
+        if (Opened && InputManager.RMouseReleased)
         {
             if (mouseSlot >= 0 && mouseSlot != SelectedSlot)
             {
@@ -181,30 +151,21 @@ public class Inventory
         }
 
         // Select slot
-        if (Opened && (LMouseClick || RMouseClick) && mouseSlot >= 0)
+        if (Opened && (InputManager.LMouseClicked || InputManager.RMouseClicked) && mouseSlot >= 0)
             SelectedSlot = mouseSlot;
 
         // Deselect
-        if (LMouseDown && (mouseSlot < 0 || mouseSlot > Items.Length)) SelectedSlot = -1;
+        if (InputManager.LMouseClicked && (mouseSlot < 0 || mouseSlot > Items.Length)) SelectedSlot = -1;
 
         // Drop items
-        if (Opened && HoverSlot >= 0 && Game.IsKeyDown(Keys.D))
+        if (Opened && HoverSlot >= 0 && InputManager.KeyDown(Keys.D))
         {
             Item? item = GetItem(HoverSlot);
-            if (item != null) Game.DropLoot(new Loot(item, Game.PlayerFoot + Constants.MageDrawShift, Game.Time));
+            if (item != null) gameManager.LevelManager.DropLoot(gameManager, new Loot(item, CameraManager.PlayerFoot + Constants.MageDrawShift, gameManager.TotalTime));
             SetSlot(HoverSlot, null);
         }
     }
     // Slot interactions
-    public void DrawSlot(int slot)
-    {
-        Item? item = GetItem(slot);
-        if (item != null)
-        {
-            Game.AddLoot(new Loot(item, Game.PlayerFoot + Constants.MageHalfSize, Game.Time));
-            SetSlot(HoverSlot, null);
-        }
-    }
     private Color SlotColor(int x, int y)
     {
         int slot = Flatten(x, y);
@@ -270,31 +231,31 @@ public class Inventory
         return false;
     }
     // GetItem
-    public Item? GetItem(Xna.Point pos)
+    public Item? GetItem(Point pos)
     {
         if (pos.X < 0 || pos.X >= Width || pos.Y < 0 || pos.Y >= Height) return null;
         return Items[pos.X, pos.Y];
     }
-    public Item? GetItem(int x, int y) { return GetItem(new Xna.Point(x, y)); }
+    public Item? GetItem(int x, int y) { return GetItem(new Point(x, y)); }
     public Item? GetItem(int idx)
     {
         if (idx < 0 || idx >= Width * Height) return null;
-        Xna.Point pos = Expand(idx);
+        Point pos = Expand(idx);
         return GetItem(pos.X, pos.Y);
     }
     // Swap
     public void Swap(int slot1, int slot2)
     {
-        Xna.Point pos1 = Expand(slot1);
-        Xna.Point pos2 = Expand(slot2);
+        Point pos1 = Expand(slot1);
+        Point pos2 = Expand(slot2);
         (Items[pos2.X, pos2.Y], Items[pos1.X, pos1.Y]) = (Items[pos1.X, pos1.Y], Items[pos2.X, pos2.Y]);
     }
-    public void Swap(Xna.Point slot1, Xna.Point slot2)
+    public void Swap(Point slot1, Point slot2)
     {
         (Items[slot2.X, slot2.Y], Items[slot1.X, slot1.Y]) = (Items[slot1.X, slot1.Y], Items[slot2.X, slot2.Y]);
     }
     // SetSlot
-    public void SetSlot(Xna.Point pos, Item? item)
+    public void SetSlot(Point pos, Item? item)
     {
         if (pos.X >= 0 && pos.X < Width && pos.Y >= 0 && pos.Y < Height) Items[pos.X, pos.Y] = item;
     }
@@ -311,7 +272,8 @@ public class Inventory
         }
     }
     // Consume
-    public void Consume(int idx) {
+    public void Consume(int idx)
+    {
         Point expanded = Expand(idx);
         if (expanded.X < 0 || expanded.X >= Width || expanded.Y < 0 || expanded.Y >= Height) return; // Out of bounds
         Items[expanded.X, expanded.Y] = null; // Remove item from inventory
@@ -335,16 +297,16 @@ public class Inventory
         }
     }
     // MouseSlot
-    public Xna.Point GetMouseSlot(MouseState MouseState)
+    public Point GetMouseSlot()
     {
         // x coord
         int left = Constants.Middle.X - (slotSize.X * Width / 2);
-        int x = (MouseState.Position.X - left) / (slotSize.X + 4);
+        int x = (InputManager.MousePosition.X - left) / (slotSize.X + 4);
         if (x < 0 || x >= Width) return Constants.NegativePoint; // Out of bounds
 
         // y coord
-        int top = Constants.Window.Y - (GetTexture(TextureID.Slot).Height + 8) * (Height + 1) - (Height != 0 ? 20 : 0);
-        int y = (MouseState.Position.Y - top) / (slotSize.Y + 8);
+        int top = Constants.Window.Y - (TextureManager.GetTexture(TextureManager.TextureID.Slot).Height + 8) * (Height + 1) - (Height != 0 ? 20 : 0);
+        int y = (InputManager.MousePosition.Y - top) / (slotSize.Y + 8);
         y = Height - y; // Flip y axis
         if (y < 0 || y >= Height) return Constants.NegativePoint; // Out of bounds
 
@@ -353,15 +315,15 @@ public class Inventory
     // Utilites
     // Flatten
     public int Flatten(int x, int y) { return y * Width + x; }
-    public int Flatten(Xna.Vector2 pos) { return Flatten((int)pos.X, (int)pos.Y); }
-    public int Flatten(Xna.Point pos) { return Flatten(pos.X, pos.Y); }
+    public int Flatten(Vector2 pos) { return Flatten((int)pos.X, (int)pos.Y); }
+    public int Flatten(Point pos) { return Flatten(pos.X, pos.Y); }
     // Expand
-    public Xna.Point Expand(int slot)
+    public Point Expand(int slot)
     {
         int columns = Items.GetLength(0);
-        return new Xna.Point(slot % columns, slot / columns);
+        return new Point(slot % columns, slot / columns);
     }
-    // Booleans
+    // IsFull
     public bool IsFull()
     {
         for (int x = 0; x < Items.GetLength(0); x++)

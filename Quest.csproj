@@ -22,7 +22,12 @@
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="TextureManager.cs" />
+    <Compile Remove="Editor\EditorWindow.cs" />
+    <Compile Remove="Editor\GameManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Editor\EditorWindow.cs" />
+    <None Include="Editor\GameManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MonoGame.Extended" Version="4.1.0" />
