@@ -23,11 +23,11 @@ public class Door : Tile
     }
     public override void OnPlayerCollide(GameManager game)
     {
-        if (game.PlayerManager.Inventory.Contains(Key))
+        if (game.Inventory.Contains(Key))
         {
             if (ConsumeKey)
             {
-                game.PlayerManager.Inventory.Consume(Key);
+                game.Inventory.Consume(Key);
                 game.UIManager.Notification($"-1 {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
             }
             IsWalkable = true;

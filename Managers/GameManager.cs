@@ -3,17 +3,18 @@ public class GameManager
 {
     public LevelManager LevelManager { get; private set; }
     public UIManager UIManager { get; private set; }
-    public PlayerManager PlayerManager { get; private set; }
     public float DeltaTime { get; private set; }
     public float TotalTime { get; private set; }
     public SpriteBatch Batch { get; private set; }
 
-    public GameManager(SpriteBatch batch, LevelManager level, UIManager ui, PlayerManager player)
+    public Inventory Inventory { get; set; }
+
+    public GameManager(SpriteBatch batch, Inventory inventory, LevelManager level, UIManager ui)
     {
         Batch = batch;
+        Inventory = inventory;
         LevelManager = level;
         UIManager = ui;
-        PlayerManager = player;
         DeltaTime = 0;
         TotalTime = 0;
     }
@@ -30,8 +31,7 @@ public class GameManager
         LevelManager.LoadLevel(this, level);
 
         UIManager.HealthBar.CurrentValue = UIManager.HealthBar.MaxValue;
-        PlayerManager.UpdatePositions(this);
-        PlayerManager.Inventory = new(6, 4);
+        //PlayerManager.Inventory = new(6, 4);
 
         CameraManager.Camera = LevelManager.Level.Spawn.ToVector2();
         CameraManager.Camera = LevelManager.Level.Spawn.ToVector2();

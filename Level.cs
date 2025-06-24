@@ -1,17 +1,16 @@
 ﻿namespace Quest;
 
-
 public class Level
 {
-    public Enemy[] Enemies { get; set; }
-    public Decal[] Decals { get; set; }
-    public NPC[] NPCs { get; private set; }
+    public List<Enemy> Enemies { get; private set; }
+    public List<Decal> Decals { get; private set; }
+    public List<NPC> NPCs { get; private set; }
     public string Name { get; private set; }
     public List<Loot> Loot { get; private set; }
     public Tile[] Tiles { get; private set; }
-    public Point Spawn { get; private set; }
-    public Color Tint { get; private set; }
-    public Level(string name, Tile[] tiles, Point spawn, NPC[] npcs, Loot[] loot, Decal[] decals, Enemy[] enemies, Color? tint = null)
+    public Point Spawn { get; set; }
+    public Color Tint { get; set; }
+    public Level(string name, Tile[] tiles, Point spawn, List<NPC> npcs, List<Loot> loot, List<Decal> decals, List<Enemy> enemies, Color? tint = null)
     {
         // Initialize the level
         Name = name;

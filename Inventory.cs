@@ -48,6 +48,8 @@ public class Inventory
     }
     public void Update(GameManager gameManager)
     {
+        if (Width < 1 || Height < 1) return; // No slots to update
+
         // Scroll slot
         if (InputManager.ScrollWheelChange > 0)
             EquippedSlot = (EquippedSlot + 1) % Width;
@@ -60,6 +62,8 @@ public class Inventory
     }
     public void Draw(GameManager gameManager)
     {
+        if (Width < 1 || Height < 1) return; // No slots to draw
+
         // Draw
         for (int x = 0; x < Width; x++)
         {

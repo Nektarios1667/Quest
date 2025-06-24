@@ -17,18 +17,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
     <Optimize>True</Optimize>
+    <DefineConstants>$(DefineConstants);EDITOR</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="Editor\EditorWindow.cs" />
-    <Compile Remove="Editor\GameManager.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Editor\EditorWindow.cs" />
-    <None Include="Editor\GameManager.cs" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MonoGame.Extended" Version="4.1.0" />
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.3.0" />

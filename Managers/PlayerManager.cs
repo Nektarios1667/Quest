@@ -23,7 +23,11 @@ public class PlayerManager
 
         // Toggle inventory
         if (InputManager.KeyPressed(Keys.I))
+        {
             Inventory.Opened = !Inventory.Opened;
+            if (Inventory.Opened) StateManager.OverlayState = OverlayState.Inventory;
+            else StateManager.OverlayState = OverlayState.None;
+        }
 
         // Loot
         DebugManager.StartBenchmark("UpdateLoot");

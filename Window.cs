@@ -81,7 +81,7 @@ public class Window : Game
         uiManager = new();
         levelManager = new();
         menuManager = new();
-        gameManager = new(spriteBatch, levelManager, uiManager, playerManager);
+        gameManager = new(spriteBatch, playerManager.Inventory, levelManager, uiManager);
 
         // Levels
         levelManager.ReadLevel(gameManager.UIManager, "island_house");

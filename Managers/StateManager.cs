@@ -1,4 +1,6 @@
-﻿namespace Quest.Managers;
+﻿using SharpDX.Win32;
+
+namespace Quest.Managers;
 public enum GameState
 {
     MainMenu,
@@ -6,7 +8,14 @@ public enum GameState
     Game,
     Death,
 }
+public enum OverlayState
+{
+    None,
+    Inventory,
+    Pause,
+}
 public static class StateManager
 {
     public static GameState State { get; set; } = GameState.MainMenu;
+    public static OverlayState OverlayState { get; set; } = OverlayState.None;
 }

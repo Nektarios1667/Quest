@@ -37,7 +37,7 @@ public class Enemy
         if (playerDistSq < AttackRange * AttackRange && AttackCooldown <= 0)
         {
             Mode = "attack";
-            gameManager.PlayerManager.DamagePlayer(gameManager, Attack);
+            // TODO Damage player
             AttackCooldown = AttackSpeed;
         }
         // Move

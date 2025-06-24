@@ -7,6 +7,7 @@ public class LevelManager
 {
     public List<Level> Levels { get; private set; }
     public Level Level { get; private set; }
+
     public static readonly Point lootStackOffset = new(4, 4);
     public LevelManager()
     {
@@ -120,6 +121,28 @@ public class LevelManager
         }
         // If not found throw an error
         Logger.Error($"Level '{levelName}' not found in stored levels. Make sure the level file has been read before loading.", true);
+    }
+    public void LoadLevelObject(GameManager gameManager, Level level)
+    {
+        // Close dialogs
+        if (Level != null)
+        {
+            foreach (NPC npc in Level.NPCs)
+            {
+                npc.DialogBox.IsVisible = false;
+                npc.DialogBox.Displayed = "";
+            }
+        }
+
+        // Load the level data
+        Level = level;
+
+        // MiniMap
+        gameManager.UIManager.RefreshMiniMap();
+
+        // Spawn
+        CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
+        CameraManager.Camera = CameraManager.CameraDest;
     }
     public void UnloadLevel(int levelIndex)
     {
@@ -240,7 +263,7 @@ public class LevelManager
             throw new ArgumentException($"Invalid level size - expected {Constants.MapSize.X}x{Constants.MapSize.X} tiles.");
 
         // Make and add the level
-        Level created = new(filename, tilesBuffer, spawn, [.. npcBuffer], [.. lootBuffer], [.. decalBuffer], [], tint);
+        Level created = new(filename, tilesBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, [], tint);
         Levels.Add(created);
     }
     public static Tile TileFromId(int id, Point location)
@@ -317,7 +340,8 @@ public class LevelManager
         if (Level.Loot.Contains(loot))
         {
             gameManager.UIManager.LootNotifications.AddNotification($"+{loot.Item.DisplayText}");
-            gameManager.PlayerManager.Inventory.AddItem(loot.Item);
+            // TODO Pickup item
+            // gameManager.PlayerManager.Inventory.AddItem(loot.Item);
             Level.Loot.Remove(loot);
         }
     }

@@ -48,7 +48,7 @@ public class UIManager
         DebugManager.EndBenchmark("InventoryDraw");
 
         // Minimap
-        if (gameManager.PlayerManager.Inventory.Opened)
+        if (StateManager.OverlayState == OverlayState.Inventory)
             DrawMiniMap(device, gameManager);
 
         // Debug
