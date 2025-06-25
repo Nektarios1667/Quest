@@ -1,4 +1,6 @@
-﻿namespace Quest.Managers;
+﻿using Microsoft.Xna.Framework.Content;
+
+namespace Quest.Managers;
 public class GameManager
 {
     public LevelManager LevelManager { get; private set; }
@@ -9,7 +11,7 @@ public class GameManager
 
     public Inventory Inventory { get; set; }
 
-    public GameManager(SpriteBatch batch, Inventory inventory, LevelManager level, UIManager ui)
+    public GameManager(ContentManager content, SpriteBatch batch, Inventory inventory, LevelManager level, UIManager ui)
     {
         Batch = batch;
         Inventory = inventory;
@@ -17,6 +19,16 @@ public class GameManager
         UIManager = ui;
         DeltaTime = 0;
         TotalTime = 0;
+
+        // Load sounds
+        SoundManager.LoadSound(content, "Footstep", "Sounds/Effects/Footstep");
+        SoundManager.LoadSound(content, "Trinkets", "Sounds/Effects/Trinkets");
+        SoundManager.LoadSound(content, "Click", "Sounds/Effects/Click");
+        SoundManager.LoadSound(content, "DoorLocked", "Sounds/Effects/DoorLocked");
+        SoundManager.LoadSound(content, "DoorUnlock", "Sounds/Effects/DoorUnlock");
+        SoundManager.LoadSound(content, "Spook", "Sounds/Effects/Spook");
+        SoundManager.LoadSound(content, "Typing", "Sounds/Effects/Typing");
+        SoundManager.LoadSound(content, "Whoosh", "Sounds/Effects/Whoosh");
     }
     public void Update(float deltaTime)
     {

@@ -29,10 +29,21 @@ public class Door : Tile
             {
                 game.Inventory.Consume(Key);
                 game.UIManager.Notification($"-1 {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
+                SoundManager.PlaySoundInstance("DoorUnlock");
             }
             IsWalkable = true;
         }
         else
+        {
+            // Notif
             game.UIManager.Notification($"{StringTools.FillCamelSpaces(Key.Name)} needed to unlock.", Color.Red, 5);
+
+            // Sound fx
+            string timerName = $"DoorLocked_{Location.X + Location.Y * Constants.MapSize.X}";
+            if (!TimerManager.Exists(timerName) || TimerManager.IsComplete(timerName)) {
+                SoundManager.PlaySoundInstance("DoorLocked");
+                TimerManager.SetTimer(timerName, 5, null);
+            }
+        }
     }
 }

@@ -116,11 +116,15 @@ public class Inventory
                 Item? mouseItem = GetItem(mouseSlot);
                 Item? selectedItem = GetItem(SelectedSlot);
                 if (SameItem(mouseItem, selectedItem))
+                {
                     MergeItems(selectedItem, mouseItem);
+                    SoundManager.PlaySound("Trinkets");
+                }
                 else if (selectedItem != null)
                 {
                     // Swap items
                     Swap(SelectedSlot, mouseSlot);
+                    SoundManager.PlaySound("Trinkets");
                     SelectedSlot = mouseSlot;
                 }
             }
@@ -142,11 +146,13 @@ public class Inventory
                         move = (byte)Math.Min(move, mouseItem!.Max - mouseItem.Amount);
                         mouseItem!.Amount += move;
                         selectedItem.Amount -= move;
+                        SoundManager.PlaySound("Trinkets");
                     }
                     else if (mouseItem == null)
                     {
                         SetSlot(mouseSlot, new Item(selectedItem.Name, selectedItem.Description, move, selectedItem.Max));
                         selectedItem.Amount -= move;
+                        SoundManager.PlaySound("Trinkets");
                     }
                     if (selectedItem.Amount < 1)
                         SetSlot(SelectedSlot, null); // Remove empty item from selected slot
@@ -167,6 +173,7 @@ public class Inventory
             Item? item = GetItem(HoverSlot);
             if (item != null) gameManager.LevelManager.DropLoot(gameManager, new Loot(item, CameraManager.PlayerFoot + Constants.MageDrawShift, gameManager.TotalTime));
             SetSlot(HoverSlot, null);
+            SoundManager.PlaySoundInstance("Trinkets");
         }
     }
     // Slot interactions

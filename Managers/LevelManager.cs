@@ -21,10 +21,13 @@ public class LevelManager
     }
     public void Draw(GameManager gameManager)
     {
-        DrawTiles(gameManager);
-        DrawDecals(gameManager);
-        DrawLoot(gameManager);
-        DrawCharacters(gameManager);
+        if (StateManager.State == GameState.Game || StateManager.State == GameState.Editor)
+        {
+            DrawTiles(gameManager);
+            DrawDecals(gameManager);
+            DrawLoot(gameManager);
+            DrawCharacters(gameManager);
+        }
     }
     public void DrawTiles(GameManager gameManager)
     {
@@ -86,7 +89,7 @@ public class LevelManager
     public void LoadLevel(GameManager gameManager, int levelIndex)
     {
         // Check index
-        if (levelIndex < 0 || levelIndex >= Levels.Count)
+        if (levelIndex < -Levels.Count || levelIndex >= Levels.Count)
             throw new ArgumentOutOfRangeException(nameof(levelIndex), "Invalid level index.");
 
         // Close dialogs
@@ -100,6 +103,7 @@ public class LevelManager
         }
 
         // Load the level data
+        if (levelIndex < 0) levelIndex = Levels.Count - Math.Abs(levelIndex);
         Level = Levels[levelIndex];
 
         // MiniMap
@@ -340,8 +344,7 @@ public class LevelManager
         if (Level.Loot.Contains(loot))
         {
             gameManager.UIManager.LootNotifications.AddNotification($"+{loot.Item.DisplayText}");
-            // TODO Pickup item
-            // gameManager.PlayerManager.Inventory.AddItem(loot.Item);
+             gameManager.Inventory.AddItem(loot.Item);
             Level.Loot.Remove(loot);
         }
     }

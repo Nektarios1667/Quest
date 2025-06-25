@@ -1,8 +1,8 @@
 ﻿namespace Quest.Managers;
-public class TimerManager
+public static class TimerManager
 {
-    private Dictionary<string, Timer> timers = [];
-    private List<string> removals = [];
+    private static Dictionary<string, Timer> timers = [];
+    private static List<string> removals = [];
     public class Timer
     {
         public float left;
@@ -23,6 +23,8 @@ public class TimerManager
         }
         public void Update(GameManager manager)
         {
+            DebugManager.StartBenchmark("TimerUpdates");
+
             left -= manager.DeltaTime;
             if (left <= 0f)
             {
@@ -32,41 +34,43 @@ public class TimerManager
                 if (repetitions > completions)
                     left = duration;
             }
+
+            DebugManager.EndBenchmark("TimerUpdates");
         }
 
         public bool IsExpired => left <= 0f && completions >= repetitions;
     }
-    public Timer NewTimer(string name, float duration, Action? call, int repetitions = 1)
+    public static Timer NewTimer(string name, float duration, Action? call, int repetitions = 1)
     {
         if (!timers.ContainsKey(name))
             timers[name] = new(duration, call, repetitions);
         return timers[name];
     }
-    public Timer SetTimer(string name, float duration, Action? call, int repetitions = 1)
+    public static Timer SetTimer(string name, float duration, Action? call, int repetitions = 1)
     {
         timers[name] = new(duration, call, repetitions);
         return timers[name];
     }
-    public void Remove(string name)
+    public static void Remove(string name)
     {
         if (!timers.Remove(name))
             throw new KeyNotFoundException($"No timer with name '{name}' found");
     }
-    public void TryRemove(string name) { timers.Remove(name); }
-    public float TimeLeft(string name)
+    public static void TryRemove(string name) { timers.Remove(name); }
+    public static float TimeLeft(string name)
     {
         if (timers.TryGetValue(name, out var timer))
             return timer.left;
         throw new KeyNotFoundException($"No timer with name '{name}' found");
     }
-    public bool IsComplete(string name)
+    public static bool IsComplete(string name)
     {
         if (timers.TryGetValue(name, out var timer))
             return timer.left <= 0;
         throw new KeyNotFoundException($"No timer with name '{name}' found");
     }
-    public bool Exists(string name) => timers.ContainsKey(name);
-    public void Update(GameManager gameManager)
+    public static bool Exists(string name) => timers.ContainsKey(name);
+    public static void Update(GameManager gameManager)
     {
         // Update timers
         foreach (var (key, timer) in timers)

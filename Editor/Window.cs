@@ -14,7 +14,6 @@ public class Window : Game
     private GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
     private GameManager gameManager;
-    private TimerManager timerManager;
     private UIManager uiManager;
     private LevelManager levelManager;
     private MenuManager menuManager;
@@ -86,17 +85,17 @@ public class Window : Game
         TextureManager.LoadTextures(Content);
 
         // Managers
-        timerManager = new();
         uiManager = new();
         levelManager = new();
         menuManager = new();
-        gameManager = new(spriteBatch, new(0, 0), levelManager, uiManager);
+        gameManager = new(Content, spriteBatch, new(0, 0), levelManager, uiManager);
+        StateManager.State = GameState.Editor;
 
         // Levels
-        levelManager.ReadLevel(gameManager.UIManager, "island_house");
-        levelManager.ReadLevel(gameManager.UIManager, "island_house_basement");
-        levelManager.LoadLevel(gameManager, 0);
-        ReadLevel("island_house");
+        levelManager.ReadLevel(uiManager, "island_house");
+        levelManager.ReadLevel(uiManager, "island_house_basement");
+
+        levelManager.LoadLevel(gameManager, "island_house");
 
         // Shaders
         Grayscale = Content.Load<Effect>("Shaders/Grayscale");
@@ -105,7 +104,7 @@ public class Window : Game
         CursorArrow = Content.Load<Texture2D>("Images/Gui/CursorArrow");
 
         // Timer
-        timerManager.NewTimer("frameTimeUpdate", 1, UpdateFrameTimes, int.MaxValue);
+        TimerManager.NewTimer("frameTimeUpdate", 1, UpdateFrameTimes, int.MaxValue);
     }
 
     protected override void Update(GameTime gameTime)
@@ -134,11 +133,12 @@ public class Window : Game
         DebugManager.EndBenchmark("InputUpdate");
 
         // Open file
-        if (InputManager.AllKeysDown(Keys.O, Keys.LeftControl))
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.O))
         {
             string filename = Logger.Input("Open level file: ");
             try {
                 levelManager.ReadLevel(uiManager, filename);
+                levelManager.LoadLevel(gameManager, filename);
                 Logger.Log($"Opened level '{filename}'.");
             } catch (Exception ex) {
                 Logger.Error($"Failed to open level '{filename}': {ex.Message}");
@@ -172,14 +172,23 @@ public class Window : Game
             SetTile(tile);
             Logger.Log($"Set tile to '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}.");
         }
+
         // Edit options
-        if (InputManager.RMouseClicked) EditTile(mouseTile);
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.M)) EditTile(mouseTile);
 
         // Erase (set to sky)
-        if (InputManager.MMouseClicked && mouseTile.Type != TileType.Sky)
+        if (InputManager.RMouseDown && mouseTile.Type != TileType.Sky)
         {
             SetTile(new Sky(mouseCoord));
             Logger.Log($"Set tile to '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}.");
+        }
+
+        // Pick
+        if (InputManager.MMouseClicked)
+        {
+            Selection = (int)mouseTile.Type;
+            Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileNames[Selection]);
+            Logger.Log($"Picked tile '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}.");
         }
 
         // Fill
@@ -201,7 +210,7 @@ public class Window : Game
         DebugManager.Update();
         CameraManager.Update(delta);
 
-        timerManager.Update(gameManager);
+        TimerManager.Update(gameManager);
         gameManager.Update(delta);
         levelManager.Update(gameManager);
         uiManager.Update(gameManager);
@@ -495,93 +504,6 @@ public class Window : Game
             byte max = Logger.InputByte("Max: ", fallback: Constants.MaxStack);
             levelManager.Level.Loot.Add(new Loot(new Item(name, description, amount, max), InputManager.MousePosition + CameraManager.Camera.ToPoint() - Constants.Middle, gameManager.TotalTime));
         }
-    }
-    public void ReadLevel(string filename)
-    {
-        // Check exists
-        if (!File.Exists($"Levels/{filename}.lvl"))
-            throw new FileNotFoundException("Level file not found.", filename);
-
-        // Parse
-        Tile[] tilesBuffer;
-        using FileStream fileStream = File.OpenRead($"Levels/{filename}.lvl");
-        using GZipStream gzipStream = new(fileStream, CompressionMode.Decompress);
-        using BinaryReader reader = new(gzipStream);
-        // Make buffers
-        tilesBuffer = new Tile[Constants.MapSize.X * Constants.MapSize.Y];
-        List<NPC> npcBuffer = [];
-        List<Loot> lootBuffer = [];
-        List<Decal> decalBuffer = [];
-
-        // Tint
-        Color tint = new(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
-
-        // Spawn
-        Point spawn = new(reader.ReadByte(), reader.ReadByte());
-        CameraManager.Camera = (spawn * Constants.TileSize).ToVector2();
-
-        // Tiles
-        for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
-        {
-            // Read tile data
-            int type = reader.ReadByte();
-            // Check if valid tile type
-            if (type < 0 || type >= Enum.GetValues(typeof(TileType)).Length)
-                throw new ArgumentException($"Invalid tile type {type} @ {i % Constants.MapSize.X}, {i / Constants.MapSize.X} in level file.");
-            // Extra properties
-            Tile tile;
-            if (type == (int)TileType.Stairs)
-                tile = new Stairs(new(i % Constants.MapSize.X, i / Constants.MapSize.X), reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
-            else if (type == (int)TileType.Door)
-                tile = new Door(new(i % Constants.MapSize.X, i / Constants.MapSize.X), new Item(reader.ReadString(), reader.ReadString(), 1, 1));
-            else // Regular tile
-                tile = LevelManager.TileFromId(type, new(i % Constants.MapSize.X, i / Constants.MapSize.X));
-            int idx = tile.Location.X + tile.Location.Y * Constants.MapSize.X;
-            tilesBuffer[idx] = tile;
-        }
-
-        // NPCs
-        byte npcCount = reader.ReadByte();
-        for (int n = 0; n < npcCount; n++)
-        {
-            string name = reader.ReadString();
-            string dialog = reader.ReadString();
-            Point location = new(reader.ReadByte(), reader.ReadByte());
-            int scale = reader.ReadByte();
-            TextureID texture = (TextureID)reader.ReadByte();
-            npcBuffer.Add(new NPC(uiManager, texture, location, name, dialog, Color.White, scale / 10f));
-        }
-
-        // Loot
-        byte lootCount = reader.ReadByte();
-        for (int n = 0; n < lootCount; n++)
-        {
-            string name = reader.ReadString();
-            string description = reader.ReadString();
-            byte amount = reader.ReadByte();
-            byte max = reader.ReadByte();
-            Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
-            lootBuffer.Add(new Loot(new Item(name, description, amount, max), location, gameManager.TotalTime));
-        }
-
-        // Decals
-        byte decalCount = reader.ReadByte();
-        for (int n = 0; n < decalCount; n++)
-        {
-            DecalType type = (DecalType)reader.ReadByte();
-            Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
-            decalBuffer.Add(LevelManager.DecalFromId(reader.ReadByte(), location));
-        }
-
-        // Check null
-        if (tilesBuffer == null)
-            throw new ArgumentException("No tiles found in level file.");
-        // Check size
-        if (tilesBuffer.Length != Constants.MapSize.X * Constants.MapSize.Y)
-            throw new ArgumentException($"Invalid level size - expected {Constants.MapSize.X}x{Constants.MapSize.X} tiles.");
-
-        // Make and add the level
-        levelManager.LoadLevelObject(gameManager, new(filename, tilesBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, [], tint));
     }
     public void SaveLevel()
     {

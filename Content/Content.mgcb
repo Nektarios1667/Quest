@@ -72,18 +72,6 @@
 /processorParam:TextureFormat=Color
 /build:Images/Characters/Ghost.png
 
-#begin Images/Characters/Ghost.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Characters/Ghost.png
-
 #begin Images/Characters/GrayMage.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -461,4 +449,76 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Shaders/Grayscale.fx
+
+#begin Sounds/Effects/Click.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Click.wav
+
+#begin Sounds/Effects/DoorLocked.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/DoorLocked.wav
+
+#begin Sounds/Effects/DoorUnlock.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/DoorUnlock.wav
+
+#begin Sounds/Effects/Footstep.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Footstep.wav
+
+#begin Sounds/Effects/Spook.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Spook.wav
+
+#begin Sounds/Effects/Trinkets.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Trinkets.wav
+
+#begin Sounds/Effects/Typing.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Typing.wav
+
+#begin Sounds/Effects/Whoosh.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Whoosh.wav
+
+#begin Sounds/Music/CavesOfDawn.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/CavesOfDawn.mp3
+
+#begin Sounds/Music/Clouds.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/Clouds.mp3
+
+#begin Sounds/Music/NightmareAlley.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/NightmareAlley.mp3
+
+#begin Sounds/Music/TerrorHeights.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/TerrorHeights.mp3
 

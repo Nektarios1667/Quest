@@ -27,6 +27,7 @@ public class PlayerManager
             Inventory.Opened = !Inventory.Opened;
             if (Inventory.Opened) StateManager.OverlayState = OverlayState.Inventory;
             else StateManager.OverlayState = OverlayState.None;
+            SoundManager.PlaySound("Click");
         }
 
         // Loot
@@ -68,11 +69,17 @@ public class PlayerManager
     }
     public void Draw(GameManager gameManager)
     {
-        DrawPlayer(gameManager);
-        if (Constants.DRAW_HITBOXES)
-            DrawPlayerHitbox(gameManager);
+        switch (StateManager.State)
+        {
+            case GameState.Game or GameState.Editor:
+                DrawPlayer(gameManager);
+                if (Constants.DRAW_HITBOXES)
+                    DrawPlayerHitbox(gameManager);
 
-        Inventory.Draw(gameManager);
+                Inventory.Draw(gameManager);
+                break;
+        }
+
     }
     public void DrawPlayer(GameManager gameManager)
     {

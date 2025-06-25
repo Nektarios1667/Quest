@@ -10,7 +10,6 @@ public class Window : Game
     private GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
     private GameManager gameManager;
-    private TimerManager timerManager;
     private PlayerManager playerManager;
     private UIManager uiManager;
     private LevelManager levelManager;
@@ -76,12 +75,11 @@ public class Window : Game
         TextureManager.LoadTextures(Content);
 
         // Managers
-        timerManager = new();
         playerManager = new();
         uiManager = new();
         levelManager = new();
         menuManager = new();
-        gameManager = new(spriteBatch, playerManager.Inventory, levelManager, uiManager);
+        gameManager = new(Content, spriteBatch, playerManager.Inventory, levelManager, uiManager);
 
         // Levels
         levelManager.ReadLevel(gameManager.UIManager, "island_house");
@@ -95,7 +93,7 @@ public class Window : Game
         CursorArrow = Content.Load<Texture2D>("Images/Gui/CursorArrow");
 
         // Timer
-        timerManager.NewTimer("frameTimeUpdate", 1, UpdateFrameTimes, int.MaxValue);
+        TimerManager.NewTimer("frameTimeUpdate", 1, UpdateFrameTimes, int.MaxValue);
     }
 
     protected override void Update(GameTime gameTime)
@@ -112,8 +110,8 @@ public class Window : Game
         InputManager.Update();
         DebugManager.Update();
         CameraManager.Update(delta);
+        TimerManager.Update(gameManager);
 
-        timerManager.Update(gameManager);
         gameManager.Update(delta);
         playerManager.Update(gameManager);
         levelManager.Update(gameManager);

@@ -11,7 +11,7 @@ public class MenuManager
             case GameState.Settings:
                 // DrawSettings(gameManager);
                 break;
-            case GameState.Game:
+            case GameState.Game or GameState.Editor:
                 // DrawGame(gameManager);
                 break;
             case GameState.Death:

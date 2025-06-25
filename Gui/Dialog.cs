@@ -37,6 +37,8 @@ public class Dialog : Widget
     }
     public override void Update(float deltaTime)
     {
+        if (!IsVisible) return;
+
         if (Displayed.Length < Text.Length)
         {
             charWait -= deltaTime;
@@ -44,6 +46,7 @@ public class Dialog : Widget
             {
                 Displayed += Text[Displayed.Length];
                 Displayed = SoftwrapWords(Displayed, Font, Inside);
+                SoundManager.PlaySoundInstance("Typing", pitch:RandomManager.RandomFloat() / 4 - .125f, volume:.5f);
                 charWait = CharDelay;
             }
         }

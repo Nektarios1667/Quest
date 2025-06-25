@@ -6,6 +6,7 @@ public enum GameState
     MainMenu,
     Settings,
     Game,
+    Editor,
     Death,
 }
 public enum OverlayState

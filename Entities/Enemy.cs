@@ -31,6 +31,8 @@ public class Enemy
     }
     public virtual void Update(GameManager gameManager)
     {
+        if (StateManager.State != GameState.Game) return;
+
         // View range
         float playerDistSq = Vector2.DistanceSquared(Location, CameraManager.CameraDest);
         // Attack
