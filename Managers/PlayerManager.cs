@@ -41,6 +41,7 @@ public class PlayerManager
             if (PointTools.DistanceSquared(CameraManager.PlayerFoot, loot.Location + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
             {
                 gameManager.LevelManager.Pickup(gameManager, loot);
+                SoundManager.PlaySound("Pickup", pitch:RandomManager.RandomFloat() / 2 - .25f);
             }
         }
         DebugManager.EndBenchmark("UpdateLoot");

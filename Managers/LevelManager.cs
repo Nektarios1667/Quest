@@ -344,7 +344,7 @@ public class LevelManager
         if (Level.Loot.Contains(loot))
         {
             gameManager.UIManager.LootNotifications.AddNotification($"+{loot.Item.DisplayText}");
-             gameManager.Inventory.AddItem(loot.Item);
+            gameManager.Inventory.AddItem(loot.Item);
             Level.Loot.Remove(loot);
         }
     }
