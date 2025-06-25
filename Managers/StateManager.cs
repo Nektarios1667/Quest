@@ -15,8 +15,15 @@ public enum OverlayState
     Inventory,
     Pause,
 }
+public enum Mood
+{
+    Calm,
+    Dark,
+    Epic,
+}
 public static class StateManager
 {
     public static GameState State { get; set; } = GameState.MainMenu;
     public static OverlayState OverlayState { get; set; } = OverlayState.None;
+    public static Mood Mood { get; set; } = Mood.Calm;
 }

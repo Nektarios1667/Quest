@@ -74,6 +74,9 @@ public class Window : Game
         // Textures
         TextureManager.LoadTextures(Content);
 
+        // Soundtracks
+        SoundtrackManager.LoadSoundtracks(Content);
+
         // Managers
         playerManager = new();
         uiManager = new();
@@ -111,6 +114,7 @@ public class Window : Game
         DebugManager.Update();
         CameraManager.Update(delta);
         TimerManager.Update(gameManager);
+        SoundtrackManager.Update();
 
         gameManager.Update(delta);
         playerManager.Update(gameManager);
@@ -195,6 +199,8 @@ public class Window : Game
         debugSb.Append(playerManager.Inventory.Opened);
         debugSb.Append("\nGUI: ");
         debugSb.Append(uiManager.Gui.Widgets.Count);
+        debugSb.Append("\nMusic: ");
+        debugSb.Append(SoundtrackManager.Playing?.File ?? "none");
 
         spriteBatch.DrawString(TextureManager.Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);
     }
