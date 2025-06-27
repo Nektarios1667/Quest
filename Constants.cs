@@ -10,6 +10,7 @@ public static class Constants
     public static bool LOG_INFO = true; // Log game info
     public static bool FRAME_BAR = true; // Frame time graphical bar
     public static bool DRAW_HITBOXES = true; // Draw hitboxes for entities
+    public static bool COMMANDS = true; // Allow console commands
 
     // Tile and map
     public static readonly Point TileSize = new(64, 64); // In-game tile size
@@ -34,7 +35,7 @@ public static class Constants
 
     // Game
     public static readonly string[] TileNames = ["Sky", "Grass", "Water", "StoneWall", "Stairs", "Flooring", "Sand", "Dirt", "Darkness", "Door"];
-    public const int PlayerSpeed = 200;
+    public static int PlayerSpeed = 200;
     public const int MaxStack = 10;
 
     // Rendering and positioning
@@ -44,9 +45,6 @@ public static class Constants
     public static readonly Point MageSize = new(80, 80); // Size of the mage sprite in pixels
     public static readonly Point MageHalfSize = new(40, 40); // Half size of the mage sprite in pixels
     public static readonly Point MageDrawShift = new(MageHalfSize.X, 0); // Used for center aligning mages
-
-    // Items
-    public static readonly Item Key = new("Key", "A key used to unlock doors.", 1, 1);
 
     // Colors
     public static readonly Color NearBlack = new(85, 85, 85);

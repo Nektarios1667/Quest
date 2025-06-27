@@ -1,4 +1,4 @@
-﻿namespace Quest.Tools;
+﻿namespace Quest.Utilities;
 
 public static class Logger
 {
@@ -40,10 +40,10 @@ public static class Logger
         if (resp < 0 || resp > 255) return fallback;
         return (byte)resp;
     }
-    public static TextureManager.TextureID InputTexture(string message, TextureManager.TextureID fallback = TextureManager.TextureID.Null)
+    public static TextureID InputTexture(string message, TextureID fallback = TextureID.Null)
     {
         string resp = Input(message);
-        if (Enum.TryParse(resp, true, out TextureManager.TextureID texture) && TextureManager.Metadata[texture].Type == "character")
+        if (Enum.TryParse(resp, true, out TextureID texture) && TextureManager.Metadata[texture].Type == "character")
             return texture;
         else
         {

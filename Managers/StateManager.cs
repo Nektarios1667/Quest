@@ -1,6 +1,4 @@
-﻿using SharpDX.Win32;
-
-namespace Quest.Managers;
+﻿namespace Quest.Managers;
 public enum GameState
 {
     MainMenu,

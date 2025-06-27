@@ -1,22 +1,23 @@
 ﻿using System.Linq;
 
-namespace Quest.Entities;
+namespace Quest.Decals;
 public enum DecalType
 {
-    Footprint = 0,
-    Torch = 1,
-    BlueTorch = 2,
-    Sign = 3,
+    Footprint,
+    Torch,
+    BlueTorch,
+    WaterPuddle,
+    BloodPuddle,
 }
 public class Decal
 {
-    protected static readonly Dictionary<DecalType, TextureManager.TextureID> TileToTexture = Enum.GetValues<DecalType>()
+    protected static readonly Dictionary<DecalType, TextureID> TileToTexture = Enum.GetValues<DecalType>()
     .ToDictionary(
         tileType => tileType,
-        tileType => Enum.TryParse<TextureManager.TextureID>(tileType.ToString(), out var texture) ? texture : TextureManager.TextureID.Null
+        tileType => Enum.TryParse<TextureID>(tileType.ToString(), out var texture) ? texture : TextureID.Null
     );
     // Auto generated - no setter
-    public TextureManager.TextureID Texture { get; }
+    public TextureID Texture { get; }
     public Point Location { get; }
     // Properties - protected setter
     public Color Tint { get; protected set; } = Color.White;
@@ -33,7 +34,7 @@ public class Decal
         // Draw
         Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
         Point size = TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap;
-        Rectangle source = TextureManager.GetAnimationSource(Texture, gameManager.TotalTime, duration: .75f);
-        TextureManager.DrawTexture(gameManager.Batch, Texture, dest, source: source, scale: 4, color: Tint);
+        Rectangle source = GetAnimationSource(Texture, gameManager.TotalTime, duration: .75f);
+        DrawTexture(gameManager.Batch, Texture, dest, source: source, scale: 4, color: Tint);
     }
 }

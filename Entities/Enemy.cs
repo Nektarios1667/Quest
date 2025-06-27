@@ -1,6 +1,7 @@
 ﻿namespace Quest.Entities;
 public class Enemy
 {
+    public bool IsAlive => Health >= 0;
     public string Name { get; private set; }
     public int Health { get; private set; }
     public int Attack { get; private set; }
@@ -10,11 +11,12 @@ public class Enemy
     public int Speed { get; private set; }
     public int ViewRange { get; private set; }
     public int AttackRange { get; private set; }
-    public TextureManager.TextureID Texture { get; private set; }
+    public TextureID Texture { get; private set; }
     public Vector2 Location { get; private set; }
     public string Mode { get; private set; }
+    public RectangleF Hitbox => new(Location, tileSize);
     private Point tileSize { get; set; }
-    public Enemy(string name, int health, Point location, int attack, float attackSpeed, float defense, int speed, int viewRange, int attackRange, TextureManager.TextureID texture)
+    public Enemy(string name, int health, Point location, int attack, float attackSpeed, float defense, int speed, int viewRange, int attackRange, TextureID texture)
     {
         Name = name;
         Health = health;
@@ -56,12 +58,12 @@ public class Enemy
     }
     public virtual void Draw(GameManager gameManager)
     {
-        Rectangle source = TextureManager.GetAnimationSource(Texture, gameManager.TotalTime, duration: 0.5f);
-        TextureManager.DrawTexture(gameManager.Batch, Texture, Location.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, source: source);
+        Rectangle source = GetAnimationSource(Texture, gameManager.TotalTime, duration: 0.5f);
+        DrawTexture(gameManager.Batch, Texture, Location.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, source: source);
     }
     public virtual void Damage(int damage)
     {
-        if (damage <= Defense) Health -= (int)(damage * (1f - Defense / (Defense + 500)));
+        if (damage <= Defense) Health -= damage / 2;
         else Health -= damage;
     }
 }

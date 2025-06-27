@@ -10,7 +10,7 @@ public class NPC
     public Point Location { get; set; }
     public string Name { get; set; }
     public string Dialog { get; set; }
-    public TextureManager.TextureID Texture { get; set; }
+    public TextureID Texture { get; set; }
     public Color TextureColor { get; set; }
     public float Scale { get; set; }
     public bool Important { get; set; }
@@ -18,7 +18,7 @@ public class NPC
     private Point tilemap { get; set; }
     private Point tilesize { get; set; }
 
-    public NPC(UIManager uiManager, TextureManager.TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1, bool important = true)
+    public NPC(UIManager uiManager, TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1, bool important = true)
     {
         HasSpoken = false;
         Important = important;
@@ -33,7 +33,7 @@ public class NPC
         Dialog = dialog;
         TextureColor = textureColor == default ? Color.White : textureColor;
         Scale = scale;
-        DialogBox = new Dialog(uiManager.Gui, new(Constants.Middle.X - 600, Constants.Window.Y - 190), new(1200, 100), new(100, 100, 100), Color.Black, $"[{name}] {dialog}", TextureManager.PixelOperator, borderColor: new(40, 40, 40)) { IsVisible = false };
+        DialogBox = new Dialog(uiManager.Gui, new(Constants.Middle.X - 600, Constants.Window.Y - 190), new(1200, 100), new(100, 100, 100), Color.Black, $"[{name}] {dialog}", PixelOperator, borderColor: new(40, 40, 40)) { IsVisible = false };
         uiManager.Gui.Widgets.Add(DialogBox);
     }
     public void Draw(GameManager gameManager)
@@ -41,8 +41,8 @@ public class NPC
         // Npc
         Vector2 origin = new(tilesize.X / 2, tilesize.Y);
         Point pos = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle + tilesize / Constants.TwoPoint;
-        Rectangle source = TextureManager.GetAnimationSource(Texture, gameManager.TotalTime);
-        TextureManager.DrawTexture(gameManager.Batch, Texture, pos, color: TextureColor, scale: Scale, source: source, origin: origin);
+        Rectangle source = GetAnimationSource(Texture, gameManager.TotalTime);
+        DrawTexture(gameManager.Batch, Texture, pos, color: TextureColor, scale: Scale, source: source, origin: origin);
         // Debug
         if (Constants.DRAW_HITBOXES)
             gameManager.Batch.FillRectangle(new((pos - tilesize).ToVector2(), source.Size.ToVector2() * Scale), Constants.DebugPinkTint);

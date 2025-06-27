@@ -1,6 +1,6 @@
 ﻿using Xna = Microsoft.Xna.Framework;
 
-namespace Quest.Tools;
+namespace Quest.Utilities;
 
 public static class PointTools
 {

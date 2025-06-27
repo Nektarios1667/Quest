@@ -63,11 +63,23 @@ public static class TimerManager
             return timer.left;
         throw new KeyNotFoundException($"No timer with name '{name}' found");
     }
+    public static float TryTimeLeft(string name)
+    {
+        if (timers.TryGetValue(name, out var timer))
+            return timer.left;
+        return 0;
+    }
     public static bool IsComplete(string name)
     {
         if (timers.TryGetValue(name, out var timer))
             return timer.left <= 0;
         throw new KeyNotFoundException($"No timer with name '{name}' found");
+    }
+    public static bool TryIsComplete(string name)
+    {
+        if (timers.TryGetValue(name, out var timer))
+            return timer.left <= 0;
+        return false;
     }
     public static bool Exists(string name) => timers.ContainsKey(name);
     public static void Update(GameManager gameManager)

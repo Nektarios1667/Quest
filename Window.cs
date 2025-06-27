@@ -14,6 +14,7 @@ public class Window : Game
     private UIManager uiManager;
     private LevelManager levelManager;
     private MenuManager menuManager;
+    private EnemyManager enemyManager;
 
     // Time
     private float delta;
@@ -71,8 +72,11 @@ public class Window : Game
     {
         spriteBatch = new SpriteBatch(GraphicsDevice);
 
+        // State Manager
+        StateManager.Mood = Mood.Dark;
+
         // Textures
-        TextureManager.LoadTextures(Content);
+        LoadTextures(Content);
 
         // Soundtracks
         SoundtrackManager.LoadSoundtracks(Content);
@@ -83,6 +87,8 @@ public class Window : Game
         levelManager = new();
         menuManager = new();
         gameManager = new(Content, spriteBatch, playerManager.Inventory, levelManager, uiManager);
+        enemyManager = new();
+        CommandManager.Init(this, gameManager, levelManager, playerManager);
 
         // Levels
         levelManager.ReadLevel(gameManager.UIManager, "island_house");
@@ -118,9 +124,18 @@ public class Window : Game
 
         gameManager.Update(delta);
         playerManager.Update(gameManager);
+        enemyManager.Update(gameManager, [.. playerManager.Attacks]);
         levelManager.Update(gameManager);
         uiManager.Update(gameManager);
 
+        // Console commands
+        if (Constants.COMMANDS && InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.OemTilde))
+        {
+            Console.Write(">> ");
+            string? cmd = Console.ReadLine();
+            string resp = CommandManager.Execute(cmd ?? "");
+            Logger.Log(resp);
+        }
 
         // Final
         base.Update(gameTime);
@@ -155,7 +170,7 @@ public class Window : Game
         DebugManager.EndBenchmark("FrameBarDraw");
 
         // Cursor
-        TextureManager.DrawTexture(spriteBatch, TextureManager.TextureID.CursorArrow, InputManager.MousePosition);
+        DrawTexture(spriteBatch, TextureID.CursorArrow, InputManager.MousePosition);
 
         // Final
         spriteBatch.End();
@@ -165,7 +180,7 @@ public class Window : Game
     public void DrawFrameInfo()
     {
         float boxHeight = DebugManager.FrameTimes.Count * 20;
-        spriteBatch.FillRectangle(new(Constants.Window.X - 190, 0, 190, boxHeight), Color.Black * 0.8f);
+        spriteBatch.FillRectangle(new(Constants.Window.X - 190, 0, 180, boxHeight), Color.Black * 0.8f);
 
         debugSb.Clear();
         foreach (var kv in frameTimes)
@@ -176,11 +191,11 @@ public class Window : Game
             debugSb.Append('\n');
         }
 
-        spriteBatch.DrawString(TextureManager.Arial, debugSb.ToString(), new Vector2(Constants.Window.X - 180, 10), Color.White);
+        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.Window.X - 180, 10), Color.White);
     }
     public void DrawTextInfo()
     {
-        spriteBatch.FillRectangle(new(0, 0, 200, 180), Color.Black * 0.8f);
+        spriteBatch.FillRectangle(new(0, 0, 220, 200), Color.Black * 0.8f);
 
         debugSb.Clear();
         debugSb.Append("FPS: ");
@@ -199,10 +214,12 @@ public class Window : Game
         debugSb.Append(playerManager.Inventory.Opened);
         debugSb.Append("\nGUI: ");
         debugSb.Append(uiManager.Gui.Widgets.Count);
+        debugSb.Append("\nMood: ");
+        debugSb.Append(StateManager.Mood);
         debugSb.Append("\nMusic: ");
         debugSb.Append(SoundtrackManager.Playing?.File ?? "none");
 
-        spriteBatch.DrawString(TextureManager.Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);
+        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);
     }
     public void DrawFrameBar()
     {
@@ -222,7 +239,7 @@ public class Window : Game
         spriteBatch.FillRectangle(new(Constants.Window.X - 310, Constants.Window.Y - 40, 300, 25), Color.White);
         foreach (KeyValuePair<string, double> process in frameTimes)
         {
-            spriteBatch.DrawString(TextureManager.Arial, process.Key, new(Constants.Window.X - TextureManager.Arial.MeasureString(process.Key).X - 5, Constants.Window.Y - 20 * c - 60), colors[c]);
+            spriteBatch.DrawString(Arial, process.Key, new(Constants.Window.X - Arial.MeasureString(process.Key).X - 5, Constants.Window.Y - 20 * c - 60), colors[c]);
             spriteBatch.FillRectangle(new(Constants.Window.X - 310 + start, Constants.Window.Y - 40, (int)(process.Value / (cacheDelta * 1000) * 300), 25), colors[c]);
             start += (int)(process.Value / (cacheDelta * 1000)) * 300;
             c++;

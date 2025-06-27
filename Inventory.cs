@@ -1,32 +1,8 @@
 ﻿namespace Quest;
-public class Item
-{
-    public string DisplayText => $"{Amount} {StringTools.FillCamelSpaces(Amount != 1 ? StringTools.Pluralize(Name) : Name)}";
-    public string Name { get; private set; }
-    public string Description { get; private set; }
-    public byte Amount { get; set; }
-    public byte Max { get; private set; }
-    public TextureManager.TextureID Texture { get; private set; }
-    public Item(string name, string description, byte amount = 1, byte max = Constants.MaxStack)
-    {
-        Name = name;
-        Description = description;
-        Amount = amount;
-        Max = max;
-        Texture = (TextureManager.TextureID)(Enum.TryParse(typeof(TextureManager.TextureID), Name, out var tex) ? tex : TextureManager.TextureID.Null);
-    }
-    public bool IsSameItemType(Item? other)
-    {
-        if (other == null) return false;
-        return Name == other.Name && Description == other.Description;
-    }
-}
 public class Inventory
 {
     public Item?[,] Items { get; private set; }
     public bool Opened { get; set; } = false;
-    private SpriteFont PixelOperator { get; } = TextureManager.PixelOperator;
-    private SpriteFont PixelOperatorBold { get; } = TextureManager.PixelOperator;
     public int EquippedSlot { get; set; }
     public Item? Equipped => Items[EquippedSlot, 0];
     public int SelectedSlot { get; set; }
@@ -35,7 +11,7 @@ public class Inventory
     public int Height { get; }
     private readonly Point itemOffset = new(14, 14);
     private readonly float itemScale = 3;
-    private readonly Point slotSize = TextureManager.Metadata[TextureManager.TextureID.Slot].Size;
+    private readonly Point slotSize = TextureManager.Metadata[TextureID.Slot].Size;
     private readonly Point itemStart;
     public Inventory(int width, int height)
     {
@@ -46,7 +22,7 @@ public class Inventory
         HoverSlot = 0;
         itemStart = new(Constants.Middle.X - (slotSize.X * Width / 2), Constants.Window.Y - slotSize.Y - 8);
     }
-    public void Update(GameManager gameManager)
+    public void Update(GameManager gameManager, PlayerManager playerManager)
     {
         if (Width < 1 || Height < 1) return; // No slots to update
 
@@ -58,7 +34,7 @@ public class Inventory
         if (EquippedSlot < 0) EquippedSlot += Width;
 
         // Handle slot interactions
-        SlotInteractions(gameManager);
+        SlotInteractions(gameManager, playerManager);
     }
     public void Draw(GameManager gameManager)
     {
@@ -74,11 +50,11 @@ public class Inventory
 
                 // Draw inventory slots
                 Vector2 itemDest = new(itemStart.X + (slotSize.X + 4) * x, itemStart.Y - (slotSize.Y + 8) * y - (y != 0 ? 20 : 0));
-                TextureManager.DrawTexture(gameManager.Batch, TextureManager.TextureID.Slot, itemDest.ToPoint(), color: SlotColor(x, y));
+                DrawTexture(gameManager.Batch, TextureID.Slot, itemDest.ToPoint(), color: SlotColor(x, y));
 
                 // Draw inventory items
                 if (item == null) continue;
-                TextureManager.DrawTexture(gameManager.Batch, item.Texture, itemDest.ToPoint() + itemOffset, scale: itemScale);
+                DrawTexture(gameManager.Batch, item.Texture, itemDest.ToPoint() + itemOffset, scale: itemScale);
 
                 // Amount text
                 if (item.Amount <= 1) continue; // Don't draw amount text for single items
@@ -99,7 +75,7 @@ public class Inventory
             gameManager.Batch.DrawString(PixelOperator, display, labelPos + new Vector2(8, -8), Color.White);
         }
     }
-    public void SlotInteractions(GameManager gameManager)
+    public void SlotInteractions(GameManager gameManager, PlayerManager playerManager)
     {
         // Get
         int mouseSlot = Flatten(GetMouseSlot());
@@ -143,14 +119,14 @@ public class Inventory
                     byte move = (byte)Math.Ceiling(selectedItem!.Amount / 2f);
                     if (SameItem(mouseItem, selectedItem))
                     {
-                        move = (byte)Math.Min(move, mouseItem!.Max - mouseItem.Amount);
+                        move = (byte)Math.Min(move, mouseItem!.MaxAmount - mouseItem.Amount);
                         mouseItem!.Amount += move;
                         selectedItem.Amount -= move;
                         SoundManager.PlaySound("Trinkets");
                     }
                     else if (mouseItem == null)
                     {
-                        SetSlot(mouseSlot, new Item(selectedItem.Name, selectedItem.Description, move, selectedItem.Max));
+                        SetSlot(mouseSlot, Item.ItemFromName(playerManager, selectedItem.Name, move));
                         selectedItem.Amount -= move;
                         SoundManager.PlaySound("Trinkets");
                     }
@@ -171,7 +147,7 @@ public class Inventory
         if (Opened && HoverSlot >= 0 && InputManager.KeyDown(Keys.D))
         {
             Item? item = GetItem(HoverSlot);
-            if (item != null) gameManager.LevelManager.DropLoot(gameManager, new Loot(item, CameraManager.PlayerFoot + Constants.MageDrawShift, gameManager.TotalTime));
+            if (item != null) gameManager.LevelManager.DropLoot(gameManager, new Loot(item.Name, item.Amount, CameraManager.PlayerFoot + Constants.MageDrawShift, gameManager.TotalTime));
             SetSlot(HoverSlot, null);
             SoundManager.PlaySoundInstance("Trinkets");
         }
@@ -189,7 +165,7 @@ public class Inventory
     {
         if (from != null && dest != null)
         {
-            byte moved = (byte)Math.Min(from.Amount, dest.Max - dest.Amount);
+            byte moved = (byte)Math.Min(from.Amount, dest.MaxAmount - dest.Amount);
             dest.Amount += moved;
             from.Amount -= moved;
             if (from.Amount < 1)
@@ -212,7 +188,7 @@ public class Inventory
                 }
                 if (SameItem(current, item))
                 {
-                    byte moved = (byte)Math.Min(item.Amount, current.Max - current.Amount);
+                    byte moved = (byte)Math.Min(item.Amount, current.MaxAmount - current.Amount);
                     current!.Amount += moved; // Add to existing item
                     item.Amount -= moved; // Reduce amount of new item
                     if (item.Amount < 1) return; // If item is fully added exit
@@ -227,7 +203,7 @@ public class Inventory
         return item1.Name == item2.Name && item1.Description == item2.Description;
     }
     // Contains
-    public bool Contains(Item item)
+    public bool Contains(string item)
     {
         for (int x = 0; x < Width; x++)
         {
@@ -236,7 +212,7 @@ public class Inventory
                 // Item
                 Item? currentItem = Items[x, y];
                 if (currentItem == null) continue; // Skip empty slots
-                if (currentItem.Name == item.Name && currentItem.Description == item.Description) return true;
+                if (currentItem.Name == item) return true;
             }
         }
         return false;
@@ -294,7 +270,7 @@ public class Inventory
         if (slot.X < 0 || slot.X >= Width || slot.Y < 0 || slot.Y >= Height) return; // Out of bounds
         Items[slot.X, slot.Y] = null; // Remove item from inventory
     }
-    public void Consume(Item item)
+    public void Consume(string item)
     {
         for (int x = 0; x < Width; x++)
         {
@@ -303,7 +279,7 @@ public class Inventory
                 // Item
                 Item? currentItem = Items[x, y];
                 if (currentItem == null) continue; // Skip empty slots
-                if (currentItem.Name == item.Name && currentItem.Description == item.Description) Items[x, y] = null;
+                if (currentItem.Name == item) Items[x, y] = null;
             }
         }
     }
@@ -316,7 +292,7 @@ public class Inventory
         if (x < 0 || x >= Width) return Constants.NegativePoint; // Out of bounds
 
         // y coord
-        int top = Constants.Window.Y - (TextureManager.GetTexture(TextureManager.TextureID.Slot).Height + 8) * (Height + 1) - (Height != 0 ? 20 : 0);
+        int top = Constants.Window.Y - (GetTexture(TextureID.Slot).Height + 8) * (Height + 1) - (Height != 0 ? 20 : 0);
         int y = (InputManager.MousePosition.Y - top) / (slotSize.Y + 8);
         y = Height - y; // Flip y axis
         if (y < 0 || y >= Height) return Constants.NegativePoint; // Out of bounds

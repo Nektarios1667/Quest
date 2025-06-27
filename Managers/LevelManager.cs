@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.IO.Compression;
-using static Quest.Managers.TextureManager;
 
 namespace Quest.Managers;
 public class LevelManager
@@ -12,7 +11,11 @@ public class LevelManager
     public LevelManager()
     {
         Levels = [];
-        Level = new("null", [], new(128, 128), [], [], [], []);
+
+        Tile[] skyTiles = new Tile[256 * 256];
+        for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) skyTiles[t] = new Sky(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
+
+        Level = new("null", skyTiles, new(128, 128), [], [], [], []);
     }
     public void Update(GameManager gameManager)
     {
@@ -66,12 +69,12 @@ public class LevelManager
             Loot loot = Level.Loot[l];
             Point pos = loot.Location - CameraManager.Camera.ToPoint() + Constants.Middle;
             pos.Y += (int)(Math.Sin((gameManager.TotalTime - loot.Birth) * 2 % (Math.PI * 2)) * 6); // Bob up and down
-            TextureManager.DrawTexture(gameManager.Batch, loot.Texture, pos, scale: 2);
+            DrawTexture(gameManager.Batch, loot.Texture, pos, scale: 2);
             // Draw stacks if multiple
-            if (loot.Item.Amount > 1)
-                TextureManager.DrawTexture(gameManager.Batch, loot.Texture, pos + lootStackOffset, scale: 2);
-            if (loot.Item.Amount > 2)
-                TextureManager.DrawTexture(gameManager.Batch, loot.Texture, pos + lootStackOffset, scale: 2);
+            if (loot.Amount > 1)
+                DrawTexture(gameManager.Batch, loot.Texture, pos + lootStackOffset, scale: 2);
+            if (loot.Amount > 2)
+                DrawTexture(gameManager.Batch, loot.Texture, pos + lootStackOffset + lootStackOffset, scale: 2);
             // Draw hitbox if enabled
             if (Constants.DRAW_HITBOXES)
                 gameManager.Batch.FillRectangle(new(pos.ToVector2(), new(32, 32)), Constants.DebugPinkTint);
@@ -108,7 +111,7 @@ public class LevelManager
 
         // MiniMap
         gameManager.UIManager.RefreshMiniMap();
-        
+
         // Spawn
         CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
         CameraManager.Camera = CameraManager.CameraDest;
@@ -218,7 +221,7 @@ public class LevelManager
             if (type == (int)TileType.Stairs)
                 tile = new Stairs(new(i % Constants.MapSize.X, i / Constants.MapSize.X), reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
             else if (type == (int)TileType.Door)
-                tile = new Door(new(i % Constants.MapSize.X, i / Constants.MapSize.X), new Item(reader.ReadString(), reader.ReadString(), 1, 1));
+                tile = new Door(new(i % Constants.MapSize.X, i / Constants.MapSize.X), reader.ReadString());
             else // Regular tile
                 tile = TileFromId(type, new(i % Constants.MapSize.X, i / Constants.MapSize.X));
             int idx = tile.Location.X + tile.Location.Y * Constants.MapSize.X;
@@ -243,20 +246,18 @@ public class LevelManager
         for (int n = 0; n < lootCount; n++)
         {
             string name = reader.ReadString();
-            string description = reader.ReadString();
             byte amount = reader.ReadByte();
-            byte max = reader.ReadByte();
             Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
-            lootBuffer.Add(new Loot(new Item(name, description, amount, max), location, 0f));
+            lootBuffer.Add(new Loot(name, amount, location, 0f));
         }
 
         // Decals
         byte decalCount = reader.ReadByte();
         for (int n = 0; n < decalCount; n++)
         {
-            DecalType type = (DecalType)reader.ReadByte();
+            int type = reader.ReadByte();
             Point location = new(reader.ReadByte(), reader.ReadByte());
-            decalBuffer.Add(DecalFromId(reader.ReadByte(), location));
+            decalBuffer.Add(DecalFromId(type, location));
         }
 
         // Check null
@@ -296,6 +297,9 @@ public class LevelManager
         {
             DecalType.Torch => new Torch(location),
             DecalType.BlueTorch => new BlueTorch(location),
+            DecalType.WaterPuddle => new WaterPuddle(location),
+            DecalType.BloodPuddle => new BloodPuddle(location),
+            DecalType.Footprint => new Footprint(location),
             _ => new Decal(location), // Default tile
         };
     }
@@ -339,18 +343,9 @@ public class LevelManager
             return null;
         return Level.Tiles[x + y * Constants.MapSize.X];
     }
-    public void Pickup(GameManager gameManager, Loot loot)
-    {
-        if (Level.Loot.Contains(loot))
-        {
-            gameManager.UIManager.LootNotifications.AddNotification($"+{loot.Item.DisplayText}");
-            gameManager.Inventory.AddItem(loot.Item);
-            Level.Loot.Remove(loot);
-        }
-    }
     public void DropLoot(GameManager gameManager, Loot loot)
     {
         Level.Loot.Add(loot);
-        gameManager.UIManager.LootNotifications.AddNotification($"-{loot.Item.DisplayText}");
+        gameManager.UIManager.LootNotifications.AddNotification($"-{loot.DisplayName}");
     }
 }

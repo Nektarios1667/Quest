@@ -1,20 +1,21 @@
 ﻿namespace Quest.Managers;
+
+public class Attack(int damage, RectangleF hitbox)
+{
+    public int Damage { get; } = damage;
+    public RectangleF Hitbox { get; } = hitbox;
+}
 public class PlayerManager
 {
     public Inventory Inventory { get; set; }
     public Tile? TileBelow { get; private set; }
     public Direction PlayerDirection { get; private set; }
+    public List<Attack> Attacks { get; private set; } = [];
     private float moveX, moveY;
     public PlayerManager()
     {
         Inventory = new(6, 4);
-        Inventory.SetSlot(0, new Item("Sword", "A sharp, pointy sword", max: 1));
-        Inventory.SetSlot(1, new Item("Pickaxe", "Sturdy iron pickaxe for mining", max: 1));
-        Inventory.SetSlot(2, new Item("ActivePalantir", "A seeing stone, used to communicate with Sauron", 1, max: 1));
-        Inventory.SetSlot(3, new Item("InactivePalantir", "A seeing stone, used to communicate with Sauron", 1, max: 1));
-        Inventory.SetSlot(4, new Item("PhiCoin", "A small copper coin", 20, max: 20));
-        Inventory.SetSlot(5, new Item("DeltaCoin", "A shiny gold coin", 10, max: 20));
-        Inventory.SetSlot(6, new Item("GammaCoin", "A rare diamond coin", 5, max: 20));
+        Inventory.SetSlot(0, new ActivePalantir(this, 1));
     }
     public void Update(GameManager gameManager)
     {
@@ -40,8 +41,10 @@ public class PlayerManager
             // Pick up loot
             if (PointTools.DistanceSquared(CameraManager.PlayerFoot, loot.Location + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
             {
-                gameManager.LevelManager.Pickup(gameManager, loot);
-                SoundManager.PlaySound("Pickup", pitch:RandomManager.RandomFloat() / 2 - .25f);
+                gameManager.UIManager.LootNotifications.AddNotification($"+{loot.DisplayName}");
+                gameManager.Inventory.AddItem(Item.ItemFromName(this, loot.Item, loot.Amount));
+                gameManager.LevelManager.Level.Loot.Remove(loot);
+                SoundManager.PlaySound("Pickup", pitch: RandomManager.RandomFloat() / 2 - .25f);
             }
         }
         DebugManager.EndBenchmark("UpdateLoot");
@@ -65,8 +68,18 @@ public class PlayerManager
 
         // Inventory
         DebugManager.StartBenchmark("InventoryUpdate");
-        Inventory.Update(gameManager);
+        Inventory.Update(gameManager, this);
         DebugManager.EndBenchmark("InventoryUpdate");
+
+        // Remove attacks
+        DebugManager.StartBenchmark("UpdateAttacks");
+
+        Attacks.Clear();
+
+        if (InputManager.LMouseClicked) Inventory.Equipped?.PrimaryUse();
+        else if (InputManager.RMouseClicked) Inventory.Equipped?.SecondaryUse();
+
+        DebugManager.EndBenchmark("UpdateAttacks");
     }
     public void Draw(GameManager gameManager)
     {
@@ -93,13 +106,13 @@ public class PlayerManager
         else if (PlayerDirection == Direction.Up) sourceRow = 4;
         // Draw player
         Point pos = Constants.Middle - Constants.MageHalfSize + CameraManager.CameraOffset.ToPoint();
-        Rectangle source = TextureManager.GetAnimationSource(TextureManager.TextureID.BlueMage, gameManager.TotalTime, duration: sourceRow == 0 ? .5f : .25f, row: sourceRow);
-        TextureManager.DrawTexture(gameManager.Batch, TextureManager.TextureID.BlueMage, pos, source: source);
+        Rectangle source = GetAnimationSource(TextureID.BlueMage, gameManager.TotalTime, duration: sourceRow == 0 ? .5f : .25f, row: sourceRow);
+        DrawTexture(gameManager.Batch, TextureID.BlueMage, pos, source: source);
         // Draw equipped item
         if (Inventory.Equipped != null)
         {
             Point itemPos = Constants.Middle + CameraManager.CameraOffset.ToPoint() - (PlayerDirection == Direction.Left ? Constants.MageDrawShift : Point.Zero);
-            TextureManager.DrawTexture(gameManager.Batch, Inventory.Equipped.Texture, itemPos, scale: 2, effects: PlayerDirection == Direction.Left ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+            DrawTexture(gameManager.Batch, Inventory.Equipped.Texture, itemPos, scale: 2, effects: PlayerDirection == Direction.Left ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
         }
     }
     public void DrawPlayerHitbox(GameManager gameManager)
@@ -166,5 +179,9 @@ public class PlayerManager
             gameManager.UIManager.HealthBar.CurrentValue = 0;
             StateManager.State = GameState.Death;
         }
+    }
+    public void AddAttack(Attack attack)
+    {
+        Attacks.Add(attack);
     }
 }

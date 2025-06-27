@@ -15,7 +15,7 @@ public class UIManager
         {
             Widgets = [
                 HealthBar = new StatusBar(new(10, Constants.Window.Y - 35), new(300, 25), Color.Green, Color.Red, 100, 100),
-                LootNotifications = new NotificationArea(Constants.Middle - new Point(0, Constants.MageHalfSize.Y + 15), 5, TextureManager.PixelOperatorBold)
+                LootNotifications = new NotificationArea(Constants.Middle - new Point(0, Constants.MageHalfSize.Y + 15), 5, PixelOperatorBold)
             ]
         };
     }
@@ -75,8 +75,8 @@ public class UIManager
         {
             if (deathTime == -1) deathTime = gameManager.TotalTime;
             gameManager.Batch.FillRectangle(new Rectangle(Point.Zero, Constants.Window), Color.Black * ((gameManager.TotalTime - deathTime) / 5));
-            gameManager.Batch.DrawString(TextureManager.PixelOperator, "YOU DIED!", Constants.Middle.ToVector2() - TextureManager.PixelOperator.MeasureString("You died!") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
-            gameManager.Batch.DrawString(TextureManager.PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - TextureManager.PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
+            gameManager.Batch.DrawString(PixelOperator, "YOU DIED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("You died!") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
+            gameManager.Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
         }
         DebugManager.EndBenchmark("PostProcessing");
     }

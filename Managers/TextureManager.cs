@@ -27,13 +27,14 @@ public static class TextureManager
         Slot,
         Speech,
         // Items
-        Pickaxe,
-        Sword,
-        PhiCoin,
-        DeltaCoin,
-        GammaCoin,
+        //Pickaxe,
+        //Sword,
+        //PhiCoin,
+        //DeltaCoin,
+        //GammaCoin,
+        Key,
         ActivePalantir,
-        InactivePalantir,
+        //InactivePalantir,
         // Tiles
         Dirt,
         Flooring,
@@ -49,8 +50,12 @@ public static class TextureManager
         // Decals
         Torch,
         BlueTorch,
+        WaterPuddle,
+        BloodPuddle,
+        Footprint,
         // Effecs
         Glow,
+        Slash,
     }
 
     private static List<string> errors = [];
@@ -79,13 +84,14 @@ public static class TextureManager
         Textures[TextureID.GuiBackground] = content.Load<Texture2D>($"Images/Gui/GuiBackground");
         Textures[TextureID.Slot] = content.Load<Texture2D>($"Images/Gui/Slot");
         Textures[TextureID.Speech] = content.Load<Texture2D>($"Images/Gui/Speech");
-        Textures[TextureID.Pickaxe] = content.Load<Texture2D>($"Images/Items/Pickaxe");
-        Textures[TextureID.Sword] = content.Load<Texture2D>($"Images/Items/Sword");
-        Textures[TextureID.PhiCoin] = content.Load<Texture2D>($"Images/Items/PhiCoin");
-        Textures[TextureID.DeltaCoin] = content.Load<Texture2D>($"Images/Items/DeltaCoin");
-        Textures[TextureID.GammaCoin] = content.Load<Texture2D>($"Images/Items/GammaCoin");
+        //Textures[TextureID.Pickaxe] = content.Load<Texture2D>($"Images/Items/Pickaxe");
+        //Textures[TextureID.Sword] = content.Load<Texture2D>($"Images/Items/Sword");
+        //Textures[TextureID.PhiCoin] = content.Load<Texture2D>($"Images/Items/PhiCoin");
+        //Textures[TextureID.DeltaCoin] = content.Load<Texture2D>($"Images/Items/DeltaCoin");
+        //Textures[TextureID.GammaCoin] = content.Load<Texture2D>($"Images/Items/GammaCoin");
+        Textures[TextureID.Key] = content.Load<Texture2D>($"Images/Items/Key");
         Textures[TextureID.ActivePalantir] = content.Load<Texture2D>($"Images/Items/ActivePalantir");
-        Textures[TextureID.InactivePalantir] = content.Load<Texture2D>($"Images/Items/InactivePalantir");
+        //Textures[TextureID.InactivePalantir] = content.Load<Texture2D>($"Images/Items/InactivePalantir");
         Textures[TextureID.Dirt] = content.Load<Texture2D>($"Images/Tiles/Dirt");
         Textures[TextureID.Flooring] = content.Load<Texture2D>($"Images/Tiles/Flooring");
         Textures[TextureID.Grass] = content.Load<Texture2D>($"Images/Tiles/Grass");
@@ -99,7 +105,11 @@ public static class TextureManager
         Textures[TextureID.Door] = content.Load<Texture2D>($"Images/Tiles/Door");
         Textures[TextureID.Torch] = content.Load<Texture2D>($"Images/Decals/Torch");
         Textures[TextureID.BlueTorch] = content.Load<Texture2D>($"Images/Decals/BlueTorch");
+        Textures[TextureID.WaterPuddle] = content.Load<Texture2D>($"Images/Decals/WaterPuddle");
+        Textures[TextureID.BloodPuddle] = content.Load<Texture2D>($"Images/Decals/BloodPuddle");
+        Textures[TextureID.Footprint] = content.Load<Texture2D>($"Images/Decals/Footprint");
         Textures[TextureID.Glow] = content.Load<Texture2D>($"Images/Effects/Glow");
+        Textures[TextureID.Slash] = content.Load<Texture2D>($"Images/Effects/Slash");
         Logger.Log("Textures loaded successfully.");
 
         // Metadata
@@ -115,13 +125,14 @@ public static class TextureManager
         Metadata[TextureID.GuiBackground] = new(Textures[TextureID.GuiBackground].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.Slot] = new(Textures[TextureID.Slot].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.Speech] = new(Textures[TextureID.Speech].Bounds.Size, new(1, 4), "gui");
-        Metadata[TextureID.Pickaxe] = new(Textures[TextureID.Pickaxe].Bounds.Size, new(1, 1), "item");
-        Metadata[TextureID.Sword] = new(Textures[TextureID.Sword].Bounds.Size, new(1, 1), "item");
-        Metadata[TextureID.PhiCoin] = new(Textures[TextureID.PhiCoin].Bounds.Size, new(1, 1), "item");
-        Metadata[TextureID.DeltaCoin] = new(Textures[TextureID.DeltaCoin].Bounds.Size, new(1, 1), "item");
-        Metadata[TextureID.GammaCoin] = new(Textures[TextureID.GammaCoin].Bounds.Size, new(1, 1), "item");
+        //Metadata[TextureID.Pickaxe] = new(Textures[TextureID.Pickaxe].Bounds.Size, new(1, 1), "item");
+        //Metadata[TextureID.Sword] = new(Textures[TextureID.Sword].Bounds.Size, new(1, 1), "item");
+        //Metadata[TextureID.PhiCoin] = new(Textures[TextureID.PhiCoin].Bounds.Size, new(1, 1), "item");
+        //Metadata[TextureID.DeltaCoin] = new(Textures[TextureID.DeltaCoin].Bounds.Size, new(1, 1), "item");
+        //Metadata[TextureID.GammaCoin] = new(Textures[TextureID.GammaCoin].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Key] = new(Textures[TextureID.Key].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.ActivePalantir] = new(Textures[TextureID.ActivePalantir].Bounds.Size, new(1, 1), "item");
-        Metadata[TextureID.InactivePalantir] = new(Textures[TextureID.InactivePalantir].Bounds.Size, new(1, 1), "item");
+        //Metadata[TextureID.InactivePalantir] = new(Textures[TextureID.InactivePalantir].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Dirt] = new(Textures[TextureID.Dirt].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Flooring] = new(Textures[TextureID.Flooring].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Grass] = new(Textures[TextureID.Grass].Bounds.Size, new(4, 4), "tile");
@@ -135,8 +146,12 @@ public static class TextureManager
         Metadata[TextureID.Door] = new(Textures[TextureID.Door].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Torch] = new(Textures[TextureID.Torch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), "decal");
+        Metadata[TextureID.WaterPuddle] = new(Textures[TextureID.WaterPuddle].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.BloodPuddle] = new(Textures[TextureID.BloodPuddle].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Footprint] = new(Textures[TextureID.Footprint].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.Glow] = new(Textures[TextureID.Glow].Bounds.Size, new(1, 1), "effect");
-        Logger.Log("Metadata loaded successfully.");
+        Metadata[TextureID.Slash] = new(Textures[TextureID.Slash].Bounds.Size, new(1, 1), "effect");
+        Logger.Log("TextureManager.Metadata loaded successfully.");
 
         // Fonts
         PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");
@@ -150,7 +165,6 @@ public static class TextureManager
     }
     public static Texture2D GetTexture(TextureID id)
     {
-        // Found
         return Textures.GetValueOrDefault(id, Textures[TextureID.Null]);
     }
     public static void DrawTexture(SpriteBatch batch, TextureID id, Point pos, Rectangle? source = null, Color color = default, float rotation = 0f, Vector2 origin = default, float scale = 1, SpriteEffects effects = SpriteEffects.None)
@@ -173,7 +187,7 @@ public static class TextureManager
         // Get the texture ID from the content manager
         if (!Metadata.TryGetValue(texture, out Metadata? meta))
         {
-            Logger.Error($"Metadata for texture '{texture}' not found.");
+            Logger.Error($"TextureManager.Metadata for texture '{texture}' not found.");
             return new(0, 0, 64, 64);
         }
 

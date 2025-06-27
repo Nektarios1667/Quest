@@ -1,25 +1,18 @@
-﻿using System.Drawing;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.Xna.Framework.Content;
 
 namespace Quest.Managers;
-public enum SoundtrackMoods
-{
-    Calm,
-    Dark,
-    Epic,
-}
-public class Soundtrack(string file, SoundtrackMoods mood)
+public class Soundtrack(string file, Mood mood)
 {
     public string File { get; } = file;
-    public SoundtrackMoods Mood { get; } = mood;
+    public Mood Mood { get; } = mood;
 }
 public static class SoundtrackManager
 {
     public static float MusicVolume { get; set; } = 1f;
     public static Soundtrack? Playing { get; private set; }
     private static Soundtrack[] Soundtracks { get; set; } = [];
-    private static Dictionary<SoundtrackMoods, Soundtrack[]> SoundtrackCategories { get; set; } = [];
+    private static Dictionary<Mood, Soundtrack[]> SoundtrackCategories { get; set; } = [];
     public static void LoadSoundtracks(ContentManager content)
     {
         // Setup music
@@ -27,11 +20,15 @@ public static class SoundtrackManager
 
         // Load soundtrack objects
         Soundtracks = [
-            new("CavesOfDawn", SoundtrackMoods.Dark),
-            new("Clouds", SoundtrackMoods.Calm),
-            new("SacredGarden", SoundtrackMoods.Calm),
-            new("NightmareAlley", SoundtrackMoods.Dark),
-            new("TerrorHeights", SoundtrackMoods.Dark),
+            new("CavesOfDawn", Mood.Dark),
+            new("Clouds", Mood.Calm),
+            new("SacredGarden", Mood.Calm),
+            new("NightmareAlley", Mood.Dark),
+            new("TerrorHeights", Mood.Dark),
+            new("Pulse", Mood.Dark),
+            new("Beauty", Mood.Calm),
+            new("WanderingWind", Mood.Dark),
+            new("Mystical", Mood.Calm)
         ];
 
         // Load sound files
@@ -43,19 +40,19 @@ public static class SoundtrackManager
         }
 
         // Categorize
-        foreach (SoundtrackMoods mood in Enum.GetValues<SoundtrackMoods>())
+        foreach (Mood mood in Enum.GetValues<Mood>())
             SoundtrackCategories[mood] = Soundtracks.Where(s => s.Mood == mood).ToArray();
     }
     public static void Update()
     {
         if (!SoundManager.IsMusicPlaying)
         {
-            Soundtrack soundtrack = GetRandomSoundtrack(SoundtrackMoods.Calm);
+            Soundtrack soundtrack = GetRandomSoundtrack(StateManager.Mood);
             SoundManager.PlayMusic(soundtrack.File);
             Playing = soundtrack;
         }
     }
-    public static Soundtrack GetRandomSoundtrack(SoundtrackMoods mood)
+    public static Soundtrack GetRandomSoundtrack(Mood mood)
     {
         if (SoundtrackCategories.TryGetValue(mood, out var soundtracks) && soundtracks.Length > 0)
         {

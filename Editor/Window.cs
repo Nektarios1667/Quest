@@ -1,10 +1,6 @@
-﻿using System.IO.Compression;
-using System.IO;
+﻿using System.IO;
+using System.IO.Compression;
 using System.Text;
-using Microsoft.Xna.Framework.Input;
-using static Quest.Managers.TextureManager;
-
-// TODO Player not being drawn, dialog box not being drawn, update minimap on level change, inventory not being drawn
 
 namespace Quest.Editor;
 public class Window : Game
@@ -82,7 +78,7 @@ public class Window : Game
         spriteBatch = new SpriteBatch(GraphicsDevice);
 
         // Textures
-        TextureManager.LoadTextures(Content);
+        LoadTextures(Content);
 
         // Managers
         uiManager = new();
@@ -92,10 +88,10 @@ public class Window : Game
         StateManager.State = GameState.Editor;
 
         // Levels
-        levelManager.ReadLevel(uiManager, "island_house");
-        levelManager.ReadLevel(uiManager, "island_house_basement");
+        //levelManager.ReadLevel(uiManager, "island_house");
+        //levelManager.ReadLevel(uiManager, "island_house_basement");
 
-        levelManager.LoadLevel(gameManager, "island_house");
+        //levelManager.LoadLevel(gameManager, "island_house");
 
         // Shaders
         Grayscale = Content.Load<Effect>("Shaders/Grayscale");
@@ -119,6 +115,8 @@ public class Window : Game
 
         // Mouse
         mouseCoord = (InputManager.MousePosition + CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
+        mouseCoord.X = Math.Clamp(mouseCoord.X, 0, Constants.MapSize.X - 1);
+        mouseCoord.Y = Math.Clamp(mouseCoord.Y, 0, Constants.MapSize.Y - 1);
         mouseTile = GetTile(mouseCoord);
 
         // Movement
@@ -136,21 +134,27 @@ public class Window : Game
         if (InputManager.Hotkey(Keys.LeftControl, Keys.O))
         {
             string filename = Logger.Input("Open level file: ");
-            try {
+            try
+            {
                 levelManager.ReadLevel(uiManager, filename);
                 levelManager.LoadLevel(gameManager, filename);
                 Logger.Log($"Opened level '{filename}'.");
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Logger.Error($"Failed to open level '{filename}': {ex.Message}");
             }
         }
 
         // Change material
-        if (InputManager.ScrollWheelChange > 0 || InputManager.KeyPressed(Keys.OemCloseBrackets)) {
+        if (InputManager.ScrollWheelChange > 0 || InputManager.KeyPressed(Keys.OemCloseBrackets))
+        {
             Selection = (Selection + 1) % Constants.TileNames.Length;
             Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileNames[Selection]);
             Logger.Log($"Material set to '{Material}'.");
-        } if (InputManager.ScrollWheelChange < 0 || InputManager.KeyPressed(Keys.OemCloseBrackets)) {
+        }
+        if (InputManager.ScrollWheelChange < 0 || InputManager.KeyPressed(Keys.OemCloseBrackets))
+        {
             Selection = (Selection - 1) % Constants.TileNames.Length;
             if (Selection < 0) Selection += Constants.TileNames.Length;
             Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileNames[Selection]);
@@ -165,7 +169,7 @@ public class Window : Game
             if (Selection == (int)TileType.Stairs)
                 tile = new Stairs(mouseCoord, "null", Constants.MiddleCoord);
             else if (Selection == (int)TileType.Door)
-                tile = new Door(mouseCoord, Constants.Key);
+                tile = new Door(mouseCoord, "Key");
             else
                 tile = LevelManager.TileFromId(Selection, mouseCoord);
 
@@ -268,7 +272,7 @@ public class Window : Game
             debugSb.Append('\n');
         }
 
-        spriteBatch.DrawString(TextureManager.Arial, debugSb.ToString(), new Vector2(Constants.Window.X - 180, 10), Color.White);
+        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.Window.X - 180, 10), Color.White);
     }
     public void DrawTextInfo()
     {
@@ -292,7 +296,7 @@ public class Window : Game
         debugSb.Append("\nGUI: ");
         debugSb.Append(uiManager.Gui.Widgets.Count);
 
-        spriteBatch.DrawString(TextureManager.Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);
+        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);
     }
     public void DrawFrameBar()
     {
@@ -312,7 +316,7 @@ public class Window : Game
         spriteBatch.FillRectangle(new(Constants.Window.X - 310, Constants.Window.Y - 40, 300, 25), Color.White);
         foreach (KeyValuePair<string, double> process in frameTimes)
         {
-            spriteBatch.DrawString(TextureManager.Arial, process.Key, new(Constants.Window.X - TextureManager.Arial.MeasureString(process.Key).X - 5, Constants.Window.Y - 20 * c - 60), colors[c]);
+            spriteBatch.DrawString(Arial, process.Key, new(Constants.Window.X - Arial.MeasureString(process.Key).X - 5, Constants.Window.Y - 20 * c - 60), colors[c]);
             spriteBatch.FillRectangle(new(Constants.Window.X - 310 + start, Constants.Window.Y - 40, (int)(process.Value / (cacheDelta * 1000) * 300), 25), colors[c]);
             start += (int)(process.Value / (cacheDelta * 1000)) * 300;
             c++;
@@ -354,9 +358,8 @@ public class Window : Game
         else if (tile is Door door)
         {
             Logger.Print("__Editing Door__");
-            string name = Logger.Input($"Key name [{door.Key.Name}]: ");
-            string description = Logger.Input($"Key description [{door.Key.Description[..Math.Min(12, door.Key.Description.Length - 1)]}...]: ");
-            door.Key = new Item(name, description, 1, 1);
+            string name = Logger.Input($"Key name [{door.Key}]: ");
+            door.Key = name;
         }
     }
     public void FloodFill()
@@ -490,7 +493,7 @@ public class Window : Game
                 if (loot.Location == mouseCoord)
                 {
                     levelManager.Level.Loot.Remove(loot);
-                    Logger.Log($"Deleted loot '{loot.Item.DisplayText}' @ {mouseCoord.X}, {mouseCoord.Y}.");
+                    Logger.Log($"Deleted loot '{loot.DisplayName}' @ {mouseCoord.X}, {mouseCoord.Y}.");
                     break;
                 }
             }
@@ -499,10 +502,8 @@ public class Window : Game
         {
             Logger.Print("__Loot__");
             string name = Logger.Input("Name: ");
-            string description = Logger.Input("Description: ");
             byte amount = Logger.InputByte("Amount: ", fallback: 1);
-            byte max = Logger.InputByte("Max: ", fallback: Constants.MaxStack);
-            levelManager.Level.Loot.Add(new Loot(new Item(name, description, amount, max), InputManager.MousePosition + CameraManager.Camera.ToPoint() - Constants.Middle, gameManager.TotalTime));
+            levelManager.Level.Loot.Add(new Loot(name, amount, InputManager.MousePosition + CameraManager.Camera.ToPoint() - Constants.Middle, gameManager.TotalTime));
         }
     }
     public void SaveLevel()
@@ -543,8 +544,7 @@ public class Window : Game
             else if (tile is Door door)
             {
                 // Write door key
-                writer.Write(door.Key.Name);
-                writer.Write(door.Key.Description);
+                writer.Write(door.Key);
             }
         }
 
@@ -567,11 +567,9 @@ public class Window : Game
         for (int n = 0; n < Math.Min(levelManager.Level.Loot.Count, 255); n++)
         {
             Loot loot = levelManager.Level.Loot[n];
-            // Write NPC data
-            writer.Write(loot.Item.Name);
-            writer.Write(loot.Item.Description);
-            writer.Write(loot.Item.Amount);
-            writer.Write(loot.Item.Max);
+            // Write loot data
+            writer.Write(loot.Item);
+            writer.Write(IntToByte(loot.Amount));
             writer.Write((UInt16)loot.Location.X);
             writer.Write((UInt16)loot.Location.Y);
         }

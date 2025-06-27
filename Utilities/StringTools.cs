@@ -1,4 +1,4 @@
-﻿namespace Quest.Tools;
+﻿namespace Quest.Utilities;
 
 public static class StringTools
 {

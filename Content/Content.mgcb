@@ -120,6 +120,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Characters/WhiteWizard.png
 
+#begin Images/Decals/BloodPuddle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Decals/BloodPuddle.png
+
 #begin Images/Decals/BlueTorch.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -131,6 +143,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Decals/BlueTorch.png
+
+#begin Images/Decals/Footprint.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Decals/Footprint.png
 
 #begin Images/Decals/Torch.png
 /importer:TextureImporter
@@ -144,6 +168,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Decals/Torch.png
 
+#begin Images/Decals/WaterPuddle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Decals/WaterPuddle.png
+
 #begin Images/Effects/Glow.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -155,6 +191,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Effects/Glow.png
+
+#begin Images/Effects/Slash.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Effects/Slash.png
 
 #begin Images/Gui/CursorArrow.png
 /importer:TextureImporter
@@ -263,6 +311,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Items/InactivePalantir.png
+
+#begin Images/Items/Key.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/Key.png
 
 #begin Images/Items/PhiCoin.png
 /importer:TextureImporter
@@ -456,11 +516,29 @@
 /processorParam:Quality=Best
 /build:Sounds/Effects/Click.wav
 
+#begin Sounds/Effects/Click.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Click.wav
+
 #begin Sounds/Effects/DoorLocked.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Sounds/Effects/DoorLocked.wav
+
+#begin Sounds/Effects/DoorLocked.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/DoorLocked.wav
+
+#begin Sounds/Effects/DoorUnlock.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/DoorUnlock.wav
 
 #begin Sounds/Effects/DoorUnlock.wav
 /importer:WavImporter
@@ -474,11 +552,29 @@
 /processorParam:Quality=Best
 /build:Sounds/Effects/Footstep.wav
 
+#begin Sounds/Effects/Footstep.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Footstep.wav
+
 #begin Sounds/Effects/Pickup.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Sounds/Effects/Pickup.wav
+
+#begin Sounds/Effects/Pickup.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Pickup.wav
+
+#begin Sounds/Effects/Spook.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Spook.wav
 
 #begin Sounds/Effects/Spook.wav
 /importer:WavImporter
@@ -492,6 +588,18 @@
 /processorParam:Quality=Best
 /build:Sounds/Effects/Trinkets.wav
 
+#begin Sounds/Effects/Trinkets.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Trinkets.wav
+
+#begin Sounds/Effects/Typing.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Typing.wav
+
 #begin Sounds/Effects/Typing.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -503,6 +611,18 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Sounds/Effects/Whoosh.wav
+
+#begin Sounds/Effects/Whoosh.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Whoosh.wav
+
+#begin Sounds/Music/Beauty.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/Beauty.mp3
 
 #begin Sounds/Music/CavesOfDawn.mp3
 /importer:Mp3Importer
@@ -516,11 +636,23 @@
 /processorParam:Quality=Best
 /build:Sounds/Music/Clouds.mp3
 
+#begin Sounds/Music/Mystical.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/Mystical.mp3
+
 #begin Sounds/Music/NightmareAlley.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:Sounds/Music/NightmareAlley.mp3
+
+#begin Sounds/Music/Pulse.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/Pulse.mp3
 
 #begin Sounds/Music/SacredGarden.mp3
 /importer:Mp3Importer
@@ -533,4 +665,10 @@
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:Sounds/Music/TerrorHeights.mp3
+
+#begin Sounds/Music/WanderingWind.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/WanderingWind.mp3
 

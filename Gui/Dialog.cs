@@ -46,7 +46,7 @@ public class Dialog : Widget
             {
                 Displayed += Text[Displayed.Length];
                 Displayed = SoftwrapWords(Displayed, Font, Inside);
-                SoundManager.PlaySoundInstance("Typing", pitch:RandomManager.RandomFloat() / 4 - .125f, volume:.5f);
+                SoundManager.PlaySoundInstance("Typing", pitch: RandomManager.RandomFloat() / 4 - .125f, volume: .5f);
                 charWait = CharDelay;
             }
         }
