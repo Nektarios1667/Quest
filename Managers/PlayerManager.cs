@@ -16,9 +16,12 @@ public class PlayerManager
     {
         Inventory = new(6, 4);
         Inventory.SetSlot(0, new ActivePalantir(this, 1));
+        Inventory.SetSlot(1, new SteelSword(this, 1));
     }
     public void Update(GameManager gameManager)
     {
+        if (StateManager.State != GameState.Game && StateManager.State != GameState.Editor) return;
+
         // Update player position
         UpdatePositions(gameManager);
 
@@ -73,11 +76,10 @@ public class PlayerManager
 
         // Remove attacks
         DebugManager.StartBenchmark("UpdateAttacks");
-
         Attacks.Clear();
-
         if (InputManager.LMouseClicked) Inventory.Equipped?.PrimaryUse();
         else if (InputManager.RMouseClicked) Inventory.Equipped?.SecondaryUse();
+
 
         DebugManager.EndBenchmark("UpdateAttacks");
     }
@@ -88,7 +90,10 @@ public class PlayerManager
             case GameState.Game or GameState.Editor:
                 DrawPlayer(gameManager);
                 if (Constants.DRAW_HITBOXES)
+                {
                     DrawPlayerHitbox(gameManager);
+                    foreach (Attack attack in Attacks) gameManager.Batch.FillRectangle(attack.Hitbox, Constants.DebugPinkTint);
+                }
 
                 Inventory.Draw(gameManager);
                 break;
@@ -112,7 +117,7 @@ public class PlayerManager
         if (Inventory.Equipped != null)
         {
             Point itemPos = Constants.Middle + CameraManager.CameraOffset.ToPoint() - (PlayerDirection == Direction.Left ? Constants.MageDrawShift : Point.Zero);
-            DrawTexture(gameManager.Batch, Inventory.Equipped.Texture, itemPos, scale: 2, effects: PlayerDirection == Direction.Left ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+            DrawTexture(gameManager.Batch, Inventory.Equipped.Texture, itemPos, scale: 2, effects: PlayerDirection == Direction.Left ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
         }
     }
     public void DrawPlayerHitbox(GameManager gameManager)

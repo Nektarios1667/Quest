@@ -34,7 +34,8 @@ public static class TextureManager
         //GammaCoin,
         Key,
         ActivePalantir,
-        //InactivePalantir,
+        InactivePalantir,
+        SteelSword,
         // Tiles
         Dirt,
         Flooring,
@@ -91,7 +92,8 @@ public static class TextureManager
         //Textures[TextureID.GammaCoin] = content.Load<Texture2D>($"Images/Items/GammaCoin");
         Textures[TextureID.Key] = content.Load<Texture2D>($"Images/Items/Key");
         Textures[TextureID.ActivePalantir] = content.Load<Texture2D>($"Images/Items/ActivePalantir");
-        //Textures[TextureID.InactivePalantir] = content.Load<Texture2D>($"Images/Items/InactivePalantir");
+        Textures[TextureID.InactivePalantir] = content.Load<Texture2D>($"Images/Items/InactivePalantir");
+        Textures[TextureID.SteelSword] = content.Load<Texture2D>($"Images/Items/SteelSword");
         Textures[TextureID.Dirt] = content.Load<Texture2D>($"Images/Tiles/Dirt");
         Textures[TextureID.Flooring] = content.Load<Texture2D>($"Images/Tiles/Flooring");
         Textures[TextureID.Grass] = content.Load<Texture2D>($"Images/Tiles/Grass");
@@ -132,7 +134,8 @@ public static class TextureManager
         //Metadata[TextureID.GammaCoin] = new(Textures[TextureID.GammaCoin].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Key] = new(Textures[TextureID.Key].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.ActivePalantir] = new(Textures[TextureID.ActivePalantir].Bounds.Size, new(1, 1), "item");
-        //Metadata[TextureID.InactivePalantir] = new(Textures[TextureID.InactivePalantir].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.InactivePalantir] = new(Textures[TextureID.InactivePalantir].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.SteelSword] = new(Textures[TextureID.SteelSword].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Dirt] = new(Textures[TextureID.Dirt].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Flooring] = new(Textures[TextureID.Flooring].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Grass] = new(Textures[TextureID.Grass].Bounds.Size, new(4, 4), "tile");

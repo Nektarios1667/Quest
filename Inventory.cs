@@ -230,6 +230,38 @@ public class Inventory
         Point pos = Expand(idx);
         return GetItem(pos.X, pos.Y);
     }
+    // ItemIndex
+    public Point ItemLocation(Item item)
+    {
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                // Item
+                Item? currentItem = Items[x, y];
+                if (currentItem == null) continue; // Skip empty slots
+                if (SameItem(currentItem, item)) return new(x, y);
+            }
+        }
+        throw new Exception($"Item '{item.Name}' not found in inventory.");
+    }
+    // Replace
+    public void ReplaceItem(Item item, Item repl)
+    {
+        Point loc = ItemLocation(item);
+        Items[loc.X, loc.Y] = repl;
+    }
+    public void ReplaceItem(int slot, Item repl)
+    {
+        Point pos = Expand(slot);
+        if (pos.X < 0 || pos.X >= Width || pos.Y < 0 || pos.Y >= Height) return; // Out of bounds
+        Items[pos.X, pos.Y] = repl;
+    }
+    public void ReplaceItem(Point pos, Item repl)
+    {
+        if (pos.X < 0 || pos.X >= Width || pos.Y < 0 || pos.Y >= Height) return; // Out of bounds
+        Items[pos.X, pos.Y] = repl;
+    }
     // Swap
     public void Swap(int slot1, int slot2)
     {

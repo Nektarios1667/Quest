@@ -31,6 +31,7 @@ public class GameManager
         SoundManager.LoadSound(content, "Whoosh", "Sounds/Effects/Whoosh");
         SoundManager.LoadSound(content, "Pickup", "Sounds/Effects/Pickup");
         SoundManager.LoadSound(content, "Spook", "Sounds/Effects/Spook");
+        SoundManager.LoadSound(content, "Swoosh", "Sounds/Effects/Swoosh");
     }
     public void Update(float deltaTime)
     {

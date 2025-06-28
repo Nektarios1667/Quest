@@ -70,10 +70,10 @@ public class Window : Game
 
     protected override void LoadContent()
     {
-        spriteBatch = new SpriteBatch(GraphicsDevice);
+        spriteBatch = new(GraphicsDevice);
 
         // State Manager
-        StateManager.Mood = Mood.Dark;
+        StateManager.Mood = Mood.Calm;
 
         // Textures
         LoadTextures(Content);
