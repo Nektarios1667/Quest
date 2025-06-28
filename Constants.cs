@@ -55,7 +55,7 @@ public static class Constants
     public static readonly Color DebugGreenTint = new Color(55, 255, 55) * .5f;
 
     // Minimap pixel colors
-    public static readonly Xna.Color[] MiniMapColors = [
+    public static readonly Color[] MiniMapColors = [
         new(92, 221, 241), // Sky
         Color.Green, // Grass
         Color.Blue, // Water

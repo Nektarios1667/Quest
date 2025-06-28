@@ -21,7 +21,7 @@ public class Enemy
         Name = GetType().Name;
         Mode = "idle";
         Texture = (TextureID)Enum.Parse(typeof(TextureID), GetType().Name);
-        UID = UIDManager.NewUID("Items");
+        UID = UIDManager.NewUID("Enemies");
         tileSize = TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap;
         Location = location.ToVector2();
         
