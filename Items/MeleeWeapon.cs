@@ -17,7 +17,7 @@ public class MeleeWeapon : Item
         if (TimerManager.TryTimeLeft($"MeleeSwing_{UID}") <= 0)
         {
             TimerManager.SetTimer($"MeleeSwing_{UID}", 1f / FireRate, null);
-            RectangleF hitbox = new(CameraManager.Camera.X, CameraManager.Camera.Y, Range, Constants.MageSize.Y);
+            RectangleF hitbox = new(CameraManager.Camera.X, CameraManager.Camera.Y, Range, Constants.MageHalfSize.Y / (float)Constants.TileSize.Y);
             PlayerManager.AddAttack(new(Damage, hitbox));
         }
     }

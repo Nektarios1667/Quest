@@ -17,6 +17,7 @@ public class PlayerManager
         Inventory = new(6, 4);
         Inventory.SetSlot(0, new ActivePalantir(this, 1));
         Inventory.SetSlot(1, new SteelSword(this, 1));
+        Inventory.SetSlot(2, new DiamondSword(this, 1));
     }
     public void Update(GameManager gameManager)
     {
@@ -92,7 +93,8 @@ public class PlayerManager
                 if (Constants.DRAW_HITBOXES)
                 {
                     DrawPlayerHitbox(gameManager);
-                    foreach (Attack attack in Attacks) gameManager.Batch.FillRectangle(attack.Hitbox, Constants.DebugPinkTint);
+                    foreach (Attack attack in Attacks)
+                        gameManager.Batch.FillRectangle(new(attack.Hitbox.Position - CameraManager.Camera + Constants.Middle.ToVector2(), new Vector2(attack.Hitbox.Width, attack.Hitbox.Height) * Constants.TileSize.ToVector2()), Constants.DebugPinkTint);
                 }
 
                 Inventory.Draw(gameManager);
