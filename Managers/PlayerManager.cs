@@ -81,7 +81,6 @@ public class PlayerManager
         if (InputManager.LMouseClicked) Inventory.Equipped?.PrimaryUse();
         else if (InputManager.RMouseClicked) Inventory.Equipped?.SecondaryUse();
 
-
         DebugManager.EndBenchmark("UpdateAttacks");
     }
     public void Draw(GameManager gameManager)

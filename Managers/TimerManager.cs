@@ -69,17 +69,23 @@ public static class TimerManager
             return timer.left;
         return 0;
     }
+    /// <summary>
+    /// Returns whether the timer with the given name is complete. If the timer does not exist, an exception is thrown.
+    /// </summary>
     public static bool IsComplete(string name)
     {
         if (timers.TryGetValue(name, out var timer))
             return timer.left <= 0;
         throw new KeyNotFoundException($"No timer with name '{name}' found");
     }
+    /// <summary>
+    /// Returns true if the timer with the given name is complete, or if it does not exist.
+    /// </summary>
     public static bool TryIsComplete(string name)
     {
         if (timers.TryGetValue(name, out var timer))
             return timer.left <= 0;
-        return false;
+        return true;
     }
     public static bool Exists(string name) => timers.ContainsKey(name);
     public static void Update(GameManager gameManager)

@@ -1,7 +1,7 @@
 ﻿namespace Quest.Items;
 public class SteelSword : MeleeWeapon
 {
-    public SteelSword(PlayerManager playerManager, int amount): base(playerManager, amount, 1f, .6f, 20)
+    public SteelSword(PlayerManager playerManager, int amount): base(playerManager, amount, 1f, 45, 20)
     {
         Description = "A sturdy bronze sword.";
         MaxAmount = 1;

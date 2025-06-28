@@ -2,7 +2,7 @@
 public class MeleeWeapon : Item
 {
     public float FireRate { get; } // Attacks per second
-    public float Range { get; } // Range in tiles
+    public float Range { get; } // Pixels
     public int Damage { get; } // Damage dealt per hit
     public MeleeWeapon(PlayerManager playerManager, int amount, float firerate, float range, int damage) : base(playerManager, amount)
     {
@@ -14,10 +14,10 @@ public class MeleeWeapon : Item
     }
     public override void PrimaryUse()
     {
-        if (TimerManager.TryTimeLeft($"MeleeSwing_{UID}") <= 0)
+        if (TimerManager.TryIsComplete($"MeleeSwing_{UID}"))
         {
             TimerManager.SetTimer($"MeleeSwing_{UID}", 1f / FireRate, null);
-            RectangleF hitbox = new(CameraManager.Camera.X, CameraManager.Camera.Y, Range, Constants.MageHalfSize.Y / (float)Constants.TileSize.Y);
+            RectangleF hitbox = new(CameraManager.Camera.X, CameraManager.Camera.Y, Range, Constants.MageHalfSize.Y);
             PlayerManager.AddAttack(new(Damage, hitbox));
         }
     }

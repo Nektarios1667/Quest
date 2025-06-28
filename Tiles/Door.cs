@@ -40,7 +40,7 @@ public class Door : Tile
 
             // Sound fx
             string timerName = $"DoorLocked_{Location.X + Location.Y * Constants.MapSize.X}";
-            if (!TimerManager.Exists(timerName) || TimerManager.IsComplete(timerName))
+            if (TimerManager.TryIsComplete(timerName))
             {
                 SoundManager.PlaySoundInstance("DoorLocked");
                 TimerManager.SetTimer(timerName, 5, null);

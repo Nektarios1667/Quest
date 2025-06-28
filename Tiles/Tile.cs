@@ -5,16 +5,17 @@ namespace Quest.Tiles;
 
 public enum TileType
 {
-    Sky = 0,
-    Grass = 1,
-    Water = 2,
-    StoneWall = 3,
-    Stairs = 4,
-    Flooring = 5,
-    Sand = 6,
-    Dirt = 7,
-    Darkness = 8,
-    Door = 9,
+    Sky,
+    Grass,
+    Water,
+    StoneWall,
+    Stairs,
+    Flooring,
+    Sand,
+    Dirt,
+    Darkness,
+    Door,
+    WoodPlanks,
 }
 public class Tile
 {

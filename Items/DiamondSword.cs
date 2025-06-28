@@ -1,7 +1,7 @@
 ﻿namespace Quest.Items;
 public class DiamondSword : MeleeWeapon
 {
-    public DiamondSword(PlayerManager playerManager, int amount): base(playerManager, amount, .8f, .9f, 40)
+    public DiamondSword(PlayerManager playerManager, int amount): base(playerManager, amount, .8f, 60, 40)
     {
         Description = "A razor sharp sword made with pure diamonds.";
         MaxAmount = 1;

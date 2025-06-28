@@ -4,6 +4,7 @@ public static class UIDManager
     private static Dictionary<string, int> uids = new()
     {
         { "Items", 0 },
+        { "Enemies", 0 },
     };
     public static void NewUIDCategory(string name)
     {

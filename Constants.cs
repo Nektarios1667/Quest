@@ -34,7 +34,7 @@ public static class Constants
     public static readonly Point TwoPoint = new(2, 2);
 
     // Game
-    public static readonly string[] TileNames = ["Sky", "Grass", "Water", "StoneWall", "Stairs", "Flooring", "Sand", "Dirt", "Darkness", "Door"];
+    public static readonly string[] TileNames = Enum.GetNames(typeof(TileType));
     public static int PlayerSpeed = 200;
     public const int MaxStack = 10;
 
@@ -66,5 +66,6 @@ public static class Constants
         new(48, 25, 0), // Dirt
         new(18, 18, 18), // Darkness
         new(41, 15, 0), // Door
+        new(102, 60, 14), // WoodPlanks
     ];
 }

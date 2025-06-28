@@ -1,35 +1,39 @@
 ﻿namespace Quest.Entities;
 public class Enemy
 {
+    public int UID { get; }
     public bool IsAlive => Health >= 0;
     public string Name { get; private set; }
     public int Health { get; private set; }
     public int Attack { get; private set; }
-    public float AttackSpeed { get; private set; }
-    public float AttackCooldown { get; private set; } = 0f;
-    public float Defense { get; private set; }
-    public int Speed { get; private set; }
-    public int ViewRange { get; private set; }
-    public int AttackRange { get; private set; }
+    public float AttackSpeed { get; private set; } // Attacks per second
+    public float Defense { get; private set; } // If damage <= Defense, damage /= 2
+    public int Speed { get; private set; } // Pixels per second
+    public int ViewRange { get; private set; } // Pixels
+    public int AttackRange { get; private set; } // Pixels
     public TextureID Texture { get; private set; }
     public Vector2 Location { get; private set; }
     public string Mode { get; private set; }
     public RectangleF Hitbox => new(Location, tileSize);
     private Point tileSize { get; set; }
-    public Enemy(string name, int health, Point location, int attack, float attackSpeed, float defense, int speed, int viewRange, int attackRange, TextureID texture)
+    public Enemy(Point location)
     {
-        Name = name;
-        Health = health;
-        Location = location.ToVector2();
-        Attack = attack;
-        AttackSpeed = attackSpeed;
-        Defense = defense;
-        Speed = speed;
-        Texture = texture;
-        ViewRange = viewRange;
-        AttackRange = attackRange;
+        Name = GetType().Name;
         Mode = "idle";
+        Texture = (TextureID)Enum.Parse(typeof(TextureID), GetType().Name);
+        UID = UIDManager.NewUID("Items");
         tileSize = TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap;
+        Location = location.ToVector2();
+        
+        // Stats
+        Health = 100;
+        Attack = 25;
+        AttackSpeed = 1;
+        Defense = 20;
+        Speed = 100;
+        ViewRange = 900;
+        AttackRange = 50;
+
     }
     public virtual void Update(GameManager gameManager)
     {
@@ -38,11 +42,10 @@ public class Enemy
         // View range
         float playerDistSq = Vector2.DistanceSquared(Location, CameraManager.CameraDest);
         // Attack
-        if (playerDistSq < AttackRange * AttackRange && AttackCooldown <= 0)
+        if (TimerManager.TryIsComplete($"EnemyAttack_{UID}") && playerDistSq < AttackRange * AttackRange)
         {
             Mode = "attack";
-            // TODO Damage player
-            AttackCooldown = AttackSpeed;
+            TimerManager.SetTimer($"EnemyAttack_{UID}", 0, null);
         }
         // Move
         else if (playerDistSq < ViewRange * ViewRange && playerDistSq != 0)
@@ -53,8 +56,6 @@ public class Enemy
         else
             Mode = "idle";
 
-        // Final
-        if (AttackCooldown > 0) AttackCooldown -= gameManager.DeltaTime;
     }
     public virtual void Draw(GameManager gameManager)
     {
