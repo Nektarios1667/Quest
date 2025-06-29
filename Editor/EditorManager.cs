@@ -353,4 +353,8 @@ public class EditorManager
             throw new ArgumentOutOfRangeException(nameof(coord), "Coordinates are out of bounds of the level.");
         return levelManager.Level.Tiles[coord.X + coord.Y * Constants.MapSize.X];
     }
+    public void SetTile(Tile tile)
+    {
+        levelManager.Level.Tiles[tile.Location.X + tile.Location.Y * Constants.MapSize.X] = tile;
+    }
 }
