@@ -17,11 +17,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
     <Optimize>True</Optimize>
+    <DefineConstants>$(DefineConstants);EDITOR</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="DotnetNoise" Version="1.0.0" />
     <PackageReference Include="MonoGame.Extended" Version="4.1.0" />
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.3.0" />
 	<PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.3.0" />
@@ -30,6 +32,11 @@
     <None Update="Levels\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+	<None Update="Structures\**\*">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />

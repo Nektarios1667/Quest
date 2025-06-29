@@ -177,7 +177,7 @@ public class LevelManager
     public void ReadLevel(UIManager uiManager, string filename)
     {
         // Check file exists
-        if (!File.Exists($"Levels/{filename}.lvl"))
+        if (!File.Exists($"Levels/{filename}.qlv"))
             throw new FileNotFoundException("Level file not found.", filename);
 
         // Check if already read
@@ -186,12 +186,12 @@ public class LevelManager
                 return;
 
         // Get data
-        string data = File.ReadAllText($"Levels/{filename}.lvl");
+        string data = File.ReadAllText($"Levels/{filename}.qlv");
         string[] lines = data.Split('\n');
 
         // Parse
         Tile[] tilesBuffer;
-        using FileStream fileStream = File.OpenRead($"Levels/{filename}.lvl");
+        using FileStream fileStream = File.OpenRead($"Levels/{filename}.qlv");
         using GZipStream gzipStream = new(fileStream, CompressionMode.Decompress);
         using BinaryReader reader = new(gzipStream);
         // Make buffers
@@ -290,6 +290,7 @@ public class LevelManager
             _ => new Tile(location), // Default tile
         };
     }
+    public static Tile TileFromId(TileType id, Point location) => TileFromId((int)id, location);
     public static Decal DecalFromId(int id, Point location)
     {
         // Create a decal from an id

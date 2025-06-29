@@ -20,6 +20,8 @@ public class Window : Game
     private Point mouseCoord;
     private readonly Color highlightColor = new(1, 1, 1, .8f);
     private Tile mouseTile;
+    private LevelGenerator levelGenerator;
+    private RenderTarget2D? minimap;
 
     // Time
     private float delta;
@@ -88,6 +90,7 @@ public class Window : Game
         StateManager.State = GameState.Editor;
 
         // Levels
+        levelGenerator = new(42, 1f / 64);
         //levelManager.ReadLevel(uiManager, "island_house");
         //levelManager.ReadLevel(uiManager, "island_house_basement");
 
@@ -208,6 +211,8 @@ public class Window : Game
         // Level info
         if (InputManager.Hotkey(Keys.LeftControl, Keys.I)) SetSpawn();
         if (InputManager.Hotkey(Keys.LeftControl, Keys.T)) SetTint();
+        // Generate level
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.G)) GenerateLevel();
 
         // Managers
         InputManager.Update();
@@ -249,6 +254,9 @@ public class Window : Game
         if (Constants.FRAME_BAR)
             DrawFrameBar();
         DebugManager.EndBenchmark("FrameBarDraw");
+
+        // Minimap
+        DrawMiniMap();
 
         // Cursor
         DrawTexture(spriteBatch, TextureID.CursorArrow, InputManager.MousePosition);
@@ -397,19 +405,45 @@ public class Window : Game
     }
     public void DrawMiniMap()
     {
-        spriteBatch.DrawRectangle(new(7, Constants.Window.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
-        for (int y = 0; y < Constants.MapSize.Y; y++)
+        DebugManager.StartBenchmark("DrawMinimap");
+        // Frame
+        gameManager.Batch.DrawRectangle(new(7, Constants.Window.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
+
+        // Create render if not done already
+        if (minimap == null)
         {
-            for (int x = 0; x < Constants.MapSize.X; x++)
+            // Setup target
+            minimap = new RenderTarget2D(GraphicsDevice, Constants.MapSize.X, Constants.MapSize.Y);
+            GraphicsDevice.SetRenderTarget(minimap);
+            GraphicsDevice.Clear(Color.Transparent);
+            spriteBatch.End();
+            spriteBatch.Begin();
+
+            // Pixels
+            for (int y = 0; y < Constants.MapSize.Y; y++)
             {
-                // Get tile
-                Tile tile = GetTile(new Point(x, y))!;
-                spriteBatch.DrawPoint(new(10 + x, Constants.Window.Y - Constants.MapSize.Y - 10 + y), Constants.MiniMapColors[(int)tile.Type]);
+                for (int x = 0; x < Constants.MapSize.X; x++)
+                {
+                    // Get tile
+                    Tile tile = gameManager.LevelManager.GetTile(new Point(x, y))!;
+                    spriteBatch.DrawPoint(new(x, y), Constants.MiniMapColors[(int)tile.Type]);
+                }
             }
+
+            // Resume normal render
+            spriteBatch.End();
+            GraphicsDevice.SetRenderTarget(null);
+            spriteBatch.Begin();
+
         }
+        else
+            spriteBatch.Draw(minimap, new Rectangle(10, Constants.Window.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
+
         // Player
         Point dest = CameraManager.TileCoord + new Point(10, Constants.Window.Y - Constants.MapSize.Y - 10);
         spriteBatch.DrawPoint(dest.ToVector2(), Color.Red, size: 2);
+
+        DebugManager.EndBenchmark("DrawMinimap");
     }
     public void SetSpawn()
     {
@@ -513,7 +547,7 @@ public class Window : Game
 
         // Parse
         Directory.CreateDirectory("..\\..\\..\\Levels");
-        using FileStream fileStream = File.Create($"..\\..\\..\\Levels/{name}.lvl");
+        using FileStream fileStream = File.Create($"..\\..\\..\\Levels/{name}.qlv");
         using GZipStream gzipStream = new(fileStream, CompressionLevel.Optimal);
         using BinaryWriter writer = new(gzipStream);
 
@@ -584,6 +618,14 @@ public class Window : Game
             writer.Write(IntToByte(decal.Location.X));
             writer.Write(IntToByte(decal.Location.Y));
         }
+    }
+    public void GenerateLevel()
+    {
+        levelGenerator.Seed = RandomManager.RandomIntRange(0, Int32.MaxValue);
+        Tile[] tiles = levelGenerator.GenerateLevel(Constants.MapSize, 20);
+        Level level = new("generated", tiles, Constants.HalfMapSize, [], [], [], []);
+        levelManager.LoadLevelObject(gameManager, level);
+        minimap = null;
     }
     public Tile GetTile(Point coord)
     {
