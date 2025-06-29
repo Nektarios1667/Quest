@@ -54,6 +54,7 @@ public static class Constants
     public static readonly Color DarkenScreen = new(0, 0, 0, 188);
     public static readonly Color DebugPinkTint = new Color(255, 0, 255) * .5f;
     public static readonly Color DebugGreenTint = new Color(55, 255, 55) * .5f;
+    public static readonly Color SemiTransparent = Color.White * .6f;
 
     // Minimap pixel colors
     public static readonly Color[] MiniMapColors = [
