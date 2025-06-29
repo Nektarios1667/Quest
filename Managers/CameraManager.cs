@@ -10,9 +10,11 @@ public static class CameraManager
     {
         // Lerp camera
         DebugManager.StartBenchmark("CameraUpdate");
+        CameraDest = Vector2.Clamp(CameraDest, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
         if (Vector2.DistanceSquared(Camera, CameraDest) < 4 * deltaTime * 60) Camera = CameraDest; // If close enough snap to destination
         if (CameraDest != Camera) // If not, lerp towards destination
             Camera = Vector2.Lerp(Camera, CameraDest, 1f - MathF.Pow(1f - Constants.CameraRigidity, deltaTime * 60f));
+        // Clamp camera to map bounds
         DebugManager.EndBenchmark("CameraUpdate");
     }
 }
