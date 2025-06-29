@@ -1,6 +1,13 @@
 ﻿using System.IO;
+using System.Linq;
+using System.Windows.Forms;
+using SharpDX.DirectWrite;
 
 namespace Quest.Editor;
+public class Terrain(params (float min, float max, TileType tile)[] ranges)
+{
+    public (float min, float max, TileType tile)[] Ranges { get; private set; } = ranges;
+}
 public class Structure(TileType?[] tiles, Point size, TileType? spawnTile)
 {
     public TileType?[] Tiles { get; private set; } = tiles;
@@ -11,7 +18,9 @@ public class LevelGenerator
 {
     private FastNoiseLite Noise { get; set; } = new();
     private int _seed;
-    private Structure[] structures = new Structure[Directory.GetFiles("Structures").Length];
+    private Dictionary<string, Structure> Structures = new();
+    public Terrain Terrain { get; set; }
+    public Dictionary<string, Terrain> Terrains { get; set; } = new();
     public int Seed
     {
         get => _seed;
@@ -29,43 +38,21 @@ public class LevelGenerator
         Noise.SetFractalType(FastNoiseLite.FractalType.FBm);
         Noise.SetFrequency(freq);
 
-        // Setup structures
-        List<TileType?> tileTypesBuffer = [];
-        int f = 0;
-        Point size = Point.Zero;
-        TileType? spawn = null;
-
         // Read each structure
-        foreach (string file in Directory.GetFiles("Structures"))
+        foreach (string file in Directory.GetFiles("World/Structures"))
         {
-            tileTypesBuffer.Clear();
-            using (FileStream stream = File.Open(file, FileMode.Open))
-            using (BinaryReader reader = new(stream))
-            {
-                // Header
-                byte b = reader.ReadByte();
-                spawn = b == 0 ? null : (TileType)b;
-                size = new(reader.ReadByte(), reader.ReadByte());
-
-                // Tiles
-                for (int i = 0; i < size.X * size.Y; i++)
-                {
-                    b = reader.ReadByte();
-                    TileType? type = b == 0 ? null : (TileType)b;
-                    tileTypesBuffer.Add(type);
-                }
-            }
-            structures[f] = new([.. tileTypesBuffer], size, spawn);
-            f++;
+            string name = Path.GetFileNameWithoutExtension(file);
+            Structures[name] = ReadStructure(file);
         }
-    }
 
-    public Dictionary<TileType, (float min, float max)> TileRanges { get; set; } = new()
-    {
-        { TileType.Water, (0, 0.58f) },
-        { TileType.Sand, (.58f, .6f) },
-        { TileType.Grass, (.6f, 1) },
-    };
+        // Read each terrain preset
+        foreach (string file in Directory.GetFiles("World/Terrain"))
+        {
+            string name = Path.GetFileNameWithoutExtension(file);
+            Terrains[name] = ReadTerrainPreset(file);
+        }
+        Terrain = Terrains["Islands"];
+    }
     public float GetNormNoise(int x, int y)
     {
         // Generate noise value in range [0, 1]
@@ -81,11 +68,12 @@ public class LevelGenerator
     public float GetNoise(Point point) => GetNoise(point.X, point.Y);
     public TileType GetGeneratedTile(int x, int y, float? value = null)
     {
-        value = value ?? GetNormNoise(x, y); // Noise
-        foreach (var (tileType, (min, max)) in TileRanges)
+        value ??= GetNormNoise(x, y); // Noise
+        foreach (var (min, max, tile) in Terrain.Ranges)
         {
+            // Check if value is in range
             if (value >= min && value < max)
-                return tileType;
+                return tile;
         }
         return TileType.Sky;
     }
@@ -118,7 +106,7 @@ public class LevelGenerator
         for (int i = 0; i < structureAttempts; i++)
         {
             // Randomly select a structure
-            Structure structure = structures[RandomManager.RandomIntRange(0, structures.Length - 1)];
+            Structure structure = Structures.Values.ElementAt(RandomManager.RandomIntRange(0, Structures.Count - 1));
             Point spawnPoint = new(RandomManager.RandomIntRange(0, width - structure.Size.X), RandomManager.RandomIntRange(0, height - structure.Size.Y));
 
             // Check if on valid tile
@@ -138,5 +126,53 @@ public class LevelGenerator
         return level;
     }
     public Tile[] GenerateLevel(Point size, int structureAttempts) => GenerateLevel(size.X, size.Y, structureAttempts);
+    public static Structure ReadStructure(string file)
+    {
+        // Check
+        if (!file.EndsWith(".qst")) throw new Exception($"Failed to read structure '{file}'. Expected .qst file.");
 
+        // Setup
+        List<TileType?> tileTypesBuffer = [];
+        TileType? spawn;
+        Point size = Point.Zero;
+        using (FileStream stream = File.Open(file, FileMode.Open))
+        using (BinaryReader reader = new(stream))
+        {
+            // Header
+            byte b = reader.ReadByte();
+            spawn = b == 0 ? null : (TileType)b;
+            size = new(reader.ReadByte(), reader.ReadByte());
+
+            // Tiles
+            for (int i = 0; i < size.X * size.Y; i++)
+            {
+                b = reader.ReadByte();
+                TileType? type = b == 0 ? null : (TileType)b;
+                tileTypesBuffer.Add(type);
+            }
+        }
+        return new([.. tileTypesBuffer], size, spawn);
+    }
+    public static Terrain ReadTerrainPreset(string file)
+    {
+        // Check
+        if (!file.EndsWith(".qtr")) throw new Exception($"Failed to read preset '{file}'. Expected .qtr file.");
+        // Read
+        List<(float min, float max, TileType tile)> ranges = [];
+        using (FileStream stream = File.Open(file, FileMode.Open))
+        using (BinaryReader reader = new(stream))
+        {
+            // Header
+            int count = reader.ReadByte();
+            // Ranges
+            for (int i = 0; i < count; i++)
+            {
+                float min = reader.ReadByte() / 100f;
+                float max = reader.ReadByte() / 100f;
+                TileType tile = (TileType)reader.ReadByte();
+                ranges.Add((min, max, tile));
+            }
+        }
+        return new([.. ranges]);
+    }
 }

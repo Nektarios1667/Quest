@@ -50,6 +50,7 @@ public static class TextureManager
         Darkness,
         Door,
         WoodPlanks,
+        Stone,
         // Decals
         Torch,
         BlueTorch,
@@ -108,6 +109,7 @@ public static class TextureManager
         Textures[TextureID.Water] = content.Load<Texture2D>($"Images/Tiles/Water");
         Textures[TextureID.Darkness] = content.Load<Texture2D>($"Images/Tiles/Darkness");
         Textures[TextureID.Door] = content.Load<Texture2D>($"Images/Tiles/Door");
+        Textures[TextureID.Stone] = content.Load<Texture2D>($"Images/Tiles/Stone");
         Textures[TextureID.Torch] = content.Load<Texture2D>($"Images/Decals/Torch");
         Textures[TextureID.BlueTorch] = content.Load<Texture2D>($"Images/Decals/BlueTorch");
         Textures[TextureID.WaterPuddle] = content.Load<Texture2D>($"Images/Decals/WaterPuddle");
@@ -151,6 +153,7 @@ public static class TextureManager
         Metadata[TextureID.Water] = new(Textures[TextureID.Water].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Darkness] = new(Textures[TextureID.Darkness].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Door] = new(Textures[TextureID.Door].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.Stone] = new(Textures[TextureID.Stone].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Torch] = new(Textures[TextureID.Torch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.WaterPuddle] = new(Textures[TextureID.WaterPuddle].Bounds.Size, new(1, 1), "decal");

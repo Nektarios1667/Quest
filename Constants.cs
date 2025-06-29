@@ -60,7 +60,7 @@ public static class Constants
         new(92, 221, 241), // Sky
         Color.Green, // Grass
         Color.Blue, // Water
-        Color.Gray, // StoneWall
+        Color.DarkGray, // StoneWall
         new(117, 66, 13), // Stairs
         new(155, 155, 195), // Flooring
         Color.Yellow, // Sand
@@ -68,5 +68,6 @@ public static class Constants
         new(18, 18, 18), // Darkness
         new(41, 15, 0), // Door
         new(102, 60, 14), // WoodPlanks
+        Color.Gray, // Stone
     ];
 }

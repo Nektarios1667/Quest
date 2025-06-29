@@ -621,7 +621,9 @@ public class Window : Game
     }
     public void GenerateLevel()
     {
-        levelGenerator.Seed = RandomManager.RandomIntRange(0, Int32.MaxValue);
+        Logger.Print("__Generate Level__");
+        levelGenerator.Seed = Logger.InputInt("Seed: ", fallback:levelGenerator.Seed);
+        levelGenerator.Terrain = levelGenerator.Terrains.TryGetValue(Logger.Input("Preset: "), out var preset) ? preset : levelGenerator.Terrain;
         Tile[] tiles = levelGenerator.GenerateLevel(Constants.MapSize, 20);
         Level level = new("generated", tiles, Constants.HalfMapSize, [], [], [], []);
         levelManager.LoadLevelObject(gameManager, level);

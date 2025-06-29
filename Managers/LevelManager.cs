@@ -176,17 +176,13 @@ public class LevelManager
     }
     public void ReadLevel(UIManager uiManager, string filename)
     {
-        // Check file exists
-        if (!File.Exists($"Levels/{filename}.qlv"))
-            throw new FileNotFoundException("Level file not found.", filename);
-
         // Check if already read
         foreach (Level level in Levels)
             if (level.Name == filename)
                 return;
 
         // Get data
-        string data = File.ReadAllText($"Levels/{filename}.qlv");
+        string data = File.ReadAllText($"World/Levels/{filename}.qlv");
         string[] lines = data.Split('\n');
 
         // Parse
@@ -287,6 +283,7 @@ public class LevelManager
             TileType.Dirt => new Dirt(location),
             TileType.Darkness => new Darkness(location),
             TileType.WoodPlanks => new WoodPlanks(location),
+            TileType.Stone => new Stone(location),
             _ => new Tile(location), // Default tile
         };
     }

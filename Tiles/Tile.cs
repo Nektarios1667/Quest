@@ -16,6 +16,7 @@ public enum TileType
     Darkness,
     Door,
     WoodPlanks,
+    Stone,
 }
 public class Tile
 {
