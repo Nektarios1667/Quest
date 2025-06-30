@@ -187,7 +187,7 @@ public class LevelManager
 
         // Parse
         Tile[] tilesBuffer;
-        using FileStream fileStream = File.OpenRead($"Levels/{filename}.qlv");
+        using FileStream fileStream = File.OpenRead($"World/Levels/{filename}.qlv");
         using GZipStream gzipStream = new(fileStream, CompressionMode.Decompress);
         using BinaryReader reader = new(gzipStream);
         // Make buffers
