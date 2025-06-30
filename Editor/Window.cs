@@ -57,6 +57,7 @@ public class Window : Game
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
         IsFixedTimeStep = false;
+        Logger.System("Initialized window object.");
     }
 
     protected override void Initialize()
@@ -84,6 +85,7 @@ public class Window : Game
         gameManager = new(Content, spriteBatch, new(0, 0), levelManager, uiManager);
         editorManager = new(gameManager, levelManager, levelGenerator, spriteBatch, debugSb);
         StateManager.State = GameState.Editor;
+        Logger.System("Initialized managers.");
 
         // Shaders
         Grayscale = Content.Load<Effect>("Shaders/Grayscale");

@@ -2,8 +2,9 @@
 
 public static class Logger
 {
-    private static readonly List<string> MessageLevels = ["Input", "Log", "System", "Warning", "Error"];
+    private static readonly List<string> MessageLevels = ["Input", "System", "Log", "Warning", "Error"];
     private static readonly List<ConsoleColor> MessageColors = [ConsoleColor.Cyan, ConsoleColor.Blue, ConsoleColor.Green, ConsoleColor.Yellow, ConsoleColor.Red];
+    private static string timestamp => DateTime.Now.ToString("HH:mm:ss.fff");
     public static void CreateLevel(string levelName, ConsoleColor color)
     {
         if (!MessageLevels.Contains(levelName))
@@ -17,7 +18,7 @@ public static class Logger
         if (MessageLevels.Contains(type))
         {
             Console.ForegroundColor = MessageColors[MessageLevels.IndexOf(type)];
-            Console.WriteLine($"[{type}] {message}");
+            Console.WriteLine($"({timestamp}) [{type}] {message}");
             Console.ForegroundColor = ConsoleColor.White; // Reset color
         }
         else
@@ -57,14 +58,12 @@ public static class Logger
         string[] parts = resp.Split(',');
         if (parts.Length == 3)
         {
-            int r, g, b;
-            if (int.TryParse(parts[0], out r) && int.TryParse(parts[1], out g) && int.TryParse(parts[2], out b))
+            if (int.TryParse(parts[0], out int r) && int.TryParse(parts[1], out int g) && int.TryParse(parts[2], out int b))
                 return new Color(r, g, b);
         }
         else if (parts.Length == 4)
         {
-            int r, g, b, a;
-            if (int.TryParse(parts[0], out r) && int.TryParse(parts[1], out g) && int.TryParse(parts[2], out b) && int.TryParse(parts[3], out a))
+            if (int.TryParse(parts[0], out int r) && int.TryParse(parts[1], out int g) && int.TryParse(parts[2], out int b) && int.TryParse(parts[3], out int a))
                 return new Color(r, g, b, a);
         }
         Error("Invalid input- expected r,g,b or r,g,b,a color");
@@ -73,7 +72,7 @@ public static class Logger
     public static string Input(string message)
     {
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Input")];
-        Console.WriteLine($"[Input] {message}");
+        Console.WriteLine($"({timestamp}) [Input] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color
         return Console.ReadLine() ?? "";
     }
@@ -84,7 +83,7 @@ public static class Logger
     public static void System(string message)
     {
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("System")];
-        Console.WriteLine($"[System] {message}");
+        Console.WriteLine($"({timestamp}) [System] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color
     }
     public static void Log(string message)
@@ -92,19 +91,19 @@ public static class Logger
         if (!Constants.LOG_INFO) return; // Skip logging if not enabled
 
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Log")];
-        Console.WriteLine($"[Log] {message}");
+        Console.WriteLine($"({timestamp}) [Log] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color
     }
     public static void Warning(string message)
     {
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Warning")];
-        Console.WriteLine($"[Warning] {message}");
+        Console.WriteLine($"({timestamp}) [Warning] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color
     }
     public static void Error(string message, bool exit = false)
     {
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Error")];
-        Console.WriteLine($"[Error] {message}");
+        Console.WriteLine($"({timestamp}) [Error] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color
         if (exit) Environment.Exit(1);
     }

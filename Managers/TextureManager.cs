@@ -117,7 +117,12 @@ public static class TextureManager
         Textures[TextureID.Footprint] = content.Load<Texture2D>($"Images/Decals/Footprint");
         Textures[TextureID.Glow] = content.Load<Texture2D>($"Images/Effects/Glow");
         Textures[TextureID.Slash] = content.Load<Texture2D>($"Images/Effects/Slash");
-        Logger.Log("Textures loaded successfully.");
+        foreach (var kv in Textures)
+            if (kv.Value == null)
+                Logger.Error($"Texture '{kv.Key}' failed to load.");
+            else
+                Logger.System($"Texture '{kv.Key}' successfully loaded.");
+        Logger.System($"Successfully loaded {Textures.Count} textures.");
 
         // Metadata
         Metadata[TextureID.Null] = new(Textures[TextureID.Null].Bounds.Size, new(1, 1), "null");
@@ -161,13 +166,19 @@ public static class TextureManager
         Metadata[TextureID.Footprint] = new(Textures[TextureID.Footprint].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.Glow] = new(Textures[TextureID.Glow].Bounds.Size, new(1, 1), "effect");
         Metadata[TextureID.Slash] = new(Textures[TextureID.Slash].Bounds.Size, new(1, 1), "effect");
-        Logger.Log("TextureManager.Metadata loaded successfully.");
+        foreach (var kv in Metadata)
+            if (kv.Value == null)
+                Logger.Error($"Metadata for texture '{kv.Key}' failed to load.");
+            else
+                Logger.System($"Metadata for texture '{kv.Key}' successfully loaded.");
+        Logger.System($"Successfully loaded {Metadata.Count} texture Metadatas.");
 
         // Fonts
         PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");
         PixelOperatorBold = Content.Load<SpriteFont>("Fonts/PixelOperatorBold");
         Arial = Content.Load<SpriteFont>("Fonts/Arial");
         ArialSmall = Content.Load<SpriteFont>("Fonts/ArialSmall");
+        Logger.System("Successfully loaded fonts.");
     }
     public static TextureID ParseTextureString(string textureName)
     {
@@ -175,7 +186,14 @@ public static class TextureManager
     }
     public static Texture2D GetTexture(TextureID id)
     {
-        return Textures.GetValueOrDefault(id, Textures[TextureID.Null]);
+        Texture2D tex = Textures.GetValueOrDefault(id, Textures[TextureID.Null]);
+        if (tex == Textures[TextureID.Null] && !errors.Contains($"getfail-{id}"))
+        {
+            Logger.Error($"Texture with name '{id}' not found.");
+            errors.Add($"getfail-{id}");
+            return Textures[TextureID.Null];
+        }
+        return tex;
     }
     public static void DrawTexture(SpriteBatch batch, TextureID id, Point pos, Rectangle? source = null, Color color = default, float rotation = 0f, Vector2 origin = default, float scale = 1, SpriteEffects effects = SpriteEffects.None)
     {

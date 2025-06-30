@@ -88,7 +88,6 @@ public class LevelManager
         foreach (Enemy enemy in Level.Enemies) enemy.Draw(gameManager);
         DebugManager.EndBenchmark("CharacterDraws");
     }
-    public void AddLoot(Loot loot) => Level.Loot.Add(loot);
     public void LoadLevel(GameManager gameManager, int levelIndex)
     {
         // Check index
@@ -150,6 +149,7 @@ public class LevelManager
         // Spawn
         CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
         CameraManager.Camera = CameraManager.CameraDest;
+        Logger.System($"Loaded level '{level.Name}'.");
     }
     public void UnloadLevel(int levelIndex)
     {
@@ -157,9 +157,11 @@ public class LevelManager
         if (levelIndex < 0 || levelIndex >= Levels.Count)
             throw new ArgumentOutOfRangeException(nameof(levelIndex), "Invalid level index.");
         // Unload the level
+        string name = Levels[levelIndex].Name;
         if (Level == Levels[levelIndex])
             Level = new("null", [], new Point(128, 128), [], [], [], []);
         Levels.RemoveAt(levelIndex);
+        Logger.System($"Unloaded level '{name}'.");
     }
     public void UnloadLevel(string levelName)
     {
@@ -181,20 +183,16 @@ public class LevelManager
             if (level.Name == filename)
                 return;
 
-        // Get data
-        string data = File.ReadAllText($"World/Levels/{filename}.qlv");
-        string[] lines = data.Split('\n');
-
-        // Parse
-        Tile[] tilesBuffer;
-        using FileStream fileStream = File.OpenRead($"World/Levels/{filename}.qlv");
-        using GZipStream gzipStream = new(fileStream, CompressionMode.Decompress);
-        using BinaryReader reader = new(gzipStream);
         // Make buffers
-        tilesBuffer = new Tile[Constants.MapSize.X * Constants.MapSize.Y];
+        Tile[] tilesBuffer = new Tile[Constants.MapSize.X * Constants.MapSize.Y];
         List<NPC> npcBuffer = [];
         List<Loot> lootBuffer = [];
         List<Decal> decalBuffer = [];
+
+        // Context
+        using FileStream fileStream = File.OpenRead($"World/Levels/{filename}.qlv");
+        using GZipStream gzipStream = new(fileStream, CompressionMode.Decompress);
+        using BinaryReader reader = new(gzipStream);
 
         // Tint
         Color tint = new(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
@@ -256,16 +254,10 @@ public class LevelManager
             decalBuffer.Add(DecalFromId(type, location));
         }
 
-        // Check null
-        if (tilesBuffer == null)
-            throw new ArgumentException("No tiles found in level file.");
-        // Check size
-        if (tilesBuffer.Length != Constants.MapSize.X * Constants.MapSize.Y)
-            throw new ArgumentException($"Invalid level size - expected {Constants.MapSize.X}x{Constants.MapSize.X} tiles.");
-
         // Make and add the level
         Level created = new(filename, tilesBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, [], tint);
         Levels.Add(created);
+        Logger.System($"Successfully read level '{filename}'.");
     }
     public static Tile TileFromId(int id, Point location)
     {
@@ -284,7 +276,7 @@ public class LevelManager
             TileType.Darkness => new Darkness(location),
             TileType.WoodPlanks => new WoodPlanks(location),
             TileType.Stone => new Stone(location),
-            _ => new Tile(location), // Default tile
+            _ => throw new ArgumentException($"Unknown TileFromId TileType '{id}'.")
         };
     }
     public static Tile TileFromId(TileType id, Point location) => TileFromId((int)id, location);

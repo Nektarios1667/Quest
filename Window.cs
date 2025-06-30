@@ -56,6 +56,7 @@ public class Window : Game
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
         IsFixedTimeStep = false;
+        Logger.System("Initialized window object.");
     }
 
     protected override void Initialize()
@@ -89,11 +90,13 @@ public class Window : Game
         gameManager = new(Content, spriteBatch, playerManager.Inventory, levelManager, uiManager);
         enemyManager = new();
         CommandManager.Init(this, gameManager, levelManager, playerManager);
+        Logger.System("Initialized managers.");
 
         // Levels
         levelManager.ReadLevel(gameManager.UIManager, "island_house");
         levelManager.ReadLevel(gameManager.UIManager, "island_house_basement");
         levelManager.LoadLevel(gameManager, 0);
+        Logger.System("Loaded levels.");
 
         // Shaders
         Grayscale = Content.Load<Effect>("Shaders/Grayscale");

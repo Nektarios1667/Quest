@@ -37,6 +37,7 @@ public static class SoundtrackManager
             // Load the soundtrack file
             string path = $"Sounds/Music/{soundtrack.File}";
             SoundManager.LoadSong(content, soundtrack.File, path);
+            Logger.System($"Loaded soundtrack '{soundtrack.File}' with mood '{soundtrack.Mood}'");
         }
 
         // Categorize
