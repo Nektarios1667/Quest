@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Quest Editor": {
+      "commandName": "Project",
+      "commandLineArgs": "--editor"
+    },
+    "Quest Game": {
+      "commandName": "Project"
+    }
+  }
+}
