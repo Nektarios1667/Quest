@@ -13,9 +13,9 @@ public class Stairs : Tile
     public override void OnPlayerEnter(GameManager game)
     {
         // Load another level
-        Console.WriteLine($"[System] Teleporting to level '{DestLevel}' @ {DestPosition.X}, {DestPosition.Y}");
         game.LevelManager.LoadLevel(game, DestLevel);
         CameraManager.CameraDest = (DestPosition * Constants.TileSize).ToVector2() + new Vector2(Constants.TileSize.X / 2, 0);
         CameraManager.Camera = CameraManager.CameraDest;
+        Logger.System($"Teleporting to level '{DestLevel}' @ {DestPosition.X}, {DestPosition.Y}");
     }
 }

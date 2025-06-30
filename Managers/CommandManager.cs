@@ -159,15 +159,15 @@ public static class CommandManager
 
         // Commands creation
         commands = [
-            new Command("teleport <coordinate>", CTeleport, "Teleported player to |1|", "Failed to teleport player to |1|"),
-            new Command("health <modify> {0-999}", CHealth, "Player health |1| [|2|]", "Failed to |1| player health [|2|]"),
-            new Command("move_speed {0-999}", CMoveSpeed, "Set player speed to |1|", "Failed to set player speed to |1|"),
-            new Command("force_quit", CForceQuit, "Force quit application", "Failed to force quit application"),
-            new Command("quit", CQuit, "Quit application", "Failed to quit application"),
-            new Command("location", CLocation, "$noout", "Failed to get player location"),
-            new Command("level [load|read] <string>", CLevel, "Ran |1| level '|2|'", "Failed to |1| level '|2|'"),
-            new Command("mood [calm|dark|epic]", CMood, "Set mood to '|1|'", "Failed to set mood to '|1|'"),
-            new Command("say **", CSay, "$noout", "Failed to speak"),
+            new Command("teleport <coordinate>", CTeleport, "Teleported player to |1|.", "Failed to teleport player to |1|."),
+            new Command("health <modify> {0-999}", CHealth, "Player health |1| [|2|].", "Failed to |1| player health [|2|]."),
+            new Command("move_speed {0-999}", CMoveSpeed, "Set player speed to |1|.", "Failed to set player speed to |1|."),
+            new Command("force_quit", CForceQuit, "Force quit application.", "Failed to force quit application."),
+            new Command("quit", CQuit, "Quit application.", "Failed to quit application."),
+            new Command("location", CLocation, "$noout", "Failed to get player location."),
+            new Command("level [load|read] <string>", CLevel, "Ran |1| level '|2|'.", "Failed to |1| level '|2|'."),
+            new Command("mood [calm|dark|epic]", CMood, "Set mood to '|1|'.", "Failed to set mood to '|1|.'"),
+            new Command("say **", CSay, "$noout", "Failed to speak."),
         ];
 
         // Run them

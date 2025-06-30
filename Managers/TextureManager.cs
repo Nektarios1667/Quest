@@ -44,7 +44,6 @@ public static class TextureManager
         Sky,
         Stairs,
         StoneWall,
-        Template,
         Water,
         Darkness,
         Door,
@@ -115,6 +114,7 @@ public static class TextureManager
         Textures[TextureID.Footprint] = content.Load<Texture2D>($"Images/Decals/Footprint");
         Textures[TextureID.Glow] = content.Load<Texture2D>($"Images/Effects/Glow");
         Textures[TextureID.Slash] = content.Load<Texture2D>($"Images/Effects/Slash");
+
         foreach (var kv in Textures)
             if (kv.Value == null)
                 Logger.Error($"Texture '{kv.Key}' failed to load.");

@@ -105,7 +105,7 @@ public class Window : Game
         CursorArrow = Content.Load<Texture2D>("Images/Gui/CursorArrow");
 
         // Timer
-        TimerManager.NewTimer("frameTimeUpdate", 1, UpdateFrameTimes, int.MaxValue);
+        TimerManager.NewTimer("FrameTimeUpdate", 1, UpdateFrameTimes, int.MaxValue);
     }
 
     protected override void Update(GameTime gameTime)
