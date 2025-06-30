@@ -27,11 +27,10 @@ public static class TextureManager
         Slot,
         Speech,
         // Items
-        //Pickaxe,
-        //Sword,
-        //PhiCoin,
-        //DeltaCoin,
-        //GammaCoin,
+        Pickaxe,
+        PhiCoin,
+        DeltaCoin,
+        GammaCoin,
         Key,
         ActivePalantir,
         InactivePalantir,
@@ -88,11 +87,10 @@ public static class TextureManager
         Textures[TextureID.GuiBackground] = content.Load<Texture2D>($"Images/Gui/GuiBackground");
         Textures[TextureID.Slot] = content.Load<Texture2D>($"Images/Gui/Slot");
         Textures[TextureID.Speech] = content.Load<Texture2D>($"Images/Gui/Speech");
-        //Textures[TextureID.Pickaxe] = content.Load<Texture2D>($"Images/Items/Pickaxe");
-        //Textures[TextureID.Sword] = content.Load<Texture2D>($"Images/Items/Sword");
-        //Textures[TextureID.PhiCoin] = content.Load<Texture2D>($"Images/Items/PhiCoin");
-        //Textures[TextureID.DeltaCoin] = content.Load<Texture2D>($"Images/Items/DeltaCoin");
-        //Textures[TextureID.GammaCoin] = content.Load<Texture2D>($"Images/Items/GammaCoin");
+        Textures[TextureID.Pickaxe] = content.Load<Texture2D>($"Images/Items/Pickaxe");
+        Textures[TextureID.PhiCoin] = content.Load<Texture2D>($"Images/Items/PhiCoin");
+        Textures[TextureID.DeltaCoin] = content.Load<Texture2D>($"Images/Items/DeltaCoin");
+        Textures[TextureID.GammaCoin] = content.Load<Texture2D>($"Images/Items/GammaCoin");
         Textures[TextureID.Key] = content.Load<Texture2D>($"Images/Items/Key");
         Textures[TextureID.ActivePalantir] = content.Load<Texture2D>($"Images/Items/ActivePalantir");
         Textures[TextureID.InactivePalantir] = content.Load<Texture2D>($"Images/Items/InactivePalantir");
@@ -122,7 +120,7 @@ public static class TextureManager
                 Logger.Error($"Texture '{kv.Key}' failed to load.");
             else
                 Logger.System($"Texture '{kv.Key}' successfully loaded.");
-        Logger.System($"Successfully loaded {Textures.Count} textures.");
+        Logger.System($"Successfully loaded {Textures.Count}/{Enum.GetValues(typeof(TextureID)).Length} textures.");
 
         // Metadata
         Metadata[TextureID.Null] = new(Textures[TextureID.Null].Bounds.Size, new(1, 1), "null");
@@ -137,11 +135,10 @@ public static class TextureManager
         Metadata[TextureID.GuiBackground] = new(Textures[TextureID.GuiBackground].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.Slot] = new(Textures[TextureID.Slot].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.Speech] = new(Textures[TextureID.Speech].Bounds.Size, new(1, 4), "gui");
-        //Metadata[TextureID.Pickaxe] = new(Textures[TextureID.Pickaxe].Bounds.Size, new(1, 1), "item");
-        //Metadata[TextureID.Sword] = new(Textures[TextureID.Sword].Bounds.Size, new(1, 1), "item");
-        //Metadata[TextureID.PhiCoin] = new(Textures[TextureID.PhiCoin].Bounds.Size, new(1, 1), "item");
-        //Metadata[TextureID.DeltaCoin] = new(Textures[TextureID.DeltaCoin].Bounds.Size, new(1, 1), "item");
-        //Metadata[TextureID.GammaCoin] = new(Textures[TextureID.GammaCoin].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Pickaxe] = new(Textures[TextureID.Pickaxe].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.PhiCoin] = new(Textures[TextureID.PhiCoin].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.DeltaCoin] = new(Textures[TextureID.DeltaCoin].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.GammaCoin] = new(Textures[TextureID.GammaCoin].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Key] = new(Textures[TextureID.Key].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.ActivePalantir] = new(Textures[TextureID.ActivePalantir].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.InactivePalantir] = new(Textures[TextureID.InactivePalantir].Bounds.Size, new(1, 1), "item");
@@ -171,7 +168,7 @@ public static class TextureManager
                 Logger.Error($"Metadata for texture '{kv.Key}' failed to load.");
             else
                 Logger.System($"Metadata for texture '{kv.Key}' successfully loaded.");
-        Logger.System($"Successfully loaded {Metadata.Count} texture Metadatas.");
+        Logger.System($"Successfully loaded {Metadata.Count}/{Textures.Count} texture Metadata.");
 
         // Fonts
         PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");

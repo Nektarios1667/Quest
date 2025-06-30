@@ -16,8 +16,11 @@ public class PlayerManager
     {
         Inventory = new(6, 4);
         Inventory.SetSlot(0, new ActivePalantir(this, 1));
-        Inventory.SetSlot(1, new SteelSword(this, 1));
-        Inventory.SetSlot(2, new DiamondSword(this, 1));
+        Inventory.SetSlot(1, new DiamondSword(this, 1));
+        Inventory.SetSlot(2, new Pickaxe(this, 1));
+        Inventory.SetSlot(3, new PhiCoin(this, 10));
+        Inventory.SetSlot(4, new DeltaCoin(this, 5));
+        Inventory.SetSlot(5, new GammaCoin(this, 2));
     }
     public void Update(GameManager gameManager)
     {
@@ -57,6 +60,7 @@ public class PlayerManager
         if (!Inventory.Opened)
         {
             // Movement
+            DebugManager.StartBenchmark("UpdateMovement");
             moveX = 0; moveY = 0;
             moveX += InputManager.AnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : 0;
             moveX += InputManager.AnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0;
@@ -68,20 +72,20 @@ public class PlayerManager
             else if (moveY > 0) PlayerDirection = Direction.Down;
             else if (moveY < 0) PlayerDirection = Direction.Up;
             else PlayerDirection = Direction.Forward;
+            DebugManager.EndBenchmark("UpdateMovement");
+
+            // Remove attacks
+            DebugManager.StartBenchmark("UpdateAttacks");
+            Attacks.Clear();
+            if (InputManager.LMouseClicked) Inventory.Equipped?.PrimaryUse();
+            else if (InputManager.RMouseClicked) Inventory.Equipped?.SecondaryUse();
+            DebugManager.EndBenchmark("UpdateAttacks");
         }
 
         // Inventory
         DebugManager.StartBenchmark("InventoryUpdate");
         Inventory.Update(gameManager, this);
         DebugManager.EndBenchmark("InventoryUpdate");
-
-        // Remove attacks
-        DebugManager.StartBenchmark("UpdateAttacks");
-        Attacks.Clear();
-        if (InputManager.LMouseClicked) Inventory.Equipped?.PrimaryUse();
-        else if (InputManager.RMouseClicked) Inventory.Equipped?.SecondaryUse();
-
-        DebugManager.EndBenchmark("UpdateAttacks");
     }
     public void Draw(GameManager gameManager)
     {
