@@ -277,22 +277,22 @@ public class EditorManager
         writer.Write(levelManager.Level.Tint.A);
 
         // Write spawn
-        writer.Write(Window.IntToByte(levelManager.Level.Spawn.X));
-        writer.Write(Window.IntToByte(levelManager.Level.Spawn.Y));
+        writer.Write(LevelEditor.IntToByte(levelManager.Level.Spawn.X));
+        writer.Write(LevelEditor.IntToByte(levelManager.Level.Spawn.Y));
 
         // Tiles
         for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
         {
             Tile tile = levelManager.Level.Tiles[i];
             // Write tile data
-            writer.Write(Window.IntToByte((int)tile.Type));
+            writer.Write(LevelEditor.IntToByte((int)tile.Type));
             // Extra properties
             if (tile is Stairs stairs)
             {
                 // Write destination
                 writer.Write(stairs.DestLevel);
-                writer.Write(Window.IntToByte(stairs.DestPosition.X));
-                writer.Write(Window.IntToByte(stairs.DestPosition.Y));
+                writer.Write(LevelEditor.IntToByte(stairs.DestPosition.X));
+                writer.Write(LevelEditor.IntToByte(stairs.DestPosition.Y));
             }
             else if (tile is Door door)
             {
@@ -309,10 +309,10 @@ public class EditorManager
             // Write NPC data
             writer.Write(npc.Name);
             writer.Write(npc.Dialog);
-            writer.Write(Window.IntToByte(npc.Location.X));
-            writer.Write(Window.IntToByte(npc.Location.Y));
-            writer.Write(Window.IntToByte((int)(npc.Scale * 10)));
-            writer.Write(Window.IntToByte((int)npc.Texture));
+            writer.Write(LevelEditor.IntToByte(npc.Location.X));
+            writer.Write(LevelEditor.IntToByte(npc.Location.Y));
+            writer.Write(LevelEditor.IntToByte((int)(npc.Scale * 10)));
+            writer.Write(LevelEditor.IntToByte((int)npc.Texture));
         }
 
         // Floor loot
@@ -322,7 +322,7 @@ public class EditorManager
             Loot loot = levelManager.Level.Loot[n];
             // Write loot data
             writer.Write(loot.Item);
-            writer.Write(Window.IntToByte(loot.Amount));
+            writer.Write(LevelEditor.IntToByte(loot.Amount));
             writer.Write((UInt16)loot.Location.X);
             writer.Write((UInt16)loot.Location.Y);
         }
@@ -334,8 +334,8 @@ public class EditorManager
             Decal decal = levelManager.Level.Decals[n];
             // Write decal data
             writer.Write((byte)decal.Type);
-            writer.Write(Window.IntToByte(decal.Location.X));
-            writer.Write(Window.IntToByte(decal.Location.Y));
+            writer.Write(LevelEditor.IntToByte(decal.Location.X));
+            writer.Write(LevelEditor.IntToByte(decal.Location.Y));
         }
     }
     public void GenerateLevel()

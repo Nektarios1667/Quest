@@ -21,10 +21,10 @@ static class Program
 {
     static void Main(string[] args)
     {
-        if (args.Contains("--editor"))
+        if (args.Contains("--level-editor"))
         {
-            using var editorApp = new Quest.Editor.Window();
-            editorApp.Run();
+            using var levelEditorApp = new Quest.Editor.LevelEditor();
+            levelEditorApp.Run();
         }
         else
         {

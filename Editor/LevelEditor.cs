@@ -3,7 +3,7 @@ using System.IO.Compression;
 using System.Text;
 
 namespace Quest.Editor;
-public class Window : Game
+public class LevelEditor : Game
 {
     static readonly StringBuilder debugSb = new();
     // Devices and managers
@@ -42,7 +42,7 @@ public class Window : Game
     public RenderTarget2D? Minimap { get; set; }
     private float debugUpdateTime;
     private float cacheDelta;
-    public Window()
+    public LevelEditor()
     {
         graphics = new GraphicsDeviceManager(this)
         {
