@@ -1,4 +1,6 @@
-﻿namespace Quest.Tiles;
+﻿using Quest.Managers;
+
+namespace Quest.Tiles;
 
 public class Door : Tile
 {
@@ -10,13 +12,18 @@ public class Door : Tile
         Key = key;
         ConsumeKey = consumeKey;
     }
-    public override void Draw(GameManager game)
+    public override void Draw(GameManager gameManager)
     {
-        // Draw
+        // Draw tile
         Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
         Color color = Marked ? Color.Red : Color.White;
         Rectangle source = new(IsWalkable ? 16 : 0, 0, 16, 16);
-        DrawTexture(game.Batch, TextureID.Door, dest, source: source, scale: 4, color: color);
+        DrawTexture(gameManager.Batch, TextureID.Door, dest, source: source, scale: 4, color: color);
+
+        // Lighting
+        float distSq = Vector2.DistanceSquared(dest.ToVector2() + Constants.HalfVec, Constants.Middle.ToVector2() + CameraManager.CameraOffset - Constants.MageHalfSize.ToVector2()) / (Constants.TileSize.X * Constants.TileSize.Y);
+        Color lighting = Color.Lerp(Color.Transparent, gameManager.LevelManager.SkyLight, Math.Clamp(distSq / 25, 0, 1));
+        gameManager.Batch.FillRectangle(new(dest.ToVector2(), Constants.TileSize), lighting);
 
         // Handling
         Marked = false;
