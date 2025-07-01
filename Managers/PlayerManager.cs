@@ -95,7 +95,7 @@ public class PlayerManager
         {
             case GameState.Game or GameState.Editor:
                 DrawPlayer(gameManager);
-                if (Constants.DRAW_HITBOXES)
+                if (DebugManager.DrawHitboxes)
                 {
                     DrawPlayerHitbox(gameManager);
                     foreach (Attack attack in Attacks)
@@ -160,7 +160,7 @@ public class PlayerManager
         TileBelow.OnPlayerEnter(gameManager);
 
         // Debug
-        if (Constants.COLLISION_DEBUG) TileBelow.Marked = true;
+        if (DebugManager.CollisionDebug) TileBelow.Marked = true;
     }
     public bool IsColliding(GameManager gameManager)
     {

@@ -6,13 +6,7 @@ namespace Quest;
 public static class Constants
 {
     // Debug
-    public static bool COLLISION_DEBUG = true; // Enable collision debug mode
-    public static bool TEXT_INFO = true; // Show text info on screen
-    public static bool FRAME_INFO = true; // Show frame info on screen
-    public static bool LOG_INFO = true; // Log game info
-    public static bool FRAME_BAR = true; // Frame time graphical bar
-    public static bool DRAW_HITBOXES = true; // Draw hitboxes for entities
-    public static bool COMMANDS = true; // Allow console commands
+    public const bool COMMANDS = true;
 
     // Tile and map
     public static readonly Point TileSize = new(64, 64); // In-game tile size
@@ -40,6 +34,7 @@ public static class Constants
     public static readonly string[] TileNames = Enum.GetNames(typeof(TileType));
     public static int PlayerSpeed = 200;
     public const int MaxStack = 10;
+    public const int DayLength = 600; // Length of a day in seconds
 
     // Rendering and positioning
     public static readonly Rectangle ZeroSource = new(0, 0, TilePixelSize.X, TilePixelSize.Y); // Default tile source rect

@@ -6,38 +6,45 @@ public static class DebugManager
     public static Stopwatch Watch { get; private set; } = new();
     public static Dictionary<string, double> FrameTimes { get; private set; } = [];
     private static Dictionary<string, float> benchmarkTimes = [];
+    public static bool CollisionDebug { get; set; } = true;
+    public static bool TextInfo { get; set; } = true;
+    public static bool FrameInfo { get; set; } = true;
+    public static bool LogInfo { get; set; } = true;
+    public static bool FrameBar { get; set; } = true;
+    public static bool DrawHitboxes { get; set; } = true;
+
     public static void Update()
     {
         // Debug
         if (InputManager.KeyPressed(Keys.F1))
         {
-            Constants.COLLISION_DEBUG = !Constants.COLLISION_DEBUG;
-            Logger.System($"COLLISION_DEBUG set to: {Constants.COLLISION_DEBUG}");
+            CollisionDebug = !CollisionDebug;
+            Logger.System($"CollisionDebug set to: {CollisionDebug}");
         }
         if (InputManager.KeyPressed(Keys.F2))
         {
-            Constants.TEXT_INFO = !Constants.TEXT_INFO;
-            Logger.System($"TEXT_INFO set to: {Constants.TEXT_INFO}");
+            TextInfo = !TextInfo;
+            Logger.System($"TextInfo set to: {TextInfo}");
         }
         if (InputManager.KeyPressed(Keys.F3))
         {
-            Constants.FRAME_INFO = !Constants.FRAME_INFO;
-            Logger.System($"FRAME_INFO set to: {Constants.FRAME_INFO}");
+            FrameInfo = !FrameInfo;
+            Logger.System($"FrameInfo set to: {FrameInfo}");
         }
         if (InputManager.KeyPressed(Keys.F4))
         {
-            Constants.LOG_INFO = !Constants.LOG_INFO;
-            Logger.System($"LOG_INFO set to: {Constants.LOG_INFO}");
+            LogInfo = !LogInfo;
+            Logger.System($"LogInfo set to: {LogInfo}");
         }
         if (InputManager.KeyPressed(Keys.F5))
         {
-            Constants.FRAME_BAR = !Constants.FRAME_BAR;
-            Logger.System($"FRAME_BAR set to: {Constants.FRAME_BAR}");
+            FrameBar = !FrameBar;
+            Logger.System($"FrameBar set to: {FrameBar}");
         }
         if (InputManager.KeyPressed(Keys.F6))
         {
-            Constants.DRAW_HITBOXES = !Constants.DRAW_HITBOXES;
-            Logger.System($"DRAW_HITBOXES set to: {Constants.DRAW_HITBOXES}");
+            DrawHitboxes = !DrawHitboxes;
+            Logger.System($"DrawHitboxes set to: {DrawHitboxes}");
         }
     }
     public static void StartBenchmark(string name)

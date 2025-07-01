@@ -56,7 +56,7 @@ public class Window : Game
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
         IsFixedTimeStep = false;
-        Logger.System("Initialized window object.");
+        Logger.System("Initialized game window object.");
     }
 
     protected override void Initialize()
@@ -107,6 +107,9 @@ public class Window : Game
 
         // Timer
         TimerManager.NewTimer("FrameTimeUpdate", 1, UpdateFrameTimes, int.MaxValue);
+
+        // Final
+        Logger.System("Game finished initializing.");
     }
 
     protected override void Update(GameTime gameTime)
@@ -159,17 +162,17 @@ public class Window : Game
 
         // Text info
         DebugManager.StartBenchmark("DebugTextDraw");
-        if (Constants.TEXT_INFO)
+        if (DebugManager.TextInfo)
             DrawTextInfo();
 
         // Frame info
-        if (Constants.FRAME_INFO)
+        if (DebugManager.FrameInfo)
             DrawFrameInfo();
         DebugManager.EndBenchmark("DebugTextDraw");
 
         // Frame bar
         DebugManager.StartBenchmark("FrameBarDraw");
-        if (Constants.FRAME_BAR)
+        if (DebugManager.FrameBar)
             DrawFrameBar();
         DebugManager.EndBenchmark("FrameBarDraw");
 

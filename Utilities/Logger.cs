@@ -88,7 +88,7 @@ public static class Logger
     }
     public static void Log(string message)
     {
-        if (!Constants.LOG_INFO) return; // Skip logging if not enabled
+        if (!DebugManager.LogInfo) return; // Skip logging if not enabled
 
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Log")];
         Console.WriteLine($"({timestamp}) [Log] {message}");

@@ -6,6 +6,7 @@ public class LevelManager
 {
     public List<Level> Levels { get; private set; }
     public Level Level { get; private set; }
+    public Color SkyLight { get; private set; }
 
     public static readonly Point lootStackOffset = new(4, 4);
     public LevelManager()
@@ -19,8 +20,12 @@ public class LevelManager
     }
     public void Update(GameManager gameManager)
     {
+        // Entities
         foreach (NPC npc in Level.NPCs) npc.Update(gameManager);
         foreach (Enemy enemy in Level.Enemies) enemy.Update(gameManager);
+
+        // SkyTint
+        SkyLight = (Level.Tint != Color.Transparent ? Level.Tint : ColorTools.GetSkyColor(gameManager.TotalTime)) * .8f;
     }
     public void Draw(GameManager gameManager)
     {
@@ -76,7 +81,7 @@ public class LevelManager
             if (loot.Amount > 2)
                 DrawTexture(gameManager.Batch, loot.Texture, pos + lootStackOffset + lootStackOffset, scale: 2);
             // Draw hitbox if enabled
-            if (Constants.DRAW_HITBOXES)
+            if (DebugManager.DrawHitboxes)
                 gameManager.Batch.FillRectangle(new(pos.ToVector2(), new(32, 32)), Constants.DebugPinkTint);
         }
         DebugManager.EndBenchmark("DrawLoot");

@@ -58,12 +58,8 @@ public class UIManager
     {
         DebugManager.StartBenchmark("PostProcessing");
 
-        // Tint
-        if (gameManager.LevelManager.Level != null)
-            gameManager.Batch.FillRectangle(new(Vector2.Zero, Constants.Window), gameManager.LevelManager.Level.Tint);
-
         // Hitboxes
-        if (Constants.DRAW_HITBOXES)
+        if (DebugManager.DrawHitboxes)
         {
             gameManager.Batch.DrawPoint(Constants.Middle.ToVector2(), Constants.DebugPinkTint, 5);
             gameManager.Batch.DrawPoint(Constants.Middle.ToVector2() - new Vector2(0, Constants.MageHalfSize.Y + 12), Constants.DebugPinkTint, 5);

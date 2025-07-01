@@ -52,7 +52,7 @@ public class LevelEditor : Game
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
         IsFixedTimeStep = false;
-        Logger.System("Initialized window object.");
+        Logger.System("Initialized level editor window object.");
     }
 
     protected override void Initialize()
@@ -116,6 +116,9 @@ public class LevelEditor : Game
 
         // Timer
         TimerManager.NewTimer("FrameTimeUpdate", 1, editorManager.UpdateFrameTimes, int.MaxValue);
+
+        // Final
+        Logger.System("Level editor finished initializing.");
     }
 
     protected override void Update(GameTime gameTime)
@@ -235,17 +238,17 @@ public class LevelEditor : Game
 
         // Text info
         DebugManager.StartBenchmark("DebugTextDraw");
-        if (Constants.TEXT_INFO)
+        if (DebugManager.TextInfo)
             editorManager.DrawTextInfo();
 
         // Frame info
-        if (Constants.FRAME_INFO)
+        if (DebugManager.FrameInfo)
             editorManager.DrawFrameInfo();
         DebugManager.EndBenchmark("DebugTextDraw");
 
         // Frame bar
         DebugManager.StartBenchmark("FrameBarDraw");
-        if (Constants.FRAME_BAR)
+        if (DebugManager.FrameBar)
             editorManager.DrawFrameBar();
         DebugManager.EndBenchmark("FrameBarDraw");
 

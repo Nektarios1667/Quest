@@ -44,7 +44,7 @@ public class NPC
         Rectangle source = GetAnimationSource(Texture, gameManager.TotalTime);
         DrawTexture(gameManager.Batch, Texture, pos, color: TextureColor, scale: Scale, source: source, origin: origin);
         // Debug
-        if (Constants.DRAW_HITBOXES)
+        if (DebugManager.DrawHitboxes)
             gameManager.Batch.FillRectangle(new((pos - tilesize).ToVector2(), source.Size.ToVector2() * Scale), Constants.DebugPinkTint);
     }
     public void Update(GameManager gameManager)
