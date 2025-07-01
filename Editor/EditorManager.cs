@@ -217,14 +217,7 @@ public class EditorManager
     }
     public void SetSpawn()
     {
-        // Winforms
-        var (success, values) = ShowInputForm("Spawn Editor", [new("X", IsByte), new("Y", IsByte)]);
-        if (!success)
-        {
-            if (!PopupOpen) Logger.Error("Failed to set spawn.");
-            return;
-        }
-        levelManager.Level.Spawn = new(byte.Parse(values[0]), byte.Parse(values[1]));
+        levelManager.Level.Spawn = mouseSelectionCoord;
     }
     public void SetTint()
     {
