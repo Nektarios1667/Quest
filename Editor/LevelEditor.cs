@@ -79,16 +79,25 @@ public class LevelEditor : Game
 
         // Gui
         gui = new(this, spriteBatch, Arial);
-        MouseMenu mouseMenu = new(gui, Point.Zero, new(100, 380), Color.White, Constants.NearBlack, Color.Gray, border:1, seperation:3, borderColor:Color.White);
+        MouseMenu mouseMenu = new(gui, Point.Zero, new(100, 270), Color.White, GUI.NearBlack, Color.Gray, border:1, seperation:3, borderColor:Color.White);
         mouseMenu.AddItem("Pick", () => { Selection = (int)mouseTile.Type; Material = mouseTile.Type; Logger.Log($"Picked tile '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}."); }, []);
         mouseMenu.AddItem("Open", editorManager.OpenFile, []);
         mouseMenu.AddItem("Fill", editorManager.FloodFill, []);
-        mouseMenu.AddItem("New NPC", editorManager.NewNPC, []);
-        mouseMenu.AddItem("New Loot", editorManager.NewLoot, []);
-        mouseMenu.AddItem("New Decal", editorManager.NewDecal, []);
-        mouseMenu.AddItem("Delete NPC", editorManager.DeleteNPC, []);
-        mouseMenu.AddItem("Delete Loot", editorManager.DeleteLoot, []);
-        mouseMenu.AddItem("Delete Decal", editorManager.DeleteDecal, []);
+
+        MouseMenu newMenu = new(gui, Point.Zero, new(100, 80), Color.White, GUI.NearBlack, Color.Gray, border: 1, seperation: 3, borderColor: Color.White);
+        newMenu.AddItem("New NPC", editorManager.NewNPC, []);
+        newMenu.AddItem("New Loot", editorManager.NewLoot, []);
+        newMenu.AddItem("New Decal", editorManager.NewDecal, []);
+        mouseMenu.AddItem("New...", null, []);
+        mouseMenu.AddSubMenu("New...", newMenu);
+
+        MouseMenu deleteMenu = new(gui, Point.Zero, new(150, 80), Color.White, GUI.NearBlack, Color.Gray, border: 1, seperation: 3, borderColor: Color.White);
+        deleteMenu.AddItem("Delete NPC", editorManager.DeleteNPC, []);
+        deleteMenu.AddItem("Delete Loot", editorManager.DeleteLoot, []);
+        deleteMenu.AddItem("Delete Decal", editorManager.DeleteDecal, []);
+        mouseMenu.AddItem("Delete...", null, []);
+        mouseMenu.AddSubMenu("Delete...", deleteMenu);
+
         mouseMenu.AddItem("Save", editorManager.SaveLevel, []);
         mouseMenu.AddItem("Spawn", editorManager.SetSpawn, []);
         mouseMenu.AddItem("Tint", editorManager.SetTint, []);
