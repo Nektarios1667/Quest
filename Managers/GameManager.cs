@@ -18,7 +18,7 @@ public class GameManager
         LevelManager = level;
         UIManager = ui;
         DeltaTime = 0;
-        TotalTime = 0;
+        TotalTime = 250;
 
         // Load sounds
         SoundManager.LoadSound(content, "Footstep", "Sounds/Effects/Footstep");
