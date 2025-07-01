@@ -23,8 +23,6 @@ public class LevelEditor : Game
     private Point mouseSelectionCoord;
     private Point mouseSelection;
     private LevelGenerator levelGenerator = null!;
-    private RenderTarget2D? minimap = null!;
-    private bool rebuildMinimap = true;
 
     // Time
     private float delta = 0;
@@ -75,7 +73,7 @@ public class LevelEditor : Game
         levelManager = new();
         menuManager = new();
         gameManager = new(Content, spriteBatch, new(0, 0), levelManager, uiManager);
-        editorManager = new(gameManager, levelManager, levelGenerator, spriteBatch, debugSb);
+        editorManager = new(GraphicsDevice, gameManager, levelManager, levelGenerator, spriteBatch, debugSb);
         StateManager.State = GameState.Editor;
         Logger.System("Initialized managers.");
 
@@ -94,7 +92,7 @@ public class LevelEditor : Game
         mouseMenu.AddItem("Save", editorManager.SaveLevel, []);
         mouseMenu.AddItem("Spawn", editorManager.SetSpawn, []);
         mouseMenu.AddItem("Tint", editorManager.SetTint, []);
-        mouseMenu.AddItem("Generate", () => { editorManager.GenerateLevel(); rebuildMinimap = true; }, []);
+        mouseMenu.AddItem("Generate", editorManager.GenerateLevel, []);
         mouseMenu.AddItem("Exit", Exit, []);
         gui.Widgets.Add(mouseMenu);
 
@@ -144,9 +142,6 @@ public class LevelEditor : Game
         // Gui
         gui.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
 
-        // Minimap
-        if (rebuildMinimap) RebuildMiniMap();
-
         // Change material
         if (InputManager.ScrollWheelChange > 0 || InputManager.KeyPressed(Keys.OemCloseBrackets))
         {
@@ -174,8 +169,7 @@ public class LevelEditor : Game
             else
                 tile = LevelManager.TileFromId(Selection, mouseCoord);
 
-            SetTile(tile);
-            rebuildMinimap = true;
+            editorManager.SetTile(tile);
             Logger.Log($"Set tile to '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}.");
         }
 
@@ -203,11 +197,7 @@ public class LevelEditor : Game
         if (InputManager.Hotkey(Keys.LeftControl, Keys.I)) editorManager.SetSpawn();
         if (InputManager.Hotkey(Keys.LeftControl, Keys.T)) editorManager.SetTint();
         // Generate level
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.G))
-        {
-            editorManager.GenerateLevel();
-            rebuildMinimap = true;
-        }
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.G)) editorManager.GenerateLevel();
 
         // Managers
         if (!PopupFactory.PopupOpen) InputManager.Update();
@@ -251,7 +241,7 @@ public class LevelEditor : Game
         DebugManager.EndBenchmark("FrameBarDraw");
 
         // Minimap
-        DrawMiniMap();
+        editorManager.DrawMiniMap();
 
         // Ghost tile
         if (mouseTile != null)
@@ -269,44 +259,6 @@ public class LevelEditor : Game
         // Final
         spriteBatch.End();
         base.Draw(gameTime);
-    }
-    public void DrawMiniMap()
-    {
-        DebugManager.StartBenchmark("DrawMinimap");
-
-        // Frame
-        gameManager.Batch.DrawRectangle(new(7, Constants.Window.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
-
-        // Draw minimap texture
-        if (minimap != null)
-            spriteBatch.Draw(minimap, new Rectangle(10, Constants.Window.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
-
-        // Player
-        Point dest = CameraManager.TileCoord + new Point(10, Constants.Window.Y - Constants.MapSize.Y - 10);
-        spriteBatch.DrawPoint(dest.ToVector2(), Color.Red, size: 2);
-
-        DebugManager.EndBenchmark("DrawMinimap");
-    }
-
-    public void RebuildMiniMap()
-    {
-        minimap = new RenderTarget2D(GraphicsDevice, Constants.MapSize.X, Constants.MapSize.Y);
-        GraphicsDevice.SetRenderTarget(minimap);
-        GraphicsDevice.Clear(Color.Transparent);
-        spriteBatch.Begin();
-
-        for (int y = 0; y < Constants.MapSize.Y; y++)
-        {
-            for (int x = 0; x < Constants.MapSize.X; x++)
-            {
-                Tile tile = gameManager.LevelManager.GetTile(new Point(x, y))!;
-                spriteBatch.DrawPoint(new(x, y), Constants.MiniMapColors[(int)tile.Type]);
-            }
-        }
-
-        spriteBatch.End();
-        GraphicsDevice.SetRenderTarget(null);
-        rebuildMinimap = false;
     }
     public void PickTile()
     {
@@ -330,9 +282,5 @@ public class LevelEditor : Game
         if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
             throw new ArgumentOutOfRangeException(nameof(coord), "Coordinates are out of bounds of the level.");
         return levelManager.Level.Tiles[coord.X + coord.Y * Constants.MapSize.X];
-    }
-    public void SetTile(Tile tile)
-    {
-        levelManager.Level.Tiles[tile.Location.X + tile.Location.Y * Constants.MapSize.X] = tile;
     }
 }

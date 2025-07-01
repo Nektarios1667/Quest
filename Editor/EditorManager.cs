@@ -18,6 +18,7 @@ public class EditorManager
     private LevelManager levelManager { get; }
     private LevelGenerator levelGenerator { get; }
     private StringBuilder debugSb { get; }
+    private GraphicsDevice graphics { get; }
     private SpriteBatch spriteBatch { get; }
     private float delta { get; set; }
     private float cacheDelta { get; set; }
@@ -27,8 +28,11 @@ public class EditorManager
     private Point mouseSelection { get; set; }
     private Point mouseSelectionCoord { get; set; }
     private TileType Material { get; set; }
-    public EditorManager(GameManager gameManager, LevelManager levelManager, LevelGenerator levelGenerator, SpriteBatch batch, StringBuilder debugSb)
+    private RenderTarget2D minimap { get; set; }
+    private bool rebuildMinimap { get; set; } = true;
+    public EditorManager(GraphicsDevice graphics, GameManager gameManager, LevelManager levelManager, LevelGenerator levelGenerator, SpriteBatch batch, StringBuilder debugSb)
     {
+        this.graphics = graphics;
         this.gameManager = gameManager;
         this.levelManager = levelManager;
         this.levelGenerator = levelGenerator;
@@ -44,6 +48,46 @@ public class EditorManager
         this.mouseSelection = mouseSelection;
         this.mouseSelectionCoord = mouseSelectionCoord;
         Material = material;
+
+        if (rebuildMinimap) RebuildMiniMap();
+    }
+    public void DrawMiniMap()
+    {
+        DebugManager.StartBenchmark("DrawMinimap");
+
+        // Frame
+        gameManager.Batch.DrawRectangle(new(7, Constants.Window.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
+
+        // Draw minimap texture
+        if (minimap != null)
+            spriteBatch.Draw(minimap, new Rectangle(10, Constants.Window.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
+
+        // Player
+        Point dest = CameraManager.TileCoord + new Point(10, Constants.Window.Y - Constants.MapSize.Y - 10);
+        spriteBatch.DrawPoint(dest.ToVector2(), Color.Red, size: 2);
+
+        DebugManager.EndBenchmark("DrawMinimap");
+    }
+
+    public void RebuildMiniMap()
+    {
+        minimap = new RenderTarget2D(graphics, Constants.MapSize.X, Constants.MapSize.Y);
+        graphics.SetRenderTarget(minimap);
+        graphics.Clear(Color.Transparent);
+        spriteBatch.Begin();
+
+        for (int y = 0; y < Constants.MapSize.Y; y++)
+        {
+            for (int x = 0; x < Constants.MapSize.X; x++)
+            {
+                Tile tile = gameManager.LevelManager.GetTile(new Point(x, y))!;
+                spriteBatch.DrawPoint(new(x, y), Constants.MiniMapColors[(int)tile.Type]);
+            }
+        }
+
+        spriteBatch.End();
+        graphics.SetRenderTarget(null);
+        rebuildMinimap = false;
     }
     public void DrawFrameInfo()
     {
@@ -420,9 +464,12 @@ public class EditorManager
         levelGenerator.Seed = int.Parse(values[0]);
         levelGenerator.Terrain = levelGenerator.Terrains.GetValueOrDefault(values[1], levelGenerator.Terrain);
         Tile[] tiles = levelGenerator.GenerateLevel(Constants.MapSize, int.Parse(values[2]));
+
         Level current = levelManager.Level;
         Level level = new(current.Name, tiles, current.Spawn, current.NPCs, current.Loot, current.Decals, current.Enemies, current.Tint);
+
         levelManager.LoadLevelObject(gameManager, level);
+        FlagRebuildMinimap();
     }
     public void OpenFile()
     {
@@ -446,6 +493,8 @@ public class EditorManager
         {
             Logger.Error($"Failed to open level '{filename}': {ex.Message}");
         }
+
+        FlagRebuildMinimap();
     }
     public Tile GetTile(Point coord)
     {
@@ -456,5 +505,7 @@ public class EditorManager
     public void SetTile(Tile tile)
     {
         levelManager.Level.Tiles[tile.Location.X + tile.Location.Y * Constants.MapSize.X] = tile;
+        FlagRebuildMinimap();
     }
+    public void FlagRebuildMinimap() { rebuildMinimap = true; }
 }
