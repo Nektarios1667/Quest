@@ -19,6 +19,7 @@ public class LevelGenerator
     private FastNoiseLite Noise { get; set; } = new();
     private int _seed;
     private Dictionary<string, Structure> Structures = new();
+    private List<Rectangle> GeneratedStructures = [];
     public Terrain Terrain { get; set; }
     public Dictionary<string, Terrain> Terrains { get; set; } = new();
     public int Seed
@@ -102,6 +103,7 @@ public class LevelGenerator
         Tile[] level = GenerateTerrain(width, height);
 
         // Structures
+        GeneratedStructures.Clear(); // Reset generated structures
         if (structureAttempts <= 0) return level;
         for (int i = 0; i < structureAttempts; i++)
         {
@@ -111,6 +113,9 @@ public class LevelGenerator
 
             // Check if on valid tile
             if (structure.SpawnTile != null && level[spawnPoint.Y * width + spawnPoint.X].Type != structure.SpawnTile) continue;
+            // Intersects other structures
+            Rectangle rect = new(spawnPoint.X - 1, spawnPoint.Y - 1, structure.Size.X + 1, structure.Size.Y + 1);
+            if (GeneratedStructures.Any(r => r.Intersects(rect))) continue; // Overlap
 
             // Place
             for (int y = 0; y < structure.Size.Y; y++)
@@ -122,6 +127,8 @@ public class LevelGenerator
                     level[(spawnPoint.Y + y) * width + (spawnPoint.X + x)] = LevelManager.TileFromId(tileType.Value, new(spawnPoint.X + x, spawnPoint.Y + y));
                 }
             }
+            // Add to generated structures
+            GeneratedStructures.Add(rect);
         }
         return level;
     }

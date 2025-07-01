@@ -93,6 +93,7 @@ public class Window : Game
         Logger.System("Initialized managers.");
 
         // Levels
+        levelManager.ReadLevel(gameManager.UIManager, "islands");
         levelManager.ReadLevel(gameManager.UIManager, "island_house");
         levelManager.ReadLevel(gameManager.UIManager, "island_house_basement");
         levelManager.LoadLevel(gameManager, 0);

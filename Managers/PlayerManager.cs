@@ -1,4 +1,6 @@
-﻿namespace Quest.Managers;
+﻿using SharpDX.Direct3D9;
+
+namespace Quest.Managers;
 
 public class Attack(int damage, RectangleF hitbox)
 {
@@ -142,14 +144,12 @@ public class PlayerManager
         if (IsColliding(gameManager)) return;
 
         // Check bump
-        Point nextPoint = (CameraManager.CameraDest + finalMove).ToPoint();
-        Tile? nextTile = gameManager.LevelManager.GetTile(nextPoint / Constants.TileSize);
-        if (nextTile != null && !nextTile.IsWalkable)
-            nextTile.OnPlayerCollide(gameManager);
+        CheckBumping(gameManager, finalMove);
 
         // Check collision for x
         CameraManager.CameraDest += new Vector2(finalMove.X, 0);
-        if (IsColliding(gameManager)) CameraManager.CameraDest -= new Vector2(finalMove.X, 0);
+        if (IsColliding(gameManager))
+            CameraManager.CameraDest -= new Vector2(finalMove.X, 0);
         // Check collision for y
         CameraManager.CameraDest += new Vector2(0, finalMove.Y);
         if (IsColliding(gameManager)) CameraManager.CameraDest -= new Vector2(0, finalMove.Y);
@@ -176,6 +176,25 @@ public class PlayerManager
             if (TileBelow == null || !TileBelow.IsWalkable) return true;
         }
         return false;
+    }
+    public void CheckBumping(GameManager gameManager, Vector2 finalMove)
+    {
+        Rectangle playerBounds = new((CameraManager.CameraDest + finalMove + new Vector2(-Constants.PlayerBox.X / 2, Constants.PlayerBox.Y)).ToPoint(), Constants.PlayerBox);
+        Point topLeftTile = playerBounds.Location / Constants.TileSize;
+        Point bottomRightTile = (playerBounds.Location + playerBounds.Size) / Constants.TileSize;
+
+        for (int y = topLeftTile.Y; y <= bottomRightTile.Y; y++)
+        {
+            for (int x = topLeftTile.X; x <= bottomRightTile.X; x++)
+            {
+                Tile? tile = gameManager.LevelManager.GetTile(new Point(x, y));
+                if (tile != null && !tile.IsWalkable)
+                {
+                    tile.OnPlayerCollide(gameManager);
+                    return;
+                }
+            }
+        }
     }
     public void UpdatePositions(GameManager gameManager)
     {

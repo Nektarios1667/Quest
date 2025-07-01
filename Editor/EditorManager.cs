@@ -377,8 +377,8 @@ public class EditorManager
         }
 
         // Parse
-        Directory.CreateDirectory("..\\..\\..\\Levels");
-        using FileStream fileStream = File.Create($"..\\..\\..\\Levels/{values[0]}.qlv");
+        Directory.CreateDirectory("../../../World/Levels/");
+        using FileStream fileStream = File.Create($"../../../World/Levels/{values[0]}.qlv");
         using GZipStream gzipStream = new(fileStream, CompressionLevel.Optimal);
         using BinaryWriter writer = new(gzipStream);
 
@@ -449,6 +449,9 @@ public class EditorManager
             writer.Write(LevelEditor.IntToByte(decal.Location.X));
             writer.Write(LevelEditor.IntToByte(decal.Location.Y));
         }
+
+        // Log
+        Logger.Log($"Exported level to '{values[0]}.qlv'.");
     }
     public void GenerateLevel()
     {

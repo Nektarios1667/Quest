@@ -23,9 +23,9 @@ public class Door : Tile
     }
     public override void OnPlayerCollide(GameManager game)
     {
-        if (game.Inventory.Contains(Key))
+        if (Key == "" || game.Inventory.Contains(Key))
         {
-            if (ConsumeKey)
+            if (Key != "" && ConsumeKey)
             {
                 game.Inventory.Consume(Key);
                 game.UIManager.Notification($"-1 {StringTools.FillCamelSpaces(Key)}", Color.Red, 3);
