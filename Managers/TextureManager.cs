@@ -64,10 +64,10 @@ public static class TextureManager
     public static Dictionary<TextureID, Texture2D> Textures { get; private set; } = [];
     public static Dictionary<TextureID, Metadata> Metadata { get; private set; } = [];
     // Fonts
-    public static SpriteFont PixelOperator { get; private set; }
-    public static SpriteFont PixelOperatorBold { get; private set; }
-    public static SpriteFont Arial { get; private set; }
-    public static SpriteFont ArialSmall { get; private set; }
+    public static SpriteFont PixelOperator { get; private set; } = null!;
+    public static SpriteFont PixelOperatorBold { get; private set; } = null!;
+    public static SpriteFont Arial { get; private set; } = null!;
+    public static SpriteFont ArialSmall { get; private set; } = null!;
 
     private static ContentManager? Content { get; set; }
     public static void LoadTextures(ContentManager content)

@@ -1,4 +1,6 @@
-﻿using Xna = Microsoft.Xna.Framework;
+﻿using System.IO;
+using System.Linq;
+using Xna = Microsoft.Xna.Framework;
 namespace Quest;
 
 public static class Constants
@@ -55,6 +57,12 @@ public static class Constants
     public static readonly Color DebugPinkTint = new Color(255, 0, 255) * .5f;
     public static readonly Color DebugGreenTint = new Color(55, 255, 55) * .5f;
     public static readonly Color SemiTransparent = Color.White * .6f;
+
+    // Enum string representations
+    public static readonly string[] TileTypeNames = Enum.GetNames(typeof(TileType));
+    public static readonly string[] DecalTypeNames = Enum.GetNames(typeof(DecalType));
+    public static readonly string[] ItemTypeNames = Enum.GetNames(typeof(ItemType));
+    public static readonly string[] TextureIDNames = Enum.GetNames(typeof(TextureID));
 
     // Minimap pixel colors
     public static readonly Color[] MiniMapColors = [

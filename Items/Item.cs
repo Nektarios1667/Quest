@@ -1,4 +1,16 @@
 ﻿namespace Quest.Items;
+public enum ItemType
+{
+    ActivePalantir,
+    BronzeSword,
+    DeltaCoin,
+    DiamondSword,
+    GammaCoin,
+    InactivePalantir,
+    Key,
+    PhiCoin,
+    Pickaxe,
+}
 public class Item
 {
     public string DisplayName => $"{Amount} {StringTools.FillCamelSpaces(Name)}";

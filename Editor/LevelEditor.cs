@@ -1,6 +1,5 @@
-﻿using System.IO;
-using System.IO.Compression;
-using System.Text;
+﻿using System.Text;
+using MonoGUI;
 
 namespace Quest.Editor;
 public class LevelEditor : Game
@@ -8,40 +7,38 @@ public class LevelEditor : Game
     static readonly StringBuilder debugSb = new();
     // Devices and managers
     private GraphicsDeviceManager graphics;
-    private SpriteBatch spriteBatch;
-    private GameManager gameManager;
-    private UIManager uiManager;
-    private LevelManager levelManager;
-    private MenuManager menuManager;
-    private EditorManager editorManager;
+    private SpriteBatch spriteBatch = null!;
+    private GameManager gameManager = null!;
+    private UIManager uiManager = null!;
+    private LevelManager levelManager = null!;
+    private MenuManager menuManager = null!;
+    private EditorManager editorManager = null!;
+    private GUI gui = null!;
 
     // Editing
     private TileType Material;
     private int Selection;
     private Point mouseCoord;
-    private readonly Color highlightColor = new(1, 1, 1, .8f);
-    private Tile mouseTile;
-    private LevelGenerator levelGenerator;
-    private RenderTarget2D? minimap;
+    private Tile mouseTile = null!;
+    private Point mouseSelectionCoord;
+    private Point mouseSelection;
+    private LevelGenerator levelGenerator = null!;
+    private RenderTarget2D? minimap = null!;
     private bool rebuildMinimap = true;
 
     // Time
-    private float delta;
-    private Dictionary<string, double> frameTimes;
+    private float delta = 0;
 
     // Textures
-    public Texture2D CursorArrow { get; private set; }
+    public Texture2D CursorArrow { get; private set; } = null!;
 
     // Movements
-    public int moveX;
-    public int moveY;
+    public int moveX = 0;
+    public int moveY = 0;
     // Shaders
-    public Effect Grayscale { get; private set; }
-    public Effect Light { get; private set; }
+    public Effect Grayscale { get; private set; } = null!;
+    public Effect Light { get; private set; } = null!;
     // Render targets
-    public RenderTarget2D? Minimap { get; set; }
-    private float debugUpdateTime;
-    private float cacheDelta;
     public LevelEditor()
     {
         graphics = new GraphicsDeviceManager(this)
@@ -62,11 +59,6 @@ public class LevelEditor : Game
 
     protected override void Initialize()
     {
-        // Defaults
-        frameTimes = [];
-        debugUpdateTime = 0;
-        cacheDelta = 0f;
-
         base.Initialize();
     }
 
@@ -86,6 +78,28 @@ public class LevelEditor : Game
         editorManager = new(gameManager, levelManager, levelGenerator, spriteBatch, debugSb);
         StateManager.State = GameState.Editor;
         Logger.System("Initialized managers.");
+
+        // Gui
+        gui = new(this, spriteBatch, Arial);
+        MouseMenu mouseMenu = new(gui, Point.Zero, new(100, 380), Color.White, Constants.NearBlack, Color.Gray, border:1, seperation:3, borderColor:Color.White);
+        mouseMenu.AddItem("Pick", () => { Selection = (int)mouseTile.Type; Material = mouseTile.Type; Logger.Log($"Picked tile '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}."); }, []);
+        mouseMenu.AddItem("Open", editorManager.OpenFile, []);
+        mouseMenu.AddItem("Fill", editorManager.FloodFill, []);
+        mouseMenu.AddItem("New NPC", editorManager.NewNPC, []);
+        mouseMenu.AddItem("New Loot", editorManager.NewLoot, []);
+        mouseMenu.AddItem("New Decal", editorManager.NewDecal, []);
+        mouseMenu.AddItem("Delete NPC", editorManager.DeleteNPC, []);
+        mouseMenu.AddItem("Delete Loot", editorManager.DeleteLoot, []);
+        mouseMenu.AddItem("Delete Decal", editorManager.DeleteDecal, []);
+        mouseMenu.AddItem("Save", editorManager.SaveLevel, []);
+        mouseMenu.AddItem("Spawn", editorManager.SetSpawn, []);
+        mouseMenu.AddItem("Tint", editorManager.SetTint, []);
+        mouseMenu.AddItem("Generate", () => { editorManager.GenerateLevel(); rebuildMinimap = true; }, []);
+        mouseMenu.AddItem("Exit", Exit, []);
+        gui.Widgets.Add(mouseMenu);
+
+        gui.LoadContent(Content, "Images/Gui");
+        Logger.System("Initialized GUI.");
 
         // Shaders
         Grayscale = Content.Load<Effect>("Shaders/Grayscale");
@@ -125,26 +139,13 @@ public class LevelEditor : Game
         DebugManager.EndBenchmark("InputUpdate");
 
         // Manager
-        editorManager.Update(Material, delta, mouseTile, mouseCoord);
+        editorManager.Update(Material, delta, mouseTile, mouseCoord, mouseSelection, mouseSelectionCoord);
+
+        // Gui
+        gui.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
 
         // Minimap
         if (rebuildMinimap) RebuildMiniMap();
-
-        // Open file
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.O))
-        {
-            string filename = Logger.Input("Open level file: ");
-            try
-            {
-                levelManager.ReadLevel(uiManager, filename);
-                levelManager.LoadLevel(gameManager, filename);
-                Logger.Log($"Opened level '{filename}'.");
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Failed to open level '{filename}': {ex.Message}");
-            }
-        }
 
         // Change material
         if (InputManager.ScrollWheelChange > 0 || InputManager.KeyPressed(Keys.OemCloseBrackets))
@@ -182,29 +183,20 @@ public class LevelEditor : Game
         if (InputManager.Hotkey(Keys.LeftControl, Keys.M)) EditorManager.EditTile(mouseTile);
 
         // Erase (set to sky)
-        if (InputManager.RMouseDown && mouseTile.Type != TileType.Sky)
-        {
-            SetTile(new Sky(mouseCoord));
-            rebuildMinimap = true;
-            Logger.Log($"Set tile to '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}.");
-        }
+        if (InputManager.RMouseDown) MouseSelect();
 
         // Pick
-        if (InputManager.MMouseClicked)
-        {
-            Selection = (int)mouseTile.Type;
-            Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileNames[Selection]);
-            Logger.Log($"Picked tile '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}.");
-        }
-
+        if (InputManager.MMouseClicked) PickTile();
+        // Open file
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.O)) editorManager.OpenFile();
         // Fill
         if (InputManager.KeyPressed(Keys.F)) editorManager.FloodFill();
         // NPCs
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.N)) editorManager.EditNPCs();
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.N)) { MouseSelect(); editorManager.EditNPCs(); }
         // Loot
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.L)) editorManager.EditLoot();
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.L)) { MouseSelect(); editorManager.EditLoot(); }
         // Decals
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.D)) editorManager.EditDecals();
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.D)) { MouseSelect(); editorManager.EditDecals(); }
         // Save
         if (InputManager.Hotkey(Keys.LeftControl, Keys.E)) editorManager.SaveLevel();
         // Level info
@@ -218,7 +210,7 @@ public class LevelEditor : Game
         }
 
         // Managers
-        InputManager.Update();
+        if (!PopupFactory.PopupOpen) InputManager.Update();
         DebugManager.Update();
         CameraManager.Update(delta);
 
@@ -261,12 +253,17 @@ public class LevelEditor : Game
         // Minimap
         DrawMiniMap();
 
-        // Cursor
+        // Ghost tile
         if (mouseTile != null)
         {
             TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), Material.ToString());
             DrawTexture(spriteBatch, texture, mouseTile.Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle, source:new(Point.Zero, Constants.TilePixelSize), scale:4, color:Constants.SemiTransparent);
         }
+
+        // Gui
+        gui.Draw();
+
+        // Cursor
         DrawTexture(spriteBatch, TextureID.CursorArrow, InputManager.MousePosition);
 
         // Final
@@ -311,7 +308,17 @@ public class LevelEditor : Game
         GraphicsDevice.SetRenderTarget(null);
         rebuildMinimap = false;
     }
-
+    public void PickTile()
+    {
+        Selection = (int)mouseTile.Type;
+        Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileNames[Selection]);
+        Logger.Log($"Picked tile '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}.");
+    }
+    public void MouseSelect()
+    {
+        mouseSelection = CameraManager.Camera.ToPoint() + InputManager.MousePosition - Constants.Middle;
+        mouseSelectionCoord = mouseCoord;
+    }
     public static byte IntToByte(int value)
     {
         if (value < 0 || value > 255)

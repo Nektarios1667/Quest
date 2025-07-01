@@ -1,6 +1,9 @@
 ﻿using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
+using static Quest.Editor.PopupFactory;
+
 namespace Quest.Editor;
 public class EditorManager
 {
@@ -21,6 +24,8 @@ public class EditorManager
     private Dictionary<string, double> frameTimes { get; set; } = new();
     private Tile? mouseTile { get; set; }
     private Point mouseCoord { get; set; }
+    private Point mouseSelection { get; set; }
+    private Point mouseSelectionCoord { get; set; }
     private TileType Material { get; set; }
     public EditorManager(GameManager gameManager, LevelManager levelManager, LevelGenerator levelGenerator, SpriteBatch batch, StringBuilder debugSb)
     {
@@ -31,11 +36,13 @@ public class EditorManager
         this.spriteBatch = batch;
         cacheDelta = delta;
     }
-    public void Update(TileType material, float deltaTime, Tile? mouseTile, Point mouseCoord)
+    public void Update(TileType material, float deltaTime, Tile? mouseTile, Point mouseCoord, Point mouseSelection, Point mouseSelectionCoord)
     {
         delta = deltaTime;
         this.mouseTile = mouseTile;
         this.mouseCoord = mouseCoord;
+        this.mouseSelection = mouseSelection;
+        this.mouseSelectionCoord = mouseSelectionCoord;
         Material = material;
     }
     public void DrawFrameInfo()
@@ -166,107 +173,168 @@ public class EditorManager
     }
     public void SetSpawn()
     {
-        // Destination position
-        string resp = Logger.Input($"Spawn position [{levelManager.Level.Spawn.X}, {levelManager.Level.Spawn.Y}]: ");
-        if (resp != "")
+        // Winforms
+        var (success, values) = ShowInputForm("Spawn Editor", [new("X", IsByte), new("Y", IsByte)]);
+        if (!success)
         {
-            string[] parts = resp.Split(',');
-            if (parts.Length == 2 && int.TryParse(parts[0], out int x) && int.TryParse(parts[1], out int y))
-                if (x >= 0 && x < Constants.MapSize.X && y >= 0 && y < Constants.MapSize.Y)
-                    levelManager.Level.Spawn = new(x, y);
-                else
-                    Logger.Error($"Position out of bounds - must be within the map size {Constants.MapSize.X}x{Constants.MapSize.Y}.");
-            else
-                Logger.Error("Invalid position format - use 'x,y'.");
+            if (!PopupOpen) Logger.Error("Failed to set spawn.");
+            return;
         }
+        levelManager.Level.Spawn = new(byte.Parse(values[0]), byte.Parse(values[1]));
     }
     public void SetTint()
     {
-        Color current = levelManager.Level.Tint;
-        Color tint = Logger.InputColor($"Tint (R,G,B,A) [{current.R},{current.G},{current.B},{current.A}]: ", Color.Transparent);
-        levelManager.Level.Tint = tint;
+        // Winforms
+        var (success, values) = ShowInputForm("Tint Editor", [new("R", IsByte), new("G", IsByte), new("B", IsByte), new("A", IsByte)]);
+        if (!success)
+        {
+            if (!PopupOpen) Logger.Error("Failed to set tint.");
+            return;
+        }
+        levelManager.Level.Tint = new Color(byte.Parse(values[0]), byte.Parse(values[1]), byte.Parse(values[2])) * (byte.Parse(values[3]) / 255f);
     }
     public void EditNPCs()
     {
         if (InputManager.KeyDown(Keys.LeftShift)) // Delete
-        {
-            foreach (NPC npc in levelManager.Level.NPCs)
-            {
-                if (npc.Location == mouseCoord)
-                {
-                    levelManager.Level.NPCs.Remove(npc);
-                    Logger.Log($"Deleted NPC '{npc.Name}' @ {mouseCoord.X}, {mouseCoord.Y}.");
-                    break;
-                }
-            }
-        }
+            DeleteNPC();
         else // New
+            NewNPC();
+    }
+    public void NewNPC()
+    {
+        // Check
+        if (levelManager.Level.NPCs.Count >= 255)
         {
-            Logger.Print("__NPC__");
-            string name = Logger.Input("Name: ");
-            string dialog = Logger.Input("Dialog: ");
-            int scale = Logger.InputInt("Size: ", fallback: 1);
-            if (scale <= 0 || scale > 25.5)
+            Logger.Error("Maximum number of NPCs reached (255).");
+            return;
+        }
+
+        // Winforms
+        var (success, values) = ShowInputForm("NPC Editor", [new("Name", null), new("Dialog", null), new("Size [1-25.5]", IsScaleValue), new("Texture", null, Enum.GetNames(typeof(TextureID)))]);
+        if (!success) {
+            if (!PopupOpen) Logger.Error("NPC creation failed.");
+            return;
+        }
+
+        // Create
+        string name = values[0];
+        string dialog = values[1];
+        int scale = int.Parse(values[2]);
+        if (scale <= 0 || scale > 25)
+        {
+            Logger.Warning("Scale must be between 1 and 25. Scale defaulted to 1.");
+            scale = 1;
+        }
+        TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), values[3]);
+        levelManager.Level.NPCs.Add(new NPC(gameManager.UIManager, texture, mouseSelectionCoord, name, dialog, Color.White, scale));
+    }
+    public void DeleteNPC()
+    {
+        foreach (NPC npc in levelManager.Level.NPCs)
+        {
+            if (npc.Location == mouseSelectionCoord)
             {
-                Logger.Warning("Scale must be between 1 and 25.5- setting to 1");
-                scale = 1;
+                levelManager.Level.NPCs.Remove(npc);
+                Logger.Log($"Deleted NPC '{npc.Name}' @ {mouseSelectionCoord.X}, {mouseSelectionCoord.Y}.");
+                break;
             }
-            TextureID texture = Logger.InputTexture("Texture: ", fallback: TextureID.PurpleWizard);
-            levelManager.Level.NPCs.Add(new NPC(gameManager.UIManager, texture, mouseCoord, name, dialog, Color.White, scale));
         }
     }
     public void EditDecals()
     {
         if (InputManager.KeyDown(Keys.LeftShift)) // Delete
         {
-            foreach (Decal decal in levelManager.Level.Decals)
-            {
-                if (decal.Location == mouseCoord)
-                {
-                    levelManager.Level.Decals.Remove(decal);
-                    Logger.Log($"Deleted decal  @ {mouseCoord.X}, {mouseCoord.Y}.");
-                    break;
-                }
-            }
+            DeleteDecal();
         }
         else // New
+            NewDecal();
+    }
+    public void NewDecal()
+    {
+        // Check
+        if (levelManager.Level.Decals.Count >= 255)
         {
-            Logger.Print("__Decal__");
-            string name = Logger.Input("Decal: ");
-            int decal = (int)(Enum.TryParse<DecalType>(name, true, out var dec) ? dec : DecalType.Torch);
-            levelManager.Level.Decals.Add(LevelManager.DecalFromId(decal, mouseCoord));
+            Logger.Error("Maximum number of Decals reached (255).");
+            return;
+        }
+
+        // Winforms
+        var (success, values) = ShowInputForm("Decal Editor", [new("Decal", null, Constants.DecalTypeNames)]);
+        if (!success)
+        {
+            if (!PopupOpen) Logger.Error("Decal creation failed.");
+            return;
+        }
+
+        string name = values[0];
+        DecalType decal = Enum.TryParse<DecalType>(name, true, out var dec) ? dec : DecalType.Torch;
+        levelManager.Level.Decals.Add(LevelManager.DecalFromId(decal, mouseSelectionCoord));
+    }
+    public void DeleteDecal()
+    {
+        foreach (Decal decal in levelManager.Level.Decals)
+        {
+            if (decal.Location == mouseSelectionCoord)
+            {
+                levelManager.Level.Decals.Remove(decal);
+                Logger.Log($"Deleted decal '{decal.Type}' @ {mouseSelectionCoord.X}, {mouseSelectionCoord.Y}.");
+                break;
+            }
         }
     }
     public void EditLoot()
     {
         if (InputManager.KeyDown(Keys.LeftShift)) // Delete
-        {
-            foreach (Loot loot in levelManager.Level.Loot)
-            {
-                if (loot.Location == mouseCoord)
-                {
-                    levelManager.Level.Loot.Remove(loot);
-                    Logger.Log($"Deleted loot '{loot.DisplayName}' @ {mouseCoord.X}, {mouseCoord.Y}.");
-                    break;
-                }
-            }
-        }
+            DeleteLoot();
         else // New
+            NewLoot();
+    }
+    public void NewLoot()
+    {
+        // Check
+        if (levelManager.Level.Loot.Count >= 255)
         {
-            Logger.Print("__Loot__");
-            string name = Logger.Input("Name: ");
-            byte amount = Logger.InputByte("Amount: ", fallback: 1);
-            levelManager.Level.Loot.Add(new Loot(name, amount, InputManager.MousePosition + CameraManager.Camera.ToPoint() - Constants.Middle, gameManager.TotalTime));
+            Logger.Error("Maximum number of Loot reached (255).");
+            return;
+        }
+
+        // Winforms
+        var (success, values) = ShowInputForm("Loot Editor", [new("Item", null, Constants.ItemTypeNames), new("Amount", IsByte)]);
+        if (!success || values[1] == "0")
+        {
+            if (!PopupOpen) Logger.Error("Loot creation failed.");
+            return;
+        }
+
+        string name = values[0];
+        byte amount = byte.Parse(values[1]);
+        levelManager.Level.Loot.Add(new Loot(name, amount, mouseSelection, gameManager.TotalTime));
+    }
+    public void DeleteLoot()
+    {
+        foreach (Loot loot in levelManager.Level.Loot)
+        {
+            if (Vector2.DistanceSquared(loot.Location.ToVector2(), mouseSelection.ToVector2()) < 900)
+            {
+                levelManager.Level.Loot.Remove(loot);
+                Logger.Log($"Deleted loot '{loot.Item}' @ {mouseCoord.X}, {mouseCoord.Y}.");
+                break;
+            }
         }
     }
     public void SaveLevel()
     {
-        // Input
-        string name = Logger.Input("Export file name: ");
+        // Winforms
+        var (success, values) = ShowInputForm("Save Level", [new("Name", null)]);
+        if (!success)
+        {
+            if (!PopupOpen) Logger.Error("Failed to save level.");
+            return;
+        }
 
         // Parse
         Directory.CreateDirectory("..\\..\\..\\Levels");
-        using FileStream fileStream = File.Create($"..\\..\\..\\Levels/{name}.qlv");
+        using FileStream fileStream = File.Create($"..\\..\\..\\Levels/{values[0]}.qlv");
         using GZipStream gzipStream = new(fileStream, CompressionLevel.Optimal);
         using BinaryWriter writer = new(gzipStream);
 
@@ -340,12 +408,44 @@ public class EditorManager
     }
     public void GenerateLevel()
     {
-        Logger.Print("__Generate Level__");
-        levelGenerator.Seed = Logger.InputInt("Seed: ", fallback: levelGenerator.Seed);
-        levelGenerator.Terrain = levelGenerator.Terrains.TryGetValue(Logger.Input("Preset: "), out var preset) ? preset : levelGenerator.Terrain;
-        Tile[] tiles = levelGenerator.GenerateLevel(Constants.MapSize, 20);
-        Level level = new("generated", tiles, Constants.HalfMapSize, [], [], [], []);
+        // Winforms
+        var (success, values) = ShowInputForm("Generate Level", [new("Seed", IsInteger), new("Terrain", null, [.. levelGenerator.Terrains.Keys]), new("Structure Attempts", IsPositiveIntegerOrZero)]);
+        if (!success)
+        {
+            if (!PopupOpen) Logger.Error("Level generation failed.");
+            return;
+        }
+
+        // Generate
+        levelGenerator.Seed = int.Parse(values[0]);
+        levelGenerator.Terrain = levelGenerator.Terrains.GetValueOrDefault(values[1], levelGenerator.Terrain);
+        Tile[] tiles = levelGenerator.GenerateLevel(Constants.MapSize, int.Parse(values[2]));
+        Level current = levelManager.Level;
+        Level level = new(current.Name, tiles, current.Spawn, current.NPCs, current.Loot, current.Decals, current.Enemies, current.Tint);
         levelManager.LoadLevelObject(gameManager, level);
+    }
+    public void OpenFile()
+    {
+        // Winforms
+        var (success, values) = ShowInputForm("Open File", [new("File Name", null)]);
+        if (!success)
+        {
+            if (!PopupOpen) Logger.Error("Failed to open file.");
+            return;
+        }
+
+        // Open
+        string filename = values[0];
+        try
+        {
+            levelManager.ReadLevel(gameManager.UIManager, filename);
+            levelManager.LoadLevel(gameManager, filename);
+            Logger.Log($"Opened level '{filename}'.");
+        }
+        catch (Exception ex)
+        {
+            Logger.Error($"Failed to open level '{filename}': {ex.Message}");
+        }
     }
     public Tile GetTile(Point coord)
     {

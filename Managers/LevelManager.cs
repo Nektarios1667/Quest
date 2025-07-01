@@ -251,7 +251,7 @@ public class LevelManager
         {
             int type = reader.ReadByte();
             Point location = new(reader.ReadByte(), reader.ReadByte());
-            decalBuffer.Add(DecalFromId(type, location));
+            decalBuffer.Add(DecalFromId((DecalType)type, location));
         }
 
         // Make and add the level
@@ -280,18 +280,17 @@ public class LevelManager
         };
     }
     public static Tile TileFromId(TileType id, Point location) => TileFromId((int)id, location);
-    public static Decal DecalFromId(int id, Point location)
+    public static Decal DecalFromId(DecalType id, Point location)
     {
         // Create a decal from an id
-        DecalType type = (DecalType)id;
-        return type switch
+        return id switch
         {
             DecalType.Torch => new Torch(location),
             DecalType.BlueTorch => new BlueTorch(location),
             DecalType.WaterPuddle => new WaterPuddle(location),
             DecalType.BloodPuddle => new BloodPuddle(location),
             DecalType.Footprint => new Footprint(location),
-            _ => new Decal(location), // Default tile
+            _ => throw new ArgumentException($"Unknown DecalFromId DecalType '{id}'.")
         };
     }
     public int TileConnectionsMask(Tile tile)
