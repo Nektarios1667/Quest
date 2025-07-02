@@ -1,4 +1,6 @@
-﻿namespace Quest.Managers;
+﻿using Quest.Enemies;
+
+namespace Quest.Managers;
 public class EnemyManager
 {
     public List<Enemy> Enemies { get; protected set; }
@@ -13,7 +15,7 @@ public class EnemyManager
         foreach (Enemy enemy in Enemies)
         {
             foreach (Attack attack in attacks)
-                if (enemy.Hitbox.Intersects(attack.Hitbox)) enemy.Damage(attack.Damage);
+                if (enemy.Hitbox.Intersects(attack.Hitbox)) enemy.Hurt(attack.Damage);
             enemy.Update(gameManager);
         }
 

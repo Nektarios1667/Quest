@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Quest.Enemies;
 
 // TODO Player not being drawn, dialog box not being drawn, update minimap on level change, inventory not being drawn
 
@@ -143,6 +144,14 @@ public class Window : Game
             string? cmd = Console.ReadLine();
             string resp = CommandManager.Execute(cmd ?? "");
             Logger.Log(resp);
+        }
+
+        // Spawn enemy
+        if (Constants.COMMANDS && InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.E))
+        {
+            Enemy enemy = new(CameraManager.Camera.ToPoint() + InputManager.MousePosition - Constants.Middle);
+            gameManager.LevelManager.Level.Enemies.Add(enemy);
+            Logger.Log($"Spawned {enemy.Name} at {enemy.Location}");
         }
 
         // Final

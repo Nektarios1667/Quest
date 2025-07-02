@@ -12,6 +12,7 @@ global using Quest.Managers;
 global using Quest.Tiles;
 global using Quest.Utilities;
 global using Quest.Decals;
+global using Quest.Enemies;
 
 global using static Quest.Managers.TextureManager;
 

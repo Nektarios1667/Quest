@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.IO.Compression;
+using Quest.Enemies;
 
 namespace Quest.Managers;
 public class LevelManager
@@ -343,5 +344,8 @@ public class LevelManager
         Level.Loot.Add(loot);
         gameManager.UIManager.LootNotifications.AddNotification($"-{loot.DisplayName}");
     }
+    public static Point TileCoord(Point loc) => new(loc.X / Constants.TileSize.X, loc.Y / Constants.TileSize.Y);
+    public static Point TileCoord(Vector2 loc) => new((int)(loc.X / Constants.TileSize.X), (int)(loc.Y / Constants.TileSize.Y));
+    public static Vector2 WorldCoord(Point tileCoord) => new(tileCoord.X * Constants.TileSize.X, tileCoord.Y * Constants.TileSize.Y);
     public static int Flatten(Point point) => point.X + point.Y * Constants.MapSize.X;
 }

@@ -14,7 +14,7 @@ public class MeleeWeapon : Item
     }
     public override void PrimaryUse()
     {
-        if (TimerManager.TryIsComplete($"MeleeSwing_{UID}"))
+        if (TimerManager.IsCompleteOrMissing($"MeleeSwing_{UID}"))
         {
             TimerManager.SetTimer($"MeleeSwing_{UID}", 1f / FireRate, null);
             RectangleF hitbox = new(CameraManager.Camera.X, CameraManager.Camera.Y, Range, Constants.MageHalfSize.Y);

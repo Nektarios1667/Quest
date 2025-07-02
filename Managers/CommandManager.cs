@@ -59,15 +59,15 @@ public static class CommandManager
         // Commands creation
         commands = [
             new Command("teleport <coordinate>", CTeleport, "Teleported player to |1|.", "Failed to teleport player to |1|."),
-            new Command("health <modify> {0-999}", CHealth, "Player health |1| [|2|].", "Failed to |1| player health [|2|]."),
-            new Command("move_speed {0-999}", CMoveSpeed, "Set player speed to |1|.", "Failed to set player speed to |1|."),
+            new Command("health <modify> {0:999}", CHealth, "Player health |1| [|2|].", "Failed to |1| player health [|2|]."),
+            new Command("move_speed {0:999}", CMoveSpeed, "Set player speed to |1|.", "Failed to set player speed to |1|."),
             new Command("force_quit", CForceQuit, "Force quit application.", "Failed to force quit application."),
             new Command("quit", CQuit, "Quit application.", "Failed to quit application."),
             new Command("location", CLocation, "$noout", "Failed to get player location."),
             new Command("level [load|read] <string>", CLevel, "Ran |1| level '|2|'.", "Failed to |1| level '|2|'."),
             new Command("mood [calm|dark|epic]", CMood, "Set mood to '|1|'.", "Failed to set mood to '|1|.'"),
             new Command("say **", CSay, "$noout", "Failed to speak."),
-            new Command($"daytime <modify> {{0-{Constants.DayLength}}}", CDaytime, "Daytime |1| |2|", "Failed |1| daytime |2|"),
+            new Command($"daytime <modify> {{-{Constants.DayLength}:{Constants.DayLength}}}", CDaytime, "Daytime |1| |2|", "Failed |1| daytime |2|"),
         ];
     }
     // Customn type predicates
@@ -128,9 +128,9 @@ public static class CommandManager
             // Any
             else if (args[p] == "*") { }
             // Float range
-            else if (args[p].StartsWith("f{") && args[p].EndsWith("}"))
+            else if (args[p].StartsWith("f{") && args[p].EndsWith('}'))
             {
-                var range = args[p][2..^1].Split('-');
+                string[] range = args[p][2..^1].Split(':');
                 if (range.Length != 2) { return false; }
                 if (!float.TryParse(range[0], out float min)) { return false; }
                 if (!float.TryParse(range[1], out float max)) { return false; }
@@ -138,9 +138,9 @@ public static class CommandManager
                 if (num < min || num > max) { return false; }
             }
             // Integer range
-            else if (args[p].StartsWith('{') && args[p].EndsWith("}"))
+            else if (args[p].StartsWith('{') && args[p].EndsWith('}'))
             {
-                var range = args[p][1..^1].Split('-');
+                string[] range = args[p][1..^1].Split(':');
                 if (range.Length != 2) { return false; }
                 if (!int.TryParse(range[0], out int min)) { return false; }
                 if (!int.TryParse(range[1], out int max)) { return false; }
@@ -232,19 +232,9 @@ public static class CommandManager
     {
         string[] parts = command.Split(' ');
         if (parts[1] == "set")
-        {
-            if (int.TryParse(parts[2], out int value) && value >= 0 && value <= Constants.DayLength)
-            {
-                return true;
-            }
-        }
+            gameManager!.DayTime = int.Parse(parts[2]);
         else if (parts[1] == "change")
-        {
-            if (int.TryParse(parts[2], out int value) && value >= 0 && value <= Constants.DayLength)
-            {
-                return true;
-            }
-        }
+            gameManager!.DayTime += int.Parse(parts[2]);
         return false;
     }
 }

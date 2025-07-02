@@ -1,4 +1,6 @@
-﻿namespace Quest;
+﻿using Quest.Enemies;
+
+namespace Quest;
 
 public class Level
 {
