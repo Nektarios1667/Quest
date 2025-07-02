@@ -9,7 +9,7 @@ public static class ColorTools
 {
     public static Color GetSkyColor(float time)
     {
-        float cycle = (time % Constants.DayLength) / Constants.DayLength;
+        float cycle = time / Constants.DayLength;
         List<(float pos, Color color)> stops = [
             (0, Color.Transparent),
             (0.2f, Color.Transparent),

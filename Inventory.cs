@@ -147,7 +147,7 @@ public class Inventory
         if (Opened && HoverSlot >= 0 && InputManager.KeyDown(Keys.D))
         {
             Item? item = GetItem(HoverSlot);
-            if (item != null) gameManager.LevelManager.DropLoot(gameManager, new Loot(item.Name, item.Amount, CameraManager.PlayerFoot + Constants.MageDrawShift, gameManager.TotalTime));
+            if (item != null) gameManager.LevelManager.DropLoot(gameManager, new Loot(item.Name, item.Amount, CameraManager.PlayerFoot + Constants.MageDrawShift, gameManager.GameTime));
             SetSlot(HoverSlot, null);
             SoundManager.PlaySoundInstance("Trinkets");
         }

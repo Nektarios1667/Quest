@@ -118,7 +118,7 @@ public class PlayerManager
         else if (PlayerDirection == Direction.Up) sourceRow = 4;
         // Draw player
         Point pos = Constants.Middle - Constants.MageHalfSize + CameraManager.CameraOffset.ToPoint();
-        Rectangle source = GetAnimationSource(TextureID.BlueMage, gameManager.TotalTime, duration: sourceRow == 0 ? .5f : .25f, row: sourceRow);
+        Rectangle source = GetAnimationSource(TextureID.BlueMage, gameManager.GameTime, duration: sourceRow == 0 ? .5f : .25f, row: sourceRow);
         DrawTexture(gameManager.Batch, TextureID.BlueMage, pos, source: source);
         // Draw equipped item
         if (Inventory.Equipped != null)

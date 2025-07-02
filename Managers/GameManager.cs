@@ -6,7 +6,9 @@ public class GameManager
     public LevelManager LevelManager { get; private set; }
     public UIManager UIManager { get; private set; }
     public float DeltaTime { get; private set; }
-    public float TotalTime { get; private set; }
+    public float GameTime { get; private set; } = 0f;
+    public float TotalTime { get; private set; } = 0f;
+    public float DayTime { get; set; } = 0f;
     public SpriteBatch Batch { get; private set; }
 
     public Inventory Inventory { get; set; }
@@ -18,7 +20,6 @@ public class GameManager
         LevelManager = level;
         UIManager = ui;
         DeltaTime = 0;
-        TotalTime = 250;
 
         // Load sounds
         SoundManager.LoadSound(content, "Footstep", "Sounds/Effects/Footstep");
@@ -36,7 +37,10 @@ public class GameManager
     public void Update(float deltaTime)
     {
         DeltaTime = deltaTime;
+        GameTime += deltaTime;
+        DayTime += deltaTime;
         TotalTime += deltaTime;
+        if (DayTime >= Constants.DayLength) DayTime = 0f;
     }
     public void Respawn()
     {

@@ -112,7 +112,11 @@ public class EditorManager
         debugSb.Clear();
         debugSb.Append("FPS: ");
         debugSb.AppendFormat("{0:0.0}", cacheDelta != 0 ? 1f / cacheDelta : 0);
-        debugSb.Append("\nTime: ");
+        debugSb.Append("\nGameTime: ");
+        debugSb.AppendFormat("{0:0.00}", gameManager.GameTime);
+        debugSb.Append("\nDayTime: ");
+        debugSb.AppendFormat("{0:0.00}", gameManager.DayTime);
+        debugSb.Append("\nTotalTime: ");
         debugSb.AppendFormat("{0:0.00}", gameManager.TotalTime);
         debugSb.Append("\nCamera: ");
         debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.Camera.X, CameraManager.Camera.Y);
@@ -345,7 +349,7 @@ public class EditorManager
 
         string name = values[0];
         byte amount = byte.Parse(values[1]);
-        levelManager.Level.Loot.Add(new Loot(name, amount, mouseSelection, gameManager.TotalTime));
+        levelManager.Level.Loot.Add(new Loot(name, amount, mouseSelection, gameManager.GameTime));
     }
     public void DeleteLoot()
     {

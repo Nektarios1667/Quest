@@ -90,6 +90,7 @@ public class Window : Game
         gameManager = new(Content, spriteBatch, playerManager.Inventory, levelManager, uiManager);
         enemyManager = new();
         CommandManager.Init(this, gameManager, levelManager, playerManager);
+        Pathfinder.Init(gameManager);
         Logger.System("Initialized managers.");
 
         // Levels
@@ -198,16 +199,19 @@ public class Window : Game
             debugSb.Append('\n');
         }
 
-        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.Window.X - 180, 10), Color.White);
+        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.Window.X - 180, 0), Color.White);
     }
     public void DrawTextInfo()
     {
-        spriteBatch.FillRectangle(new(0, 0, 220, 200), Color.Black * 0.8f);
 
         debugSb.Clear();
         debugSb.Append("FPS: ");
         debugSb.AppendFormat("{0:0.0}", cacheDelta != 0 ? 1f / cacheDelta : 0);
-        debugSb.Append("\nTime: ");
+        debugSb.Append("\nGameTime: ");
+        debugSb.AppendFormat("{0:0.00}", gameManager.GameTime);
+        debugSb.Append("\nDayTime: ");
+        debugSb.AppendFormat("{0:0.00}", gameManager.DayTime);
+        debugSb.Append("\nTotalTime: ");
         debugSb.AppendFormat("{0:0.00}", gameManager.TotalTime);
         debugSb.Append("\nCamera: ");
         debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.Camera.X, CameraManager.Camera.Y);
@@ -226,6 +230,7 @@ public class Window : Game
         debugSb.Append("\nMusic: ");
         debugSb.Append(SoundtrackManager.Playing?.File ?? "none");
 
+        spriteBatch.FillRectangle(new(0, 0, 220, debugSb.ToString().Split('\n').Length * 20), Color.Black * 0.8f);
         spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);
     }
     public void DrawFrameBar()

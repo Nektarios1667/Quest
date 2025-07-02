@@ -51,7 +51,7 @@ public class Enemy
     }
     public virtual void Draw(GameManager gameManager)
     {
-        Rectangle source = GetAnimationSource(Texture, gameManager.TotalTime, duration: 0.5f);
+        Rectangle source = GetAnimationSource(Texture, gameManager.GameTime, duration: 0.5f);
         DrawTexture(gameManager.Batch, Texture, Location.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, source: source);
     }
     public virtual void Damage(int damage)

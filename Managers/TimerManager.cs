@@ -1,26 +1,16 @@
 ﻿namespace Quest.Managers;
 public static class TimerManager
 {
-    private static Dictionary<string, Timer> timers = [];
-    private static List<string> removals = [];
-    public class Timer
+    public class Timer(float duration, Action? call, int repetitions = 1)
     {
-        public float left;
-        public int completions;
-        public readonly int repetitions;
-        public readonly Action? call;
-        public readonly float duration;
-
+        public float left = duration;
+        public int completions = 0;
+        public readonly int repetitions = repetitions;
+        public readonly Action? call = call;
+        public readonly float duration = duration;
+        public bool IsExpired => left <= 0f && completions >= repetitions;
         public event Action? Completed;
 
-        public Timer(float duration, Action? call, int repetitions = 1)
-        {
-            this.duration = duration;
-            left = duration;
-            this.repetitions = repetitions;
-            completions = 0;
-            this.call = call;
-        }
         public void Update(GameManager manager)
         {
             DebugManager.StartBenchmark("TimerUpdates");
@@ -37,8 +27,40 @@ public static class TimerManager
 
             DebugManager.EndBenchmark("TimerUpdates");
         }
+    }
+    public class StopWatch
+    {
+        public float Elapsed { get; private set; } = 0f;
+        public bool IsRunning { get; private set; } = false;
+        public void Start() => IsRunning = true;
+        public void Stop() => IsRunning = false;
+        public void Reset() => Elapsed = 0f;
+        public void Update(GameManager manager)
+        {
+            if (IsRunning)
+                Elapsed += manager.DeltaTime;
+        }
+    }
+    private static Dictionary<string, Timer> timers = [];
+    private static List<string> removals = [];
+    public static void Update(GameManager gameManager)
+    {
+        DebugManager.StartBenchmark("TimerManagerUpdate");
 
-        public bool IsExpired => left <= 0f && completions >= repetitions;
+        // Update timers
+        foreach (var (key, timer) in timers)
+        {
+            timer.Update(gameManager);
+            if (timer.IsExpired)
+                removals.Add(key);
+        }
+
+        // Remove expired timers
+        foreach (string timer in removals)
+            timers.Remove(timer);
+        removals.Clear();
+
+        DebugManager.EndBenchmark("TimerManagerUpdate");
     }
     public static Timer NewTimer(string name, float duration, Action? call, int repetitions = 1)
     {
@@ -88,19 +110,4 @@ public static class TimerManager
         return true;
     }
     public static bool Exists(string name) => timers.ContainsKey(name);
-    public static void Update(GameManager gameManager)
-    {
-        // Update timers
-        foreach (var (key, timer) in timers)
-        {
-            timer.Update(gameManager);
-            if (timer.IsExpired)
-                removals.Add(key);
-        }
-
-        // Remove expired timers
-        foreach (string timer in removals)
-            timers.Remove(timer);
-        removals.Clear();
-    }
 }

@@ -25,7 +25,7 @@ public class LevelManager
         foreach (Enemy enemy in Level.Enemies) enemy.Update(gameManager);
 
         // SkyTint
-        SkyLight = (Level.Tint != Color.Transparent ? Level.Tint : ColorTools.GetSkyColor(gameManager.TotalTime)) * .8f;
+        SkyLight = (Level.Tint != Color.Transparent ? Level.Tint : ColorTools.GetSkyColor(gameManager.DayTime)) * .8f;
     }
     public void Draw(GameManager gameManager)
     {
@@ -73,7 +73,7 @@ public class LevelManager
         {
             Loot loot = Level.Loot[l];
             Point pos = loot.Location - CameraManager.Camera.ToPoint() + Constants.Middle;
-            pos.Y += (int)(Math.Sin((gameManager.TotalTime - loot.Birth) * 2 % (Math.PI * 2)) * 6); // Bob up and down
+            pos.Y += (int)(Math.Sin((gameManager.GameTime - loot.Birth) * 2 % (Math.PI * 2)) * 6); // Bob up and down
             DrawTexture(gameManager.Batch, loot.Texture, pos, scale: 2);
             // Draw stacks if multiple
             if (loot.Amount > 1)
@@ -343,4 +343,5 @@ public class LevelManager
         Level.Loot.Add(loot);
         gameManager.UIManager.LootNotifications.AddNotification($"-{loot.DisplayName}");
     }
+    public static int Flatten(Point point) => point.X + point.Y * Constants.MapSize.X;
 }
