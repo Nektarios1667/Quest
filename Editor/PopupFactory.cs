@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SysColor = System.Drawing.Color; 
 using System.Linq;
 using System.Windows.Forms;
 namespace Quest.Editor;
@@ -12,12 +12,14 @@ public class InputField(string label, Func<string, bool>? validate = null, strin
 public static class PopupFactory
 {
     public static bool PopupOpen { get; private set; } = false;
-    public static (bool success, string[] values) ShowInputForm(string title, InputField[] fields)
+    public static Form? Form { get; private set; }
+
+    public static (bool success, string[] values) ShowInputForm(string title, InputField[] fields, bool closeOnEnter = true, Action<string[]>? onSubmit = null)
     {
         if (PopupOpen) return (false, Array.Empty<string>());
         PopupOpen = true;
         // Setup
-        Form form = new() { Text = title, Width = 400, Height = 100 + fields.Length * 35 };
+        Form = new() { Text = title, Width = 400, Height = 100 + fields.Length * 35 };
         List<Control> inputs = [];
 
         // Fields
@@ -45,7 +47,7 @@ public static class PopupFactory
                     Width = 200,
                     DropDownStyle = ComboBoxStyle.DropDownList
                 };
-                combo.Items.AddRange(field.DropdownOptions);
+                combo.Items.AddRange(field.DropdownOptions!);
                 combo.SelectedIndex = 0;
                 inputControl = combo;
             }
@@ -62,21 +64,22 @@ public static class PopupFactory
             }
 
             // Add created controls to the form
-            form.Controls.Add(label);
-            form.Controls.Add(inputControl);
+            Form.Controls.Add(label);
+            Form.Controls.Add(inputControl);
             inputs.Add(inputControl);
         }
 
         // Error message label
-        Label errorLabel = new()
+        Label outputLabel = new()
         {
+            Name = "OutputLabel",
             Text = "",
-            ForeColor = System.Drawing.Color.Red,
+            ForeColor = SysColor.Green,
             Left = 10,
             Top = fields.Length * 35 + 38,
-            Width = 260
+            Width = 380
         };
-        form.Controls.Add(errorLabel);
+        Form.Controls.Add(outputLabel);
 
         // Enter button
         Button okButton = new()
@@ -102,39 +105,60 @@ public static class PopupFactory
 
                 if (!fields[i].Validate(value))
                 {
-                    errorLabel.Text = $"Invalid input: {fields[i].Label}";
+                    outputLabel.Text = $"Invalid input: {fields[i].Label}";
+                    outputLabel.ForeColor = SysColor.Red;
                     return;
                 }
             }
 
-            form.DialogResult = DialogResult.OK;
-            form.Close();
+            string[] values = GetValues(inputs);
+
+            // If handler
+            if (onSubmit != null)
+            {
+                onSubmit(values);
+                return; // Don't close the form now
+            }
+
+            // No handler
+            if (closeOnEnter)
+                Form.DialogResult = DialogResult.OK;
         };
 
-        form.Controls.Add(okButton);
-        form.AcceptButton = okButton;
+        Form.Controls.Add(okButton);
+        Form.AcceptButton = okButton;
 
         // Results
-        DialogResult result = form.ShowDialog();
+        DialogResult result = Form.ShowDialog();
         PopupOpen = false;
         if (result == DialogResult.OK)
         {
-            string[] values = inputs.Select(input =>
-            {
-                return input switch
-                {
-                    TextBox t => t.Text,
-                    ComboBox c => c.SelectedItem?.ToString() ?? "",
-                    _ => ""
-                };
-            }).ToArray();
-
+            string[] values = GetValues(inputs);
             return (true, values);
         }
 
         return (false, Array.Empty<string>());
     }
-
+    private static string[] GetValues(List<Control> inputs)
+    {
+        return inputs.Select(input =>
+        {
+            return input switch
+            {
+                TextBox t => t.Text,
+                ComboBox c => c.SelectedItem?.ToString() ?? "",
+                _ => ""
+            };
+        }).ToArray();
+    }
+    public static void SetOutputLabel(string value, SysColor color)
+    {
+        if (!PopupOpen || Form == null) return;
+        var outputLabel = Form.Controls["OutputLabel"]!;
+        outputLabel.Text = value;
+        outputLabel.ForeColor = color;
+        outputLabel.Visible = true;
+    }
     public static bool IsNotEmpty(string value)
     {
         return !string.IsNullOrWhiteSpace(value);

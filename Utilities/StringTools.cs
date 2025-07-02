@@ -73,4 +73,16 @@ public static class StringTools
     {
         return "aeiou".Contains(c);
     }
+    public static object ConvertByTypeName(string typeName, string value)
+    {
+        string[] parts = value.Split(' ');
+        return typeName.ToLower() switch
+        {
+            "int" => int.Parse(value),
+            "float" => float.Parse(value),
+            "string" => value,
+            "point" => new Point(int.Parse(parts[0]), int.Parse(parts[1])),
+            _ => throw new ArgumentException($"Unsupported type '{typeName}'")
+        };
+    }
 }

@@ -139,13 +139,7 @@ public class Window : Game
 
         // Console commands
         if (Constants.COMMANDS && InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.OemTilde))
-        {
-            Console.Write(">> ");
-            string? cmd = Console.ReadLine();
-            string resp = CommandManager.Execute(cmd ?? "");
-            Logger.Log(resp);
-        }
-
+            CommandManager.OpenCommandPrompt();
         // Spawn enemy
         if (Constants.COMMANDS && InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.E))
         {

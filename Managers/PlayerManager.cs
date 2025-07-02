@@ -17,8 +17,8 @@ public class PlayerManager
     public PlayerManager()
     {
         Inventory = new(6, 4);
-        Inventory.SetSlot(0, new ActivePalantir(this, 1));
-        Inventory.SetSlot(1, new DiamondSword(this, 1));
+        Inventory.SetSlot(0, new DiamondSword(this, 1));
+        Inventory.SetSlot(1, new ActivePalantir(this, 1));
         Inventory.SetSlot(2, new Pickaxe(this, 1));
         Inventory.SetSlot(3, new PhiCoin(this, 10));
         Inventory.SetSlot(4, new DeltaCoin(this, 5));

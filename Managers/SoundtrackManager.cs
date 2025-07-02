@@ -16,7 +16,7 @@ public static class SoundtrackManager
     public static void LoadSoundtracks(ContentManager content)
     {
         // Setup music
-        SoundManager.MusicVolume = .6f;
+        SoundManager.MusicVolume = 0f;
 
         // Load soundtrack objects
         Soundtracks = [

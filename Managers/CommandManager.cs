@@ -1,7 +1,6 @@
 ﻿using System.Linq;
-
+using SysColor = System.Drawing.Color;
 namespace Quest.Managers;
-
 
 public static class CommandManager
 {
@@ -16,39 +15,44 @@ public static class CommandManager
 
         public bool IsCommand(string command) => command.Split(' ')[0] == Name;
         public bool Matches(string command) { return CommandManager.CommandCheck(command, Pattern); }
-        public string TryExecute(string command)
+        public (bool success, string output) TryExecute(string command)
         {
-            // Setup
+            // Replace parts
+            string success = Success; string failure = Failure;
             string[] parts = command.Split(' ');
             for (int p = 0; p < parts.Length; p++)
-            {
-                Success = Success.Replace($"|{p}|", parts[p]);
-            }
+                success = success.Replace($"|{p}|", parts[p]);
             for (int p = 0; p < parts.Length; p++)
+                failure = failure.Replace($"|{p}|", parts[p]);
+            success = success.Replace("|*|", string.Join(' ', parts[1..]));
+            failure = failure.Replace("|*|", string.Join(' ', parts[1..]));
+
+            // Replace variables
+            foreach (var (name, value) in Variables)
             {
-                Failure = Failure.Replace($"|{p}|", parts[p]);
+                command = command.Replace($"={name}", value);
+                success = success.Replace($"={name}", value);
+                failure = failure.Replace($"={name}", value);
             }
 
             // Checks and run
             if (Matches(command))
             {
-                if (Action(command)) { return Success; }
-                return Failure;
+                if (Action(command)) { return (true, success); }
+                return (false, failure);
             }
-            else { return $"Command should be formatted as '{Pattern}'"; }
+            else
+                return (false, $"Expected format '{Pattern}'");
         }
     }
-    private class CommandResponse(string message, bool success)
-    {
-        public string Message { get; private set; } = message;
-        public bool Success { get; private set; } = success;
-    }
-
+    // Fields
     private static List<Command> commands { get; set; } = [];
     private static Game? game { get; set; }
     private static GameManager? gameManager { get; set; }
     private static LevelManager? levelManager { get; set; }
     private static PlayerManager? playerManager { get; set; }
+    // Public
+    public static Dictionary<string, string> Variables { get; private set; } = [];
     // Type dict
     private readonly static Dictionary<string, Func<string, bool>> predicateMap = new()
     {
@@ -74,12 +78,37 @@ public static class CommandManager
             new("move_speed {0:999}", CMoveSpeed, "Set player speed to |1|.", "Failed to set player speed to |1|."),
             new("force_quit", CForceQuit, "Force quit application.", "Failed to force quit application."),
             new("quit", CQuit, "Quit application.", "Failed to quit application."),
-            new("location", CLocation, "$noout", "Failed to get player location."),
             new("level [load|read] <string>", CLevel, "Ran |1| level '|2|'.", "Failed to |1| level '|2|'."),
             new("mood [calm|dark|epic]", CMood, "Set mood to '|1|'.", "Failed to set mood to '|1|.'"),
-            new("say **", CSay, "$noout", "Failed to speak."),
+            new("say **", CSay, "|*|", "Failed to speak."),
             new($"daytime <modify> {{-{Constants.DayLength}:{Constants.DayLength}}}", CDaytime, "Daytime |1| |2|", "Failed |1| daytime |2|"),
+            new("store * *", CStore, "Stored |2| to '|1|'", "Failed to store |2| to '|1|'")
         ];
+    }
+    public static (bool success, string output) Execute(string command)
+    {
+        if (game == null || gameManager == null || levelManager == null || playerManager == null)
+            throw new Exception("CommandManager is not initialized");
+
+        foreach (Command commandObj in commands)
+            if (commandObj.IsCommand(command)) { return commandObj.TryExecute(command); }
+        return (false, $"Unknown command '{command}'");
+    }
+    public static (bool success, string output) OpenCommandPrompt()
+    {
+        string[]? result = null;
+        Editor.PopupFactory.ShowInputForm("Command", [new("Enter command")], false, values =>
+        {
+            string command = values[0].Trim();
+            var (success, output) = Execute(command);
+            if (output != "$noout")
+                Editor.PopupFactory.SetOutputLabel(output, success ? SysColor.Green : SysColor.Red);
+        });
+
+        if (result == null)
+            return (false, "No command entered.");
+
+        return (true, result[0]);
     }
     // Custom type predicates
     static bool IsCoordinate(string val)
@@ -155,20 +184,11 @@ public static class CommandManager
         // Passed
         return true;
     }
-    public static string Execute(string command)
-    {
-        if (game == null || gameManager == null || levelManager == null || playerManager == null)
-            throw new Exception("CommandManager not initialized");
-
-        foreach (Command commandObj in commands)
-            if (commandObj.IsCommand(command)) { return commandObj.TryExecute(command); }
-        return $"Unknown command '{command}'";
-    }
     // Command functions
     private static bool CTeleport(string command)
     {
         string[] coords = command.Split(' ')[1].Split(',');
-        CameraManager.CameraDest = new Vector2(float.Parse(coords[0]), float.Parse(coords[1]));
+        CameraManager.CameraDest = new Vector2(float.Parse(coords[0]), float.Parse(coords[1])) * Constants.TileSize.ToVector2();
         return true;
     }
     private static bool CHealth(string command)
@@ -185,8 +205,7 @@ public static class CommandManager
     }
     private static bool CForceQuit(string command) { throw new Exception("Force quit"); }
     private static bool CQuit(string command) { game?.Exit(); return true; }
-    private static bool CLocation(string command) { Logger.Log($"Player location: {CameraManager.Camera}"); return true; }
-    private static bool CSay(string command) { Logger.Log(string.Join(' ', command.Split(' ')[1..])); return true; }
+    private static bool CSay(string command) => true;
     private static bool CLevel(string command)
     {
         string[] parts = command.Split(' ');
@@ -223,6 +242,16 @@ public static class CommandManager
             gameManager!.DayTime += int.Parse(parts[2]);
         else
             return false;
+        return true;
+    }
+    private static bool CStore(string command)
+    {
+        string[] parts = command.Split(' ');
+        if (parts.Length < 3) return false;
+        string name = parts[1];
+        string value = parts[2];
+        Variables[name] = value;
+
         return true;
     }
 }
