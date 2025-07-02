@@ -49,6 +49,17 @@ public static class CommandManager
     private static GameManager? gameManager { get; set; }
     private static LevelManager? levelManager { get; set; }
     private static PlayerManager? playerManager { get; set; }
+    // Type dict
+    private readonly static Dictionary<string, Func<string, bool>> predicateMap = new()
+    {
+        { "int", value => int.TryParse(value, out _)  },
+        { "decimal", value => decimal.TryParse(value, out _) && !decimal.TryParse(value, out _) },
+        { "number", value => decimal.TryParse(value, out _) }, // Any numeric value
+        { "string", value => true },
+        { "bool", value => bool.TryParse(value, out _) },
+        { "coordinate", value => IsCoordinate(value) },
+        { "modify", value => value == "set" || value == "change" }
+    };
     public static void Init(Game game, GameManager gameManager, LevelManager levelManager, PlayerManager playerManager)
     {
         CommandManager.game = game;
@@ -58,19 +69,19 @@ public static class CommandManager
 
         // Commands creation
         commands = [
-            new Command("teleport <coordinate>", CTeleport, "Teleported player to |1|.", "Failed to teleport player to |1|."),
-            new Command("health <modify> {0:999}", CHealth, "Player health |1| [|2|].", "Failed to |1| player health [|2|]."),
-            new Command("move_speed {0:999}", CMoveSpeed, "Set player speed to |1|.", "Failed to set player speed to |1|."),
-            new Command("force_quit", CForceQuit, "Force quit application.", "Failed to force quit application."),
-            new Command("quit", CQuit, "Quit application.", "Failed to quit application."),
-            new Command("location", CLocation, "$noout", "Failed to get player location."),
-            new Command("level [load|read] <string>", CLevel, "Ran |1| level '|2|'.", "Failed to |1| level '|2|'."),
-            new Command("mood [calm|dark|epic]", CMood, "Set mood to '|1|'.", "Failed to set mood to '|1|.'"),
-            new Command("say **", CSay, "$noout", "Failed to speak."),
-            new Command($"daytime <modify> {{-{Constants.DayLength}:{Constants.DayLength}}}", CDaytime, "Daytime |1| |2|", "Failed |1| daytime |2|"),
+            new("teleport <coordinate>", CTeleport, "Teleported player to |1|.", "Failed to teleport player to |1|."),
+            new("health <modify> {0:999}", CHealth, "Player health |1| [|2|].", "Failed to |1| player health [|2|]."),
+            new("move_speed {0:999}", CMoveSpeed, "Set player speed to |1|.", "Failed to set player speed to |1|."),
+            new("force_quit", CForceQuit, "Force quit application.", "Failed to force quit application."),
+            new("quit", CQuit, "Quit application.", "Failed to quit application."),
+            new("location", CLocation, "$noout", "Failed to get player location."),
+            new("level [load|read] <string>", CLevel, "Ran |1| level '|2|'.", "Failed to |1| level '|2|'."),
+            new("mood [calm|dark|epic]", CMood, "Set mood to '|1|'.", "Failed to set mood to '|1|.'"),
+            new("say **", CSay, "$noout", "Failed to speak."),
+            new($"daytime <modify> {{-{Constants.DayLength}:{Constants.DayLength}}}", CDaytime, "Daytime |1| |2|", "Failed |1| daytime |2|"),
         ];
     }
-    // Customn type predicates
+    // Custom type predicates
     static bool IsCoordinate(string val)
     {
         string[] parts = val.Split(',');
@@ -80,20 +91,6 @@ public static class CommandManager
         }
         return false;
     }
-
-    // Type dict
-    private readonly static Dictionary<string, Func<string, bool>> predicateMap = new()
-    {
-
-
-        { "int", value => int.TryParse(value, out _)  },
-        { "decimal", value => decimal.TryParse(value, out _) && !decimal.TryParse(value, out _) }, // This includes any non integer numeric value
-        { "number", value => decimal.TryParse(value, out _) }, // Any numeric value
-        { "string", value => true },
-        { "bool", value => bool.TryParse(value, out _) },
-        { "coordinate", value => IsCoordinate(value) },
-        { "modify", value => value == "set" || value == "change" }
-    };
 
     private static bool CommandCheck(string command, string pattern)
     {
@@ -161,21 +158,10 @@ public static class CommandManager
     public static string Execute(string command)
     {
         if (game == null || gameManager == null || levelManager == null || playerManager == null)
-        {
             throw new Exception("CommandManager not initialized");
-        }
 
-        // Split
-        string[] parts = command.Split(' ');
-
-        // Check
-        if (parts.Length < 1) { return ""; }
-
-        // Run them
         foreach (Command commandObj in commands)
-        {
             if (commandObj.IsCommand(command)) { return commandObj.TryExecute(command); }
-        }
         return $"Unknown command '{command}'";
     }
     // Command functions
@@ -235,6 +221,8 @@ public static class CommandManager
             gameManager!.DayTime = int.Parse(parts[2]);
         else if (parts[1] == "change")
             gameManager!.DayTime += int.Parse(parts[2]);
-        return false;
+        else
+            return false;
+        return true;
     }
 }

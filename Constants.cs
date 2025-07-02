@@ -39,6 +39,8 @@ public static class Constants
     public static int PlayerSpeed = 200;
     public const int MaxStack = 10;
     public const int DayLength = 600; // Length of a day in seconds
+    public const int PlayerLight = 5; // In tiles
+    public const float LightUpdateRate = 1 / 10f;
 
     // Rendering and positioning
     public static readonly Rectangle ZeroSource = new(0, 0, TilePixelSize.X, TilePixelSize.Y); // Default tile source rect

@@ -5,6 +5,7 @@ public static class UIDManager
     {
         { "Items", 0 },
         { "Enemies", 0 },
+        { "Tiles", 0 },
     };
     public static void NewUIDCategory(string name)
     {
