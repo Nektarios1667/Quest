@@ -57,7 +57,7 @@ public class Dialog : Widget
         if (!IsVisible) { return; }
 
         // Background
-        batch.FillRectangle(Rect, Color);
+        FillRectangle(batch, Rect, Color);
         // Text
         batch.DrawString(Font, LimitLines(Displayed, Font, Inside.Y), new(Location.X + Border + 2, Location.Y + Border + 2), Foreground);
         // Outline

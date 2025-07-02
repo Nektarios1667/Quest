@@ -70,7 +70,7 @@ public class UIManager
         if (StateManager.State == GameState.Death)
         {
             if (deathTime == -1) deathTime = gameManager.GameTime;
-            gameManager.Batch.FillRectangle(new Rectangle(Point.Zero, Constants.Window), Color.Black * ((gameManager.GameTime - deathTime) / 5));
+            FillRectangle(gameManager.Batch, new Rectangle(Point.Zero, Constants.Window), Color.Black * ((gameManager.GameTime - deathTime) / 5));
             gameManager.Batch.DrawString(PixelOperator, "YOU DIED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("You died!") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
             gameManager.Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
         }

@@ -53,9 +53,9 @@ public static class DebugManager
     }
     public static void EndBenchmark(string name)
     {
-        if (benchmarkTimes.ContainsKey(name))
+        if (benchmarkTimes.TryGetValue(name, out float value))
         {
-            float elapsed = (float)(Watch.Elapsed.TotalMilliseconds - benchmarkTimes[name]);
+            float elapsed = (float)(Watch.Elapsed.TotalMilliseconds - value);
             FrameTimes[name] = elapsed;
         }
         else

@@ -23,7 +23,7 @@ public class MenuManager
     {
         // Draw the menu screen
         DebugManager.StartBenchmark("DrawMenu");
-        gameManager.Batch.FillRectangle(new Rectangle(Point.Zero, Constants.Window), Color.Black);
+        FillRectangle(gameManager.Batch, new(Point.Zero, Constants.Window), Color.Black);
         gameManager.Batch.DrawString(PixelOperator, "Quest", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Quest") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
         gameManager.Batch.DrawString(PixelOperator, "Press space to start", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to start") / 2 + new Vector2(0, 80), Color.White);
 

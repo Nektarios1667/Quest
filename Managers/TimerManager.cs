@@ -13,8 +13,6 @@ public static class TimerManager
 
         public void Update(GameManager manager)
         {
-            DebugManager.StartBenchmark("TimerUpdates");
-
             left -= manager.DeltaTime;
             if (left <= 0f)
             {
@@ -24,28 +22,13 @@ public static class TimerManager
                 if (repetitions > completions)
                     left = duration;
             }
-
-            DebugManager.EndBenchmark("TimerUpdates");
-        }
-    }
-    public class StopWatch
-    {
-        public float Elapsed { get; private set; } = 0f;
-        public bool IsRunning { get; private set; } = false;
-        public void Start() => IsRunning = true;
-        public void Stop() => IsRunning = false;
-        public void Reset() => Elapsed = 0f;
-        public void Update(GameManager manager)
-        {
-            if (IsRunning)
-                Elapsed += manager.DeltaTime;
         }
     }
     private static Dictionary<string, Timer> timers = [];
     private static List<string> removals = [];
     public static void Update(GameManager gameManager)
     {
-        DebugManager.StartBenchmark("TimerManagerUpdate");
+        DebugManager.StartBenchmark("TimerUpdates");
 
         // Update timers
         foreach (var (key, timer) in timers)
@@ -60,7 +43,7 @@ public static class TimerManager
             timers.Remove(timer);
         removals.Clear();
 
-        DebugManager.EndBenchmark("TimerManagerUpdate");
+        DebugManager.EndBenchmark("TimerUpdates");
     }
     public static Timer NewTimer(string name, float duration, Action? call, int repetitions = 1)
     {

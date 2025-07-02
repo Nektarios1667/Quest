@@ -19,9 +19,7 @@ public class Water : Tile
         DrawTexture(gameManager.Batch, TextureID.Water, dest, source: gameManager.LevelManager.TileTextureSource(this), color: color, scale: Constants.TileSizeScale);
 
         // Lighting
-        float distSq = Vector2.DistanceSquared(dest.ToVector2() + Constants.HalfVec, Constants.Middle.ToVector2() + CameraManager.CameraOffset - Constants.MageHalfSize.ToVector2()) / (Constants.TileSize.X * Constants.TileSize.Y);
-        Color lighting = Color.Lerp(Color.Transparent, gameManager.LevelManager.SkyLight, Math.Clamp(distSq / 25, 0, 1));
-        gameManager.Batch.FillRectangle(new(dest.ToVector2(), Constants.TileSize), lighting);
+        DrawLighting(gameManager, dest);
 
         Marked = false; // Reset marked state for next frame
     }

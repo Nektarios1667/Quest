@@ -83,7 +83,7 @@ public class LevelManager
                 DrawTexture(gameManager.Batch, loot.Texture, pos + lootStackOffset + lootStackOffset, scale: 2);
             // Draw hitbox if enabled
             if (DebugManager.DrawHitboxes)
-                gameManager.Batch.FillRectangle(new(pos.ToVector2(), new(32, 32)), Constants.DebugPinkTint);
+                FillRectangle(gameManager.Batch, new(pos, new(32)), Constants.DebugPinkTint);
         }
         DebugManager.EndBenchmark("DrawLoot");
     }

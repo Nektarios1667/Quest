@@ -17,7 +17,7 @@ public class StatusBar : Widget
     }
     public override void Draw(SpriteBatch batch)
     {
-        batch.FillRectangle(new(Location.ToVector2(), Size), Background); // Background
-        batch.FillRectangle(new(Location.X, Location.Y, Size.X * CurrentValue / MaxValue, Size.Y), Foreground); // Foreground
+        FillRectangle(batch, new(Location, Size), Background); // Background
+        FillRectangle(batch, new(Location.X, Location.Y, Size.X * CurrentValue / MaxValue, Size.Y), Foreground); // Foreground
     }
 }

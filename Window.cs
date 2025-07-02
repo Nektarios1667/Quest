@@ -156,7 +156,7 @@ public class Window : Game
     {
         // Clear and start
         GraphicsDevice.Clear(Color.Magenta);
-        spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
 
         // Draw game
         levelManager.Draw(gameManager);
@@ -191,7 +191,7 @@ public class Window : Game
     public void DrawFrameInfo()
     {
         float boxHeight = DebugManager.FrameTimes.Count * 20;
-        spriteBatch.FillRectangle(new(Constants.Window.X - 190, 0, 180, boxHeight), Color.Black * 0.8f);
+        FillRectangle(spriteBatch, new(Constants.Window.X - 190, 0, 180, (int)boxHeight), Color.Black * 0.8f);
 
         debugSb.Clear();
         foreach (var kv in frameTimes)
@@ -233,7 +233,7 @@ public class Window : Game
         debugSb.Append("\nMusic: ");
         debugSb.Append(SoundtrackManager.Playing?.File ?? "none");
 
-        spriteBatch.FillRectangle(new(0, 0, 220, debugSb.ToString().Split('\n').Length * 20), Color.Black * 0.8f);
+        FillRectangle(spriteBatch, new(0, 0, 220, debugSb.ToString().Split('\n').Length * 20), Color.Black * 0.8f);
         spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);
     }
     public void DrawFrameBar()
@@ -246,16 +246,16 @@ public class Window : Game
             debugUpdateTime = 0;
         }
         // Background
-        spriteBatch.FillRectangle(new(Constants.Window.X - 320, Constants.Window.Y - frameTimes.Count * 20 - 50, 320, 1000), Color.Black * .8f);
+        FillRectangle(spriteBatch, new(Constants.Window.X - 320, Constants.Window.Y - frameTimes.Count * 20 - 50, 320, 1000), Color.Black * .8f);
 
         // Labels and bars
         int start = 0;
         int c = 0;
-        spriteBatch.FillRectangle(new(Constants.Window.X - 310, Constants.Window.Y - 40, 300, 25), Color.White);
+        FillRectangle(spriteBatch, new(Constants.Window.X - 310, Constants.Window.Y - 40, 300, 25), Color.White);
         foreach (KeyValuePair<string, double> process in frameTimes)
         {
             spriteBatch.DrawString(Arial, process.Key, new(Constants.Window.X - Arial.MeasureString(process.Key).X - 5, Constants.Window.Y - 20 * c - 60), colors[c]);
-            spriteBatch.FillRectangle(new(Constants.Window.X - 310 + start, Constants.Window.Y - 40, (int)(process.Value / (cacheDelta * 1000) * 300), 25), colors[c]);
+            FillRectangle(spriteBatch, new(Constants.Window.X - 310 + start, Constants.Window.Y - 40, (int)(process.Value / (cacheDelta * 1000) * 300), 25), colors[c]);
             start += (int)(process.Value / (cacheDelta * 1000)) * 300;
             c++;
         }

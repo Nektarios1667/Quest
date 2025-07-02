@@ -92,7 +92,7 @@ public class EditorManager
     public void DrawFrameInfo()
     {
         float boxHeight = DebugManager.FrameTimes.Count * 20;
-        spriteBatch.FillRectangle(new(Constants.Window.X - 190, 0, 190, boxHeight), Color.Black * 0.8f);
+        FillRectangle(spriteBatch, new(Constants.Window.X - 190, 0, 190, (int)boxHeight), Color.Black * 0.8f);
 
         debugSb.Clear();
         foreach (var kv in frameTimes)
@@ -107,7 +107,7 @@ public class EditorManager
     }
     public void DrawTextInfo()
     {
-        spriteBatch.FillRectangle(new(0, 0, 200, 180), Color.Black * 0.8f);
+        FillRectangle(spriteBatch, new(0, 0, 200, 180), Color.Black * 0.8f);
 
         debugSb.Clear();
         debugSb.Append("FPS: ");
@@ -136,16 +136,16 @@ public class EditorManager
     public void DrawFrameBar()
     {
         // Background
-        spriteBatch.FillRectangle(new(Constants.Window.X - 320, Constants.Window.Y - frameTimes.Count * 20 - 50, 320, 1000), Color.Black * .8f);
+        FillRectangle(spriteBatch, new(Constants.Window.X - 320, Constants.Window.Y - frameTimes.Count * 20 - 50, 320, 1000), Color.Black * .8f);
 
         // Labels and bars
         int start = 0;
         int c = 0;
-        spriteBatch.FillRectangle(new(Constants.Window.X - 310, Constants.Window.Y - 40, 300, 25), Color.White);
+        FillRectangle(spriteBatch, new(Constants.Window.X - 310, Constants.Window.Y - 40, 300, 25), Color.White);
         foreach (KeyValuePair<string, double> process in frameTimes)
         {
             spriteBatch.DrawString(Arial, process.Key, new Vector2(Constants.Window.X - Arial.MeasureString(process.Key).X - 5, Constants.Window.Y - 20 * c - 60), colors[c]);
-            spriteBatch.FillRectangle(new Rectangle(Constants.Window.X - 310 + start, Constants.Window.Y - 40, (int)(process.Value / (cacheDelta * 1000) * 300), 25), colors[c]);
+            FillRectangle(spriteBatch, new Rectangle(Constants.Window.X - 310 + start, Constants.Window.Y - 40, (int)(process.Value / (cacheDelta * 1000) * 300), 25), colors[c]);
             start += (int)(process.Value / (cacheDelta * 1000)) * 300;
             c++;
         }

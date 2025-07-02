@@ -13,6 +13,7 @@ public static class TextureManager
     public enum TextureID
     {
         Null,
+        Pixel,
         // Characters
         BlueMage,
         GrayMage,
@@ -63,6 +64,7 @@ public static class TextureManager
     private static List<string> errors = [];
     public static Dictionary<TextureID, Texture2D> Textures { get; private set; } = [];
     public static Dictionary<TextureID, Metadata> Metadata { get; private set; } = [];
+    private static Texture2D Pixel { get; set; } = null!;
     // Fonts
     public static SpriteFont PixelOperator { get; private set; } = null!;
     public static SpriteFont PixelOperatorBold { get; private set; } = null!;
@@ -75,6 +77,7 @@ public static class TextureManager
         Content = content;
         // Load all
         Textures[TextureID.Null] = content.Load<Texture2D>($"Images/Null");
+        Textures[TextureID.Pixel] = content.Load<Texture2D>($"Images/Pixel");
         Textures[TextureID.BlueMage] = content.Load<Texture2D>($"Images/Characters/BlueMage");
         Textures[TextureID.GrayMage] = content.Load<Texture2D>($"Images/Characters/GrayMage");
         Textures[TextureID.WhiteMage] = content.Load<Texture2D>($"Images/Characters/WhiteMage");
@@ -114,6 +117,7 @@ public static class TextureManager
         Textures[TextureID.Footprint] = content.Load<Texture2D>($"Images/Decals/Footprint");
         Textures[TextureID.Glow] = content.Load<Texture2D>($"Images/Effects/Glow");
         Textures[TextureID.Slash] = content.Load<Texture2D>($"Images/Effects/Slash");
+        Pixel = Textures[TextureID.Pixel];
 
         foreach (var kv in Textures)
             if (kv.Value == null)
@@ -124,6 +128,7 @@ public static class TextureManager
 
         // Metadata
         Metadata[TextureID.Null] = new(Textures[TextureID.Null].Bounds.Size, new(1, 1), "null");
+        Metadata[TextureID.Pixel] = new(Textures[TextureID.Pixel].Bounds.Size, new(1, 1), "pixel");
         Metadata[TextureID.BlueMage] = new(Textures[TextureID.BlueMage].Bounds.Size, new(4, 5), "character");
         Metadata[TextureID.GrayMage] = new(Textures[TextureID.GrayMage].Bounds.Size, new(4, 5), "character");
         Metadata[TextureID.WhiteMage] = new(Textures[TextureID.WhiteMage].Bounds.Size, new(4, 5), "character");
@@ -198,6 +203,14 @@ public static class TextureManager
         if (color == default) color = Color.White;
         if (origin == default) origin = Vector2.Zero;
         batch.Draw(tex, pos.ToVector2(), source, color, rotation, origin, scale, effects, 0f);
+    }
+    public static void FillRectangle(SpriteBatch batch, Point pos, Point size, Color color)
+    {
+        batch.Draw(Pixel, new Rectangle(pos.X, pos.Y, size.X, size.Y), color);
+    }
+    public static void FillRectangle(SpriteBatch batch, Rectangle rect, Color color)
+    {
+        batch.Draw(Pixel, rect, color);
     }
     public static void UnloadTexture(TextureID id)
     {

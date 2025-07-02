@@ -99,7 +99,7 @@ public class PlayerManager
                 {
                     DrawPlayerHitbox(gameManager);
                     foreach (Attack attack in Attacks)
-                        gameManager.Batch.FillRectangle(new(attack.Hitbox.Position - CameraManager.Camera + Constants.Middle.ToVector2(), new Vector2(attack.Hitbox.Width, attack.Hitbox.Height) * Constants.TileSize.ToVector2()), Constants.DebugPinkTint);
+                        FillRectangle(gameManager.Batch, new(attack.Hitbox.Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, new Point((int)attack.Hitbox.Width, (int)attack.Hitbox.Height)), Constants.DebugPinkTint);
                 }
 
                 Inventory.Draw(gameManager);
@@ -132,7 +132,7 @@ public class PlayerManager
         Point[] points = new Point[4];
         for (int c = 0; c < Constants.PlayerCorners.Length; c++)
             points[c] = CameraManager.PlayerFoot + Constants.PlayerCorners[c] - CameraManager.Camera.ToPoint() + Constants.Middle;
-        gameManager.Batch.FillRectangle(new Rectangle(points[0].X, points[0].Y, points[1].X - points[0].X, points[2].Y - points[1].Y), Constants.DebugPinkTint);
+        FillRectangle(gameManager.Batch, new Rectangle(points[0].X, points[0].Y, points[1].X - points[0].X, points[2].Y - points[1].Y), Constants.DebugPinkTint);
     }
     public void Move(GameManager gameManager, Vector2 move)
     {
