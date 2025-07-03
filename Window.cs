@@ -52,6 +52,7 @@ public class Window : Game
             IsFullScreen = false,
             SynchronizeWithVerticalRetrace = Constants.VSYNC,
             PreferHalfPixelOffset = false,
+            GraphicsProfile = GraphicsProfile.HiDef,
         };
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
@@ -102,10 +103,8 @@ public class Window : Game
 
         // Shaders
         Lighting = Content.Load<Effect>("Shaders/Lighting");
-        Lighting.Parameters["lightRadius"].SetValue(Constants.PlayerLight);
-        Lighting.Parameters["lightSource"].SetValue(Constants.Middle.ToVector2());
         Lighting.Parameters["dim"].SetValue(Constants.Window.ToVector2());
-        Lighting.Parameters["skyColor"].SetValue(Color.Transparent.ToVector3());
+        Lighting.Parameters["numLights"].SetValue(1);
 
         // Render Targets
         ShaderTarget = new(GraphicsDevice, Constants.Window.X, Constants.Window.Y);
@@ -171,7 +170,10 @@ public class Window : Game
     protected override void Draw(GameTime gameTime)
     {
         // Shader updates
-        Lighting.Parameters["lightSource"].SetValue(Constants.Middle.ToVector2() + CameraManager.CameraOffset);
+        int[] radii = [Constants.PlayerLight];
+        Lighting.Parameters["lightRadii"].SetValue(radii);
+        Lighting.Parameters["lightSources"].SetValue([Constants.Middle.ToVector2() + CameraManager.CameraOffset]);
+        Lighting.Parameters["lightColors"].SetValue([Color.Transparent.ToVector4()]);
         Lighting.Parameters["skyColor"].SetValue(gameManager.LevelManager.SkyLight.ToVector4());
 
         // Start shader target

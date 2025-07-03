@@ -1,8 +1,12 @@
-﻿float2 lightSource;
+﻿#define MAX_LIGHTS 4
+
+float2 lightSources[MAX_LIGHTS];
 float2 dim;
-int lightRadius;
+int lightRadii[MAX_LIGHTS];
 float4 skyColor;
+float4 lightColors[MAX_LIGHTS];
 Texture2D SpriteTexture;
+int numLights;
 
 sampler2D SpriteTextureSampler = sampler_state
 {
@@ -19,10 +23,29 @@ struct VertexShaderOutput
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
     float2 xy = input.TextureCoordinates * dim;
-    float4 color = tex2D(SpriteTextureSampler, input.TextureCoordinates);
-    float blendWeight = saturate(length(xy - lightSource) / lightRadius) * skyColor.a;
-    float3 blendedRgb = lerp(color.rgb, skyColor.rgb, blendWeight);
-    return float4(blendedRgb, color.a);
+    float4 baseColor = tex2D(SpriteTextureSampler, input.TextureCoordinates);
+
+    float3 totalLight = float3(0, 0, 0);
+
+    float blendWeight = 1;
+    for (int i = 0; i < numLights; ++i)
+    {
+        float2 delta = xy - lightSources[i];
+        float distSq = dot(delta, delta);
+        float radiusSq = lightRadii[i] * lightRadii[i];
+        float weight = saturate(1.0 - (distSq / radiusSq));
+        blendWeight *= weight;
+        totalLight += lightColors[i].rgb * weight;
+    }
+    
+    // Add base color additively
+    totalLight += baseColor.rgb;
+
+    // Lerp with sky color
+    float3 blendedRgb = lerp(totalLight, skyColor.rgb, (1 - blendWeight) * skyColor.a);
+    blendedRgb = saturate(blendedRgb);
+
+    return float4(blendedRgb, 1);
 }
 
 technique SpriteDrawing

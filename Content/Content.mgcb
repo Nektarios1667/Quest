@@ -586,6 +586,7 @@
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
+/processorParam:Profile=HiDef
 /build:Shaders/Lighting.fx
 
 #begin Sounds/Effects/Click.wav
