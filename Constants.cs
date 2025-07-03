@@ -8,6 +8,13 @@ public static class Constants
     // Debug
     public const bool COMMANDS = true;
 
+    // Game
+    public static readonly string[] TileNames = Enum.GetNames(typeof(TileType));
+    public static int PlayerSpeed = 200;
+    public const int MaxStack = 10;
+    public const int DayLength = 600; // Length of a day in seconds
+    public const int PlayerLight = 300; // In pixels
+
     // Tile and map
     public static readonly Point TileSize = new(64, 64); // In-game tile size
     public static readonly Point TileHalfSize = new(TileSize.X / 2, TileSize.Y / 2); // Half of the in-game tile size
@@ -33,14 +40,6 @@ public static class Constants
     public static readonly Point OnePoint = new(1, 1);
     public static readonly Point TwoPoint = new(2, 2);
     public const float SqrtTwo = 1.41421356237f;
-
-    // Game
-    public static readonly string[] TileNames = Enum.GetNames(typeof(TileType));
-    public static int PlayerSpeed = 200;
-    public const int MaxStack = 10;
-    public const int DayLength = 600; // Length of a day in seconds
-    public const int PlayerLight = 5; // In tiles
-    public const float LightUpdateRate = 1 / 10f;
 
     // Rendering and positioning
     public static readonly Rectangle ZeroSource = new(0, 0, TilePixelSize.X, TilePixelSize.Y); // Default tile source rect
