@@ -20,9 +20,6 @@ public class Door : Tile
         Rectangle source = new(IsWalkable ? 16 : 0, 0, 16, 16);
         DrawTexture(gameManager.Batch, TextureID.Door, dest, source: source, scale: 4, color: color);
 
-        // Lighting
-        DrawLighting(gameManager, dest);
-
         // Handling
         Marked = false;
     }

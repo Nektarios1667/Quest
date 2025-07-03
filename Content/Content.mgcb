@@ -582,6 +582,12 @@
 /processorParam:DebugMode=Auto
 /build:Shaders/Grayscale.fx
 
+#begin Shaders/Lighting.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/Lighting.fx
+
 #begin Sounds/Effects/Click.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor

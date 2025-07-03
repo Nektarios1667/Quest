@@ -1,7 +1,5 @@
 ﻿using System.Text;
-using Quest.Enemies;
-
-// TODO Player not being drawn, dialog box not being drawn, update minimap on level change, inventory not being drawn
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Quest;
 public class Window : Game
@@ -29,9 +27,10 @@ public class Window : Game
     public int moveY;
     // Shaders
     public Effect Grayscale { get; private set; }
-    public Effect Light { get; private set; }
+    public Effect Lighting { get; private set; }
     // Render targets
     public RenderTarget2D? Minimap { get; set; }
+    private RenderTarget2D? ShaderTarget { get; set; }
 
     // Debug
     private static readonly Color[] colors = {
@@ -102,7 +101,24 @@ public class Window : Game
         Logger.System("Loaded levels.");
 
         // Shaders
-        Grayscale = Content.Load<Effect>("Shaders/Grayscale");
+        Lighting = Content.Load<Effect>("Shaders/Lighting");
+        Lighting.Parameters["lightRadius"].SetValue(Constants.PlayerLight);
+        Lighting.Parameters["lightSource"].SetValue(Constants.Middle.ToVector2());
+        Lighting.Parameters["dim"].SetValue(Constants.Window.ToVector2());
+        Lighting.Parameters["skyColor"].SetValue(Color.Transparent.ToVector3());
+
+        // Render Targets
+        ShaderTarget = new(GraphicsDevice, Constants.Window.X, Constants.Window.Y);
+        ShaderTarget = new(
+            GraphicsDevice,
+            width: Constants.Window.X,
+            height: Constants.Window.Y,
+            mipMap: false,
+            preferredFormat: SurfaceFormat.Color,
+            preferredDepthFormat: DepthFormat.None,
+            preferredMultiSampleCount: 0,
+            usage: RenderTargetUsage.DiscardContents
+        );
 
         // Other
         CursorArrow = Content.Load<Texture2D>("Images/Gui/CursorArrow");
@@ -154,13 +170,33 @@ public class Window : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        // Clear and start
+        // Shader updates
+        Lighting.Parameters["lightSource"].SetValue(Constants.Middle.ToVector2() + CameraManager.CameraOffset);
+        Lighting.Parameters["skyColor"].SetValue(gameManager.LevelManager.SkyLight.ToVector4());
+
+        // Start shader target
+        GraphicsDevice.SetRenderTarget(ShaderTarget);
         GraphicsDevice.Clear(Color.Magenta);
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
 
         // Draw game
         levelManager.Draw(gameManager);
         playerManager.Draw(gameManager);
+
+        spriteBatch.End();
+
+        // Draw shader target
+        GraphicsDevice.SetRenderTarget(null); // back to screen
+        GraphicsDevice.Clear(Color.Magenta);
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, Lighting);
+        spriteBatch.Draw(ShaderTarget, Vector2.Zero, Color.White);
+
+
+        // Switch to normal
+        spriteBatch.End();
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+
+        // Draw overlays
         uiManager.Draw(GraphicsDevice, gameManager, playerManager.Inventory);
         menuManager.Draw(gameManager);
 

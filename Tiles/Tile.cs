@@ -53,22 +53,10 @@ public class Tile
         Color color = Marked ? Color.Red : Color.White;
         DrawTexture(gameManager.Batch, Texture, dest, source: gameManager.LevelManager.TileTextureSource(this), scale: 4, color: color);
 
-        // Lighting
-        DrawLighting(gameManager, dest);
-
         // Final
         Marked = false;
     }
-    public virtual void DrawLighting(GameManager gameManager, Point dest)
-    {
-        if (TimerManager.IsCompleteOrMissing($"TileLighting_{TileID}"))
-        {
-            float distSq = Vector2.DistanceSquared(dest.ToVector2() + Constants.HalfVec, Constants.Middle.ToVector2() + CameraManager.CameraOffset - Constants.MageHalfSize.ToVector2()) / (Constants.TileSize.X * Constants.TileSize.Y);
-            lightCache = Color.Lerp(Color.Transparent, gameManager.LevelManager.SkyLight, Math.Clamp(distSq / 25, 0, 1));
-            TimerManager.SetTimer($"TileLighting_{TileID}", Constants.LightUpdateRate, null);
-        }
-        if (lightCache != Color.Transparent) FillRectangle(gameManager.Batch, new(dest, Constants.TileSize), lightCache);
-    }
+
     public virtual void OnPlayerEnter(GameManager game) { }
     public virtual void OnPlayerExit(GameManager game) { }
     public virtual void OnPlayerInteract(GameManager game) { }
