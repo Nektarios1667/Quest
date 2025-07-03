@@ -28,6 +28,7 @@ public static class TextureManager
         Slot,
         Speech,
         // Items
+        Lantern,
         Pickaxe,
         PhiCoin,
         DeltaCoin,
@@ -89,6 +90,7 @@ public static class TextureManager
         Textures[TextureID.GuiBackground] = content.Load<Texture2D>($"Images/Gui/GuiBackground");
         Textures[TextureID.Slot] = content.Load<Texture2D>($"Images/Gui/Slot");
         Textures[TextureID.Speech] = content.Load<Texture2D>($"Images/Gui/Speech");
+        Textures[TextureID.Lantern] = content.Load<Texture2D>($"Images/Items/Lantern");
         Textures[TextureID.Pickaxe] = content.Load<Texture2D>($"Images/Items/Pickaxe");
         Textures[TextureID.PhiCoin] = content.Load<Texture2D>($"Images/Items/PhiCoin");
         Textures[TextureID.DeltaCoin] = content.Load<Texture2D>($"Images/Items/DeltaCoin");
@@ -140,6 +142,7 @@ public static class TextureManager
         Metadata[TextureID.GuiBackground] = new(Textures[TextureID.GuiBackground].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.Slot] = new(Textures[TextureID.Slot].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.Speech] = new(Textures[TextureID.Speech].Bounds.Size, new(1, 4), "gui");
+        Metadata[TextureID.Lantern] = new(Textures[TextureID.Lantern].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Pickaxe] = new(Textures[TextureID.Pickaxe].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.PhiCoin] = new(Textures[TextureID.PhiCoin].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.DeltaCoin] = new(Textures[TextureID.DeltaCoin].Bounds.Size, new(1, 1), "item");

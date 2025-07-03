@@ -1,8 +1,7 @@
-﻿#define MAX_LIGHTS 4
+﻿#define MAX_LIGHTS 12
 
-float2 lightSources[MAX_LIGHTS];
+float3 lightSources[MAX_LIGHTS];
 float2 dim;
-int lightRadii[MAX_LIGHTS];
 float4 skyColor;
 float4 lightColors[MAX_LIGHTS];
 Texture2D SpriteTexture;
@@ -28,11 +27,14 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     float3 totalLight = float3(0, 0, 0);
 
     float blendWeight = 1;
+    if (numLights <= 0)
+        blendWeight = 0;
+        
     for (int i = 0; i < numLights; ++i)
     {
-        float2 delta = xy - lightSources[i];
+        float2 delta = xy - lightSources[i].xy;
         float distSq = dot(delta, delta);
-        float radiusSq = lightRadii[i] * lightRadii[i];
+        float radiusSq = lightSources[i].z * lightSources[i].z;
         float weight = saturate(1.0 - (distSq / radiusSq));
         blendWeight *= weight;
         totalLight += lightColors[i].rgb * weight;
@@ -52,7 +54,6 @@ technique SpriteDrawing
 {
     pass P0
     {
-        PixelShader = compile ps_4_0_level_9_1
-        MainPS();
+        PixelShader = compile ps_4_0_level_9_3 MainPS();
     }
 };

@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Microsoft.Xna.Framework.Graphics;
+using SharpDX.MediaFoundation;
 
 namespace Quest;
 public class Window : Game
@@ -170,11 +171,16 @@ public class Window : Game
     protected override void Draw(GameTime gameTime)
     {
         // Shader updates
-        int[] radii = [Constants.PlayerLight];
-        Lighting.Parameters["lightRadii"].SetValue(radii);
-        Lighting.Parameters["lightSources"].SetValue([Constants.Middle.ToVector2() + CameraManager.CameraOffset]);
-        Lighting.Parameters["lightColors"].SetValue([Color.Transparent.ToVector4()]);
         Lighting.Parameters["skyColor"].SetValue(gameManager.LevelManager.SkyLight.ToVector4());
+        if (gameManager.Inventory.Equipped is Light light)
+        {
+            Vector3 playerLightSource = new(Constants.Middle.ToVector2() + CameraManager.CameraOffset, light.LightStrength);
+            Lighting.Parameters["numLights"].SetValue(1);
+            Lighting.Parameters["lightSources"].SetValue([playerLightSource]);
+            Lighting.Parameters["lightColors"].SetValue([light.LightColor.ToVector4()]);
+        }
+        else
+            Lighting.Parameters["numLights"].SetValue(0);
 
         // Start shader target
         GraphicsDevice.SetRenderTarget(ShaderTarget);

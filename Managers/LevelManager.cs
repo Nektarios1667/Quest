@@ -291,7 +291,7 @@ public class LevelManager
         // Create a decal from an id
         return id switch
         {
-            DecalType.Torch => new Torch(location),
+            DecalType.Torch => new Decals.Torch(location),
             DecalType.BlueTorch => new BlueTorch(location),
             DecalType.WaterPuddle => new WaterPuddle(location),
             DecalType.BloodPuddle => new BloodPuddle(location),
@@ -347,5 +347,6 @@ public class LevelManager
     public static Point TileCoord(Point loc) => new(loc.X / Constants.TileSize.X, loc.Y / Constants.TileSize.Y);
     public static Point TileCoord(Vector2 loc) => new((int)(loc.X / Constants.TileSize.X), (int)(loc.Y / Constants.TileSize.Y));
     public static Vector2 WorldCoord(Point tileCoord) => new(tileCoord.X * Constants.TileSize.X, tileCoord.Y * Constants.TileSize.Y);
+    public static Vector2 WorldCoord(Vector2 tileCoord) => new(tileCoord.X * Constants.TileSize.X, tileCoord.Y * Constants.TileSize.Y);
     public static int Flatten(Point point) => point.X + point.Y * Constants.MapSize.X;
 }

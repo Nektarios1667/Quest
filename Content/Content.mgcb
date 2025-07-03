@@ -5,7 +5,7 @@
 /intermediateDir:obj/$(Platform)
 /platform:Windows
 /config:
-/profile:Reach
+/profile:HiDef
 /compress:False
 
 #-------------------------------- References --------------------------------#
@@ -360,6 +360,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/Key.png
 
+#begin Images/Items/Lantern.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/Lantern.png
+
 #begin Images/Items/PhiCoin.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -586,7 +598,6 @@
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
-/processorParam:Profile=HiDef
 /build:Shaders/Lighting.fx
 
 #begin Sounds/Effects/Click.wav
