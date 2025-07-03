@@ -9,11 +9,15 @@ public static class Constants
     public const bool COMMANDS = true;
 
     // Game
-    public static readonly string[] TileNames = Enum.GetNames(typeof(TileType));
     public static int PlayerSpeed = 200;
     public const int MaxStack = 10;
     public const int DayLength = 600; // Length of a day in seconds
     public const int PlayerLight = 300; // In pixels
+
+    // Screen
+    public static readonly Point Window = new(1400, 900); // Game window resolution
+    public static readonly float CameraRigidity = .07f; // Camera smoothing weight
+    public const bool VSYNC = false;
 
     // Tile and map
     public static readonly Point TileSize = new(64, 64); // In-game tile size
@@ -26,20 +30,15 @@ public static class Constants
     public static readonly Point[] NeighborTiles = [new(0, 1), new(1, 0), new(0, -1), new(-1, 0)];
     public static readonly Point[] DiagonalNeighborTiles = [new(1, 1), new(1, -1), new(-1, 1), new(-1, -1)];
     public static readonly Point[] AllNeighborTiles = [.. NeighborTiles.Concat(DiagonalNeighborTiles)]; // All 8 neighbor tiles
-
-    // Screen
-    public static readonly Point Window = new(1400, 900); // Game window resolution
     public static readonly Point Middle = new(Window.X / 2, Window.Y / 2); // Center of the screen
     public static readonly Point MiddleCoord = Middle / TileSize; // Center tile coordinate
-    public static readonly float CameraRigidity = .07f; // Camera smoothing weight
-    public const bool VSYNC = false;
 
     // Utility
     public static readonly Vector2 HalfVec = new(0.5f, 0.5f);
     public static readonly Point NegativePoint = new(-1, -1);
     public static readonly Point OnePoint = new(1, 1);
     public static readonly Point TwoPoint = new(2, 2);
-    public const float SqrtTwo = 1.41421356237f;
+    public const float SQRT2 = 1.41421356237f;
 
     // Rendering and positioning
     public static readonly Rectangle ZeroSource = new(0, 0, TilePixelSize.X, TilePixelSize.Y); // Default tile source rect

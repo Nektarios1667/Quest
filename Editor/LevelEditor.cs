@@ -157,15 +157,15 @@ public class LevelEditor : Game
         // Change material
         if (InputManager.ScrollWheelChange > 0 || InputManager.KeyPressed(Keys.OemCloseBrackets))
         {
-            Selection = (Selection + 1) % Constants.TileNames.Length;
-            Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileNames[Selection]);
+            Selection = (Selection + 1) % Constants.TileTypeNames.Length;
+            Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileTypeNames[Selection]);
             Logger.Log($"Material set to '{Material}'.");
         }
         if (InputManager.ScrollWheelChange < 0 || InputManager.KeyPressed(Keys.OemCloseBrackets))
         {
-            Selection = (Selection - 1) % Constants.TileNames.Length;
-            if (Selection < 0) Selection += Constants.TileNames.Length;
-            Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileNames[Selection]);
+            Selection = (Selection - 1) % Constants.TileTypeNames.Length;
+            if (Selection < 0) Selection += Constants.TileTypeNames.Length;
+            Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileTypeNames[Selection]);
             Logger.Log($"Material set to '{Material}'.");
         }
 
@@ -275,7 +275,7 @@ public class LevelEditor : Game
     public void PickTile()
     {
         Selection = (int)mouseTile.Type;
-        Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileNames[Selection]);
+        Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileTypeNames[Selection]);
         Logger.Log($"Picked tile '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}.");
     }
     public void MouseSelect()

@@ -47,7 +47,7 @@ public static class Pathfinder
                 if (closedNodes.Contains(neighbor)) continue; // Skip if already evaluated
 
                 // Check for better costs
-                float tentativeG = node.GCost + (neighbor.Position.DistanceSquared(node.Position) == 1 ? 1 : Constants.SqrtTwo);
+                float tentativeG = node.GCost + (neighbor.Position.DistanceSquared(node.Position) == 1 ? 1 : Constants.SQRT2);
                 Node? openNode = openMap.GetValueOrDefault(neighbor.Position);
                 if (openNode == null || tentativeG < openNode.GCost)
                 {
