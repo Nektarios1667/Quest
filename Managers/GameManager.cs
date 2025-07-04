@@ -41,6 +41,12 @@ public class GameManager
         DayTime += deltaTime;
         TotalTime += deltaTime;
         if (DayTime >= Constants.DayLength) DayTime = 0f;
+
+        // Player lighting
+        if (Inventory.Equipped is Light light)
+            LightingManager.SetLight("PlayerLightItem", Constants.Middle + CameraManager.CameraOffset.ToPoint(), light.LightStrength, light.LightColor, 5);
+        else
+            LightingManager.RemoveLight("PlayerLightItem");
     }
     public void Respawn()
     {

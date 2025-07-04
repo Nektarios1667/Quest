@@ -24,11 +24,9 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     float2 xy = input.TextureCoordinates * dim;
     float4 baseColor = tex2D(SpriteTextureSampler, input.TextureCoordinates);
 
-    float3 totalLight = float3(0, 0, 0);
+    float3 totalLight = baseColor.rgb;
 
-    float blendWeight = 1;
-    if (numLights <= 0)
-        blendWeight = 0;
+    float brightness = 0;
         
     for (int i = 0; i < numLights; ++i)
     {
@@ -36,18 +34,14 @@ float4 MainPS(VertexShaderOutput input) : COLOR
         float distSq = dot(delta, delta);
         float radiusSq = lightSources[i].z * lightSources[i].z;
         float weight = saturate(1.0 - (distSq / radiusSq));
-        blendWeight *= weight;
+        brightness += weight;
         totalLight += lightColors[i].rgb * weight;
     }
-    
-    // Add base color additively
-    totalLight += baseColor.rgb;
 
     // Lerp with sky color
-    float3 blendedRgb = lerp(totalLight, skyColor.rgb, (1 - blendWeight) * skyColor.a);
-    blendedRgb = saturate(blendedRgb);
+    float3 blendedRgb = lerp(totalLight, skyColor.rgb, (1 - brightness) * skyColor.a);
 
-    return float4(blendedRgb, 1);
+    return float4(saturate(blendedRgb), baseColor.a);
 }
 
 technique SpriteDrawing

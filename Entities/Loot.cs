@@ -1,6 +1,7 @@
 ﻿namespace Quest.Entities;
 public struct Loot
 {
+    public int UID { get; } = UIDManager.NewUID("Loot");
     public readonly string DisplayName => $"{Amount} {StringTools.FillCamelSpaces(Item)}";
     public string Item { get; private set; }
     public int Amount { get; private set; }

@@ -1,6 +1,8 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using SharpDX.MediaFoundation;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace Quest;
 public class Window : Game
@@ -14,7 +16,6 @@ public class Window : Game
     private UIManager uiManager;
     private LevelManager levelManager;
     private MenuManager menuManager;
-    private EnemyManager enemyManager;
 
     // Time
     private float delta;
@@ -90,7 +91,6 @@ public class Window : Game
         levelManager = new();
         menuManager = new();
         gameManager = new(Content, spriteBatch, playerManager.Inventory, levelManager, uiManager);
-        enemyManager = new();
         CommandManager.Init(this, gameManager, levelManager, playerManager);
         Pathfinder.Init(gameManager);
         Logger.System("Initialized managers.");
@@ -149,7 +149,6 @@ public class Window : Game
 
         gameManager.Update(delta);
         playerManager.Update(gameManager);
-        enemyManager.Update(gameManager, [.. playerManager.Attacks]);
         levelManager.Update(gameManager);
         uiManager.Update(gameManager);
 
@@ -171,16 +170,12 @@ public class Window : Game
     protected override void Draw(GameTime gameTime)
     {
         // Shader updates
+        DebugManager.StartBenchmark("ShaderUpdate");
         Lighting.Parameters["skyColor"].SetValue(gameManager.LevelManager.SkyLight.ToVector4());
-        if (gameManager.Inventory.Equipped is Light light)
-        {
-            Vector3 playerLightSource = new(Constants.Middle.ToVector2() + CameraManager.CameraOffset, light.LightStrength);
-            Lighting.Parameters["numLights"].SetValue(1);
-            Lighting.Parameters["lightSources"].SetValue([playerLightSource]);
-            Lighting.Parameters["lightColors"].SetValue([light.LightColor.ToVector4()]);
-        }
-        else
-            Lighting.Parameters["numLights"].SetValue(0);
+        Lighting.Parameters["numLights"].SetValue(LightingManager.LightColors.Count);
+        Lighting.Parameters["lightSources"].SetValue(LightingManager.LightSources.ToArray());
+        Lighting.Parameters["lightColors"].SetValue(LightingManager.LightColors.ToArray());
+        DebugManager.EndBenchmark("ShaderUpdate");
 
         // Start shader target
         GraphicsDevice.SetRenderTarget(ShaderTarget);
@@ -194,10 +189,12 @@ public class Window : Game
         spriteBatch.End();
 
         // Draw shader target
+        DebugManager.StartBenchmark("ShaderDraw");
         GraphicsDevice.SetRenderTarget(null); // back to screen
         GraphicsDevice.Clear(Color.Magenta);
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, Lighting);
         spriteBatch.Draw(ShaderTarget, Vector2.Zero, Color.White);
+        DebugManager.EndBenchmark("ShaderDraw");
 
 
         // Switch to normal
@@ -276,6 +273,10 @@ public class Window : Game
         debugSb.Append(StateManager.Mood);
         debugSb.Append("\nMusic: ");
         debugSb.Append(SoundtrackManager.Playing?.File ?? "none");
+        debugSb.Append("\nDaylight: ");
+        debugSb.AppendFormat("{0:0}%",ColorTools.GetDaylightPercent(gameManager.DayTime));
+        debugSb.Append("\nLighting: ");
+        debugSb.Append(LightingManager.LightSources.Count);
 
         FillRectangle(spriteBatch, new(0, 0, 220, debugSb.ToString().Split('\n').Length * 20), Color.Black * 0.8f);
         spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);

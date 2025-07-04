@@ -27,6 +27,14 @@ public class LevelManager
 
         // SkyTint
         SkyLight = (Level.Tint != Color.Transparent ? Level.Tint : ColorTools.GetSkyColor(gameManager.DayTime)) * .8f;
+
+        // Dynamic lighting
+        foreach (Loot loot in Level.Loot)
+            if (loot.Item == "Lantern")
+            {
+                Point loc = loot.Location - CameraManager.Camera.ToPoint() + Constants.Middle + TextureManager.Metadata[loot.Texture].Size;
+                LightingManager.SetLight($"Loot_{loot.UID}", loc, 100, Color.Transparent, 4);
+            }
     }
     public void Draw(GameManager gameManager)
     {

@@ -53,6 +53,7 @@ public class PlayerManager
                 gameManager.UIManager.LootNotifications.AddNotification($"+{loot.DisplayName}");
                 gameManager.Inventory.AddItem(Item.ItemFromName(this, loot.Item, loot.Amount));
                 gameManager.LevelManager.Level.Loot.Remove(loot);
+                LightingManager.RemoveLight($"Loot_{loot.UID}");
                 SoundManager.PlaySound("Pickup", pitch: RandomManager.RandomFloat() / 2 - .25f);
             }
         }

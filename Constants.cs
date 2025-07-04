@@ -47,6 +47,7 @@ public static class Constants
     public static readonly Point MageSize = new(80, 80); // Size of the mage sprite in pixels
     public static readonly Point MageHalfSize = new(40, 40); // Half size of the mage sprite in pixels
     public static readonly Point MageDrawShift = new(MageHalfSize.X, 0); // Used for center aligning mages
+    public const int MAX_LIGHTS = 12;
 
     // Colors
     public static readonly Color NearBlack = new(85, 85, 85);
