@@ -274,7 +274,7 @@ public class Window : Game
         debugSb.Append("\nMusic: ");
         debugSb.Append(SoundtrackManager.Playing?.File ?? "none");
         debugSb.Append("\nDaylight: ");
-        debugSb.AppendFormat("{0:0}%",ColorTools.GetDaylightPercent(gameManager.DayTime));
+        debugSb.AppendFormat("{0:0}%", ColorTools.GetDaylightPercent(gameManager.DayTime));
         debugSb.Append("\nLighting: ");
         debugSb.Append(LightingManager.LightSources.Count);
 

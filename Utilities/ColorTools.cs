@@ -28,8 +28,8 @@ public static class ColorTools
     }
     public static float GetDaylightPercent(float time)
     {
-        float distDay = (GetSkyColor(time).ToVector4() - stops[0].color.ToVector4()).Length();
-        float distNight = (stops[stops.Count / 2].color.ToVector4() - GetSkyColor(time).ToVector4()).Length();
+        float distDay = (GetSkyColor(time).ToVector4() - stops[0].color.ToVector4()).LengthSquared();
+        float distNight = (stops[stops.Count / 2].color.ToVector4() - GetSkyColor(time).ToVector4()).LengthSquared();
         float percent = distDay / (distDay + distNight) * 100;
         return percent;
     }
