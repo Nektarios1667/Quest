@@ -58,10 +58,7 @@ public static class LightingManager
         float top = light.Position.Y - radius;
         float bottom = light.Position.Y + radius;
 
-        // AABB check (circle vs. rectangle)
-        return !(right < 0 ||
-                 left > Constants.Window.X ||
-                 bottom < 0 ||
-                 top > Constants.Window.Y );
+        // AABB check
+        return right > 0 && left < Constants.Window.X && bottom > 0 && top < Constants.Window.Y;
     }
 }
