@@ -9,6 +9,8 @@ public class Attack(int damage, RectangleF hitbox)
 }
 public class PlayerManager : IContainer
 {
+    public int SelectedSlot { get; set; }
+    public Inventory? SelectedInventory { get; set; }
     public Inventory Inventory { get; }
     public string ContainerName { get; } = "Inventory";
     public IContainer? OpenedContainer { get; private set; }
@@ -111,7 +113,8 @@ public class PlayerManager : IContainer
                         FillRectangle(gameManager.Batch, new(attack.Hitbox.Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, new Point((int)attack.Hitbox.Width, (int)attack.Hitbox.Height)), Constants.DebugPinkTint);
                 }
 
-                OpenedContainer?.Inventory.Draw(gameManager);
+                Inventory.Draw(gameManager, this);
+                OpenedContainer?.Inventory.Draw(gameManager, this);
                 break;
         }
 

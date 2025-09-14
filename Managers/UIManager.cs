@@ -30,7 +30,7 @@ public class UIManager
         if (StateManager.State == GameState.Death && InputManager.KeyPressed(Keys.Space))
             gameManager.Respawn();
     }
-    public void Draw(GraphicsDevice device, GameManager gameManager, Inventory inventory)
+    public void Draw(GraphicsDevice device, GameManager gameManager)
     {
         DebugManager.StartBenchmark("GuiDraw");
 
@@ -41,11 +41,6 @@ public class UIManager
         LootNotifications.Offset = (CameraManager.CameraDest - CameraManager.Camera).ToPoint();
         Gui.Draw(gameManager.Batch);
         DebugManager.EndBenchmark("GuiDraw");
-
-        // Inventory
-        DebugManager.StartBenchmark("InventoryDraw");
-        inventory.Draw(gameManager);
-        DebugManager.EndBenchmark("InventoryDraw");
 
         // Minimap
         if (StateManager.OverlayState == OverlayState.Container)

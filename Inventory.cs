@@ -15,7 +15,6 @@ public class Inventory
     public bool Opened { get; set; } = false;
     public int EquippedSlot { get; set; }
     public Item? Equipped => Items.Length > 0 ? Items[EquippedSlot, 0] : null;
-    public int SelectedSlot { get; set; }
     public int HoverSlot { get; set; }
     public int Width { get; }
     public int Height { get; }
@@ -33,7 +32,6 @@ public class Inventory
         slotHitboxes = new Rectangle[width, height];
         Width = width;
         Height = height;
-        SelectedSlot = width * height - 1;
         HoverSlot = 0;
         itemStart = new(Constants.Middle.X - (slotSize.X * Width / 2), Constants.Window.Y - (slotSize.Y + 8) - (isPlayer ? 4 : (slotSize.Y + 8) * 4 + 30));
 
@@ -56,7 +54,7 @@ public class Inventory
         // Handle slot interactions
         SlotInteractions(gameManager, playerManager);
     }
-    public void Draw(GameManager gameManager)
+    public void Draw(GameManager gameManager, PlayerManager playerManager)
     {
         if (!Opened && !isPlayer) return; // Don't draw if not opened
 
@@ -72,7 +70,7 @@ public class Inventory
 
                 // Draw inventory slots
                 Vector2 itemDest = new(itemStart.X + (slotSize.X + 4) * x, itemStart.Y - (slotSize.Y + 8) * y - (y != 0 && isPlayer ? 15 : 0));
-                DrawTexture(gameManager.Batch, TextureID.Slot, itemDest.ToPoint(), color: SlotColor(x, y));
+                DrawTexture(gameManager.Batch, TextureID.Slot, itemDest.ToPoint(), color: SlotColor(playerManager, x, y));
 
                 // Draw inventory items
                 if (item == null) continue;
@@ -108,22 +106,23 @@ public class Inventory
         // Swap items
         if (Opened && InputManager.LMouseReleased)
         {
-            if (mouseSlot >= 0 && mouseSlot != SelectedSlot)
+            if (mouseSlot >= 0 && (mouseSlot != playerManager.SelectedSlot || this != playerManager.SelectedInventory))
             {
                 // Merge items
                 Item? mouseItem = GetItem(mouseSlot);
-                Item? selectedItem = GetItem(SelectedSlot);
+                Item? selectedItem = playerManager.SelectedInventory!.GetItem(playerManager.SelectedSlot);
                 if (SameItem(mouseItem, selectedItem))
                 {
-                    MergeItems(selectedItem, mouseItem);
+                    playerManager.SelectedInventory!.MergeItems(playerManager, selectedItem, mouseItem);
                     SoundManager.PlaySound("Trinkets");
                 }
-                else if (selectedItem != null)
+                else if (selectedItem != null && playerManager.SelectedInventory != null)
                 {
                     // Swap items
-                    Swap(SelectedSlot, mouseSlot);
+                    Swap(playerManager.SelectedInventory, playerManager.SelectedSlot, this, mouseSlot);
                     SoundManager.PlaySound("Trinkets");
-                    SelectedSlot = mouseSlot;
+                    playerManager.SelectedSlot = mouseSlot;
+                    playerManager.SelectedInventory = this;
                 }
             }
         }
@@ -131,11 +130,11 @@ public class Inventory
         // Spread items
         if (Opened && InputManager.RMouseReleased)
         {
-            if (mouseSlot >= 0 && mouseSlot != SelectedSlot)
+            if (mouseSlot >= 0 && (mouseSlot != playerManager.SelectedSlot || this != playerManager.SelectedInventory))
             {
                 // Merge items
                 Item? mouseItem = GetItem(mouseSlot);
-                Item? selectedItem = GetItem(SelectedSlot);
+                Item? selectedItem = playerManager.SelectedInventory!.GetItem(playerManager.SelectedSlot);
                 if (selectedItem != null)
                 {
                     byte move = (byte)Math.Ceiling(selectedItem!.Amount / 2f);
@@ -153,45 +152,45 @@ public class Inventory
                         SoundManager.PlaySound("Trinkets");
                     }
                     if (selectedItem.Amount < 1)
-                        SetSlot(SelectedSlot, null); // Remove empty item from selected slot
+                        playerManager.SelectedInventory!.SetSlot(playerManager.SelectedSlot, null); // Remove empty item from selected slot
                 }
             }
         }
 
         // Select slot
         if (Opened && (InputManager.LMouseClicked || InputManager.RMouseClicked) && mouseSlot >= 0)
-            SelectedSlot = mouseSlot;
-
-        // Deselect
-        if (InputManager.LMouseClicked && (mouseSlot < 0 || mouseSlot > Items.Length)) SelectedSlot = -1;
+        {
+            playerManager.SelectedSlot = mouseSlot;
+            playerManager.SelectedInventory = this;
+        }
 
         // Drop items
         if (Opened && HoverSlot >= 0 && InputManager.KeyDown(Keys.D))
         {
             Item? item = GetItem(HoverSlot);
             if (item != null) gameManager.LevelManager.DropLoot(gameManager, new Loot(item.Name, item.Amount, CameraManager.PlayerFoot + Constants.MageDrawShift, gameManager.GameTime));
-            SetSlot(HoverSlot, null);
+            playerManager.SelectedInventory!.SetSlot(HoverSlot, null);
             SoundManager.PlaySoundInstance("Trinkets");
         }
     }
     // Slot interactions
-    private Color SlotColor(int x, int y)
+    private Color SlotColor(PlayerManager playerManager, int x, int y)
     {
         int slot = Flatten(x, y);
-        if (slot == EquippedSlot) return Constants.CottonCandy; // Equipped
-        if (Opened && slot == SelectedSlot) return Constants.FocusBlue; // Selected
+        if (slot == EquippedSlot && isPlayer) return Constants.CottonCandy; // Equipped
+        if (Opened && slot == playerManager.SelectedSlot && this == playerManager.SelectedInventory) return Constants.FocusBlue; // Selected
         if (Opened && slot == HoverSlot) return Color.LightGray; // Hovered
         return Color.White; // Default
     }
-    public void MergeItems(Item? from, Item? dest)
+    public void MergeItems(PlayerManager playerManager, Item? from, Item? dest)
     {
         if (from != null && dest != null)
         {
             byte moved = (byte)Math.Min(from.Amount, dest.MaxAmount - dest.Amount);
             dest.Amount += moved;
             from.Amount -= moved;
-            if (from.Amount < 1)
-                SetSlot(SelectedSlot, null);
+            if (from.Amount < 1 && playerManager.SelectedInventory == this)
+                playerManager.SelectedInventory!.SetSlot(playerManager.SelectedSlot, null);
         }
     }
     // AddItem
@@ -285,11 +284,11 @@ public class Inventory
         Items[pos.X, pos.Y] = repl;
     }
     // Swap
-    public void Swap(int slot1, int slot2)
+    public void Swap(Inventory inv1, int slot1, Inventory inv2, int slot2)
     {
-        Point pos1 = Expand(slot1);
-        Point pos2 = Expand(slot2);
-        (Items[pos2.X, pos2.Y], Items[pos1.X, pos1.Y]) = (Items[pos1.X, pos1.Y], Items[pos2.X, pos2.Y]);
+        Point pos1 = inv1.Expand(slot1);
+        Point pos2 = inv2.Expand(slot2);
+        (inv2.Items[pos2.X, pos2.Y], inv1.Items[pos1.X, pos1.Y]) = (inv1.Items[pos1.X, pos1.Y], inv2.Items[pos2.X, pos2.Y]);
     }
     public void Swap(Point slot1, Point slot2)
     {

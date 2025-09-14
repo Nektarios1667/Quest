@@ -233,7 +233,7 @@ public class LevelEditor : Game
 
         // Draw game
         levelManager.Draw(gameManager);
-        uiManager.Draw(GraphicsDevice, gameManager, new(0, 0));
+        uiManager.Draw(GraphicsDevice, gameManager);
         menuManager.Draw(gameManager);
 
         // Text info

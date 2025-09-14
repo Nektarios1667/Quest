@@ -202,7 +202,7 @@ public class Window : Game
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
 
         // Draw overlays
-        uiManager.Draw(GraphicsDevice, gameManager, playerManager.Inventory);
+        uiManager.Draw(GraphicsDevice, gameManager);
         menuManager.Draw(gameManager);
 
         // Text info
