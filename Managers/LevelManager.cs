@@ -140,7 +140,7 @@ public class LevelManager
             }
         }
         // If not found throw an error
-        Logger.Error($"Level '{levelName}' not found in stored levels. Make sure the level file has been read before loading.", true);
+        Logger.Error($"Level '{levelName}' not found in stored levels. Make sure the level file has been read before loading.", false);
     }
     public void LoadLevelObject(GameManager gameManager, Level level)
     {
@@ -213,8 +213,6 @@ public class LevelManager
 
         // Spawn
         Point spawn = new(reader.ReadByte(), reader.ReadByte());
-        CameraManager.CameraDest = ((spawn - Constants.MiddleCoord) * Constants.TileSize).ToVector2();
-        CameraManager.Camera = CameraManager.CameraDest;
 
         // Tiles
         for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
@@ -290,6 +288,8 @@ public class LevelManager
             TileType.Darkness => new Darkness(location),
             TileType.WoodPlanks => new WoodPlanks(location),
             TileType.Stone => new Stone(location),
+            TileType.Door => new Door(location, "null"),
+            TileType.Chest => new Chest(location),
             _ => throw new ArgumentException($"Unknown TileFromId TileType '{id}'.")
         };
     }

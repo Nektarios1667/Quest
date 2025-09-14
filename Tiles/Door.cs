@@ -23,13 +23,13 @@ public class Door : Tile
         // Handling
         Marked = false;
     }
-    public override void OnPlayerCollide(GameManager game)
+    public override void OnPlayerCollide(GameManager game, PlayerManager player)
     {
-        if (Key == "" || game.Inventory.Contains(Key))
+        if (Key == "" || player.Inventory.Contains(Key))
         {
             if (Key != "" && ConsumeKey)
             {
-                game.Inventory.Consume(Key);
+                player.Inventory.Consume(Key);
                 game.UIManager.Notification($"-1 {StringTools.FillCamelSpaces(Key)}", Color.Red, 3);
                 SoundManager.PlaySoundInstance("DoorUnlock");
             }

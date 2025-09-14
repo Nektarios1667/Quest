@@ -2,6 +2,7 @@
 
 namespace Quest.Managers;
 
+
 public class Metadata(Point size, Point tileMap, string type)
 {
     public Point Size { get; private set; } = size;
@@ -51,6 +52,7 @@ public static class TextureManager
         Door,
         WoodPlanks,
         Stone,
+        Chest,
         // Decals
         Torch,
         BlueTorch,
@@ -61,7 +63,7 @@ public static class TextureManager
         Glow,
         Slash,
     }
-
+    private static float autoDepth = 0.0f;
     private static List<string> errors = [];
     public static Dictionary<TextureID, Texture2D> Textures { get; private set; } = [];
     public static Dictionary<TextureID, Metadata> Metadata { get; private set; } = [];
@@ -112,6 +114,7 @@ public static class TextureManager
         Textures[TextureID.Darkness] = content.Load<Texture2D>($"Images/Tiles/Darkness");
         Textures[TextureID.Door] = content.Load<Texture2D>($"Images/Tiles/Door");
         Textures[TextureID.Stone] = content.Load<Texture2D>($"Images/Tiles/Stone");
+        Textures[TextureID.Chest] = content.Load<Texture2D>($"Images/Tiles/Chest");
         Textures[TextureID.Torch] = content.Load<Texture2D>($"Images/Decals/Torch");
         Textures[TextureID.BlueTorch] = content.Load<Texture2D>($"Images/Decals/BlueTorch");
         Textures[TextureID.WaterPuddle] = content.Load<Texture2D>($"Images/Decals/WaterPuddle");
@@ -164,6 +167,7 @@ public static class TextureManager
         Metadata[TextureID.Darkness] = new(Textures[TextureID.Darkness].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Door] = new(Textures[TextureID.Door].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Stone] = new(Textures[TextureID.Stone].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.Chest] = new(Textures[TextureID.Chest].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Torch] = new(Textures[TextureID.Torch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.WaterPuddle] = new(Textures[TextureID.WaterPuddle].Bounds.Size, new(1, 1), "decal");
@@ -205,7 +209,7 @@ public static class TextureManager
         Texture2D tex = GetTexture(id);
         if (color == default) color = Color.White;
         if (origin == default) origin = Vector2.Zero;
-        batch.Draw(tex, pos.ToVector2(), source, color, rotation, origin, scale, effects, 0f);
+        batch.Draw(tex, pos.ToVector2(), source, color, rotation, origin, scale, effects, 0);
     }
     public static void FillRectangle(SpriteBatch batch, Point pos, Point size, Color color)
     {

@@ -18,6 +18,7 @@ public enum TileType
     Door,
     WoodPlanks,
     Stone,
+    Chest,
 }
 public class Tile
 {
@@ -57,8 +58,6 @@ public class Tile
         Marked = false;
     }
 
-    public virtual void OnPlayerEnter(GameManager game) { }
-    public virtual void OnPlayerExit(GameManager game) { }
-    public virtual void OnPlayerInteract(GameManager game) { }
-    public virtual void OnPlayerCollide(GameManager game) { }
+    public virtual void OnPlayerEnter(GameManager game, PlayerManager player) { }
+    public virtual void OnPlayerCollide(GameManager game, PlayerManager player) { }
 }

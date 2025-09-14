@@ -13,10 +13,9 @@ public class GameManager
 
     public Inventory Inventory { get; set; }
 
-    public GameManager(ContentManager content, SpriteBatch batch, Inventory inventory, LevelManager level, UIManager ui)
+    public GameManager(ContentManager content, SpriteBatch batch, LevelManager level, UIManager ui)
     {
         Batch = batch;
-        Inventory = inventory;
         LevelManager = level;
         UIManager = ui;
         DeltaTime = 0;
@@ -41,12 +40,6 @@ public class GameManager
         DayTime += deltaTime;
         TotalTime += deltaTime;
         if (DayTime >= Constants.DayLength) DayTime = 0f;
-
-        // Player lighting
-        if (Inventory.Equipped is Light light)
-            LightingManager.SetLight("PlayerLightItem", Constants.Middle + CameraManager.CameraOffset.ToPoint(), light.LightStrength, light.LightColor, 5);
-        else
-            LightingManager.RemoveLight("PlayerLightItem");
     }
     public void Respawn()
     {

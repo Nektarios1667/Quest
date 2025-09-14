@@ -10,7 +10,7 @@ public class Stairs : Tile
         DestLevel = destLevel;
         DestPosition = destPosition;
     }
-    public override void OnPlayerEnter(GameManager game)
+    public override void OnPlayerEnter(GameManager game, PlayerManager _)
     {
         // Load another level
         game.LevelManager.LoadLevel(game, DestLevel);

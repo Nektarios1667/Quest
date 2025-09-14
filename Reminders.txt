@@ -2,11 +2,11 @@
 	1. Make new 4x4 tilemap
 	2. Add the tilemap to the `Content/Images/Tiles` folder
 	3. Add to Content.mgcb and build
-	4. Add tile name to Constants.TileNames
+	4. Add texture to TextManager.cs TextureID, and load in LoadTextures method with metadata too
 	5. Add to the TileType enum in Tile.cs
 	6. Make new class for tile in Tiles folder, inheriting from Tile
-	7. Add tile type and generator to TileFromId method in GameManager.cs
-	8. Add minimap tile color in DrawMiniMap in GameManager.cs
+	7. Add tile type and generator to TileFromId method in LevelManager.cs
+	8. Add minimap tile color to MiniMapColors in Constants.cs
 
 Save file data:
 	tintR - byte

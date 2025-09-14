@@ -72,7 +72,7 @@ public class LevelEditor : Game
         uiManager = new();
         levelManager = new();
         menuManager = new();
-        gameManager = new(Content, spriteBatch, new(0, 0), levelManager, uiManager);
+        gameManager = new(Content, spriteBatch, levelManager, uiManager);
         editorManager = new(GraphicsDevice, gameManager, levelManager, levelGenerator, spriteBatch, debugSb);
         StateManager.State = GameState.Editor;
         Logger.System("Initialized managers.");
@@ -206,7 +206,7 @@ public class LevelEditor : Game
         // Save
         if (InputManager.Hotkey(Keys.LeftControl, Keys.E)) editorManager.SaveLevel();
         // Level info
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.I)) editorManager.SetSpawn();
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.S)) editorManager.SetSpawn();
         if (InputManager.Hotkey(Keys.LeftControl, Keys.T)) editorManager.SetTint();
         // Generate level
         if (InputManager.Hotkey(Keys.LeftControl, Keys.G)) editorManager.GenerateLevel();

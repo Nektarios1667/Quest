@@ -10,7 +10,7 @@ public enum GameState
 public enum OverlayState
 {
     None,
-    Inventory,
+    Container,
     Pause,
 }
 public enum Mood

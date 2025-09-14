@@ -90,7 +90,7 @@ public class Window : Game
         uiManager = new();
         levelManager = new();
         menuManager = new();
-        gameManager = new(Content, spriteBatch, playerManager.Inventory, levelManager, uiManager);
+        gameManager = new(Content, spriteBatch, levelManager, uiManager);
         CommandManager.Init(this, gameManager, levelManager, playerManager);
         Pathfinder.Init(gameManager);
         Logger.System("Initialized managers.");
@@ -99,7 +99,8 @@ public class Window : Game
         levelManager.ReadLevel(gameManager.UIManager, "islands");
         levelManager.ReadLevel(gameManager.UIManager, "island_house");
         levelManager.ReadLevel(gameManager.UIManager, "island_house_basement");
-        levelManager.LoadLevel(gameManager, 0);
+        levelManager.ReadLevel(gameManager.UIManager, "chesttest");
+        levelManager.LoadLevel(gameManager, 3);
         Logger.System("Loaded levels.");
 
         // Shaders
@@ -195,7 +196,6 @@ public class Window : Game
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, Lighting);
         spriteBatch.Draw(ShaderTarget, Vector2.Zero, Color.White);
         DebugManager.EndBenchmark("ShaderDraw");
-
 
         // Switch to normal
         spriteBatch.End();

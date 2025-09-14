@@ -1,26 +1,46 @@
-﻿namespace Quest;
+﻿using MonoGame.Extended.Content.Tiled;
+
+namespace Quest;
+
+
+public interface IContainer
+{
+    Inventory Inventory { get; }
+    string ContainerName { get; }
+}
+
 public class Inventory
 {
     public Item?[,] Items { get; private set; }
     public bool Opened { get; set; } = false;
     public int EquippedSlot { get; set; }
-    public Item? Equipped => Items[EquippedSlot, 0];
+    public Item? Equipped => Items.Length > 0 ? Items[EquippedSlot, 0] : null;
     public int SelectedSlot { get; set; }
     public int HoverSlot { get; set; }
     public int Width { get; }
     public int Height { get; }
+
+    private Rectangle[,] slotHitboxes;
     private readonly Point itemOffset = new(14, 14);
-    private readonly float itemScale = 3;
+    private const float itemScale = 3;
     private readonly Point slotSize = TextureManager.Metadata[TextureID.Slot].Size;
     private readonly Point itemStart;
-    public Inventory(int width, int height)
+    private readonly bool isPlayer;
+    public Inventory(int width, int height, bool isPlayer = false)
     {
+        this.isPlayer = isPlayer;
         Items = new Item?[width, height];
+        slotHitboxes = new Rectangle[width, height];
         Width = width;
         Height = height;
         SelectedSlot = width * height - 1;
         HoverSlot = 0;
-        itemStart = new(Constants.Middle.X - (slotSize.X * Width / 2), Constants.Window.Y - slotSize.Y - 8);
+        itemStart = new(Constants.Middle.X - (slotSize.X * Width / 2), Constants.Window.Y - (slotSize.Y + 8) - (isPlayer ? 4 : (slotSize.Y + 8) * 4 + 30));
+
+        // Precalculate hitboxes
+        for (int x = 0; x < Width; x++)
+            for (int y = 0; y < Height; y++)
+                slotHitboxes[x, y] = new(new(itemStart.X + (slotSize.X + 4) * x, itemStart.Y - (slotSize.Y + 8) * y - (y != 0 && isPlayer ? 15 : 0)), slotSize);
     }
     public void Update(GameManager gameManager, PlayerManager playerManager)
     {
@@ -38,18 +58,20 @@ public class Inventory
     }
     public void Draw(GameManager gameManager)
     {
+        if (!Opened && !isPlayer) return; // Don't draw if not opened
+
         if (Width < 1 || Height < 1) return; // No slots to draw
 
         // Draw
         for (int x = 0; x < Width; x++)
         {
-            for (int y = 0; y < (Opened ? Height : 1); y++)
+            for (int y = 0; y < (Opened ? Height : 1); y++) // If not opened but player owned draw hotbar
             {
                 // Item
                 Item? item = Items[x, y];
 
                 // Draw inventory slots
-                Vector2 itemDest = new(itemStart.X + (slotSize.X + 4) * x, itemStart.Y - (slotSize.Y + 8) * y - (y != 0 ? 20 : 0));
+                Vector2 itemDest = new(itemStart.X + (slotSize.X + 4) * x, itemStart.Y - (slotSize.Y + 8) * y - (y != 0 && isPlayer ? 15 : 0));
                 DrawTexture(gameManager.Batch, TextureID.Slot, itemDest.ToPoint(), color: SlotColor(x, y));
 
                 // Draw inventory items
@@ -318,18 +340,12 @@ public class Inventory
     // MouseSlot
     public Point GetMouseSlot()
     {
-        // x coord
-        int left = Constants.Middle.X - (slotSize.X * Width / 2);
-        int x = (InputManager.MousePosition.X - left) / (slotSize.X + 4);
-        if (x < 0 || x >= Width) return Constants.NegativePoint; // Out of bounds
+        for (int x = 0; x < Width; x++)
+            for (int y = 0; y < Height; y++)
+                if (slotHitboxes[x, y].Contains(InputManager.MousePosition))
+                    return new(x, y);
 
-        // y coord
-        int top = Constants.Window.Y - (GetTexture(TextureID.Slot).Height + 8) * (Height + 1) - (Height != 0 ? 20 : 0);
-        int y = (InputManager.MousePosition.Y - top) / (slotSize.Y + 8);
-        y = Height - y; // Flip y axis
-        if (y < 0 || y >= Height) return Constants.NegativePoint; // Out of bounds
-
-        return new(x, y);
+        return new(-1, -1);
     }
     // Utilites
     // Flatten

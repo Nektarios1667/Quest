@@ -126,8 +126,6 @@ public class EditorManager
         debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.TileCoord.X, CameraManager.TileCoord.Y);
         debugSb.Append("\nLevel: ");
         debugSb.Append(levelManager.Level?.Name);
-        debugSb.Append("\nInventory: ");
-        debugSb.Append(gameManager.Inventory.Opened);
         debugSb.Append("\nGUI: ");
         debugSb.Append(gameManager.UIManager.Gui.Widgets.Count);
 
@@ -222,6 +220,7 @@ public class EditorManager
     public void SetSpawn()
     {
         levelManager.Level.Spawn = mouseSelectionCoord;
+        Logger.Log($"Set level spawn to {mouseSelectionCoord.X}, {mouseSelectionCoord.Y}");
     }
     public void SetTint()
     {

@@ -1,24 +1,26 @@
-﻿using SharpDX.Direct3D9;
+﻿namespace Quest.Managers;
 
-namespace Quest.Managers;
+
 
 public class Attack(int damage, RectangleF hitbox)
 {
     public int Damage { get; } = damage;
     public RectangleF Hitbox { get; } = hitbox;
 }
-public class PlayerManager
+public class PlayerManager : IContainer
 {
-    public Inventory Inventory { get; set; }
+    public Inventory Inventory { get; }
+    public string ContainerName { get; } = "Inventory";
+    public IContainer? OpenedContainer { get; private set; }
     public Tile? TileBelow { get; private set; }
     public Direction PlayerDirection { get; private set; }
     public List<Attack> Attacks { get; private set; } = [];
     private float moveX, moveY;
     public PlayerManager()
     {
-        Inventory = new(6, 4);
+        Inventory = new(6, 4, isPlayer:true);
         Inventory.SetSlot(0, new DiamondSword(this, 1));
-        Inventory.SetSlot(1, new Items.Lantern(this, 1));
+        Inventory.SetSlot(1, new Lantern(this, 1));
         Inventory.SetSlot(2, new Pickaxe(this, 1));
         Inventory.SetSlot(3, new PhiCoin(this, 10));
         Inventory.SetSlot(4, new DeltaCoin(this, 5));
@@ -34,10 +36,8 @@ public class PlayerManager
         // Toggle inventory
         if (InputManager.KeyPressed(Keys.I))
         {
-            Inventory.Opened = !Inventory.Opened;
-            if (Inventory.Opened) StateManager.OverlayState = OverlayState.Inventory;
-            else StateManager.OverlayState = OverlayState.None;
-            SoundManager.PlaySound("Click");
+            if (OpenedContainer != null) CloseContainer();
+            else OpenContainer(this);
         }
 
         // Loot
@@ -51,7 +51,7 @@ public class PlayerManager
             if (PointTools.DistanceSquared(CameraManager.PlayerFoot, loot.Location + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
             {
                 gameManager.UIManager.LootNotifications.AddNotification($"+{loot.DisplayName}");
-                gameManager.Inventory.AddItem(Item.ItemFromName(this, loot.Item, loot.Amount));
+                Inventory.AddItem(Item.ItemFromName(this, loot.Item, loot.Amount));
                 gameManager.LevelManager.Level.Loot.Remove(loot);
                 LightingManager.RemoveLight($"Loot_{loot.UID}");
                 SoundManager.PlaySound("Pickup", pitch: RandomManager.RandomFloat() / 2 - .25f);
@@ -60,7 +60,7 @@ public class PlayerManager
         DebugManager.EndBenchmark("UpdateLoot");
 
         // Movement
-        if (!Inventory.Opened)
+        if (OpenedContainer == null)
         {
             // Movement
             DebugManager.StartBenchmark("UpdateMovement");
@@ -85,10 +85,18 @@ public class PlayerManager
             DebugManager.EndBenchmark("UpdateAttacks");
         }
 
+
         // Inventory
         DebugManager.StartBenchmark("InventoryUpdate");
         Inventory.Update(gameManager, this);
+        OpenedContainer?.Inventory.Update(gameManager, this);
         DebugManager.EndBenchmark("InventoryUpdate");
+
+        // Player lighting
+        if (Inventory.Equipped is Light light)
+            LightingManager.SetLight("PlayerLightItem", Constants.Middle + CameraManager.CameraOffset.ToPoint(), light.LightStrength, light.LightColor, 5);
+        else
+            LightingManager.RemoveLight("PlayerLightItem");
     }
     public void Draw(GameManager gameManager)
     {
@@ -103,7 +111,7 @@ public class PlayerManager
                         FillRectangle(gameManager.Batch, new(attack.Hitbox.Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, new Point((int)attack.Hitbox.Width, (int)attack.Hitbox.Height)), Constants.DebugPinkTint);
                 }
 
-                Inventory.Draw(gameManager);
+                OpenedContainer?.Inventory.Draw(gameManager);
                 break;
         }
 
@@ -158,7 +166,7 @@ public class PlayerManager
         // On tile enter
         UpdatePositions(gameManager);
         if (TileBelow == null) return;
-        TileBelow.OnPlayerEnter(gameManager);
+        TileBelow.OnPlayerEnter(gameManager, this);
 
         // Debug
         if (DebugManager.CollisionDebug) TileBelow.Marked = true;
@@ -191,11 +199,29 @@ public class PlayerManager
                 Tile? tile = gameManager.LevelManager.GetTile(new Point(x, y));
                 if (tile != null && !tile.IsWalkable)
                 {
-                    tile.OnPlayerCollide(gameManager);
+                    tile.OnPlayerCollide(gameManager, this);
                     return;
                 }
             }
         }
+    }
+
+    public void OpenContainer(IContainer container)
+    {
+        Inventory.Opened = true;
+        OpenedContainer = container;
+        container.Inventory.Opened = true;
+        StateManager.OverlayState = OverlayState.Container;
+        SoundManager.PlaySound("Click");
+    }
+    public void CloseContainer()
+    {
+        if (OpenedContainer != null)
+            OpenedContainer.Inventory.Opened = false;
+        Inventory.Opened = false;
+        OpenedContainer = null;
+        StateManager.OverlayState = OverlayState.None;
+        SoundManager.PlaySound("Click");
     }
     public void UpdatePositions(GameManager gameManager)
     {

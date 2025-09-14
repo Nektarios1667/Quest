@@ -78,5 +78,6 @@ public static class Constants
         new(41, 15, 0), // Door
         new(102, 60, 14), // WoodPlanks
         Color.Gray, // Stone
+        Color.Tan, // Chest
     ];
 }
