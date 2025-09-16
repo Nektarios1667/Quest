@@ -30,7 +30,7 @@ public class UIManager
         if (StateManager.State == GameState.Death && InputManager.KeyPressed(Keys.Space))
             gameManager.Respawn();
     }
-    public void Draw(GraphicsDevice device, GameManager gameManager)
+    public void Draw(GraphicsDevice device, GameManager gameManager, PlayerManager? playerManager)
     {
         DebugManager.StartBenchmark("GuiDraw");
 
@@ -45,6 +45,15 @@ public class UIManager
         // Minimap
         if (StateManager.OverlayState == OverlayState.Container)
             DrawMiniMap(device, gameManager);
+
+        // Inventories
+        DebugManager.StartBenchmark("InventoryGuiDraw");
+        if (playerManager != null)
+        {
+            playerManager.Inventory.Draw(gameManager, playerManager);
+            playerManager.OpenedContainer?.Inventory.Draw(gameManager, playerManager);
+        }
+        DebugManager.EndBenchmark("InventoryGuiDraw");
 
         // Debug
         gameManager.Batch.DrawPoint(CameraManager.PlayerFoot.ToVector2() - CameraManager.Camera, Constants.DebugGreenTint, 3);
@@ -61,11 +70,16 @@ public class UIManager
             gameManager.Batch.DrawPoint(Constants.Middle.ToVector2() + CameraManager.CameraOffset, Constants.DebugGreenTint, 5);
         }
 
+        // Guis
+        if (StateManager.OverlayState == OverlayState.Container)
+        {
+            gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * 0.8f);
+        }
+
         // Death
         if (StateManager.State == GameState.Death)
         {
             if (deathTime == -1) deathTime = gameManager.GameTime;
-            FillRectangle(gameManager.Batch, new Rectangle(Point.Zero, Constants.Window), Color.Black * ((gameManager.GameTime - deathTime) / 5));
             gameManager.Batch.DrawString(PixelOperator, "YOU DIED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("You died!") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
             gameManager.Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
         }

@@ -1,4 +1,5 @@
-﻿using MonoGame.Extended.Content.Tiled;
+﻿using MonoGame.Extended;
+using MonoGame.Extended.Content.Tiled;
 
 namespace Quest;
 
@@ -6,7 +7,6 @@ namespace Quest;
 public interface IContainer
 {
     Inventory Inventory { get; }
-    string ContainerName { get; }
 }
 
 public class Inventory
