@@ -2,7 +2,7 @@ namespace Quest.Items
 {
     public class Lantern : Light
     {
-        public Lantern(PlayerManager playerManager, int amount) : base(playerManager, amount)
+        public Lantern(int amount) : base(amount)
         {
             Description = "A burning lantern used for light.";
             LightStrength = 300;

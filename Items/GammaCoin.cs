@@ -2,7 +2,7 @@ namespace Quest.Items
 {
     public class GammaCoin : Item
     {
-        public GammaCoin(PlayerManager playerManager, int amount) : base(playerManager, amount)
+        public GammaCoin(int amount) : base(amount)
         {
             Description = "A diamond coin.";
         }

@@ -1,7 +1,7 @@
 ﻿namespace Quest.Items;
 public class Key : Item
 {
-    public Key(PlayerManager playerManager, int amount) : base(playerManager, amount)
+    public Key(int amount) : base(amount)
     {
         MaxAmount = 1;
         Name = "Key";

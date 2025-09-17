@@ -38,13 +38,7 @@
 	<PackageReference Include="MonoGUI" Version="1.6.10" />
   </ItemGroup>
 	<ItemGroup>
-		<None Update="World\Levels\**\*">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="World\Structures\**\*">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="World\Terrain\**\*">
+		<None Update="World\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

@@ -99,7 +99,7 @@ public class Window : Game
         levelManager.ReadLevel(gameManager.UIManager, "islands");
         levelManager.ReadLevel(gameManager.UIManager, "island_house");
         levelManager.ReadLevel(gameManager.UIManager, "island_house_basement");
-        levelManager.ReadLevel(gameManager.UIManager, "chesttest");
+        levelManager.ReadLevel(gameManager.UIManager, "chesttest2");
         levelManager.LoadLevel(gameManager, 3);
         Logger.System("Loaded levels.");
 

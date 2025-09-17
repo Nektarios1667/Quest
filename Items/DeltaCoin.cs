@@ -2,7 +2,7 @@ namespace Quest.Items
 {
     public class DeltaCoin : Item
     {
-        public DeltaCoin(PlayerManager playerManager, int amount) : base(playerManager, amount)
+        public DeltaCoin(int amount) : base(amount)
         {
             Description = "A copper coin.";
         }

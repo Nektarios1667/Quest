@@ -32,6 +32,6 @@ public class MenuManager
         {
             StateManager.State = GameState.Game;
         }
-        DebugManager.StartBenchmark("DrawMenu");
+        DebugManager.EndBenchmark("DrawMenu");
     }
 }

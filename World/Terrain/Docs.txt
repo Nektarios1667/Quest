@@ -1,0 +1,8 @@
+.qtr file - Quest Terrain file
+
+byte - header byte, number of tile ranges
+
+for each tile range:
+    byte - lower range - decimal value times 100 e.g. x04 = 4 = 0.04
+    byte - upper range - decimal value times 100 e.g. x14 = 20 = 0.2
+    byte - tile ID

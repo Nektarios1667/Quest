@@ -1,0 +1,8 @@
+.qst file - Quest Structure file
+
+byte - tile ID of allowed spawn tile - 0 = null, 1 = sky...
+byte - structure width
+byte structure height
+
+for each tile left->right, up->down:
+    byte - tile ID - 0 = null, 1 = sky...

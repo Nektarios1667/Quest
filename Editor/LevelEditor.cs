@@ -79,10 +79,11 @@ public class LevelEditor : Game
 
         // Gui
         gui = new(this, spriteBatch, Arial);
-        MouseMenu mouseMenu = new(gui, Point.Zero, new(100, 270), Color.White, GUI.NearBlack, Color.Gray, border:1, seperation:3, borderColor:Color.White);
+        MouseMenu mouseMenu = new(gui, Point.Zero, new(100, 300), Color.White, GUI.NearBlack, Color.Gray, border:1, seperation:3, borderColor:Color.White);
         mouseMenu.AddItem("Pick", () => { Selection = (int)mouseTile.Type; Material = mouseTile.Type; Logger.Log($"Picked tile '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}."); }, []);
         mouseMenu.AddItem("Open", editorManager.OpenFile, []);
         mouseMenu.AddItem("Fill", editorManager.FloodFill, []);
+        mouseMenu.AddItem("Edit", editorManager.EditTile, []);
 
         MouseMenu newMenu = new(gui, Point.Zero, new(100, 80), Color.White, GUI.NearBlack, Color.Gray, border: 1, seperation: 3, borderColor: Color.White);
         newMenu.AddItem("New NPC", editorManager.NewNPC, []);
@@ -186,7 +187,7 @@ public class LevelEditor : Game
         }
 
         // Edit options
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.M)) EditorManager.EditTile(mouseTile);
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.M)) editorManager.EditTile();
 
         // Erase (set to sky)
         if (InputManager.RMouseDown) MouseSelect();

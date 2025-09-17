@@ -43,6 +43,10 @@ public static class RandomManager
     {
         return random.Next(2) == 0 ? -1 : 1;
     }
+    public static Point RandomPoint(Point min, Point max)
+    {
+        return new Point(random.Next(min.X, max.X), random.Next(min.Y, max.Y));
+    }
     public static Vector2 RandomUnitVec2()
     {
         double angle = random.NextDouble() * Math.PI * 2;

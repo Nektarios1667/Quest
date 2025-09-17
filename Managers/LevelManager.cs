@@ -1,10 +1,12 @@
-﻿using System.IO;
+﻿using Quest.Enemies;
+using System.IO;
 using System.IO.Compression;
-using Quest.Enemies;
+using System.Linq;
 
 namespace Quest.Managers;
 public class LevelManager
 {
+    public List<ILootGenerator> LootGenerators = new();
     public List<Level> Levels { get; private set; }
     public Level Level { get; private set; }
     public Color SkyLight { get; private set; }
@@ -12,12 +14,23 @@ public class LevelManager
     public static readonly Point lootStackOffset = new(4, 4);
     public LevelManager()
     {
+        // Empty
         Levels = [];
-
         Tile[] skyTiles = new Tile[256 * 256];
         for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) skyTiles[t] = new Sky(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
+        Level = new("", skyTiles, new(128, 128), [], [], [], []);
 
-        Level = new("null", skyTiles, new(128, 128), [], [], [], []);
+        // Read loot tables and presets
+        string[] qlp = Directory.GetFiles("World\\Loot", "*.qlp");
+        string[] qlt = Directory.GetFiles("World\\Loot", "*.qlt");
+        foreach (string file in qlp.Concat(qlt).ToArray())
+        {
+            if (file.EndsWith(".qlt"))
+                LootGenerators.Add(LootTable.ReadLootTable(file));
+            else if (file.EndsWith(".qlp"))
+                LootGenerators.Add(LootPreset.ReadLootPreset(file));
+            Logger.System($"Loaded Loot file {file}.");
+        }
     }
     public void Update(GameManager gameManager)
     {
@@ -224,12 +237,28 @@ public class LevelManager
                 throw new ArgumentException($"Invalid tile type {type} @ {i % Constants.MapSize.X}, {i / Constants.MapSize.X} in level file.");
             // Extra properties
             Tile tile;
+            Point loc = new(i % Constants.MapSize.X, i / Constants.MapSize.X);
             if (type == (int)TileType.Stairs)
-                tile = new Stairs(new(i % Constants.MapSize.X, i / Constants.MapSize.X), reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
+                tile = new Stairs(loc, reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
             else if (type == (int)TileType.Door)
-                tile = new Door(new(i % Constants.MapSize.X, i / Constants.MapSize.X), reader.ReadString());
+                tile = new Door(loc, reader.ReadString());
+            else if (type == (int)TileType.Chest)
+            {
+                string lootGenFile = reader.ReadString();
+                ILootGenerator? lootGen = null;
+                if (lootGenFile.EndsWith(".qlt"))
+                    lootGen = LootTable.ReadLootTable(lootGenFile);
+                else if (lootGenFile.EndsWith(".qlp"))
+                    lootGen = LootPreset.ReadLootPreset(lootGenFile);
+                if (lootGen == null)
+                {
+                    Logger.Error($"Invalid loot generator file '{lootGenFile}' for chest at {loc}.");
+                    tile = new Chest(loc, LootPreset.EmptyPreset);
+                } else
+                    tile = new Chest(loc, lootGen);
+            }
             else // Regular tile
-                tile = TileFromId(type, new(i % Constants.MapSize.X, i / Constants.MapSize.X));
+                tile = TileFromId(type, loc);
             int idx = tile.Location.X + tile.Location.Y * Constants.MapSize.X;
             tilesBuffer[idx] = tile;
         }
@@ -281,15 +310,15 @@ public class LevelManager
             TileType.Grass => new Grass(location),
             TileType.Water => new Water(location),
             TileType.StoneWall => new StoneWall(location),
-            TileType.Stairs => new Stairs(location, "null", Constants.MiddleCoord),
+            TileType.Stairs => new Stairs(location, "", Constants.MiddleCoord),
             TileType.Flooring => new Flooring(location),
             TileType.Sand => new Sand(location),
             TileType.Dirt => new Dirt(location),
             TileType.Darkness => new Darkness(location),
             TileType.WoodPlanks => new WoodPlanks(location),
             TileType.Stone => new Stone(location),
-            TileType.Door => new Door(location, "null"),
-            TileType.Chest => new Chest(location),
+            TileType.Door => new Door(location, ""),
+            TileType.Chest => new Chest(location, LootPreset.EmptyPreset),
             _ => throw new ArgumentException($"Unknown TileFromId TileType '{id}'.")
         };
     }

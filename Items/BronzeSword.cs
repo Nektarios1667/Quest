@@ -1,14 +1,14 @@
 ﻿namespace Quest.Items;
 public class SteelSword : MeleeWeapon
 {
-    public SteelSword(PlayerManager playerManager, int amount): base(playerManager, amount, 1f, 45, 20)
+    public SteelSword(int amount): base(amount, 1f, 45, 20)
     {
         Description = "A sturdy bronze sword.";
         MaxAmount = 1;
     }
-    public override void PrimaryUse()
+    public override void PrimaryUse(PlayerManager player)
     {
-        base.PrimaryUse();
+        base.PrimaryUse(player);
         SoundManager.PlaySound("Swoosh", pitch: RandomManager.RandomFloat() / 2 - .25f);
     }
 }

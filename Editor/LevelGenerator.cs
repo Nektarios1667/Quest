@@ -40,14 +40,14 @@ public class LevelGenerator
         Noise.SetFrequency(freq);
 
         // Read each structure
-        foreach (string file in Directory.GetFiles("World/Structures"))
+        foreach (string file in Directory.GetFiles("World\\Structures", "*.qst"))
         {
             string name = Path.GetFileNameWithoutExtension(file);
             Structures[name] = ReadStructure(file);
         }
 
         // Read each terrain preset
-        foreach (string file in Directory.GetFiles("World/Terrain"))
+        foreach (string file in Directory.GetFiles("World\\Terrain", "*.qtr"))
         {
             string name = Path.GetFileNameWithoutExtension(file);
             Terrains[name] = ReadTerrainPreset(file);
@@ -136,7 +136,12 @@ public class LevelGenerator
     public static Structure ReadStructure(string file)
     {
         // Check
-        if (!file.EndsWith(".qst")) throw new Exception($"Failed to read structure '{file}'. Expected .qst file.");
+        if (!file.EndsWith(".qst"))
+        {
+            Logger.Error($"Failed to read structure '{file}'. Expected .qst file.");
+            return new([], Point.Zero, null);
+        }
+        if (!File.Exists(file)) Logger.Error($"File {file} not found.", true);
 
         // Setup
         List<TileType?> tileTypesBuffer = [];
@@ -147,14 +152,14 @@ public class LevelGenerator
         {
             // Header
             byte b = reader.ReadByte();
-            spawn = b == 0 ? null : (TileType)b;
+            spawn = b == 0 ? null : (TileType)(b - 1);
             size = new(reader.ReadByte(), reader.ReadByte());
 
             // Tiles
             for (int i = 0; i < size.X * size.Y; i++)
             {
                 b = reader.ReadByte();
-                TileType? type = b == 0 ? null : (TileType)b;
+                TileType? type = b == 0 ? null : (TileType)(b - 1);
                 tileTypesBuffer.Add(type);
             }
         }
@@ -163,7 +168,13 @@ public class LevelGenerator
     public static Terrain ReadTerrainPreset(string file)
     {
         // Check
-        if (!file.EndsWith(".qtr")) throw new Exception($"Failed to read preset '{file}'. Expected .qtr file.");
+        if (!file.EndsWith(".qtr"))
+        {
+            Logger.Error($"Failed to read preset '{file}'. Expected .qtr file.");
+            return new();
+        }
+        if (!File.Exists(file)) Logger.Error($"File {file} not found.", true);
+
         // Read
         List<(float min, float max, TileType tile)> ranges = [];
         using (FileStream stream = File.Open(file, FileMode.Open))

@@ -154,34 +154,49 @@ public class EditorManager
         frameTimes = new(DebugManager.FrameTimes);
         cacheDelta = gameManager.DeltaTime;
     }
-    public static void EditTile(Tile tile)
+    public void EditTile()
     {
+        Tile? tile = levelManager.GetTile(mouseSelectionCoord);
+        // Stair
         if (tile is Stairs stairs)
         {
-            // Destination level
-            Logger.Print("__Editing Stairs__");
-            string resp = Logger.Input($"Dest level [{stairs.DestLevel}]: ");
-            if (resp != "") stairs.DestLevel = resp;
-
-            // Destination position
-            resp = Logger.Input($"Dest position [{stairs.DestPosition.X}, {stairs.DestPosition.Y}]: ");
-            if (resp != "")
+            var (success, values) = ShowInputForm("Stair Editor", [new("Level", null), new("Spawn X", IsByte), new("Spawn Y", IsByte)]);
+            if (!success)
             {
-                string[] parts = resp.Split(',');
-                if (parts.Length == 2 && int.TryParse(parts[0], out int x) && int.TryParse(parts[1], out int y))
-                    if (x >= 0 && x < Constants.MapSize.X && y >= 0 && y < Constants.MapSize.Y)
-                        stairs.DestPosition = new(x, y);
-                    else
-                        Logger.Error($"Position out of bounds - must be within the map size {Constants.MapSize.X}x{Constants.MapSize.Y}.");
-                else
-                    Logger.Error("Invalid position format - use 'x,y'.");
+                if (!PopupOpen) Logger.Error("Stair edit failed.");
+                return;
             }
+            
+            // Level
+            stairs.DestLevel = values[0];
+            stairs.DestPosition = new(int.Parse(values[1]), int.Parse(values[2]));
         }
+        // Door
         else if (tile is Door door)
         {
-            Logger.Print("__Editing Door__");
-            string name = Logger.Input($"Key name [{door.Key}]: ");
-            door.Key = name;
+            var (success, values) = ShowInputForm("Door Editor", [new("Key", null)]);
+            if (!success)
+            {
+                if (!PopupOpen) Logger.Error("Stair edit failed.");
+                return;
+            }
+            door.Key = values[0];
+        }
+        // Chest
+        else if (tile is Chest chest)
+        {
+            var (success, values) = ShowInputForm("Chest Editor", [new("Loot File Name", null), new("Loot Type", null, ["Loot Preset", "Loot Table"])]);
+            if (!success)
+            {
+                if (!PopupOpen) Logger.Error("Chest edit failed.");
+                return;
+            }
+            if (values[1] == "Loot Table")
+                chest.RegenerateLoot(LootTable.ReadLootTable($"World\\Loot\\{values[0]}"));
+            else if (values[1] == "Loot Preset")
+                chest.RegenerateLoot(LootPreset.ReadLootPreset($"World\\Loot\\{values[0]}"));
+            else
+                Logger.Error("Chest edit failed.");
         }
     }
     public void FloodFill()
@@ -406,7 +421,12 @@ public class EditorManager
             {
                 // Write door key
                 writer.Write(door.Key);
+            } else if (tile is Chest chest)
+            {
+                // Write chest loot
+                writer.Write(chest.LootGeneratorFileName);
             }
+
         }
 
         // NPCs

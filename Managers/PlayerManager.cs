@@ -20,12 +20,12 @@ public class PlayerManager : IContainer
     public PlayerManager()
     {
         Inventory = new(6, 4, isPlayer:true);
-        Inventory.SetSlot(0, new DiamondSword(this, 1));
-        Inventory.SetSlot(1, new Lantern(this, 1));
-        Inventory.SetSlot(2, new Pickaxe(this, 1));
-        Inventory.SetSlot(3, new PhiCoin(this, 10));
-        Inventory.SetSlot(4, new DeltaCoin(this, 5));
-        Inventory.SetSlot(5, new GammaCoin(this, 2));
+        Inventory.SetSlot(0, new DiamondSword(1));
+        Inventory.SetSlot(1, new Lantern(1));
+        Inventory.SetSlot(2, new Pickaxe(1));
+        Inventory.SetSlot(3, new PhiCoin(10));
+        Inventory.SetSlot(4, new DeltaCoin(5));
+        Inventory.SetSlot(5, new GammaCoin(2));
     }
     public void Update(GameManager gameManager)
     {
@@ -52,7 +52,7 @@ public class PlayerManager : IContainer
             if (PointTools.DistanceSquared(CameraManager.PlayerFoot, loot.Location + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
             {
                 gameManager.UIManager.LootNotifications.AddNotification($"+{loot.DisplayName}");
-                Inventory.AddItem(Item.ItemFromName(this, loot.Item, loot.Amount));
+                Inventory.AddItem(Item.ItemFromName(loot.Item, loot.Amount));
                 gameManager.LevelManager.Level.Loot.Remove(loot);
                 LightingManager.RemoveLight($"Loot_{loot.UID}");
                 SoundManager.PlaySound("Pickup", pitch: RandomManager.RandomFloat() / 2 - .25f);
@@ -81,8 +81,8 @@ public class PlayerManager : IContainer
             // Remove attacks
             DebugManager.StartBenchmark("UpdateAttacks");
             Attacks.Clear();
-            if (InputManager.LMouseClicked) Inventory.Equipped?.PrimaryUse();
-            else if (InputManager.RMouseClicked) Inventory.Equipped?.SecondaryUse();
+            if (InputManager.LMouseClicked) Inventory.Equipped?.PrimaryUse(this);
+            else if (InputManager.RMouseClicked) Inventory.Equipped?.SecondaryUse(this);
             DebugManager.EndBenchmark("UpdateAttacks");
         }
 

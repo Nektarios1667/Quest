@@ -18,17 +18,18 @@ public class Inventory
     public int HoverSlot { get; set; }
     public int Width { get; }
     public int Height { get; }
-
+    public Point Size { get; }
     private Rectangle[,] slotHitboxes;
     private readonly Point itemOffset = new(14, 14);
     private const float itemScale = 3;
     private readonly Point slotSize = TextureManager.Metadata[TextureID.Slot].Size;
     private readonly Point itemStart;
     private readonly bool isPlayer;
-    public Inventory(int width, int height, bool isPlayer = false)
+    public Inventory(int width, int height, Item?[,]? items = null, bool isPlayer = false)
     {
         this.isPlayer = isPlayer;
-        Items = new Item?[width, height];
+        Size = new(width, height);
+        Items = items ?? new Item?[width, height];
         slotHitboxes = new Rectangle[width, height];
         Width = width;
         Height = height;
@@ -39,6 +40,7 @@ public class Inventory
         for (int x = 0; x < Width; x++)
             for (int y = 0; y < Height; y++)
                 slotHitboxes[x, y] = new(new(itemStart.X + (slotSize.X + 4) * x, itemStart.Y - (slotSize.Y + 8) * y - (y != 0 && isPlayer ? 15 : 0)), slotSize);
+        ArrayTools.Print2DArray(Items);
     }
     public void Update(GameManager gameManager, PlayerManager playerManager)
     {
@@ -147,7 +149,7 @@ public class Inventory
                     }
                     else if (mouseItem == null)
                     {
-                        SetSlot(mouseSlot, Item.ItemFromName(playerManager, selectedItem.Name, move));
+                        SetSlot(mouseSlot, Item.ItemFromName(selectedItem.Name, move));
                         selectedItem.Amount -= move;
                         SoundManager.PlaySound("Trinkets");
                     }
