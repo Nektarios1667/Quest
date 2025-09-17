@@ -53,6 +53,9 @@ public static class TextureManager
         WoodPlanks,
         Stone,
         Chest,
+        ConcreteWall,
+        WoodWall,
+        Path,
         // Decals
         Torch,
         BlueTorch,
@@ -79,49 +82,52 @@ public static class TextureManager
     {
         Content = content;
         // Load all
-        Textures[TextureID.Null] = content.Load<Texture2D>($"Images/Null");
-        Textures[TextureID.Pixel] = content.Load<Texture2D>($"Images/Pixel");
-        Textures[TextureID.BlueMage] = content.Load<Texture2D>($"Images/Characters/BlueMage");
-        Textures[TextureID.GrayMage] = content.Load<Texture2D>($"Images/Characters/GrayMage");
-        Textures[TextureID.WhiteMage] = content.Load<Texture2D>($"Images/Characters/WhiteMage");
-        Textures[TextureID.PurpleWizard] = content.Load<Texture2D>($"Images/Characters/PurpleWizard");
-        Textures[TextureID.WhiteWizard] = content.Load<Texture2D>($"Images/Characters/WhiteWizard");
-        Textures[TextureID.Ghost] = content.Load<Texture2D>($"Images/Characters/Ghost");
-        Textures[TextureID.CursorArrow] = content.Load<Texture2D>($"Images/Gui/CursorArrow");
-        Textures[TextureID.DialogBox] = content.Load<Texture2D>($"Images/Gui/DialogBox");
-        Textures[TextureID.GuiBackground] = content.Load<Texture2D>($"Images/Gui/GuiBackground");
-        Textures[TextureID.Slot] = content.Load<Texture2D>($"Images/Gui/Slot");
-        Textures[TextureID.Speech] = content.Load<Texture2D>($"Images/Gui/Speech");
-        Textures[TextureID.Lantern] = content.Load<Texture2D>($"Images/Items/Lantern");
-        Textures[TextureID.Pickaxe] = content.Load<Texture2D>($"Images/Items/Pickaxe");
-        Textures[TextureID.PhiCoin] = content.Load<Texture2D>($"Images/Items/PhiCoin");
-        Textures[TextureID.DeltaCoin] = content.Load<Texture2D>($"Images/Items/DeltaCoin");
-        Textures[TextureID.GammaCoin] = content.Load<Texture2D>($"Images/Items/GammaCoin");
-        Textures[TextureID.Key] = content.Load<Texture2D>($"Images/Items/Key");
-        Textures[TextureID.ActivePalantir] = content.Load<Texture2D>($"Images/Items/ActivePalantir");
-        Textures[TextureID.InactivePalantir] = content.Load<Texture2D>($"Images/Items/InactivePalantir");
-        Textures[TextureID.SteelSword] = content.Load<Texture2D>($"Images/Items/SteelSword");
-        Textures[TextureID.DiamondSword] = content.Load<Texture2D>($"Images/Items/DiamondSword");
-        Textures[TextureID.Dirt] = content.Load<Texture2D>($"Images/Tiles/Dirt");
-        Textures[TextureID.Flooring] = content.Load<Texture2D>($"Images/Tiles/Flooring");
-        Textures[TextureID.Grass] = content.Load<Texture2D>($"Images/Tiles/Grass");
-        Textures[TextureID.Sand] = content.Load<Texture2D>($"Images/Tiles/Sand");
-        Textures[TextureID.Sky] = content.Load<Texture2D>($"Images/Tiles/Sky");
-        Textures[TextureID.Stairs] = content.Load<Texture2D>($"Images/Tiles/Stairs");
-        Textures[TextureID.StoneWall] = content.Load<Texture2D>($"Images/Tiles/StoneWall");
-        Textures[TextureID.WoodPlanks] = content.Load<Texture2D>($"Images/Tiles/WoodPlanks");
-        Textures[TextureID.Water] = content.Load<Texture2D>($"Images/Tiles/Water");
-        Textures[TextureID.Darkness] = content.Load<Texture2D>($"Images/Tiles/Darkness");
-        Textures[TextureID.Door] = content.Load<Texture2D>($"Images/Tiles/Door");
-        Textures[TextureID.Stone] = content.Load<Texture2D>($"Images/Tiles/Stone");
-        Textures[TextureID.Chest] = content.Load<Texture2D>($"Images/Tiles/Chest");
-        Textures[TextureID.Torch] = content.Load<Texture2D>($"Images/Decals/Torch");
-        Textures[TextureID.BlueTorch] = content.Load<Texture2D>($"Images/Decals/BlueTorch");
-        Textures[TextureID.WaterPuddle] = content.Load<Texture2D>($"Images/Decals/WaterPuddle");
-        Textures[TextureID.BloodPuddle] = content.Load<Texture2D>($"Images/Decals/BloodPuddle");
-        Textures[TextureID.Footprint] = content.Load<Texture2D>($"Images/Decals/Footprint");
-        Textures[TextureID.Glow] = content.Load<Texture2D>($"Images/Effects/Glow");
-        Textures[TextureID.Slash] = content.Load<Texture2D>($"Images/Effects/Slash");
+        Textures[TextureID.Null] = content.Load<Texture2D>("Images/Null");
+        Textures[TextureID.Pixel] = content.Load<Texture2D>("Images/Pixel");
+        Textures[TextureID.BlueMage] = content.Load<Texture2D>("Images/Characters/BlueMage");
+        Textures[TextureID.GrayMage] = content.Load<Texture2D>("Images/Characters/GrayMage");
+        Textures[TextureID.WhiteMage] = content.Load<Texture2D>("Images/Characters/WhiteMage");
+        Textures[TextureID.PurpleWizard] = content.Load<Texture2D>("Images/Characters/PurpleWizard");
+        Textures[TextureID.WhiteWizard] = content.Load<Texture2D>("Images/Characters/WhiteWizard");
+        Textures[TextureID.Ghost] = content.Load<Texture2D>("Images/Characters/Ghost");
+        Textures[TextureID.CursorArrow] = content.Load<Texture2D>("Images/Gui/CursorArrow");
+        Textures[TextureID.DialogBox] = content.Load<Texture2D>("Images/Gui/DialogBox");
+        Textures[TextureID.GuiBackground] = content.Load<Texture2D>("Images/Gui/GuiBackground");
+        Textures[TextureID.Slot] = content.Load<Texture2D>("Images/Gui/Slot");
+        Textures[TextureID.Speech] = content.Load<Texture2D>("Images/Gui/Speech");
+        Textures[TextureID.Lantern] = content.Load<Texture2D>("Images/Items/Lantern");
+        Textures[TextureID.Pickaxe] = content.Load<Texture2D>("Images/Items/Pickaxe");
+        Textures[TextureID.PhiCoin] = content.Load<Texture2D>("Images/Items/PhiCoin");
+        Textures[TextureID.DeltaCoin] = content.Load<Texture2D>("Images/Items/DeltaCoin");
+        Textures[TextureID.GammaCoin] = content.Load<Texture2D>("Images/Items/GammaCoin");
+        Textures[TextureID.Key] = content.Load<Texture2D>("Images/Items/Key");
+        Textures[TextureID.ActivePalantir] = content.Load<Texture2D>("Images/Items/ActivePalantir");
+        Textures[TextureID.InactivePalantir] = content.Load<Texture2D>("Images/Items/InactivePalantir");
+        Textures[TextureID.SteelSword] = content.Load<Texture2D>("Images/Items/SteelSword");
+        Textures[TextureID.DiamondSword] = content.Load<Texture2D>("Images/Items/DiamondSword");
+        Textures[TextureID.Dirt] = content.Load<Texture2D>("Images/Tiles/Dirt");
+        Textures[TextureID.Flooring] = content.Load<Texture2D>("Images/Tiles/Flooring");
+        Textures[TextureID.Grass] = content.Load<Texture2D>("Images/Tiles/Grass");
+        Textures[TextureID.Sand] = content.Load<Texture2D>("Images/Tiles/Sand");
+        Textures[TextureID.Sky] = content.Load<Texture2D>("Images/Tiles/Sky");
+        Textures[TextureID.Stairs] = content.Load<Texture2D>("Images/Tiles/Stairs");
+        Textures[TextureID.StoneWall] = content.Load<Texture2D>("Images/Tiles/StoneWall");
+        Textures[TextureID.WoodPlanks] = content.Load<Texture2D>("Images/Tiles/WoodPlanks");
+        Textures[TextureID.Water] = content.Load<Texture2D>("Images/Tiles/Water");
+        Textures[TextureID.Darkness] = content.Load<Texture2D>("Images/Tiles/Darkness");
+        Textures[TextureID.Door] = content.Load<Texture2D>("Images/Tiles/Door");
+        Textures[TextureID.Stone] = content.Load<Texture2D>("Images/Tiles/Stone");
+        Textures[TextureID.Chest] = content.Load<Texture2D>("Images/Tiles/Chest");
+        Textures[TextureID.ConcreteWall] = content.Load<Texture2D>("Images/Tiles/ConcreteWall");
+        Textures[TextureID.WoodWall] = content.Load<Texture2D>("Images/Tiles/WoodWall");
+        Textures[TextureID.Path] = content.Load<Texture2D>("Images/Tiles/Path");
+        Textures[TextureID.Torch] = content.Load<Texture2D>("Images/Decals/Torch");
+        Textures[TextureID.BlueTorch] = content.Load<Texture2D>("Images/Decals/BlueTorch");
+        Textures[TextureID.WaterPuddle] = content.Load<Texture2D>("Images/Decals/WaterPuddle");
+        Textures[TextureID.BloodPuddle] = content.Load<Texture2D>("Images/Decals/BloodPuddle");
+        Textures[TextureID.Footprint] = content.Load<Texture2D>("Images/Decals/Footprint");
+        Textures[TextureID.Glow] = content.Load<Texture2D>("Images/Effects/Glow");
+        Textures[TextureID.Slash] = content.Load<Texture2D>("Images/Effects/Slash");
         Pixel = Textures[TextureID.Pixel];
 
         foreach (var kv in Textures)
@@ -168,6 +174,9 @@ public static class TextureManager
         Metadata[TextureID.Door] = new(Textures[TextureID.Door].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Stone] = new(Textures[TextureID.Stone].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Chest] = new(Textures[TextureID.Chest].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.ConcreteWall] = new(Textures[TextureID.ConcreteWall].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.WoodWall] = new(Textures[TextureID.WoodWall].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.Path] = new(Textures[TextureID.Path].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Torch] = new(Textures[TextureID.Torch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.WaterPuddle] = new(Textures[TextureID.WaterPuddle].Bounds.Size, new(1, 1), "decal");

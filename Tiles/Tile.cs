@@ -19,6 +19,9 @@ public enum TileType
     WoodPlanks,
     Stone,
     Chest,
+    ConcreteWall,
+    WoodWall,
+    Path,
 }
 public class Tile
 {

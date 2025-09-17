@@ -319,6 +319,9 @@ public class LevelManager
             TileType.Stone => new Stone(location),
             TileType.Door => new Door(location, ""),
             TileType.Chest => new Chest(location, LootPreset.EmptyPreset),
+            TileType.ConcreteWall => new ConcreteWall(location),
+            TileType.WoodWall => new WoodWall(location),
+            TileType.Path => new Tiles.Path(location),
             _ => throw new ArgumentException($"Unknown TileFromId TileType '{id}'.")
         };
     }

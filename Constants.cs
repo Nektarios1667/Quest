@@ -80,5 +80,8 @@ public static class Constants
         new(102, 60, 14), // WoodPlanks
         Color.Gray, // Stone
         Color.Tan, // Chest
+        Color.LightGray, // ConcreteWall
+        new(92, 53, 23), // WoodWall
+        new(163, 89, 33), // Path
     ];
 }

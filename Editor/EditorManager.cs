@@ -192,9 +192,9 @@ public class EditorManager
                 return;
             }
             if (values[1] == "Loot Table")
-                chest.RegenerateLoot(LootTable.ReadLootTable($"World\\Loot\\{values[0]}"));
+                chest.RegenerateLoot(LootTable.ReadLootTable($"World\\Loot\\{values[0]}.qlt"));
             else if (values[1] == "Loot Preset")
-                chest.RegenerateLoot(LootPreset.ReadLootPreset($"World\\Loot\\{values[0]}"));
+                chest.RegenerateLoot(LootPreset.ReadLootPreset($"World\\Loot\\{values[0]}.qlp"));
             else
                 Logger.Error("Chest edit failed.");
         }

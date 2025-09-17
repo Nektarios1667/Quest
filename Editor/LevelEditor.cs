@@ -23,6 +23,7 @@ public class LevelEditor : Game
     private Point mouseSelectionCoord;
     private Point mouseSelection;
     private LevelGenerator levelGenerator = null!;
+    private MouseMenu mouseMenu;
 
     // Time
     private float delta = 0;
@@ -79,7 +80,7 @@ public class LevelEditor : Game
 
         // Gui
         gui = new(this, spriteBatch, Arial);
-        MouseMenu mouseMenu = new(gui, Point.Zero, new(100, 300), Color.White, GUI.NearBlack, Color.Gray, border:1, seperation:3, borderColor:Color.White);
+        mouseMenu = new(gui, Point.Zero, new(100, 300), Color.White, GUI.NearBlack, Color.Gray, border:1, seperation:3, borderColor:Color.White);
         mouseMenu.AddItem("Pick", () => { Selection = (int)mouseTile.Type; Material = mouseTile.Type; Logger.Log($"Picked tile '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}."); }, []);
         mouseMenu.AddItem("Open", editorManager.OpenFile, []);
         mouseMenu.AddItem("Fill", editorManager.FloodFill, []);
@@ -152,9 +153,6 @@ public class LevelEditor : Game
         // Manager
         editorManager.Update(Material, delta, mouseTile, mouseCoord, mouseSelection, mouseSelectionCoord);
 
-        // Gui
-        gui.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
-
         // Change material
         if (InputManager.ScrollWheelChange > 0 || InputManager.KeyPressed(Keys.OemCloseBrackets))
         {
@@ -171,14 +169,14 @@ public class LevelEditor : Game
         }
 
         // Draw
-        if (InputManager.LMouseDown && mouseTile.Type != Material)
+        if (InputManager.LMouseDown && mouseTile.Type != Material && !mouseMenu.Visible)
         {
             // Add tile
             Tile tile;
             if (Selection == (int)TileType.Stairs)
-                tile = new Stairs(mouseCoord, "null", Constants.MiddleCoord);
+                tile = new Stairs(mouseCoord, "", Constants.MiddleCoord);
             else if (Selection == (int)TileType.Door)
-                tile = new Door(mouseCoord, "Key");
+                tile = new Door(mouseCoord, "");
             else
                 tile = LevelManager.TileFromId(Selection, mouseCoord);
 
@@ -216,6 +214,8 @@ public class LevelEditor : Game
         if (!PopupFactory.PopupOpen) InputManager.Update();
         DebugManager.Update();
         CameraManager.Update(delta);
+        // Gui
+        gui.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
 
         TimerManager.Update(gameManager);
         gameManager.Update(delta);
@@ -263,6 +263,14 @@ public class LevelEditor : Game
             DrawTexture(spriteBatch, texture, mouseTile.Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle, source:new(Point.Zero, Constants.TilePixelSize), scale:4, color:Constants.SemiTransparent);
         }
 
+        // Tile info
+        if (mouseTile is Stairs stair)
+            DrawBottomInfo($"[Stairs] dest: '{stair.DestLevel}' @ {stair.DestPosition.X},{stair.DestPosition.Y}");
+        else if (mouseTile is Door door)
+            DrawBottomInfo($"[Door] key: '{door.Key}'");
+        else if (mouseTile is Chest chest)
+            DrawBottomInfo($"[Chest] gen: '{chest.LootGeneratorFileName}'");
+        
         // Gui
         gui.Draw();
 
@@ -295,5 +303,13 @@ public class LevelEditor : Game
         if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
             throw new ArgumentOutOfRangeException(nameof(coord), "Coordinates are out of bounds of the level.");
         return levelManager.Level.Tiles[coord.X + coord.Y * Constants.MapSize.X];
+    }
+    public void DrawBottomInfo(string text)
+    {
+        Vector2 textSize = Arial.MeasureString(text);
+        Vector2 pos = new(Constants.Middle.X - textSize.X / 2, Constants.Window.Y - textSize.Y - 3);
+        spriteBatch.FillRectangle(new(pos - Vector2.One * 4, textSize + Vector2.One * 8), Color.Gray * 0.5f);
+        spriteBatch.DrawRectangle(new(pos - Vector2.One * 4, textSize + Vector2.One * 8), Color.Black * 0.5f);
+        spriteBatch.DrawString(Arial, text, pos, Color.Black);
     }
 }

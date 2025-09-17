@@ -1,7 +1,5 @@
 ﻿using System.IO;
 using System.Linq;
-using System.Windows.Forms;
-using SharpDX.DirectWrite;
 
 namespace Quest.Editor;
 public class Terrain(params (float min, float max, TileType tile)[] ranges)
@@ -42,14 +40,14 @@ public class LevelGenerator
         // Read each structure
         foreach (string file in Directory.GetFiles("World\\Structures", "*.qst"))
         {
-            string name = Path.GetFileNameWithoutExtension(file);
+            string name = System.IO.Path.GetFileNameWithoutExtension(file);
             Structures[name] = ReadStructure(file);
         }
 
         // Read each terrain preset
         foreach (string file in Directory.GetFiles("World\\Terrain", "*.qtr"))
         {
-            string name = Path.GetFileNameWithoutExtension(file);
+            string name = System.IO.Path.GetFileNameWithoutExtension(file);
             Terrains[name] = ReadTerrainPreset(file);
         }
         Terrain = Terrains["Islands"];
