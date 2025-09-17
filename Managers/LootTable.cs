@@ -92,6 +92,8 @@ public class LootTable : ILootGenerator
         {
             // Check full
             if (inv.IsFull()) break;
+            // Chances
+            if (RandomManager.RandomFloat() >= table.Chance) continue;
 
             // Get random empty slot
             Point dest;
@@ -101,8 +103,8 @@ public class LootTable : ILootGenerator
 
             // Set item
             Item item = table.Item.ShallowCopy();
-            item.Amount = Math.Clamp(RandomManager.RandomIntRange(table.MinAmount, table.MaxAmount), 0, table.Item.MaxAmount);
-            inv.SetSlot(dest, table.Item);
+            item.Amount = Math.Clamp(RandomManager.RandomIntRange(table.MinAmount, table.MaxAmount + 1), 0, table.Item.MaxAmount);
+            inv.SetSlot(dest, item);
         }
         return inv;
     }

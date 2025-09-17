@@ -40,7 +40,6 @@ public class Inventory
         for (int x = 0; x < Width; x++)
             for (int y = 0; y < Height; y++)
                 slotHitboxes[x, y] = new(new(itemStart.X + (slotSize.X + 4) * x, itemStart.Y - (slotSize.Y + 8) * y - (y != 0 && isPlayer ? 15 : 0)), slotSize);
-        ArrayTools.Print2DArray(Items);
     }
     public void Update(GameManager gameManager, PlayerManager playerManager)
     {
@@ -370,5 +369,10 @@ public class Inventory
             }
         }
         return true;
+    }
+    // LootPreset
+    public LootPreset GetLootPreset(string name)
+    {
+        return new(Items, name);
     }
 }
