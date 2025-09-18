@@ -6,7 +6,7 @@ namespace Quest.Items
         {
             Description = "A burning lantern used for light.";
             LightStrength = 300;
-            LightColor = Color.Yellow * .2f;
+            LightColor = new(40, 40, 0, 255);
         }
     }
 }

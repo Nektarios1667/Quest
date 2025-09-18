@@ -7,8 +7,8 @@ public readonly struct RadialLight
     public int Size { get; }
     public Vector3 ShaderLightSource { get; }
     public Color Color { get; }
-    public int Importance { get; }
-    public RadialLight(Point pos, int size, Color color, int importance)
+    public float Importance { get; }
+    public RadialLight(Point pos, int size, Color color, float importance)
     {
         Position = pos;
         Size = size;
@@ -17,12 +17,26 @@ public readonly struct RadialLight
         ShaderLightSource = new(Position.ToVector2(), Size);
     }
 }
+
+// Current importance values:
+// 0.8 - Torch decals
+// 0.7 - Player handheld light
+// 0.6 - Light floor loot 
+
 public static class LightingManager
 {
     public static Dictionary<string, RadialLight> Lights { get; private set; } = [];
     public static readonly List<Vector3> LightSources = [];
     public static readonly List<Vector4> LightColors = [];
-    public static void SetLight(string name, Point pos, int size, Color color, int importance)
+    public static void CreateLight(string name, Point pos, int size, Color color, float importance)
+    {
+        if (Lights.ContainsKey(name)) return;
+
+        if (Lights.Count >= Constants.MAX_LIGHTS) Logger.Warning($"Lighting has reached max number of lights ({Constants.MAX_LIGHTS}). Lights with lower importance will be skipped.");
+        Lights[name] = new(pos, size, color, importance);
+        OrderLights();
+    }
+    public static void SetLight(string name, Point pos, int size, Color color, float importance)
     {
         if (Lights.Count >= Constants.MAX_LIGHTS) Logger.Warning($"Lighting has reached max number of lights ({Constants.MAX_LIGHTS}). Lights with lower importance will be skipped.");
         Lights[name] = new(pos, size, color, importance);

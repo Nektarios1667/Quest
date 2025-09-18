@@ -27,22 +27,33 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     float3 totalLight = baseColor.rgb;
 
     float brightness = 0;
-        
+
     for (int i = 0; i < numLights; ++i)
     {
         float2 delta = xy - lightSources[i].xy;
         float distSq = dot(delta, delta);
         float radiusSq = lightSources[i].z * lightSources[i].z;
+
         float weight = saturate(1.0 - (distSq / radiusSq));
-        brightness += weight;
+        weight *= weight;
+
+        // Reduce skytint
+        brightness += lightColors[i].a * weight;
+
+        // Non-premultiplied tint
         totalLight += lightColors[i].rgb * weight;
     }
 
-    // Lerp with sky color
-    float3 blendedRgb = lerp(totalLight, skyColor.rgb, (1 - brightness) * skyColor.a);
+    // Clamp
+    brightness = saturate(brightness);
 
+    // Lerp with sky color based on brightness
+    float3 blendedRgb = lerp(totalLight, skyColor.rgb, (1.0 - brightness) * skyColor.a);
+    
     return float4(saturate(blendedRgb), baseColor.a);
 }
+
+
 
 technique SpriteDrawing
 {

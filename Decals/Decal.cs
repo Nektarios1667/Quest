@@ -22,6 +22,7 @@ public class Decal
     // Properties - protected setter
     public Color Tint { get; protected set; } = Color.White;
     public DecalType Type { get; protected set; }
+    public int UID { get; } = UIDManager.NewUID("Decals");
     public Decal(Point location)
     {
         // Initialize the tile

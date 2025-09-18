@@ -170,7 +170,7 @@ public class Inventory
         {
             Item? item = GetItem(HoverSlot);
             if (item != null) gameManager.LevelManager.DropLoot(gameManager, new Loot(item.Name, item.Amount, CameraManager.PlayerFoot + Constants.MageDrawShift, gameManager.GameTime));
-            playerManager.SelectedInventory!.SetSlot(HoverSlot, null);
+            SetSlot(HoverSlot, null);
             SoundManager.PlaySoundInstance("Trinkets");
         }
     }

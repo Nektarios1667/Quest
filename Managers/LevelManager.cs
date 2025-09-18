@@ -46,7 +46,7 @@ public class LevelManager
             if (loot.Item == "Lantern")
             {
                 Point loc = loot.Location - CameraManager.Camera.ToPoint() + Constants.Middle + TextureManager.Metadata[loot.Texture].Size;
-                LightingManager.SetLight($"Loot_{loot.UID}", loc, 100, Color.Transparent, 4);
+                LightingManager.SetLight($"Loot_{loot.UID}", loc, 100, Color.Transparent, 0.6f);
             }
     }
     public void Draw(GameManager gameManager)

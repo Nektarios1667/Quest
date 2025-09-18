@@ -9,7 +9,7 @@ public static class Constants
     public const bool COMMANDS = true;
 
     // Game
-    public static int PlayerSpeed = 200;
+    public static int PlayerSpeed = 200; // normal is 200
     public const int MaxStack = 10;
     public const int DayLength = 600; // Length of a day in seconds
     public const int PlayerLight = 300; // In pixels
