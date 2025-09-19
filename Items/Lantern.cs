@@ -4,8 +4,9 @@ namespace Quest.Items
     {
         public Lantern(int amount) : base(amount)
         {
+            MaxAmount = 1;
             Description = "A burning lantern used for light.";
-            LightStrength = 300;
+            LightStrength = 400;
             LightColor = new(40, 40, 0, 255);
         }
     }

@@ -55,7 +55,7 @@ public class Tile
         // Draw tile
         Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
         Color color = Marked ? Color.Red : Color.White;
-        DrawTexture(gameManager.Batch, Texture, dest, source: gameManager.LevelManager.TileTextureSource(this), scale: 4, color: color);
+        DrawTexture(gameManager.Batch, Texture, dest, source: gameManager.LevelManager.TileTextureSource(this), scale: Constants.TileSizeScale, color: color);
 
         // Final
         Marked = false;

@@ -12,7 +12,6 @@ public static class Constants
     public static int PlayerSpeed = 200; // normal is 200
     public const int MaxStack = 10;
     public const int DayLength = 600; // Length of a day in seconds
-    public const int PlayerLight = 300; // In pixels
 
     // Screen
     public static readonly Point Window = new(1400, 900); // Game window resolution
