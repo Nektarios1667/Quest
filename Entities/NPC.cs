@@ -15,8 +15,8 @@ public class NPC
     public float Scale { get; set; }
     public bool Important { get; set; }
     // Private
-    private Point tilemap { get; set; }
-    private Point tilesize { get; set; }
+    private Point tilemap;
+    private Point tilesize;
 
     public NPC(UIManager uiManager, TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1, bool important = true)
     {

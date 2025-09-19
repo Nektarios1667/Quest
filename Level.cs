@@ -18,10 +18,10 @@ public class Level
         Name = name;
         Tiles = tiles;
         Spawn = spawn;
-        NPCs = npcs;
+        NPCs = [.. npcs];
         Loot = [.. loot];
-        Decals = decals;
-        Enemies = enemies;
+        Decals = [.. decals];
+        Enemies = [.. enemies];
         Tint = tint ?? Color.Transparent;
     }
 }

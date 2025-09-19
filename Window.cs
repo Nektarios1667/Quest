@@ -31,7 +31,6 @@ public class Window : Game
     public Effect Grayscale { get; private set; }
     public Effect Lighting { get; private set; }
     // Render targets
-    public RenderTarget2D? Minimap { get; set; }
     private RenderTarget2D? ShaderTarget { get; set; }
 
     // Debug
@@ -105,7 +104,7 @@ public class Window : Game
         // Shaders
         Lighting = Content.Load<Effect>("Shaders/Lighting");
         Lighting.Parameters["dim"].SetValue(Constants.Window.ToVector2());
-        Lighting.Parameters["numLights"].SetValue(1);
+        Lighting.Parameters["numLights"].SetValue(0);
 
         // Render Targets
         ShaderTarget = new(GraphicsDevice, Constants.Window.X, Constants.Window.Y);

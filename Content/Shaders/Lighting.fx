@@ -1,11 +1,14 @@
-﻿#define MAX_LIGHTS 12
+﻿#define MAX_LIGHTS 50
 
-float3 lightSources[MAX_LIGHTS];
-float2 dim;
-float4 skyColor;
-float4 lightColors[MAX_LIGHTS];
-Texture2D SpriteTexture;
-int numLights;
+cbuffer LightBuffer : register(b0)
+{
+    float3 lightSources[MAX_LIGHTS];
+    float2 dim;
+    float4 skyColor;
+    float4 lightColors[MAX_LIGHTS];
+    Texture2D SpriteTexture;
+    int numLights;
+};
 
 sampler2D SpriteTextureSampler = sampler_state
 {
@@ -59,6 +62,6 @@ technique SpriteDrawing
 {
     pass P0
     {
-        PixelShader = compile ps_4_0_level_9_3 MainPS();
+        PixelShader = compile ps_4_0 MainPS();
     }
 };

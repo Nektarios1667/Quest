@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using SharpDX.MediaFoundation;
+using System.Linq;
 
 namespace Quest.Managers;
 public readonly struct RadialLight
@@ -25,6 +26,7 @@ public readonly struct RadialLight
 
 public static class LightingManager
 {
+    const int MAX_LIGHTS = 50;
     public static Dictionary<string, RadialLight> Lights { get; private set; } = [];
     public static readonly List<Vector3> LightSources = [];
     public static readonly List<Vector4> LightColors = [];
@@ -32,13 +34,13 @@ public static class LightingManager
     {
         if (Lights.ContainsKey(name)) return;
 
-        if (Lights.Count >= Constants.MAX_LIGHTS) Logger.Warning($"Lighting has reached max number of lights ({Constants.MAX_LIGHTS}). Lights with lower importance will be skipped.");
+        if (Lights.Count >= MAX_LIGHTS) Logger.Warning($"Lighting has reached max number of lights ({MAX_LIGHTS}). Lights with lower importance will be skipped.");
         Lights[name] = new(pos, size, color, importance);
         OrderLights();
     }
     public static void SetLight(string name, Point pos, int size, Color color, float importance)
     {
-        if (Lights.Count >= Constants.MAX_LIGHTS) Logger.Warning($"Lighting has reached max number of lights ({Constants.MAX_LIGHTS}). Lights with lower importance will be skipped.");
+        if (Lights.Count >= MAX_LIGHTS) Logger.Warning($"Lighting has reached max number of lights ({MAX_LIGHTS}). Lights with lower importance will be skipped.");
         Lights[name] = new(pos, size, color, importance);
         OrderLights();
     }
@@ -56,7 +58,7 @@ public static class LightingManager
     {
         LightColors.Clear();
         LightSources.Clear();
-        RadialLight[] top = Lights.Values.Where(light => LightAffectsScreen(light)).OrderByDescending(l => l.Importance).Take(Constants.MAX_LIGHTS).ToArray();
+        RadialLight[] top = Lights.Values.Where(light => LightAffectsScreen(light)).OrderByDescending(l => l.Importance).Take(MAX_LIGHTS).ToArray();
         for (int r = 0; r < top.Length; r++)
         {
             LightSources.Add(top[r].ShaderLightSource);

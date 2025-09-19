@@ -274,10 +274,10 @@ public class EditorManager
         // Create
         string name = values[0];
         string dialog = values[1];
-        int scale = int.Parse(values[2]);
-        if (scale <= 0 || scale > 25)
+        float scale = float.Parse(values[2]);
+        if (scale <= 0 || scale > 25.5)
         {
-            Logger.Warning("Scale must be between 1 and 25. Scale defaulted to 1.");
+            Logger.Warning("Scale must be between 1 and 25.5. Scale defaulted to 1.");
             scale = 1;
         }
         TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), values[3]);
