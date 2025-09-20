@@ -8,7 +8,7 @@ public class GameManager
     public float DeltaTime { get; private set; }
     public float GameTime { get; private set; } = 0f;
     public float TotalTime { get; private set; } = 0f;
-    public float DayTime { get; set; } = 300f;
+    public float DayTime { get; set; } = 0f;
     public SpriteBatch Batch { get; private set; }
 
     public Inventory Inventory { get; set; }

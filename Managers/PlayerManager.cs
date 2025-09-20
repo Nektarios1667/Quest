@@ -26,6 +26,15 @@ public class PlayerManager : IContainer
         Inventory.SetSlot(3, new PhiCoin(10));
         Inventory.SetSlot(4, new DeltaCoin(5));
         Inventory.SetSlot(5, new GammaCoin(2));
+        Inventory.SetSlot(6, new WoodKey(1));
+        Inventory.SetSlot(7, new IronKey(1));
+        Inventory.SetSlot(8, new DiamondKey(1));
+        Inventory.SetSlot(9, new EmeraldKey(1));
+        Inventory.SetSlot(10, new RubyKey(1));
+        Inventory.SetSlot(11, new MagicKey(1));
+        Inventory.SetSlot(14, new Apple(1));
+        Inventory.SetSlot(15, new Bread(1));
+        Inventory.SetSlot(16, new Skull(1));
     }
     public void Update(GameManager gameManager)
     {

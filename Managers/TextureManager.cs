@@ -34,11 +34,20 @@ public static class TextureManager
         PhiCoin,
         DeltaCoin,
         GammaCoin,
-        Key,
+        GoldKey,
         ActivePalantir,
         InactivePalantir,
         SteelSword,
         DiamondSword,
+        WoodKey,
+        IronKey,
+        DiamondKey,
+        EmeraldKey,
+        RubyKey,
+        MagicKey,
+        Apple,
+        Bread,
+        Skull,
         // Tiles
         Dirt,
         Flooring,
@@ -57,6 +66,7 @@ public static class TextureManager
         WoodWall,
         Path,
         Lava,
+        LavaBorder,
         // Decals
         Torch,
         BlueTorch,
@@ -102,11 +112,20 @@ public static class TextureManager
         Textures[TextureID.PhiCoin] = content.Load<Texture2D>("Images/Items/PhiCoin");
         Textures[TextureID.DeltaCoin] = content.Load<Texture2D>("Images/Items/DeltaCoin");
         Textures[TextureID.GammaCoin] = content.Load<Texture2D>("Images/Items/GammaCoin");
-        Textures[TextureID.Key] = content.Load<Texture2D>("Images/Items/Key");
+        Textures[TextureID.GoldKey] = content.Load<Texture2D>("Images/Items/GoldKey");
         Textures[TextureID.ActivePalantir] = content.Load<Texture2D>("Images/Items/ActivePalantir");
         Textures[TextureID.InactivePalantir] = content.Load<Texture2D>("Images/Items/InactivePalantir");
         Textures[TextureID.SteelSword] = content.Load<Texture2D>("Images/Items/SteelSword");
         Textures[TextureID.DiamondSword] = content.Load<Texture2D>("Images/Items/DiamondSword");
+        Textures[TextureID.WoodKey] = content.Load<Texture2D>("Images/Items/WoodKey");
+        Textures[TextureID.IronKey] = content.Load<Texture2D>("Images/Items/IronKey");
+        Textures[TextureID.DiamondKey] = content.Load<Texture2D>("Images/Items/DiamondKey");
+        Textures[TextureID.EmeraldKey] = content.Load<Texture2D>("Images/Items/EmeraldKey");
+        Textures[TextureID.RubyKey] = content.Load<Texture2D>("Images/Items/RubyKey");
+        Textures[TextureID.MagicKey] = content.Load<Texture2D>("Images/Items/MagicKey");
+        Textures[TextureID.Apple] = content.Load<Texture2D>("Images/Items/Apple");
+        Textures[TextureID.Bread] = content.Load<Texture2D>("Images/Items/Bread");
+        Textures[TextureID.Skull] = content.Load<Texture2D>("Images/Items/Skull");
         Textures[TextureID.Dirt] = content.Load<Texture2D>("Images/Tiles/Dirt");
         Textures[TextureID.Flooring] = content.Load<Texture2D>("Images/Tiles/Flooring");
         Textures[TextureID.Grass] = content.Load<Texture2D>("Images/Tiles/Grass");
@@ -124,6 +143,7 @@ public static class TextureManager
         Textures[TextureID.WoodWall] = content.Load<Texture2D>("Images/Tiles/WoodWall");
         Textures[TextureID.Path] = content.Load<Texture2D>("Images/Tiles/Path");
         Textures[TextureID.Lava] = content.Load<Texture2D>("Images/Tiles/Lava");
+        Textures[TextureID.LavaBorder] = content.Load<Texture2D>("Images/Tiles/LavaBorder");
         Textures[TextureID.Torch] = content.Load<Texture2D>("Images/Decals/Torch");
         Textures[TextureID.BlueTorch] = content.Load<Texture2D>("Images/Decals/BlueTorch");
         Textures[TextureID.WaterPuddle] = content.Load<Texture2D>("Images/Decals/WaterPuddle");
@@ -160,11 +180,20 @@ public static class TextureManager
         Metadata[TextureID.PhiCoin] = new(Textures[TextureID.PhiCoin].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.DeltaCoin] = new(Textures[TextureID.DeltaCoin].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.GammaCoin] = new(Textures[TextureID.GammaCoin].Bounds.Size, new(1, 1), "item");
-        Metadata[TextureID.Key] = new(Textures[TextureID.Key].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.GoldKey] = new(Textures[TextureID.GoldKey].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.ActivePalantir] = new(Textures[TextureID.ActivePalantir].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.InactivePalantir] = new(Textures[TextureID.InactivePalantir].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.SteelSword] = new(Textures[TextureID.SteelSword].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.DiamondSword] = new(Textures[TextureID.DiamondSword].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.WoodKey] = new(Textures[TextureID.WoodKey].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.IronKey] = new(Textures[TextureID.IronKey].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.DiamondKey] = new(Textures[TextureID.DiamondKey].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.EmeraldKey] = new(Textures[TextureID.EmeraldKey].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.RubyKey] = new(Textures[TextureID.RubyKey].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.MagicKey] = new(Textures[TextureID.MagicKey].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Apple] = new(Textures[TextureID.Apple].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Bread] = new(Textures[TextureID.Bread].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Skull] = new(Textures[TextureID.Skull].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Dirt] = new(Textures[TextureID.Dirt].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Flooring] = new(Textures[TextureID.Flooring].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Grass] = new(Textures[TextureID.Grass].Bounds.Size, new(4, 4), "tile");
@@ -182,6 +211,7 @@ public static class TextureManager
         Metadata[TextureID.WoodWall] = new(Textures[TextureID.WoodWall].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Path] = new(Textures[TextureID.Path].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Lava] = new(Textures[TextureID.Lava].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.LavaBorder] = new(Textures[TextureID.LavaBorder].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Torch] = new(Textures[TextureID.Torch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.WaterPuddle] = new(Textures[TextureID.WaterPuddle].Bounds.Size, new(1, 1), "decal");

@@ -312,6 +312,30 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/ActivePalantir.png
 
+#begin Images/Items/Apple.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/Apple.png
+
+#begin Images/Items/Bread.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/Bread.png
+
 #begin Images/Items/DeltaCoin.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -323,6 +347,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Items/DeltaCoin.png
+
+#begin Images/Items/DiamondKey.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/DiamondKey.png
 
 #begin Images/Items/DiamondSword.png
 /importer:TextureImporter
@@ -336,6 +372,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/DiamondSword.png
 
+#begin Images/Items/EmeraldKey.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/EmeraldKey.png
+
 #begin Images/Items/GammaCoin.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -347,6 +395,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Items/GammaCoin.png
+
+#begin Images/Items/GoldKey.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/GoldKey.png
 
 #begin Images/Items/InactivePalantir.png
 /importer:TextureImporter
@@ -360,7 +420,7 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/InactivePalantir.png
 
-#begin Images/Items/Key.png
+#begin Images/Items/IronKey.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -370,7 +430,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Items/Key.png
+/build:Images/Items/IronKey.png
 
 #begin Images/Items/Lantern.png
 /importer:TextureImporter
@@ -383,6 +443,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Items/Lantern.png
+
+#begin Images/Items/MagicKey.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/MagicKey.png
 
 #begin Images/Items/PhiCoin.png
 /importer:TextureImporter
@@ -408,6 +480,30 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/Pickaxe.png
 
+#begin Images/Items/RubyKey.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/RubyKey.png
+
+#begin Images/Items/Skull.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/Skull.png
+
 #begin Images/Items/SteelSword.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -419,6 +515,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Items/SteelSword.png
+
+#begin Images/Items/WoodKey.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/WoodKey.png
 
 #begin Images/Null.png
 /importer:TextureImporter
@@ -540,7 +648,7 @@
 /processorParam:TextureFormat=Color
 /build:Images/Tiles/Lava.png
 
-#begin Images/Tiles/Lava.png
+#begin Images/Tiles/LavaBorder.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -550,7 +658,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/Lava.png
+/build:Images/Tiles/LavaBorder.png
 
 #begin Images/Tiles/Path.png
 /importer:TextureImporter

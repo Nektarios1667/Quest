@@ -7,9 +7,18 @@ public enum ItemType
     DiamondSword,
     GammaCoin,
     InactivePalantir,
-    Key,
+    GoldKey,
     PhiCoin,
     Pickaxe,
+    WoodKey,
+    IronKey,
+    DiamondKey,
+    EmeraldKey,
+    RubyKey,
+    MagicKey,
+    Apple,
+    Bread,
+    Skull,
 }
 public class Item
 {
@@ -38,7 +47,10 @@ public class Item
         var type = Type.GetType(fullTypeName);
 
         if (type == null || !typeof(Item).IsAssignableFrom(type))
-            throw new ArgumentException($"Invalid item name '{name}'");
+        {
+            Logger.Error($"Invalid ItemFromName name '{name}'");
+            return new Item(0);
+        }
 
         var created = (Item?)Activator.CreateInstance(type, amount);
         return created ?? throw new InvalidOperationException($"Failed to create item '{name}'");

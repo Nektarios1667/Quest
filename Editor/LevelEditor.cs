@@ -141,7 +141,7 @@ public class LevelEditor : Game
 
         // Movement
         DebugManager.StartBenchmark("InputUpdate");
-        int speedup = InputManager.KeyDown(Keys.LeftAlt) ? 5 : 2;
+        int speedup = InputManager.KeyDown(Keys.LeftAlt) ? 6 : 2;
         moveX = 0; moveY = 0;
         moveX += InputManager.AnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : 0;
         moveX += InputManager.AnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0;
@@ -214,6 +214,7 @@ public class LevelEditor : Game
         if (!PopupFactory.PopupOpen) InputManager.Update();
         DebugManager.Update();
         CameraManager.Update(delta);
+        CameraManager.CameraDest = Vector2.Clamp(CameraManager.CameraDest, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
         // Gui
         gui.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
 
