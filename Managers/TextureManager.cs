@@ -15,20 +15,20 @@ public static class TextureManager
     {
         Null,
         Pixel,
-        // Characters
+        // OTHER ENUM INSERT
         BlueMage,
         GrayMage,
         WhiteMage,
         PurpleWizard,
         WhiteWizard,
         Ghost,
-        // Gui
+        // CHARACTERS ENUM INSERT
         CursorArrow,
         DialogBox,
         GuiBackground,
         Slot,
         Speech,
-        // Items
+        // GUI ENUM INSERT
         Lantern,
         Pickaxe,
         PhiCoin,
@@ -48,7 +48,7 @@ public static class TextureManager
         Apple,
         Bread,
         Skull,
-        // Tiles
+        // ITEMS ENUM INSERT
         Dirt,
         Flooring,
         Grass,
@@ -67,16 +67,17 @@ public static class TextureManager
         Path,
         Lava,
         LavaBorder,
-        // Decals
+        // TILES ENUM INSERT
         Torch,
         BlueTorch,
         WaterPuddle,
         BloodPuddle,
         Footprint,
         Pebbles,
-        // Effecs
+        // DECALS ENUM INSERT
         Glow,
         Slash,
+        // EFFECTS ENUM INSERT
     }
     private static float autoDepth = 0.0f;
     private static List<string> errors = [];
@@ -93,20 +94,23 @@ public static class TextureManager
     public static void LoadTextures(ContentManager content)
     {
         Content = content;
-        // Load all
+        // Textures
         Textures[TextureID.Null] = content.Load<Texture2D>("Images/Null");
         Textures[TextureID.Pixel] = content.Load<Texture2D>("Images/Pixel");
+        // OTHER INSERT
         Textures[TextureID.BlueMage] = content.Load<Texture2D>("Images/Characters/BlueMage");
         Textures[TextureID.GrayMage] = content.Load<Texture2D>("Images/Characters/GrayMage");
         Textures[TextureID.WhiteMage] = content.Load<Texture2D>("Images/Characters/WhiteMage");
         Textures[TextureID.PurpleWizard] = content.Load<Texture2D>("Images/Characters/PurpleWizard");
         Textures[TextureID.WhiteWizard] = content.Load<Texture2D>("Images/Characters/WhiteWizard");
         Textures[TextureID.Ghost] = content.Load<Texture2D>("Images/Characters/Ghost");
+        // CHARACTERS INSERT
         Textures[TextureID.CursorArrow] = content.Load<Texture2D>("Images/Gui/CursorArrow");
         Textures[TextureID.DialogBox] = content.Load<Texture2D>("Images/Gui/DialogBox");
         Textures[TextureID.GuiBackground] = content.Load<Texture2D>("Images/Gui/GuiBackground");
         Textures[TextureID.Slot] = content.Load<Texture2D>("Images/Gui/Slot");
         Textures[TextureID.Speech] = content.Load<Texture2D>("Images/Gui/Speech");
+        // GUI INSERT
         Textures[TextureID.Lantern] = content.Load<Texture2D>("Images/Items/Lantern");
         Textures[TextureID.Pickaxe] = content.Load<Texture2D>("Images/Items/Pickaxe");
         Textures[TextureID.PhiCoin] = content.Load<Texture2D>("Images/Items/PhiCoin");
@@ -126,6 +130,7 @@ public static class TextureManager
         Textures[TextureID.Apple] = content.Load<Texture2D>("Images/Items/Apple");
         Textures[TextureID.Bread] = content.Load<Texture2D>("Images/Items/Bread");
         Textures[TextureID.Skull] = content.Load<Texture2D>("Images/Items/Skull");
+        // ITEMS INSERT
         Textures[TextureID.Dirt] = content.Load<Texture2D>("Images/Tiles/Dirt");
         Textures[TextureID.Flooring] = content.Load<Texture2D>("Images/Tiles/Flooring");
         Textures[TextureID.Grass] = content.Load<Texture2D>("Images/Tiles/Grass");
@@ -144,14 +149,18 @@ public static class TextureManager
         Textures[TextureID.Path] = content.Load<Texture2D>("Images/Tiles/Path");
         Textures[TextureID.Lava] = content.Load<Texture2D>("Images/Tiles/Lava");
         Textures[TextureID.LavaBorder] = content.Load<Texture2D>("Images/Tiles/LavaBorder");
+        // TILES INSERT
         Textures[TextureID.Torch] = content.Load<Texture2D>("Images/Decals/Torch");
         Textures[TextureID.BlueTorch] = content.Load<Texture2D>("Images/Decals/BlueTorch");
         Textures[TextureID.WaterPuddle] = content.Load<Texture2D>("Images/Decals/WaterPuddle");
         Textures[TextureID.BloodPuddle] = content.Load<Texture2D>("Images/Decals/BloodPuddle");
         Textures[TextureID.Footprint] = content.Load<Texture2D>("Images/Decals/Footprint");
         Textures[TextureID.Pebbles] = content.Load<Texture2D>("Images/Decals/Pebbles");
+        // DECALS INSERT
         Textures[TextureID.Glow] = content.Load<Texture2D>("Images/Effects/Glow");
         Textures[TextureID.Slash] = content.Load<Texture2D>("Images/Effects/Slash");
+        // EFFECTS INSERT
+
         Pixel = Textures[TextureID.Pixel];
 
         foreach (var kv in Textures)
@@ -164,17 +173,20 @@ public static class TextureManager
         // Metadata
         Metadata[TextureID.Null] = new(Textures[TextureID.Null].Bounds.Size, new(1, 1), "null");
         Metadata[TextureID.Pixel] = new(Textures[TextureID.Pixel].Bounds.Size, new(1, 1), "pixel");
+        // OTHERS METADATA INSERT
         Metadata[TextureID.BlueMage] = new(Textures[TextureID.BlueMage].Bounds.Size, new(4, 5), "character");
         Metadata[TextureID.GrayMage] = new(Textures[TextureID.GrayMage].Bounds.Size, new(4, 5), "character");
         Metadata[TextureID.WhiteMage] = new(Textures[TextureID.WhiteMage].Bounds.Size, new(4, 5), "character");
         Metadata[TextureID.PurpleWizard] = new(Textures[TextureID.PurpleWizard].Bounds.Size, new(2, 1), "character");
         Metadata[TextureID.WhiteWizard] = new(Textures[TextureID.WhiteWizard].Bounds.Size, new(2, 1), "character");
         Metadata[TextureID.Ghost] = new(Textures[TextureID.Ghost].Bounds.Size, new(4, 1), "character");
+        // CHARACTERS METADATA INSERT
         Metadata[TextureID.CursorArrow] = new(Textures[TextureID.CursorArrow].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.DialogBox] = new(Textures[TextureID.DialogBox].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.GuiBackground] = new(Textures[TextureID.GuiBackground].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.Slot] = new(Textures[TextureID.Slot].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.Speech] = new(Textures[TextureID.Speech].Bounds.Size, new(1, 4), "gui");
+        // GUI METADATA INSERT
         Metadata[TextureID.Lantern] = new(Textures[TextureID.Lantern].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Pickaxe] = new(Textures[TextureID.Pickaxe].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.PhiCoin] = new(Textures[TextureID.PhiCoin].Bounds.Size, new(1, 1), "item");
@@ -194,6 +206,7 @@ public static class TextureManager
         Metadata[TextureID.Apple] = new(Textures[TextureID.Apple].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Bread] = new(Textures[TextureID.Bread].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Skull] = new(Textures[TextureID.Skull].Bounds.Size, new(1, 1), "item");
+        // ITEMS METADATA INSERT
         Metadata[TextureID.Dirt] = new(Textures[TextureID.Dirt].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Flooring] = new(Textures[TextureID.Flooring].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Grass] = new(Textures[TextureID.Grass].Bounds.Size, new(4, 4), "tile");
@@ -212,14 +225,18 @@ public static class TextureManager
         Metadata[TextureID.Path] = new(Textures[TextureID.Path].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Lava] = new(Textures[TextureID.Lava].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.LavaBorder] = new(Textures[TextureID.LavaBorder].Bounds.Size, new(4, 4), "tile");
+        // TILES METADATA INSERT
         Metadata[TextureID.Torch] = new(Textures[TextureID.Torch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.WaterPuddle] = new(Textures[TextureID.WaterPuddle].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.BloodPuddle] = new(Textures[TextureID.BloodPuddle].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.Footprint] = new(Textures[TextureID.Footprint].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.Pebbles] = new(Textures[TextureID.Pebbles].Bounds.Size, new(1, 1), "decal");
+        // DECALS METADATA INSERT
         Metadata[TextureID.Glow] = new(Textures[TextureID.Glow].Bounds.Size, new(1, 1), "effect");
         Metadata[TextureID.Slash] = new(Textures[TextureID.Slash].Bounds.Size, new(1, 1), "effect");
+        // EFFECTS METADATA INSERT
+
         foreach (var kv in Metadata)
             if (kv.Value == null)
                 Logger.Error($"Metadata for texture '{kv.Key}' failed to load.");

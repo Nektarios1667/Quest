@@ -12,6 +12,7 @@ global using Quest.Utilities;
 global using System;
 global using System.Collections.Generic;
 global using static Quest.Managers.TextureManager;
+using Quest.Editor;
 using System.Linq;
 
 static class Program
@@ -22,6 +23,10 @@ static class Program
         {
             using var levelEditorApp = new Quest.Editor.LevelEditor();
             levelEditorApp.Run();
+        }
+        else if (args.Contains("--code-generator"))
+        {
+            CodeGenerator.Run("C:\\Users\\nekta\\source\\repos\\CSharp\\Quest");
         }
         else
         {

@@ -54,9 +54,6 @@ public class UIManager
             playerManager.Inventory.Draw(gameManager, playerManager);
         }
         DebugManager.EndBenchmark("InventoryGuiDraw");
-
-        // Debug
-        gameManager.Batch.DrawPoint(CameraManager.PlayerFoot.ToVector2() - CameraManager.Camera, Constants.DebugGreenTint, 3);
     }
     public void DrawPostProcessing(GameManager gameManager)
     {

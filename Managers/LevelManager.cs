@@ -323,6 +323,7 @@ public class LevelManager
             TileType.WoodWall => new WoodWall(location),
             TileType.Path => new Tiles.Path(location),
             TileType.Lava => new Lava(location),
+            // TILEFROMID INSERT
             _ => throw new ArgumentException($"Unknown TileFromId TileType '{id}'.")
         };
     }
@@ -338,6 +339,7 @@ public class LevelManager
             DecalType.BloodPuddle => new BloodPuddle(location),
             DecalType.Footprint => new Footprint(location),
             DecalType.Pebbles => new Pebbles(location),
+            // DECALFROMID INSERT
             _ => null,
         };
         if (dec == null)

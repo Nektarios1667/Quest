@@ -6,6 +6,10 @@
     },
     "Quest Game": {
       "commandName": "Project"
+    },
+    "Quest Code Gen": {
+      "commandName": "Project",
+      "commandLineArgs": "--code-generator"
     }
   }
 }

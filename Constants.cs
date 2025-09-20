@@ -80,5 +80,6 @@ public static class Constants
         new(92, 53, 23), // WoodWall
         new(163, 89, 33), // Path
         Color.OrangeRed, // Lava
+        // MINIMAPCOLORS
     ];
 }

@@ -20,6 +20,16 @@ Save file data:
 	[for each tile (65536)]
 		tileId - byte
 
+		(special)
+		door:
+			keyName - string
+		stairs:
+			destLevel - string
+			destX - byte
+			destY - byte
+		chest:
+			lootGeneratorFile - string
+
 	npcNumber - byte
 	[for each npc (<256)]
 		npcName - string

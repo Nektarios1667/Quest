@@ -19,6 +19,7 @@ public enum ItemType
     Apple,
     Bread,
     Skull,
+    // ITEMS
 }
 public class Item
 {

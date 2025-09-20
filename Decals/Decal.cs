@@ -9,6 +9,7 @@ public enum DecalType
     WaterPuddle,
     BloodPuddle,
     Pebbles,
+    // DECALS
 }
 public class Decal
 {
