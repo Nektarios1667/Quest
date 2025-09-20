@@ -612,7 +612,7 @@
 /processorParam:TextureFormat=Color
 /build:Images/Tiles/Water.png
 
-#begin Images/Tiles/WoodPlanks.png
+#begin Images/Tiles/WoodFlooring.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -622,7 +622,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/WoodPlanks.png
+/build:Images/Tiles/WoodFlooring.png
 
 #begin Images/Tiles/WoodWall.png
 /importer:TextureImporter

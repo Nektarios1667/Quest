@@ -16,7 +16,7 @@ public enum TileType
     Dirt,
     Darkness,
     Door,
-    WoodPlanks,
+    WoodFlooring,
     Stone,
     Chest,
     ConcreteWall,

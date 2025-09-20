@@ -315,7 +315,7 @@ public class LevelManager
             TileType.Sand => new Sand(location),
             TileType.Dirt => new Dirt(location),
             TileType.Darkness => new Darkness(location),
-            TileType.WoodPlanks => new WoodPlanks(location),
+            TileType.WoodFlooring => new WoodFlooring(location),
             TileType.Stone => new Stone(location),
             TileType.Door => new Door(location, ""),
             TileType.Chest => new Chest(location, LootPreset.EmptyPreset),

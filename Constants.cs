@@ -75,7 +75,7 @@ public static class Constants
         new(48, 25, 0), // Dirt
         new(18, 18, 18), // Darkness
         new(41, 15, 0), // Door
-        new(102, 60, 14), // WoodPlanks
+        new(102, 60, 14), // WoodFlooring
         Color.Gray, // Stone
         Color.Tan, // Chest
         Color.LightGray, // ConcreteWall
