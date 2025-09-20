@@ -50,8 +50,8 @@ public class UIManager
         DebugManager.StartBenchmark("InventoryGuiDraw");
         if (playerManager != null)
         {
-            playerManager.Inventory.Draw(gameManager, playerManager);
             playerManager.OpenedContainer?.Inventory.Draw(gameManager, playerManager);
+            playerManager.Inventory.Draw(gameManager, playerManager);
         }
         DebugManager.EndBenchmark("InventoryGuiDraw");
 

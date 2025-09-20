@@ -34,7 +34,7 @@ public class Inventory
         Width = width;
         Height = height;
         HoverSlot = 0;
-        itemStart = new(Constants.Middle.X - (slotSize.X * Width / 2), Constants.Window.Y - (slotSize.Y + 8) - (isPlayer ? 4 : (slotSize.Y + 8) * 4 + 30));
+        itemStart = new(Constants.Middle.X - (slotSize.X * Width / 2), Constants.Window.Y - (slotSize.Y + 8) - (isPlayer ? 4 : (slotSize.Y + 8) * 4 + 50));
 
         // Precalculate hitboxes
         for (int x = 0; x < Width; x++)
@@ -90,7 +90,7 @@ public class Inventory
         {
             string display = StringTools.FillCamelSpaces(hovered.Name);
             Point textSize = PixelOperator.MeasureString(display).ToPoint();
-            Vector2 labelPos = new(itemStart.X + (slotSize.X - textSize.X) / 2 + (slotSize.X + 4) * hoverCoord.X - 4, itemStart.Y - (slotSize.Y + 8) * hoverCoord.Y - textSize.Y / 2 - 10 - (hoverCoord.Y != 0 ? 20 : 0));
+            Vector2 labelPos = new(itemStart.X + (slotSize.X - textSize.X) / 2 + (slotSize.X + 4) * hoverCoord.X - 4, slotHitboxes[hoverCoord.X, hoverCoord.Y].Y - textSize.Y / 2);
             FillRectangle(gameManager.Batch, labelPos.ToPoint() + new Point(4, -8), new Point(textSize.X + 4, 30), Color.Black * 0.7f);
             gameManager.Batch.DrawRectangle(labelPos + new Vector2(2, -10), new Vector2(textSize.X + 8, 34), Color.Blue * 0.7f, 2);
             gameManager.Batch.DrawString(PixelOperator, display, labelPos + new Vector2(8, -8), Color.White);
@@ -101,7 +101,7 @@ public class Inventory
         // Get
         int mouseSlot = Flatten(GetMouseSlot());
 
-        // Hover slot
+        // Hover slot i
         HoverSlot = mouseSlot;
 
         // Swap items
@@ -166,7 +166,7 @@ public class Inventory
         }
 
         // Drop items
-        if (Opened && HoverSlot >= 0 && InputManager.KeyDown(Keys.D))
+        if (Opened && HoverSlot >= 0 && isPlayer && InputManager.KeyDown(Keys.D))
         {
             Item? item = GetItem(HoverSlot);
             if (item != null) gameManager.LevelManager.DropLoot(gameManager, new Loot(item.Name, item.Amount, CameraManager.PlayerFoot + Constants.MageDrawShift, gameManager.GameTime));
