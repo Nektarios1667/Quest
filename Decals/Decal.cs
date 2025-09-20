@@ -8,6 +8,7 @@ public enum DecalType
     BlueTorch,
     WaterPuddle,
     BloodPuddle,
+    Pebbles,
 }
 public class Decal
 {
@@ -28,7 +29,7 @@ public class Decal
         // Initialize the tile
         Location = location;
         Type = (DecalType)Enum.Parse(typeof(DecalType), GetType().Name);
-        Texture = TileToTexture[Type];
+        Texture = TileToTexture.TryGetValue(Type, out var tex) ? tex : TextureID.Null;
     }
     public virtual void Draw(GameManager gameManager)
     {

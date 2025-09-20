@@ -9,7 +9,7 @@ public static class Constants
     public const bool COMMANDS = true;
 
     // Game
-    public static int PlayerSpeed = 200; // normal is 200
+    public static int PlayerSpeed = 1000; // normal is 200
     public const int MaxStack = 10;
     public const int DayLength = 600; // Length of a day in seconds
 
@@ -81,5 +81,6 @@ public static class Constants
         Color.LightGray, // ConcreteWall
         new(92, 53, 23), // WoodWall
         new(163, 89, 33), // Path
+        Color.OrangeRed, // Lava
     ];
 }

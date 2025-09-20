@@ -56,12 +56,14 @@ public static class TextureManager
         ConcreteWall,
         WoodWall,
         Path,
+        Lava,
         // Decals
         Torch,
         BlueTorch,
         WaterPuddle,
         BloodPuddle,
         Footprint,
+        Pebbles,
         // Effecs
         Glow,
         Slash,
@@ -121,11 +123,13 @@ public static class TextureManager
         Textures[TextureID.ConcreteWall] = content.Load<Texture2D>("Images/Tiles/ConcreteWall");
         Textures[TextureID.WoodWall] = content.Load<Texture2D>("Images/Tiles/WoodWall");
         Textures[TextureID.Path] = content.Load<Texture2D>("Images/Tiles/Path");
+        Textures[TextureID.Lava] = content.Load<Texture2D>("Images/Tiles/Lava");
         Textures[TextureID.Torch] = content.Load<Texture2D>("Images/Decals/Torch");
         Textures[TextureID.BlueTorch] = content.Load<Texture2D>("Images/Decals/BlueTorch");
         Textures[TextureID.WaterPuddle] = content.Load<Texture2D>("Images/Decals/WaterPuddle");
         Textures[TextureID.BloodPuddle] = content.Load<Texture2D>("Images/Decals/BloodPuddle");
         Textures[TextureID.Footprint] = content.Load<Texture2D>("Images/Decals/Footprint");
+        Textures[TextureID.Pebbles] = content.Load<Texture2D>("Images/Decals/Pebbles");
         Textures[TextureID.Glow] = content.Load<Texture2D>("Images/Effects/Glow");
         Textures[TextureID.Slash] = content.Load<Texture2D>("Images/Effects/Slash");
         Pixel = Textures[TextureID.Pixel];
@@ -177,11 +181,13 @@ public static class TextureManager
         Metadata[TextureID.ConcreteWall] = new(Textures[TextureID.ConcreteWall].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.WoodWall] = new(Textures[TextureID.WoodWall].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Path] = new(Textures[TextureID.Path].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.Lava] = new(Textures[TextureID.Lava].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Torch] = new(Textures[TextureID.Torch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.WaterPuddle] = new(Textures[TextureID.WaterPuddle].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.BloodPuddle] = new(Textures[TextureID.BloodPuddle].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.Footprint] = new(Textures[TextureID.Footprint].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Pebbles] = new(Textures[TextureID.Pebbles].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.Glow] = new(Textures[TextureID.Glow].Bounds.Size, new(1, 1), "effect");
         Metadata[TextureID.Slash] = new(Textures[TextureID.Slash].Bounds.Size, new(1, 1), "effect");
         foreach (var kv in Metadata)

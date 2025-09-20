@@ -22,6 +22,7 @@ public enum TileType
     ConcreteWall,
     WoodWall,
     Path,
+    Lava,
 }
 public class Tile
 {

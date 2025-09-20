@@ -22,6 +22,7 @@ public readonly struct RadialLight
 // Current importance values:
 // 0.8 - Torch decals
 // 0.7 - Player handheld light
+// 0.65 - Tile lights
 // 0.6 - Light floor loot 
 
 public static class LightingManager
@@ -40,7 +41,7 @@ public static class LightingManager
     }
     public static void SetLight(string name, Point pos, int size, Color color, float importance)
     {
-        if (Lights.Count >= MAX_LIGHTS) Logger.Warning($"Lighting has reached max number of lights ({MAX_LIGHTS}). Lights with lower importance will be skipped.");
+        if (Lights.Count >= MAX_LIGHTS && !Lights.ContainsKey(name)) Logger.Warning($"Lighting has reached max number of lights ({MAX_LIGHTS}). Lights with lower importance will be skipped.");
         Lights[name] = new(pos, size, color, importance);
         OrderLights();
     }

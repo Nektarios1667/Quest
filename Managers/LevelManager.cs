@@ -1,4 +1,5 @@
 ﻿using Quest.Enemies;
+using System.Drawing.Text;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -322,6 +323,7 @@ public class LevelManager
             TileType.ConcreteWall => new ConcreteWall(location),
             TileType.WoodWall => new WoodWall(location),
             TileType.Path => new Tiles.Path(location),
+            TileType.Lava => new Lava(location),
             _ => throw new ArgumentException($"Unknown TileFromId TileType '{id}'.")
         };
     }
@@ -329,15 +331,22 @@ public class LevelManager
     public static Decal DecalFromId(DecalType id, Point location)
     {
         // Create a decal from an id
-        return id switch
+        Decal? dec = id switch
         {
-            DecalType.Torch => new Decals.Torch(location),
+            DecalType.Torch => new Torch(location),
             DecalType.BlueTorch => new BlueTorch(location),
             DecalType.WaterPuddle => new WaterPuddle(location),
             DecalType.BloodPuddle => new BloodPuddle(location),
             DecalType.Footprint => new Footprint(location),
-            _ => throw new ArgumentException($"Unknown DecalFromId DecalType '{id}'.")
+            DecalType.Pebbles => new Pebbles(location),
+            _ => null,
         };
+        if (dec == null)
+        {
+            Logger.Error($"Unknown DecalFromId DecalType '{id}'.");
+            return new Torch(location);
+        }
+        return dec;
     }
     public int TileConnectionsMask(Tile tile)
     {
@@ -350,10 +359,10 @@ public class LevelManager
         Tile? down = GetTile(x, y + 1);
         Tile? up = GetTile(x, y - 1);
 
-        if (left?.Type == tile.Type) mask |= 1; // left
-        if (down?.Type == tile.Type) mask |= 2; // down
-        if (right?.Type == tile.Type) mask |= 4; // right
-        if (up?.Type == tile.Type) mask |= 8; // up
+        if (left == null || left.Type == tile.Type) mask |= 1; // left
+        if (down == null || down.Type == tile.Type) mask |= 2; // down
+        if (right == null || right.Type == tile.Type) mask |= 4; // right
+        if (up == null || up.Type == tile.Type) mask |= 8; // up
 
         return mask;
     }
