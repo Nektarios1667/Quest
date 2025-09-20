@@ -1,5 +1,5 @@
-﻿using System.Text;
-using MonoGUI;
+﻿using MonoGUI;
+using System.Text;
 
 namespace Quest.Editor;
 public class LevelEditor : Game
@@ -80,7 +80,7 @@ public class LevelEditor : Game
 
         // Gui
         gui = new(this, spriteBatch, Arial);
-        mouseMenu = new(gui, Point.Zero, new(100, 300), Color.White, GUI.NearBlack, Color.Gray, border:1, seperation:3, borderColor:Color.White);
+        mouseMenu = new(gui, Point.Zero, new(100, 300), Color.White, GUI.NearBlack, Color.Gray, border: 1, seperation: 3, borderColor: Color.White);
         mouseMenu.AddItem("Pick", () => { Selection = (int)mouseTile.Type; Material = mouseTile.Type; Logger.Log($"Picked tile '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}."); }, []);
         mouseMenu.AddItem("Open", editorManager.OpenFile, []);
         mouseMenu.AddItem("Fill", editorManager.FloodFill, []);
@@ -261,7 +261,7 @@ public class LevelEditor : Game
         if (mouseTile != null)
         {
             TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), Material.ToString());
-            DrawTexture(spriteBatch, texture, mouseTile.Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle, source:new(Point.Zero, Constants.TilePixelSize), scale:4, color:Constants.SemiTransparent);
+            DrawTexture(spriteBatch, texture, mouseTile.Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle, source: new(Point.Zero, Constants.TilePixelSize), scale: 4, color: Constants.SemiTransparent);
         }
 
         // Tile info
@@ -271,7 +271,7 @@ public class LevelEditor : Game
             DrawBottomInfo($"[Door] key: '{door.Key}'");
         else if (mouseTile is Chest chest)
             DrawBottomInfo($"[Chest] gen: '{chest.LootGeneratorFileName}'");
-        
+
         // Gui
         gui.Draw();
 

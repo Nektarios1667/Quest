@@ -1,7 +1,4 @@
-﻿using MonoGame.Extended;
-using MonoGame.Extended.Content.Tiled;
-
-namespace Quest;
+﻿namespace Quest;
 
 
 public interface IContainer
@@ -101,7 +98,7 @@ public class Inventory
         // Get
         int mouseSlot = Flatten(GetMouseSlot());
 
-        // Hover slot i
+        // Hover slot
         HoverSlot = mouseSlot;
 
         // Swap items

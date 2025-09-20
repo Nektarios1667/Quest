@@ -1,8 +1,4 @@
-﻿using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Graphics;
-using SharpDX.MediaFoundation;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
+﻿using System.Text;
 
 namespace Quest;
 public class Window : Game

@@ -19,7 +19,7 @@ public class PlayerManager : IContainer
     private float moveX, moveY;
     public PlayerManager()
     {
-        Inventory = new(6, 4, isPlayer:true);
+        Inventory = new(6, 4, isPlayer: true);
         Inventory.SetSlot(0, new DiamondSword(1));
         Inventory.SetSlot(1, new Lantern(1));
         Inventory.SetSlot(2, new Pickaxe(1));

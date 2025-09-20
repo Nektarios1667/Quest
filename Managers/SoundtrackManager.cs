@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Content;
+using System.Linq;
 
 namespace Quest.Managers;
 public class Soundtrack(string file, Mood mood)

@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Quest.Enemies;
+﻿namespace Quest.Enemies;
 public class Enemy
 {
     public int UID { get; }

@@ -1,5 +1,4 @@
-﻿using SharpDX.MediaFoundation;
-using System.Linq;
+﻿using System.Linq;
 
 namespace Quest.Managers;
 public readonly struct RadialLight

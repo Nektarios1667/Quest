@@ -1,8 +1,7 @@
-﻿using Xna = Microsoft.Xna.Framework;
+﻿namespace Quest.Utilities;
 
-namespace Quest.Utilities;
-
-public static class PointExtensions {
+public static class PointExtensions
+{
     public static float Distance(this Point point, Point other)
     {
         return PointTools.Distance(point, other);

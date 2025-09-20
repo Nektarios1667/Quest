@@ -1,6 +1,4 @@
-﻿using Quest.Managers;
-
-namespace Quest.Tiles;
+﻿namespace Quest.Tiles;
 
 public class Door : Tile
 {

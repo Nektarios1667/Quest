@@ -1,6 +1,4 @@
-﻿using Quest.Enemies;
-using System.Drawing.Text;
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
 using System.Linq;
 
@@ -255,7 +253,8 @@ public class LevelManager
                 {
                     Logger.Error($"Invalid loot generator file '{lootGenFile}' for chest at {loc}.");
                     tile = new Chest(loc, LootPreset.EmptyPreset);
-                } else
+                }
+                else
                     tile = new Chest(loc, lootGen);
             }
             else // Regular tile

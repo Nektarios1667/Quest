@@ -220,7 +220,8 @@ public static class CommandManager
             {
                 levelManager!.ReadLevel(gameManager!.UIManager, parts[2]);
                 return true;
-            } else if (parts[1] == "open")
+            }
+            else if (parts[1] == "open")
             {
                 levelManager!.ReadLevel(gameManager!.UIManager, parts[2]);
                 levelManager!.LoadLevel(gameManager!, parts[2]);

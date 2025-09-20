@@ -3,9 +3,9 @@ public static class InputManager
 {
     // Devices
     public static KeyboardState KeyboardState { get; private set; }
-    public static KeyboardState LastKeyboardState {get; private set;}
-    public static MouseState MouseState {get; private set;}
-    public static MouseState LastMouseState {get; private set;}
+    public static KeyboardState LastKeyboardState { get; private set; }
+    public static MouseState MouseState { get; private set; }
+    public static MouseState LastMouseState { get; private set; }
     public static void Update()
     {
         // Update input states

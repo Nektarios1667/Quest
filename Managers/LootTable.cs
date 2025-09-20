@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.IO;
 
 namespace Quest.Managers;
 
@@ -32,7 +26,7 @@ public interface ILootGenerator
 public class LootPreset : ILootGenerator
 {
     public string FileName { get; }
-    public static readonly LootPreset EmptyPreset = new(new Item?[0,0], "_");
+    public static readonly LootPreset EmptyPreset = new(new Item?[0, 0], "_");
     public Item?[,] Preset { get; }
     public LootPreset(Item?[,] items, string filename)
     {

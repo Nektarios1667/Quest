@@ -1,6 +1,6 @@
-﻿using SysColor = System.Drawing.Color; 
-using System.Linq;
+﻿using System.Linq;
 using System.Windows.Forms;
+using SysColor = System.Drawing.Color;
 namespace Quest.Editor;
 public class InputField(string label, Func<string, bool>? validate = null, string?[]? dropdownOptions = null)
 {

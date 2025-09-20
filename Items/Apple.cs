@@ -1,10 +1,9 @@
-namespace Quest.Items
+namespace Quest.Items;
+
+public class Apple : Item
 {
-    public class Apple : Item
+    public Apple(int amount) : base(amount)
     {
-        public Apple(int amount) : base(amount)
-        {
-            Description = "A nutritious red apple.";
-        }
+        Description = "A nutritious red apple.";
     }
 }

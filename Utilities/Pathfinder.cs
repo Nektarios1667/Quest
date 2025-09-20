@@ -32,7 +32,7 @@ public static class Pathfinder
         {
             // Find the node with the lowest FCost
             Node node = openNodes.OrderBy(n => n.FCost).ThenBy(n => n.HCost).First();
-            
+
             // Found
             if (node.Position == to)
                 return RetracePath(node);
@@ -92,6 +92,6 @@ public static class Pathfinder
                 neighbors.Add(new Node(neighbor));
         }
         return neighbors;
-    } 
+    }
 }
 

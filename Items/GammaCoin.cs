@@ -1,10 +1,9 @@
-namespace Quest.Items
+namespace Quest.Items;
+
+public class GammaCoin : Item
 {
-    public class GammaCoin : Item
+    public GammaCoin(int amount) : base(amount)
     {
-        public GammaCoin(int amount) : base(amount)
-        {
-            Description = "A diamond coin.";
-        }
+        Description = "A diamond coin.";
     }
 }

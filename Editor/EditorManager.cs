@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Text;
 using static Quest.Editor.PopupFactory;
 
@@ -166,7 +165,7 @@ public class EditorManager
                 if (!PopupOpen) Logger.Error("Stair edit failed.");
                 return;
             }
-            
+
             // Level
             stairs.DestLevel = values[0];
             stairs.DestPosition = new(int.Parse(values[1]), int.Parse(values[2]));
@@ -266,7 +265,8 @@ public class EditorManager
 
         // Winforms
         var (success, values) = ShowInputForm("NPC Editor", [new("Name", null), new("Dialog", null), new("Size [1-25.5]", IsScaleValue), new("Texture", null, Enum.GetNames(typeof(TextureID)))]);
-        if (!success) {
+        if (!success)
+        {
             if (!PopupOpen) Logger.Error("NPC creation failed.");
             return;
         }
@@ -421,7 +421,8 @@ public class EditorManager
             {
                 // Write door key
                 writer.Write(door.Key);
-            } else if (tile is Chest chest)
+            }
+            else if (tile is Chest chest)
             {
                 // Write chest loot
                 writer.Write(chest.LootGeneratorFileName);
