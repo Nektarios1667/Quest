@@ -92,6 +92,11 @@ public static class Constants
         Color.Purple, // PurpleTiles
         Color.Pink, // PinkTiles
         Color.DarkGray, // BlackTiles
+        Color.SaddleBrown, // BrownTiles
+        new(168, 159, 151), // IronWall
+        Color.White, // Snow
+        new(107, 169, 197), // Ice
+        new(230,255,230), // SnowyGrass
         // MINIMAPCOLORS
     ];
 }

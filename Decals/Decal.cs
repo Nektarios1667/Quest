@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 
 namespace Quest.Decals;
 public enum DecalType
@@ -9,6 +9,12 @@ public enum DecalType
     WaterPuddle,
     BloodPuddle,
     Pebbles,
+    Bush1,
+    Bush2,
+    Bush3,
+    SnowyBush1,
+    SnowyBush2,
+    SnowyBush3,
     // DECALS
 }
 public class Decal

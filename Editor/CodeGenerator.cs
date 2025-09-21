@@ -21,19 +21,21 @@ public static class CodeGenerator
         {
             ReloadSource();
             // CLI
-            Console.WriteLine(">>");
+            Console.WriteLine("New [t]ile, [d]ecal, or [i]tem: ");
             string? resp = Console.ReadLine()?.ToLower();
             if (resp == null || resp == "") continue;
 
             // Tile
-            if (resp == "tile")
+            if (resp == "t" || resp == "tile")
                 WriteTileCode();
-            else if (resp == "decal")
+            else if (resp == "d" || resp == "decal")
                 WriteDecalCode();
-            else if (resp == "item")
+            else if (resp == "i" || resp == "item")
                 WriteItemCode();
-            else if (resp == "exit")
+            else if (resp == "exit" || resp == "quit")
                 return;
+            else
+                Console.WriteLine("Unknown response");
         }
     }
     public static void ReloadSource()

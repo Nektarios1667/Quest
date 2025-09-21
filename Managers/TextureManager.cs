@@ -78,6 +78,11 @@ public static class TextureManager
         PurpleTiles,
         PinkTiles,
         BlackTiles,
+        BrownTiles,
+        IronWall,
+        Snow,
+        Ice,
+        SnowyGrass,
         // TILES ENUM INSERT
         Torch,
         BlueTorch,
@@ -85,6 +90,12 @@ public static class TextureManager
         BloodPuddle,
         Footprint,
         Pebbles,
+        Bush1,
+        Bush2,
+        Bush3,
+        SnowyBush1,
+        SnowyBush2,
+        SnowyBush3,
         // DECALS ENUM INSERT
         Glow,
         Slash,
@@ -172,6 +183,11 @@ public static class TextureManager
         Textures[TextureID.PurpleTiles] = content.Load<Texture2D>("Images/Tiles/PurpleTiles");
         Textures[TextureID.PinkTiles] = content.Load<Texture2D>("Images/Tiles/PinkTiles");
         Textures[TextureID.BlackTiles] = content.Load<Texture2D>("Images/Tiles/BlackTiles");
+        Textures[TextureID.BrownTiles] = content.Load<Texture2D>("Images/Tiles/BrownTiles");
+        Textures[TextureID.IronWall] = content.Load<Texture2D>("Images/Tiles/IronWall");
+        Textures[TextureID.Snow] = content.Load<Texture2D>("Images/Tiles/Snow");
+        Textures[TextureID.Ice] = content.Load<Texture2D>("Images/Tiles/Ice");
+        Textures[TextureID.SnowyGrass] = content.Load<Texture2D>("Images/Tiles/SnowyGrass");
         // TILES INSERT
         Textures[TextureID.Torch] = content.Load<Texture2D>("Images/Decals/Torch");
         Textures[TextureID.BlueTorch] = content.Load<Texture2D>("Images/Decals/BlueTorch");
@@ -179,6 +195,12 @@ public static class TextureManager
         Textures[TextureID.BloodPuddle] = content.Load<Texture2D>("Images/Decals/BloodPuddle");
         Textures[TextureID.Footprint] = content.Load<Texture2D>("Images/Decals/Footprint");
         Textures[TextureID.Pebbles] = content.Load<Texture2D>("Images/Decals/Pebbles");
+        Textures[TextureID.Bush1] = content.Load<Texture2D>("Images/Decals/Bush1");
+        Textures[TextureID.Bush2] = content.Load<Texture2D>("Images/Decals/Bush2");
+        Textures[TextureID.Bush3] = content.Load<Texture2D>("Images/Decals/Bush3");
+        Textures[TextureID.SnowyBush1] = content.Load<Texture2D>("Images/Decals/SnowyBush1");
+        Textures[TextureID.SnowyBush2] = content.Load<Texture2D>("Images/Decals/SnowyBush2");
+        Textures[TextureID.SnowyBush3] = content.Load<Texture2D>("Images/Decals/SnowyBush3");
         // DECALS INSERT
         Textures[TextureID.Glow] = content.Load<Texture2D>("Images/Effects/Glow");
         Textures[TextureID.Slash] = content.Load<Texture2D>("Images/Effects/Slash");
@@ -260,6 +282,11 @@ public static class TextureManager
         Metadata[TextureID.PurpleTiles] = new(Textures[TextureID.PurpleTiles].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.PinkTiles] = new(Textures[TextureID.PinkTiles].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.BlackTiles] = new(Textures[TextureID.BlackTiles].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.BrownTiles] = new(Textures[TextureID.BrownTiles].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.IronWall] = new(Textures[TextureID.IronWall].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.Snow] = new(Textures[TextureID.Snow].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.Ice] = new(Textures[TextureID.Ice].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.SnowyGrass] = new(Textures[TextureID.SnowyGrass].Bounds.Size, new(4, 4), "tile");
         // TILES METADATA INSERT
         Metadata[TextureID.Torch] = new(Textures[TextureID.Torch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), "decal");
@@ -267,6 +294,12 @@ public static class TextureManager
         Metadata[TextureID.BloodPuddle] = new(Textures[TextureID.BloodPuddle].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.Footprint] = new(Textures[TextureID.Footprint].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.Pebbles] = new(Textures[TextureID.Pebbles].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Bush1] = new(Textures[TextureID.Bush1].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Bush2] = new(Textures[TextureID.Bush2].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Bush3] = new(Textures[TextureID.Bush3].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.SnowyBush1] = new(Textures[TextureID.SnowyBush1].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.SnowyBush2] = new(Textures[TextureID.SnowyBush2].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.SnowyBush3] = new(Textures[TextureID.SnowyBush3].Bounds.Size, new(1, 1), "decal");
         // DECALS METADATA INSERT
         Metadata[TextureID.Glow] = new(Textures[TextureID.Glow].Bounds.Size, new(1, 1), "effect");
         Metadata[TextureID.Slash] = new(Textures[TextureID.Slash].Bounds.Size, new(1, 1), "effect");

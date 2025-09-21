@@ -33,6 +33,11 @@ public enum TileType
     PurpleTiles,
     PinkTiles,
     BlackTiles,
+    BrownTiles,
+    IronWall,
+    Snow,
+    Ice,
+    SnowyGrass,
     // TILES
 }
 public class Tile

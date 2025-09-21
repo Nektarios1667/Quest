@@ -334,6 +334,11 @@ public class LevelManager
             TileType.PurpleTiles => new PurpleTiles(location),
             TileType.PinkTiles => new PinkTiles(location),
             TileType.BlackTiles => new BlackTiles(location),
+            TileType.BrownTiles => new BrownTiles(location),
+            TileType.IronWall => new IronWall(location),
+            TileType.Snow => new Snow(location),
+            TileType.Ice => new Ice(location),
+            TileType.SnowyGrass => new SnowyGrass(location),
             // TILEFROMID INSERT
             _ => throw new ArgumentException($"Unknown TileFromId TileType '{id}'.")
         };
@@ -350,6 +355,12 @@ public class LevelManager
             DecalType.BloodPuddle => new BloodPuddle(location),
             DecalType.Footprint => new Footprint(location),
             DecalType.Pebbles => new Pebbles(location),
+            DecalType.Bush1 => new Bush1(location),
+            DecalType.Bush2 => new Bush2(location),
+            DecalType.Bush3 => new Bush3(location),
+            DecalType.SnowyBush1 => new SnowyBush1(location),
+            DecalType.SnowyBush2 => new SnowyBush2(location),
+            DecalType.SnowyBush3 => new SnowyBush3(location),
             // DECALFROMID INSERT
             _ => null,
         };
