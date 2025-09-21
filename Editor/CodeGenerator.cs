@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using SharpDX.MediaFoundation;
+using System.IO;
 
 namespace Quest.Editor;
 public static class CodeGenerator
@@ -21,7 +22,7 @@ public static class CodeGenerator
         {
             ReloadSource();
             // CLI
-            Console.WriteLine("New [t]ile, [d]ecal, or [i]tem: ");
+            Console.WriteLine("New [t]ile, [d]ecal, [i]tem, or [l]oot table: ");
             string? resp = Console.ReadLine()?.ToLower();
             if (resp == null || resp == "") continue;
 
@@ -32,6 +33,8 @@ public static class CodeGenerator
                 WriteDecalCode();
             else if (resp == "i" || resp == "item")
                 WriteItemCode();
+            else if (resp == "l" || resp == "loot table")
+                WriteLootTable();
             else if (resp == "exit" || resp == "quit")
                 return;
             else
@@ -134,6 +137,81 @@ public static class CodeGenerator
         string newItemSource = itemSource.Replace("    // ITEMS", $"    {name},\r\n    // ITEMS");
         File.WriteAllText($"{sourceDirectory}\\Items\\Item.cs", newItemSource);
     }
+    public static void WriteLootTable()
+    {
+        byte[] data;
+        byte entries = 0;
+        Console.WriteLine("Note: ID starts at 1\nEnter blank when done.");
+        string? tableName = Ask("Table name: ");
+        if (tableName == null || tableName == "") return;
+
+        using (var ms = new MemoryStream())
+        using (var writer = new BinaryWriter(ms))
+        {
+            // Add items
+            writer.Write((byte)0);
+            string? itemResp = "";
+            do
+            {
+                int item;
+                byte percentChance;
+                byte min, max;
+
+                // Item
+                itemResp = Ask("Item name or ID: ");
+                if (itemResp == null || itemResp == "") break;
+                item = ParseItemEnumOrInt(itemResp, offset: 1);
+                if (item == -1) continue;
+                writer.Write((byte)item);
+
+                // Chance
+                percentChance = Logger.InputByte("Percent chance: ", 0);
+                if (percentChance == 0)
+                {
+                    Console.WriteLine("Bad percentage.");
+                    break;
+                }
+                writer.Write(percentChance);
+
+                // Min/max
+                min = Logger.InputByte("Min amount: ", 0);
+                max = Logger.InputByte("Max amount: ", 0);
+                writer.Write(min);
+                writer.Write(max);
+                entries++;
+
+            } while (itemResp != "" && entries < 255);
+
+            // Write to data
+            data = ms.ToArray();
+            data[0] = entries;
+        }
+
+        // Write
+        File.WriteAllBytes($"{sourceDirectory}\\World\\Loot\\{tableName}.qlt", data);
+    }
+    public static int ParseItemEnumOrInt(string input, int offset = 0)
+    {
+        // Try parse as int
+        if (int.TryParse(input, out int intValue))
+        {
+            if (Enum.IsDefined(typeof(ItemType), intValue - offset))
+                return intValue;
+            else
+            {
+                Logger.Error($"'{intValue - offset}' is not a valid value of enum ItemType.");
+                return -1;
+            }
+        }
+
+        // Try parse as enum name
+        if (Enum.TryParse(input, true, out ItemType enumValue))
+            return (int)enumValue + offset;
+
+        Logger.Error($"'{input}' is not a valid name or value of enum ItemType.");
+        return -1;
+    }
+
     public static string? Ask(string question)
     {
         Console.WriteLine(question);
