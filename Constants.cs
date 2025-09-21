@@ -81,7 +81,6 @@ public static class Constants
         new(163, 89, 33), // Path
         Color.OrangeRed, // Lava
         new(118, 128, 133), // StoneTiles
-        Color.LightGray, // StoneTiles
         Color.Red, // RedTiles
         Color.Orange, // OrangeTiles
         Color.Yellow, // YellowTiles
@@ -96,7 +95,7 @@ public static class Constants
         new(168, 159, 151), // IronWall
         Color.White, // Snow
         new(107, 169, 197), // Ice
-        new(230,255,230), // SnowyGrass
+        new(230, 255, 230), // SnowyGrass
         // MINIMAPCOLORS
     ];
 }
