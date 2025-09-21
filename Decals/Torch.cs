@@ -8,7 +8,7 @@ public class Torch(Point location) : Decal(location)
         Tint = Color.Lerp(Color.Red, Color.LightYellow, (float)Math.Sin(game.GameTime) + .5f);
         DrawTexture(game.Batch, TextureID.Glow, dest, scale: Constants.TileSizeScale, color: Color.Lerp(Tint, Color.DarkOrange, .8f) * ((float)Math.Cos(game.GameTime) / 8 + .4f));
 
-        LightingManager.SetLight($"TorchDecal_{UID}", Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle, 300, new(50, 10, 0, 150), 0.8f);
+        LightingManager.SetLight($"TorchDecal_{UID}", Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle, 400, new(30, 8, 0, 200), 0.8f);
 
         base.Draw(game);
     }
