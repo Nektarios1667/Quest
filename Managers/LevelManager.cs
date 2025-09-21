@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 
@@ -323,6 +323,17 @@ public class LevelManager
             TileType.WoodWall => new WoodWall(location),
             TileType.Path => new Tiles.Path(location),
             TileType.Lava => new Lava(location),
+            TileType.StoneTiles => new StoneTiles(location),
+            TileType.RedTiles => new RedTiles(location),
+            TileType.OrangeTiles => new OrangeTiles(location),
+            TileType.YellowTiles => new YellowTiles(location),
+            TileType.LimeTiles => new LimeTiles(location),
+            TileType.GreenTiles => new GreenTiles(location),
+            TileType.CyanTiles => new CyanTiles(location),
+            TileType.BlueTiles => new BlueTiles(location),
+            TileType.PurpleTiles => new PurpleTiles(location),
+            TileType.PinkTiles => new PinkTiles(location),
+            TileType.BlackTiles => new BlackTiles(location),
             // TILEFROMID INSERT
             _ => throw new ArgumentException($"Unknown TileFromId TileType '{id}'.")
         };

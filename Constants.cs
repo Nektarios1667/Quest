@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 namespace Quest;
 
 public static class Constants
@@ -80,6 +80,18 @@ public static class Constants
         new(92, 53, 23), // WoodWall
         new(163, 89, 33), // Path
         Color.OrangeRed, // Lava
+        new(118, 128, 133), // StoneTiles
+        Color.LightGray, // StoneTiles
+        Color.Red, // RedTiles
+        Color.Orange, // OrangeTiles
+        Color.Yellow, // YellowTiles
+        Color.Lime, // LimeTiles
+        Color.DarkGreen, // GreenTiles
+        Color.Cyan, // CyanTiles
+        Color.Blue, // BlueTiles
+        Color.Purple, // PurpleTiles
+        Color.Pink, // PinkTiles
+        Color.DarkGray, // BlackTiles
         // MINIMAPCOLORS
     ];
 }

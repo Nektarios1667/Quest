@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 
 namespace Quest.Tiles;
 
@@ -22,6 +22,17 @@ public enum TileType
     WoodWall,
     Path,
     Lava,
+    StoneTiles,
+    RedTiles,
+    OrangeTiles,
+    YellowTiles,
+    LimeTiles,
+    GreenTiles,
+    CyanTiles,
+    BlueTiles,
+    PurpleTiles,
+    PinkTiles,
+    BlackTiles,
     // TILES
 }
 public class Tile

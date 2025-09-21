@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Content;
 
 namespace Quest.Managers;
 
@@ -67,6 +67,17 @@ public static class TextureManager
         Path,
         Lava,
         LavaBorder,
+        StoneTiles,
+        RedTiles,
+        OrangeTiles,
+        YellowTiles,
+        LimeTiles,
+        GreenTiles,
+        CyanTiles,
+        BlueTiles,
+        PurpleTiles,
+        PinkTiles,
+        BlackTiles,
         // TILES ENUM INSERT
         Torch,
         BlueTorch,
@@ -149,6 +160,18 @@ public static class TextureManager
         Textures[TextureID.Path] = content.Load<Texture2D>("Images/Tiles/Path");
         Textures[TextureID.Lava] = content.Load<Texture2D>("Images/Tiles/Lava");
         Textures[TextureID.LavaBorder] = content.Load<Texture2D>("Images/Tiles/LavaBorder");
+        Textures[TextureID.StoneTiles] = content.Load<Texture2D>("Images/Tiles/StoneTiles");
+        Textures[TextureID.StoneTiles] = content.Load<Texture2D>("Images/Tiles/StoneTiles");
+        Textures[TextureID.RedTiles] = content.Load<Texture2D>("Images/Tiles/RedTiles");
+        Textures[TextureID.OrangeTiles] = content.Load<Texture2D>("Images/Tiles/OrangeTiles");
+        Textures[TextureID.YellowTiles] = content.Load<Texture2D>("Images/Tiles/YellowTiles");
+        Textures[TextureID.LimeTiles] = content.Load<Texture2D>("Images/Tiles/LimeTiles");
+        Textures[TextureID.GreenTiles] = content.Load<Texture2D>("Images/Tiles/GreenTiles");
+        Textures[TextureID.CyanTiles] = content.Load<Texture2D>("Images/Tiles/CyanTiles");
+        Textures[TextureID.BlueTiles] = content.Load<Texture2D>("Images/Tiles/BlueTiles");
+        Textures[TextureID.PurpleTiles] = content.Load<Texture2D>("Images/Tiles/PurpleTiles");
+        Textures[TextureID.PinkTiles] = content.Load<Texture2D>("Images/Tiles/PinkTiles");
+        Textures[TextureID.BlackTiles] = content.Load<Texture2D>("Images/Tiles/BlackTiles");
         // TILES INSERT
         Textures[TextureID.Torch] = content.Load<Texture2D>("Images/Decals/Torch");
         Textures[TextureID.BlueTorch] = content.Load<Texture2D>("Images/Decals/BlueTorch");
@@ -225,6 +248,18 @@ public static class TextureManager
         Metadata[TextureID.Path] = new(Textures[TextureID.Path].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Lava] = new(Textures[TextureID.Lava].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.LavaBorder] = new(Textures[TextureID.LavaBorder].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.StoneTiles] = new(Textures[TextureID.StoneTiles].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.StoneTiles] = new(Textures[TextureID.StoneTiles].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.RedTiles] = new(Textures[TextureID.RedTiles].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.OrangeTiles] = new(Textures[TextureID.OrangeTiles].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.YellowTiles] = new(Textures[TextureID.YellowTiles].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.LimeTiles] = new(Textures[TextureID.LimeTiles].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.GreenTiles] = new(Textures[TextureID.GreenTiles].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.CyanTiles] = new(Textures[TextureID.CyanTiles].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.BlueTiles] = new(Textures[TextureID.BlueTiles].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.PurpleTiles] = new(Textures[TextureID.PurpleTiles].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.PinkTiles] = new(Textures[TextureID.PinkTiles].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.BlackTiles] = new(Textures[TextureID.BlackTiles].Bounds.Size, new(4, 4), "tile");
         // TILES METADATA INSERT
         Metadata[TextureID.Torch] = new(Textures[TextureID.Torch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), "decal");
