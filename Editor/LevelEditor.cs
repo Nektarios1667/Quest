@@ -141,7 +141,7 @@ public class LevelEditor : Game
 
         // Movement
         DebugManager.StartBenchmark("InputUpdate");
-        int speedup = InputManager.KeyDown(Keys.LeftAlt) ? 6 : 2;
+        int speedup = InputManager.KeyDown(Keys.LeftControl) ? 0 : (InputManager.KeyDown(Keys.LeftAlt) ? 6 : 2);
         moveX = 0; moveY = 0;
         moveX += InputManager.AnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : 0;
         moveX += InputManager.AnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0;

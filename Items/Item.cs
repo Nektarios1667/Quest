@@ -1,4 +1,4 @@
-﻿namespace Quest.Items;
+namespace Quest.Items;
 public enum ItemType
 {
     ActivePalantir,
@@ -19,6 +19,11 @@ public enum ItemType
     Apple,
     Bread,
     Skull,
+    Cherries,
+    Cheese,
+    Chicken,
+    Potato,
+    Orange,
     // ITEMS
 }
 public class Item

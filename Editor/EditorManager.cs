@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using Quest.Decals;
+using System.IO;
 using System.IO.Compression;
 using System.Text;
 using static Quest.Editor.PopupFactory;
@@ -29,6 +30,7 @@ public class EditorManager
     private TileType Material { get; set; }
     private RenderTarget2D minimap { get; set; }
     private bool rebuildMinimap { get; set; } = true;
+    private DecalType? previousDecal { get; set; } = null;
     public EditorManager(GraphicsDevice graphics, GameManager gameManager, LevelManager levelManager, LevelGenerator levelGenerator, SpriteBatch batch, StringBuilder debugSb)
     {
         this.graphics = graphics;
@@ -298,9 +300,9 @@ public class EditorManager
     public void EditDecals()
     {
         if (InputManager.KeyDown(Keys.LeftShift)) // Delete
-        {
             DeleteDecal();
-        }
+        else if (InputManager.KeyDown(Keys.LeftAlt)) // Paste
+            PasteDecal();
         else // New
             NewDecal();
     }
@@ -323,7 +325,20 @@ public class EditorManager
 
         string name = values[0];
         DecalType decal = Enum.TryParse<DecalType>(name, true, out var dec) ? dec : DecalType.Torch;
+        previousDecal = decal;
         levelManager.Level.Decals.Add(LevelManager.DecalFromId(decal, mouseSelectionCoord));
+    }
+    public void PasteDecal()
+    {
+        // Check
+        if (previousDecal == null) return;
+        if (levelManager.Level.Decals.Count >= 255)
+        {
+            Logger.Error("Maximum number of Decals reached (255).");
+            return;
+        }
+
+        levelManager.Level.Decals.Add(LevelManager.DecalFromId(previousDecal.Value, mouseCoord));
     }
     public void DeleteDecal()
     {

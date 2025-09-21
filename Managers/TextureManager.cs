@@ -48,6 +48,11 @@ public static class TextureManager
         Apple,
         Bread,
         Skull,
+        Cherries,
+        Cheese,
+        Chicken,
+        Potato,
+        Orange,
         // ITEMS ENUM INSERT
         Dirt,
         Flooring,
@@ -152,6 +157,11 @@ public static class TextureManager
         Textures[TextureID.Apple] = content.Load<Texture2D>("Images/Items/Apple");
         Textures[TextureID.Bread] = content.Load<Texture2D>("Images/Items/Bread");
         Textures[TextureID.Skull] = content.Load<Texture2D>("Images/Items/Skull");
+        Textures[TextureID.Cherries] = content.Load<Texture2D>("Images/Items/Cherries");
+        Textures[TextureID.Cheese] = content.Load<Texture2D>("Images/Items/Cheese");
+        Textures[TextureID.Chicken] = content.Load<Texture2D>("Images/Items/Chicken");
+        Textures[TextureID.Potato] = content.Load<Texture2D>("Images/Items/Potato");
+        Textures[TextureID.Orange] = content.Load<Texture2D>("Images/Items/Orange");
         // ITEMS INSERT
         Textures[TextureID.Dirt] = content.Load<Texture2D>("Images/Tiles/Dirt");
         Textures[TextureID.Flooring] = content.Load<Texture2D>("Images/Tiles/Flooring");
@@ -251,6 +261,11 @@ public static class TextureManager
         Metadata[TextureID.Apple] = new(Textures[TextureID.Apple].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Bread] = new(Textures[TextureID.Bread].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Skull] = new(Textures[TextureID.Skull].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Cherries] = new(Textures[TextureID.Cherries].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Cheese] = new(Textures[TextureID.Cheese].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Chicken] = new(Textures[TextureID.Chicken].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Potato] = new(Textures[TextureID.Potato].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Orange] = new(Textures[TextureID.Orange].Bounds.Size, new(1, 1), "item");
         // ITEMS METADATA INSERT
         Metadata[TextureID.Dirt] = new(Textures[TextureID.Dirt].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Flooring] = new(Textures[TextureID.Flooring].Bounds.Size, new(4, 4), "tile");
