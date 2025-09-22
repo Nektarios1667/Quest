@@ -38,7 +38,6 @@ float4 MainPS(VertexShaderOutput input) : COLOR
         float radiusSq = lightSources[i].z * lightSources[i].z;
 
         float weight = saturate(1.0 - (distSq / radiusSq));
-        weight *= weight;
 
         // Reduce skytint
         brightness += lightColors[i].a * weight;

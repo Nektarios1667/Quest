@@ -12,6 +12,7 @@ global using Quest.Utilities;
 global using System;
 global using System.Collections.Generic;
 global using static Quest.Managers.TextureManager;
+using Quest;
 using Quest.Editor;
 using System.Linq;
 
@@ -21,7 +22,7 @@ static class Program
     {
         if (args.Contains("--level-editor"))
         {
-            using var levelEditorApp = new Quest.Editor.LevelEditor();
+            using var levelEditorApp = new LevelEditor();
             levelEditorApp.Run();
         }
         else if (args.Contains("--code-generator"))

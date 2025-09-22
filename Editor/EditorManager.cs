@@ -108,7 +108,7 @@ public class EditorManager
     }
     public void DrawTextInfo()
     {
-        FillRectangle(spriteBatch, new(0, 0, 200, 180), Color.Black * 0.8f);
+        FillRectangle(spriteBatch, new(0, 0, 200, 200), Color.Black * 0.8f);
 
         debugSb.Clear();
         debugSb.Append("FPS: ");
@@ -123,6 +123,11 @@ public class EditorManager
         debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.Camera.X, CameraManager.Camera.Y);
         debugSb.Append("\nTile Below: ");
         debugSb.Append(mouseTile == null ? "none" : mouseTile.Type);
+        if (mouseTile != null)
+        {
+            debugSb.Append("\nMouse Tile: ");
+            debugSb.AppendFormat("{0:0},{1:0}", mouseTile.Location.X, mouseTile.Location.Y);
+        }
         debugSb.Append("\nCoord: ");
         debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.TileCoord.X, CameraManager.TileCoord.Y);
         debugSb.Append("\nLevel: ");

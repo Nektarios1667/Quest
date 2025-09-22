@@ -261,7 +261,7 @@ public class LevelEditor : Game
         if (mouseTile != null)
         {
             TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), Material.ToString());
-            DrawTexture(spriteBatch, texture, mouseTile.Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle, source: new(Point.Zero, Constants.TilePixelSize), scale: 4, color: Constants.SemiTransparent);
+            DrawTexture(spriteBatch, texture, mouseTile.Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle, source: new(Point.Zero, Constants.TilePixelSize), scale: Constants.TileSizeScale, color: Constants.SemiTransparent);
         }
 
         // Tile info
