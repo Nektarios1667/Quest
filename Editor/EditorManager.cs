@@ -204,6 +204,18 @@ public class EditorManager
             else
                 Logger.Error("Chest edit failed.");
         }
+        // Lamp
+        else if (tile is Lamp lamp)
+        {
+            var (success, values) = ShowInputForm("Lamp Editor", [new("Color R", IsByte), new("Color G", IsByte), new("Color B", IsByte), new("Light Strength", IsByte), new("Light Radius", IsUInt16)]);
+            if (!success)
+            {
+                if (!PopupOpen) Logger.Error("Lamp edit failed.");
+                return;
+            }
+            lamp.LightColor = new(byte.Parse(values[0]), byte.Parse(values[1]), byte.Parse(values[2]), byte.Parse(values[3]));
+            lamp.LightRadius = int.Parse(values[4]);
+        }
     }
     public void FloodFill()
     {
@@ -446,6 +458,14 @@ public class EditorManager
             {
                 // Write chest loot
                 writer.Write(chest.LootGeneratorFileName);
+            } else if (tile is Lamp lamp)
+            {
+                // Write lamp data
+                writer.Write(lamp.LightColor.R);
+                writer.Write(lamp.LightColor.G);
+                writer.Write(lamp.LightColor.B);
+                writer.Write(lamp.LightColor.A);
+                writer.Write((ushort)lamp.LightRadius);
             }
 
         }

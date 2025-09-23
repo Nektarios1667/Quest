@@ -96,6 +96,7 @@ public static class Constants
         Color.White, // Snow
         new(107, 169, 197), // Ice
         new(230, 255, 230), // SnowyGrass
+        new(247, 255, 199), // Lamp
         // MINIMAPCOLORS
     ];
 }

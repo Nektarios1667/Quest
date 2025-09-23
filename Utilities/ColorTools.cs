@@ -29,4 +29,9 @@ public static class ColorTools
         float percent = distDay / (distDay + distNight) * 100;
         return 100 - percent;
     }
+
+    public static byte GetMaxComponent(Color color)
+    {
+        return Math.Max(color.R, Math.Max(color.G, color.B));
+    }
 }

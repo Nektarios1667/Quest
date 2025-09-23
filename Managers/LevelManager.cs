@@ -237,10 +237,13 @@ public class LevelManager
             // Extra properties
             Tile tile;
             Point loc = new(i % Constants.MapSize.X, i / Constants.MapSize.X);
+            // Stairs
             if (type == (int)TileType.Stairs)
                 tile = new Stairs(loc, reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
+            // Doors
             else if (type == (int)TileType.Door)
                 tile = new Door(loc, reader.ReadString());
+            // Chests
             else if (type == (int)TileType.Chest)
             {
                 string lootGenFile = reader.ReadString();
@@ -256,6 +259,13 @@ public class LevelManager
                 }
                 else
                     tile = new Chest(loc, lootGen);
+            }
+            // Lamps
+            else if (type == (int)TileType.Lamp)
+            {
+                Color lampTint = new(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
+                int lampRadius = reader.ReadUInt16();
+                tile = new Lamp(loc, lampTint, lampRadius);
             }
             else // Regular tile
                 tile = TileFromId(type, loc);
@@ -339,6 +349,7 @@ public class LevelManager
             TileType.Snow => new Snow(location),
             TileType.Ice => new Ice(location),
             TileType.SnowyGrass => new SnowyGrass(location),
+            TileType.Lamp => new Lamp(location),
             // TILEFROMID INSERT
             _ => throw new ArgumentException($"Unknown TileFromId TileType '{id}'.")
         };

@@ -191,6 +191,11 @@ public static class PopupFactory
         return byte.TryParse(value, out _);
 
     }
+    public static bool IsUInt16(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        return ushort.TryParse(value, out _);
+    }
     public static bool IsScaleValue(string value)
     {
         if (string.IsNullOrWhiteSpace(value)) return false;

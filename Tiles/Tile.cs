@@ -38,6 +38,7 @@ public enum TileType
     Snow,
     Ice,
     SnowyGrass,
+    Lamp,
     // TILES
 }
 public class Tile
