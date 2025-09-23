@@ -382,10 +382,10 @@ public class LevelManager
         Tile? down = GetTile(x, y + 1);
         Tile? up = GetTile(x, y - 1);
 
-        if (left == null || left.Type == tile.Type) mask |= 1; // left
-        if (down == null || down.Type == tile.Type) mask |= 2; // down
-        if (right == null || right.Type == tile.Type) mask |= 4; // right
-        if (up == null || up.Type == tile.Type) mask |= 8; // up
+        if (left == null || left.Type == tile.Type || (tile.IsWall && left.IsWall)) mask |= 1; // left
+        if (down == null || down.Type == tile.Type || (tile.IsWall && down.IsWall)) mask |= 2; // down
+        if (right == null || right.Type == tile.Type || (tile.IsWall && right.IsWall)) mask |= 4; // right
+        if (up == null || up.Type == tile.Type || (tile.IsWall && up.IsWall)) mask |= 8; // up
 
         return mask;
     }

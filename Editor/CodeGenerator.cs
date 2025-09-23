@@ -1,10 +1,11 @@
-﻿using SharpDX.MediaFoundation;
+﻿using MonoGame.Extended;
+using SharpDX.MediaFoundation;
 using System.IO;
 
 namespace Quest.Editor;
 public static class CodeGenerator
 {
-    private const string tileCodeTemplate = "namespace Quest.Tiles;\r\n\r\npublic class $name : Tile\r\n{\r\n    public $name(Point location) : base(location)\r\n    {\r\n        IsWalkable = $iswalkable;\r\n    }\r\n}\r\n";
+    private const string tileCodeTemplate = "namespace Quest.Tiles;\r\n\r\npublic class $name : Tile\r\n{\r\n    public $name(Point location) : base(location)\r\n    {\r\n        IsWalkable = $iswalkable;\r\n$iswall    }\r\n}\r\n";
     private const string decalCodeTemplate = "namespace Quest.Decals;\r\npublic class $name(Point location) : Decal(location) {}\r\n";
     private const string itemCodeTemplate = "namespace Quest.Items;\r\npublic class $name : Item\r\n{\r\n    public $name(int amount) : base(amount)\r\n    {\r\n        MaxAmount = $maxamount;\r\n        Description = \"$description\";\r\n    }\r\n}\r\n";
 
@@ -54,12 +55,13 @@ public static class CodeGenerator
     {
         string? name = Ask("Tile name: ");
         bool isWalkable = Ask("Is Walkable [y/n]: ")?.ToLower() == "y";
+        bool isWall = !isWalkable && Ask("Is Wall [y/n]:")?.ToLower() == "y";
         string? color = Ask("Tile Minimap Color [new(r, g, b)/Color.someColor]: ");
         if (color == null) return;
         if (name == null) return;
 
         // Source code
-        string classSource = tileCodeTemplate.Replace("$name", name).Replace("$iswalkable", isWalkable ? "true" : "false");
+        string classSource = tileCodeTemplate.Replace("$name", name).Replace("$iswalkable", isWalkable ? "true" : "false").Replace("$iswall", isWall ? "        IsWall = true;\r\n" : "");
         File.WriteAllText($"{sourceDirectory}\\Tiles\\{name}.cs", classSource);
 
         // TextureManager TextureID enum

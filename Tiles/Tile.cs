@@ -56,6 +56,7 @@ public class Tile
     public TextureID Texture { get; }
     // Properties - protected setter
     public bool IsWalkable { get; protected set; }
+    public bool IsWall { get; protected set; }
     public TileType Type { get; protected set; }
     // Private 
     protected Color lightCache { get; set; }
@@ -63,6 +64,7 @@ public class Tile
     {
         Location = location;
         IsWalkable = true;
+        IsWall = false;
         Type = (TileType)Enum.Parse(typeof(TileType), GetType().Name);
         Texture = TileToTexture[Type];
         Marked = false;

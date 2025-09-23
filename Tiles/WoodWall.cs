@@ -4,8 +4,9 @@ namespace Quest.Tiles;
 
 public class WoodWall : Tile
 {
-    public WoodWall(Xna.Point location) : base(location)
+    public WoodWall(Point location) : base(location)
     {
         IsWalkable = false;
+        IsWall = true;
     }
 }

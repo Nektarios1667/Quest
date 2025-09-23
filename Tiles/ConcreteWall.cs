@@ -4,8 +4,9 @@ namespace Quest.Tiles;
 
 public class ConcreteWall : Tile
 {
-    public ConcreteWall(Xna.Point location) : base(location)
+    public ConcreteWall(Point location) : base(location)
     {
         IsWalkable = false;
+        IsWall = true;
     }
 }
