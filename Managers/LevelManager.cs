@@ -9,7 +9,7 @@ public class LevelManager
     public List<Level> Levels { get; private set; }
     public Level Level { get; private set; }
     public Color SkyLight { get; private set; }
-
+    public event Action<string> LevelLoaded;
     public static readonly Point lootStackOffset = new(4, 4);
     public LevelManager()
     {
@@ -118,7 +118,10 @@ public class LevelManager
     {
         // Check index
         if (levelIndex < -Levels.Count || levelIndex >= Levels.Count)
-            throw new ArgumentOutOfRangeException(nameof(levelIndex), "Invalid level index.");
+        {
+            Logger.Error("Invalid level index.");
+            return;
+        }
 
         // Close dialogs
         if (Level != null)
@@ -136,6 +139,7 @@ public class LevelManager
 
         // MiniMap
         gameManager.UIManager.RefreshMiniMap();
+        LevelLoaded?.Invoke(Level.Name);
 
         // Spawn
         CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
@@ -200,14 +204,15 @@ public class LevelManager
             }
         }
         // If not found throw an error
-        Logger.Error($"Level '{levelName}' not found in stored levels. Make sure the level file has been read before unloading.", true);
+        Logger.Error($"Level '{levelName}' not found in stored levels.", true);
     }
-    public void ReadLevel(UIManager uiManager, string filename)
+    public void ReadLevel(UIManager uiManager, string filename, bool reload = false)
     {
         // Check if already read
-        foreach (Level level in Levels)
-            if (level.Name == filename)
-                return;
+        if (!reload)
+            foreach (Level level in Levels)
+                if (level.Name == filename)
+                    return;
 
         // Make buffers
         Tile[] tilesBuffer = new Tile[Constants.MapSize.X * Constants.MapSize.Y];
@@ -307,7 +312,10 @@ public class LevelManager
 
         // Make and add the level
         Level created = new(filename, tilesBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, [], tint);
-        Levels.Add(created);
+        if (reload && Levels.Contains(Level))
+            Levels[Levels.IndexOf(Level)] = created;
+        else
+            Levels.Add(created);
         Logger.System($"Successfully read level '{filename}'.");
     }
     public static Tile TileFromId(int id, Point location)

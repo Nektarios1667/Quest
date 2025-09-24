@@ -6,7 +6,11 @@ public static class RandomManager
     const string symbols = "!@#$%^&*()-_=+[]{}|;:'\",.<>?/\\`~";
     const string numbers = "1234567890";
 
-    private static readonly Random random = new();
+    private static Random random = new();
+    public static void SetSeed(int seed)
+    {
+        random = new Random(seed);
+    }
     public static int RandomIntRange(int min, int max)
     {
         return random.Next(min, max);

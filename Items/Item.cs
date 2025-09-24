@@ -1,5 +1,5 @@
 namespace Quest.Items;
-public enum ItemType
+public enum ItemType : byte
 {
     ActivePalantir,
     SteelSword,
@@ -24,6 +24,7 @@ public enum ItemType
     Chicken,
     Potato,
     Orange,
+    Lantern,
     // ITEMS
 }
 public class Item

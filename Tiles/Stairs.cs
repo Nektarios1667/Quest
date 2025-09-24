@@ -13,7 +13,7 @@ public class Stairs : Tile
     public override void OnPlayerEnter(GameManager game, PlayerManager _)
     {
         // Load another level
-        game.LevelManager.ReadLevel(game.UIManager, DestLevel);
+        game.LevelManager.ReadLevel(game.UIManager, DestLevel, reload:false);
         game.LevelManager.LoadLevel(game, DestLevel);
         CameraManager.CameraDest = (DestPosition * Constants.TileSize).ToVector2() + new Vector2(Constants.TileSize.X / 2, 0);
         CameraManager.Camera = CameraManager.CameraDest;

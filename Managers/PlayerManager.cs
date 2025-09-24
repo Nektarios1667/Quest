@@ -225,12 +225,14 @@ public class PlayerManager : IContainer
     }
     public void CloseContainer()
     {
+        if (OpenedContainer != null || Inventory.Opened)
+            SoundManager.PlaySound("Click");
+
         if (OpenedContainer != null)
             OpenedContainer.Inventory.Opened = false;
         Inventory.Opened = false;
         OpenedContainer = null;
         StateManager.OverlayState = OverlayState.None;
-        SoundManager.PlaySound("Click");
     }
     public void UpdatePositions(GameManager gameManager)
     {

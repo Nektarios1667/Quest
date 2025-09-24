@@ -86,6 +86,7 @@ public class Window : Game
         levelManager = new();
         menuManager = new();
         gameManager = new(Content, spriteBatch, levelManager, uiManager);
+        levelManager.LevelLoaded += _ => playerManager.CloseContainer();
         CommandManager.Init(this, gameManager, levelManager, playerManager);
         Pathfinder.Init(gameManager);
         Logger.System("Initialized managers.");
@@ -146,6 +147,12 @@ public class Window : Game
         playerManager.Update(gameManager);
         levelManager.Update(gameManager);
         uiManager.Update(gameManager);
+
+        // Save/load
+        if (InputManager.KeyPressed(Keys.F1))
+            StateManager.SaveGameState(gameManager, playerManager);
+        else if (InputManager.KeyPressed(Keys.F2))
+            StateManager.ReadGameState(gameManager, playerManager);
 
         // Console commands
         if (Constants.COMMANDS && InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.OemTilde))

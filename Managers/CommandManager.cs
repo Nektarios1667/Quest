@@ -14,7 +14,7 @@ public static class CommandManager
         public string Failure { get; private set; } = failure;
 
         public bool IsCommand(string command) => command.Split(' ')[0] == Name;
-        public bool Matches(string command) { return CommandManager.CommandCheck(command, Pattern); }
+        public bool Matches(string command) { return CommandCheck(command, Pattern); }
         public (bool success, string output) TryExecute(string command)
         {
             // Replace parts
@@ -218,7 +218,7 @@ public static class CommandManager
             }
             else if (parts[1] == "read")
             {
-                levelManager!.ReadLevel(gameManager!.UIManager, parts[2]);
+                levelManager!.ReadLevel(gameManager!.UIManager, parts[2], reload:true);
                 return true;
             }
             else if (parts[1] == "open")

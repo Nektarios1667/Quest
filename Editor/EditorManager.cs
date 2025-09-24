@@ -457,7 +457,7 @@ public class EditorManager
             else if (tile is Chest chest)
             {
                 // Write chest loot
-                writer.Write(chest.LootGeneratorFileName);
+                writer.Write(chest.LootGenerator.FileName);
             } else if (tile is Lamp lamp)
             {
                 // Write lamp data
@@ -545,7 +545,7 @@ public class EditorManager
         string filename = values[0];
         try
         {
-            levelManager.ReadLevel(gameManager.UIManager, filename);
+            levelManager.ReadLevel(gameManager.UIManager, filename, reload:true);
             levelManager.LoadLevel(gameManager, filename);
             Logger.Log($"Opened level '{filename}'.");
         }

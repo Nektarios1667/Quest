@@ -270,7 +270,7 @@ public class LevelEditor : Game
         else if (mouseTile is Door door)
             DrawBottomInfo($"[Door] key: '{door.Key}'");
         else if (mouseTile is Chest chest)
-            DrawBottomInfo($"[Chest] gen: '{chest.LootGeneratorFileName}'");
+            DrawBottomInfo($"[Chest] gen: '{chest.LootGenerator.FileName}'");
         else if (mouseTile is Lamp lamp)
             DrawBottomInfo($"[Lamp] color: {lamp.LightColor} | radius: {lamp.LightRadius}");
         else

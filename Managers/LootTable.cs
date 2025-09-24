@@ -20,7 +20,7 @@ public class LootTableEntry
 public interface ILootGenerator
 {
     public string FileName { get; }
-    public Inventory Generate(int width, int height);
+    public Inventory Generate(int width, int height, int seed = -1);
 }
 
 public class LootPreset : ILootGenerator
@@ -33,7 +33,7 @@ public class LootPreset : ILootGenerator
         Preset = items;
         FileName = filename;
     }
-    public Inventory Generate(int width, int height) => new(width, height, ArrayTools.Resize2DArray(Preset, width, height));
+    public Inventory Generate(int width, int height, int seed = -1) => new(width, height, ArrayTools.Resize2DArray(Preset, width, height));
     public static LootPreset ReadLootPreset(string file)
     {
         // Check
@@ -79,8 +79,11 @@ public class LootTable : ILootGenerator
         Entries = entries;
         FileName = fileName;
     }
-    public Inventory Generate(int width, int height)
+    public Inventory Generate(int width, int height, int seed = -1)
     {
+        if (seed != -1)
+            RandomManager.SetSeed(seed);
+
         Inventory inv = new(width, height);
         foreach (var table in Entries)
         {
@@ -134,5 +137,19 @@ public class LootTable : ILootGenerator
             }
         }
         return new(entries, file);
+    }
+}
+
+public static class LootGeneratorHelper
+{
+    public static ILootGenerator Read(string file)
+    {
+        if (file.EndsWith(".qlt"))
+            return LootTable.ReadLootTable(file);
+        else if (file.EndsWith(".qlp"))
+            return LootPreset.ReadLootPreset(file);
+        else 
+            Logger.Error($"Failed to read loot generator '{file}'. Expected .qlt or .qlp file.");
+        return LootPreset.EmptyPreset;
     }
 }

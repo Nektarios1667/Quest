@@ -1,0 +1,46 @@
+tintR - byte
+tintG - byte
+tintB - byte
+tintA - byte
+
+spawnX - byte
+spawnY - byte
+
+[for each tile (65536)]
+	tileId - byte
+
+	(special)
+	door:
+		keyName - string
+	stairs:
+		destLevel - string
+		destX - byte
+		destY - byte
+	chest:
+		lootGeneratorFile - string
+
+npcNumber - byte
+[for each npc (<256)]
+	npcName - string
+	npcDialog - string
+	npcX - byte
+	npcY - byte
+	npcSize - byte (x10)
+	npcColorR - byte
+	npcColorG - byte
+	npcColorB - byte
+
+lootNumber - byte
+[for each loot (<256)]
+	lootItemName - string
+	lootItemDescription - string
+	lootItemAmount - byte
+	lootItemMax - byte
+	lootX - byte
+	lootY - byte
+
+decalNumber - byte
+[for each decal (<256)]
+	decalType - byte
+	decalX - uint16
+	decalY - uint16

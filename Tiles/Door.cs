@@ -32,6 +32,7 @@ public class Door : Tile
                 SoundManager.PlaySoundInstance("DoorUnlock");
             }
             IsWalkable = true;
+            StateManager.SaveDoorOpened(TileID);
         }
         else
         {
@@ -46,5 +47,13 @@ public class Door : Tile
                 TimerManager.SetTimer(timerName, 5, null);
             }
         }
+    }
+    public void Open()
+    {
+        IsWalkable = true;
+    }
+    public void Close()
+    {
+        IsWalkable = false;
     }
 }

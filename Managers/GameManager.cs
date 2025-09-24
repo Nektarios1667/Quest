@@ -44,8 +44,7 @@ public class GameManager
     public void Respawn()
     {
         string level = LevelManager.Level.Name;
-        LevelManager.UnloadLevel(level);
-        LevelManager.ReadLevel(UIManager, level);
+        LevelManager.ReadLevel(UIManager, level, reload:true);
         LevelManager.LoadLevel(this, level);
 
         UIManager.HealthBar.CurrentValue = UIManager.HealthBar.MaxValue;

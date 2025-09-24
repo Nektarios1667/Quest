@@ -1,4 +1,9 @@
-﻿namespace Quest.Managers;
+﻿using Quest.Entities;
+using Quest.Tiles;
+using System;
+using System.IO;
+
+namespace Quest.Managers;
 public enum GameState
 {
     MainMenu,
@@ -24,4 +29,162 @@ public static class StateManager
     public static GameState State { get; set; } = GameState.MainMenu;
     public static OverlayState OverlayState { get; set; } = OverlayState.None;
     public static Mood Mood { get; set; } = Mood.Calm;
+    // Save State changes
+    private static readonly HashSet<int> openedDoors = [];
+    private static readonly HashSet<Chest> chests = [];
+    public static void SaveDoorOpened(int idx)
+    {
+        openedDoors.Add(idx);
+    }
+    public static void SaveChestGenerator(Chest chest)
+    {
+        chests.Add(chest);
+    }
+    public static void SaveGameState(GameManager gameManager, PlayerManager playerManager)
+    {
+        byte[] data;
+
+        using (var ms = new MemoryStream())
+        using (var writer = new BinaryWriter(ms))
+        {
+            // Write GameManager data
+            writer.Write(gameManager.LevelManager.Level.Name);
+            writer.Write(gameManager.DayTime);
+            // Write CameraManager data
+            writer.Write(CameraManager.CameraDest.X);
+            writer.Write(CameraManager.CameraDest.Y);
+            // Write PlayerManager data
+            writer.Write((byte)gameManager.UIManager.HealthBar.CurrentValue);
+            writer.Write((byte)gameManager.UIManager.HealthBar.MaxValue);
+            // Write LevelManager data
+            // Loot
+            writer.Write((byte)gameManager.LevelManager.Level.Loot.Count);
+            foreach (var loot in gameManager.LevelManager.Level.Loot)
+            {
+                writer.Write((byte)((byte)Enum.Parse(typeof(ItemType), loot.Item, true) + 1));
+                writer.Write((byte)loot.Amount);
+                writer.Write((ushort)loot.Location.X);
+                writer.Write((ushort)loot.Location.Y);
+            }
+            // Chests
+            writer.Write((ushort)chests.Count);
+            foreach (var chest in chests)
+            {
+                writer.Write((ushort)chest.TileID); // TileID
+                writer.Write(chest.Generated); // IsGenerated
+                if (chest.Generated)
+                    for (int y = 0; y < chest.Inventory.Items.GetLength(1); y++)
+                        for (int x = 0; x < chest.Inventory.Items.GetLength(0); x++)
+                            WriteItemData(writer, chest.Inventory.Items[x, y]);
+                else
+                    writer.Write(chest.LootGenerator.FileName);
+            }
+            // Doors
+            writer.Write((ushort)openedDoors.Count);
+            foreach (var idx in openedDoors)
+            {
+                writer.Write((ushort)idx);
+            }
+            // Write Inventory data
+            var inventory = playerManager.Inventory;
+            for (int y = 0; y < inventory.Items.GetLength(1); y++)
+                for (int x = 0; x < inventory.Items.GetLength(0); x++)
+                    WriteItemData(writer, inventory.Items[x, y]);
+            writer.Flush();
+            data = ms.ToArray();
+        }
+        Logger.System("Saved game state.");
+
+        // Write
+        using (var fs = new FileStream("C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\bin\\Release\\net8.0-windows\\World\\Saves\\save.qsv", FileMode.Create, FileAccess.Write))
+            fs.Write(data, 0, data.Length);
+        File.Copy("C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\bin\\Release\\net8.0-windows\\World\\Saves\\save.qsv", "C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\bin\\Debug\\net8.0-windows\\World\\Saves\\save.qsv", true);
+        File.Copy("C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\bin\\Release\\net8.0-windows\\World\\Saves\\save.qsv", "C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\World\\Saves\\save.qsv", true);
+
+        gameManager.UIManager.LootNotifications.AddNotification($"Game Saved", Color.Cyan);
+        Logger.System("Wrote game state to save.qsv.");
+    }
+    public static void ReadGameState(GameManager gameManager, PlayerManager playerManager)
+    {
+        using (var fs = new FileStream("World\\Saves\\save.qsv", FileMode.Open, FileAccess.Read))
+        //using (var gzip = new GZipStream(fs, CompressionMode.Decompress))
+        using (var reader = new BinaryReader(fs))
+        {
+            // Read GameManager data
+            string level = reader.ReadString();
+            gameManager.LevelManager.ReadLevel(gameManager.UIManager, level, reload: true);
+            gameManager.LevelManager.LoadLevel(gameManager, level);
+
+            gameManager.DayTime = reader.ReadSingle();
+            // Read CameraManager data
+            CameraManager.CameraDest = new(reader.ReadSingle(), reader.ReadSingle());
+            CameraManager.Camera = CameraManager.CameraDest;
+            // Read PlayerManager data
+            gameManager.UIManager.HealthBar.CurrentValue = reader.ReadByte();
+            gameManager.UIManager.HealthBar.MaxValue = reader.ReadByte();
+            // Read LevelManager data
+            // Loot
+            byte lootCount = reader.ReadByte();
+            for (int l = 0; l < lootCount; l++)
+            {
+                string name = ((ItemType)reader.ReadByte() - 1).ToString();
+                byte amount = reader.ReadByte();
+                Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
+                gameManager.LevelManager.Level.Loot.Add(new Loot(name, amount, location, 0f));
+            }
+            // Chests
+            ushort chestCount = reader.ReadUInt16();
+            for (int c = 0; c < chestCount; c++)
+            {
+                int idx = reader.ReadUInt16(); // TileID
+                bool isGenerated = reader.ReadBoolean(); // IsGenerated
+                if (gameManager.LevelManager.Level.Tiles[idx] is Chest chest)
+                    if (isGenerated)
+                        for (int s = 0; s < 18; s++)
+                            chest.Inventory.SetSlot(s, ReadItemData(reader));
+                    else
+                        chest.RegenerateLoot(LootGeneratorHelper.Read(reader.ReadString()));
+                else
+                    Logger.Error($"Tile at index {idx} is not a chest.");
+            }
+            // Doors
+            ushort doorCount = reader.ReadUInt16();
+            for (int d = 0; d < doorCount; d++)
+            {
+                int idx = reader.ReadUInt16();
+                if (gameManager.LevelManager.Level.Tiles[idx] is Door door)
+                    door.Open();
+                else
+                    Logger.Error($"Tile at index {idx} is not a door.");
+            }
+            // Read Inventory data
+            for (int s = 0; s < 24; s++)
+            {
+                var item = ReadItemData(reader);
+                playerManager.Inventory.SetSlot(s, item);
+            }
+        }
+
+        gameManager.UIManager.LootNotifications.AddNotification($"Save Loaded", Color.Cyan);
+        Logger.System("Loaded game state from save.qsv.");
+    }
+    public static void ClearSavedState()
+    {
+        openedDoors.Clear();
+        chests.Clear();
+    }
+    public static void WriteItemData(BinaryWriter writer, Item? item)
+    {
+        writer.Write((byte)(item == null ? 0 : (byte)Enum.Parse(typeof(ItemType), item.Name, true) + 1));
+        if (item != null)
+            writer.Write((byte)item.Amount);
+    }
+    public static Item? ReadItemData(BinaryReader reader)
+    {
+        int id = reader.ReadByte();
+        if (id == 0) return null;
+        ItemType itemType = (ItemType)(id - 1);
+        byte amount = reader.ReadByte();
+        return Item.ItemFromItemType(itemType, amount);
+    }
 }
