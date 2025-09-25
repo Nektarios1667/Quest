@@ -35,7 +35,7 @@ public class UIManager
         DebugManager.StartBenchmark("GuiDraw");
 
         // Darkening
-        DrawPostProcessing(gameManager);
+        DrawPostProcessing(gameManager, playerManager);
 
         // Widgets
         LootNotifications.Offset = (CameraManager.CameraDest - CameraManager.Camera).ToPoint();
@@ -55,7 +55,7 @@ public class UIManager
         }
         DebugManager.EndBenchmark("InventoryGuiDraw");
     }
-    public void DrawPostProcessing(GameManager gameManager)
+    public void DrawPostProcessing(GameManager gameManager, PlayerManager? playerManager)
     {
         DebugManager.StartBenchmark("PostProcessing");
 
@@ -68,10 +68,8 @@ public class UIManager
         }
 
         // Guis
-        if (StateManager.OverlayState == OverlayState.Container)
-        {
-            gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * 0.8f);
-        }
+        if (StateManager.OverlayState == OverlayState.Container || StateManager.OverlayState == OverlayState.Pause)
+            gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * 0.6f);
 
         // Death
         if (StateManager.State == GameState.Death)
@@ -80,6 +78,16 @@ public class UIManager
             gameManager.Batch.DrawString(PixelOperator, "YOU DIED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("You died!") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
             gameManager.Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
         }
+
+        // Settings
+        if (StateManager.OverlayState == OverlayState.Pause)
+        {
+            string text = "PAUSED";
+            gameManager.Batch.DrawString(PixelOperator, text, Constants.Middle.ToVector2() - PixelOperator.MeasureString(text) * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
+            text = "Press ESC to resume";
+            gameManager.Batch.DrawString(PixelOperator, text, Constants.Middle.ToVector2() - PixelOperator.MeasureString(text) / 2 + new Vector2(0, 80), Color.White);
+        }
+
         DebugManager.EndBenchmark("PostProcessing");
     }
     public void DrawMiniMap(GraphicsDevice device, GameManager gameManager)

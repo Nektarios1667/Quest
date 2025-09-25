@@ -8,7 +8,7 @@ public class LevelManager
     public List<ILootGenerator> LootGenerators = new();
     public List<Level> Levels { get; private set; }
     public Level Level { get; private set; }
-    public Color SkyLight { get; private set; }
+    public Color SkyLight { get; set; }
     public event Action<string> LevelLoaded;
     public static readonly Point lootStackOffset = new(4, 4);
     public LevelManager()

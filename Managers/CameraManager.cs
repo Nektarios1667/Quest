@@ -8,6 +8,8 @@ public static class CameraManager
     public static Point TileCoord => PlayerFoot / Constants.TileSize;
     public static void Update(float deltaTime)
     {
+        if (StateManager.OverlayState == OverlayState.Pause) return;
+
         DebugManager.StartBenchmark("CameraUpdate");
 
         // Clamp

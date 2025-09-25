@@ -131,7 +131,7 @@ public class Window : Game
         DebugManager.Watch.Restart();
 
         // Exit
-        if (InputManager.KeyDown(Keys.Escape)) Exit();
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.Escape)) Exit();
 
         // Delta
         delta = (float)gameTime.ElapsedGameTime.TotalSeconds;

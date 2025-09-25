@@ -39,6 +39,7 @@ public class PlayerManager : IContainer
     public void Update(GameManager gameManager)
     {
         if (StateManager.State != GameState.Game && StateManager.State != GameState.Editor) return;
+        if (StateManager.OverlayState == OverlayState.Pause) return;
 
         // Update player position
         UpdatePositions(gameManager);

@@ -35,11 +35,26 @@ public class GameManager
     }
     public void Update(float deltaTime)
     {
-        DeltaTime = deltaTime;
-        GameTime += deltaTime;
-        DayTime += deltaTime;
         TotalTime += deltaTime;
-        if (DayTime >= Constants.DayLength) DayTime = 0f;
+
+        // Pause
+        if (InputManager.KeyPressed(Keys.Escape))
+        {
+            if (StateManager.OverlayState == OverlayState.None)
+                StateManager.OverlayState = OverlayState.Pause;
+            else if (StateManager.OverlayState == OverlayState.Pause)
+                StateManager.OverlayState = OverlayState.None;
+        }
+
+        // Time
+        if (StateManager.OverlayState != OverlayState.Pause)
+        {
+            DeltaTime = deltaTime;
+            GameTime += deltaTime;
+            DayTime += deltaTime;
+            if (DayTime >= Constants.DayLength) DayTime = 0f;
+        } else
+            DeltaTime = 0f;
     }
     public void Respawn()
     {
