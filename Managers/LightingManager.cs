@@ -40,7 +40,8 @@ public static class LightingManager
     }
     public static void SetLight(string name, Point pos, int size, Color color, float importance)
     {
-        if (Lights.Count >= MAX_LIGHTS && !Lights.ContainsKey(name)) Logger.Warning($"Lighting has reached max number of lights ({MAX_LIGHTS}). Lights with lower importance will be skipped.");
+        if (Lights.Count >= MAX_LIGHTS && !Lights.ContainsKey(name))
+            Logger.Warning($"Lighting has reached max number of lights ({MAX_LIGHTS}). Lights with lower importance will be skipped.");
         Lights[name] = new(pos, size, color, importance);
         OrderLights();
     }

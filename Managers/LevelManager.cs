@@ -33,6 +33,8 @@ public class LevelManager
     }
     public void Update(GameManager gameManager)
     {
+        if (!StateManager.IsGameState) return;
+
         // Entities
         foreach (NPC npc in Level.NPCs) npc.Update(gameManager);
         foreach (Enemy enemy in Level.Enemies) enemy.Update(gameManager);
@@ -50,13 +52,12 @@ public class LevelManager
     }
     public void Draw(GameManager gameManager)
     {
-        if (StateManager.State == GameState.Game || StateManager.State == GameState.Editor)
-        {
-            DrawTiles(gameManager);
-            DrawDecals(gameManager);
-            DrawLoot(gameManager);
-            DrawCharacters(gameManager);
-        }
+        if (!StateManager.IsGameState) return;
+
+        DrawTiles(gameManager);
+        DrawDecals(gameManager);
+        DrawLoot(gameManager);
+        DrawCharacters(gameManager);
     }
     public void DrawTiles(GameManager gameManager)
     {

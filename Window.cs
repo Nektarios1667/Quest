@@ -84,7 +84,7 @@ public class Window : Game
         playerManager = new();
         uiManager = new();
         levelManager = new();
-        menuManager = new();
+        menuManager = new(this, spriteBatch, Content);
         gameManager = new(Content, spriteBatch, levelManager, uiManager);
         levelManager.LevelLoaded += _ => playerManager.CloseContainer();
         CommandManager.Init(this, gameManager, levelManager, playerManager);
@@ -146,6 +146,7 @@ public class Window : Game
         gameManager.Update(delta);
         playerManager.Update(gameManager);
         levelManager.Update(gameManager);
+        menuManager.Update(gameManager);
         uiManager.Update(gameManager);
 
         // Save/load

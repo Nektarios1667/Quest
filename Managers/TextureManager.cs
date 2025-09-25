@@ -115,6 +115,8 @@ public static class TextureManager
     // Fonts
     public static SpriteFont PixelOperator { get; private set; } = null!;
     public static SpriteFont PixelOperatorBold { get; private set; } = null!;
+    public static SpriteFont PixelOperatorTitle { get; private set; } = null!;
+    public static SpriteFont PixelOperatorSubtitle { get; private set; } = null!;
     public static SpriteFont Arial { get; private set; } = null!;
     public static SpriteFont ArialSmall { get; private set; } = null!;
 
@@ -333,6 +335,8 @@ public static class TextureManager
         // Fonts
         PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");
         PixelOperatorBold = Content.Load<SpriteFont>("Fonts/PixelOperatorBold");
+        PixelOperatorTitle = Content.Load<SpriteFont>("Fonts/PixelOperatorTitle");
+        PixelOperatorSubtitle = Content.Load<SpriteFont>("Fonts/PixelOperatorSubtitle");
         Arial = Content.Load<SpriteFont>("Fonts/Arial");
         ArialSmall = Content.Load<SpriteFont>("Fonts/ArialSmall");
         Logger.System("Successfully loaded fonts.");

@@ -26,6 +26,7 @@ public enum Mood
 }
 public static class StateManager
 {
+    public static bool IsGameState => State == GameState.Game || State == GameState.Editor;
     public static GameState State { get; set; } = GameState.MainMenu;
     public static OverlayState OverlayState { get; set; } = OverlayState.None;
     public static Mood Mood { get; set; } = Mood.Calm;
@@ -96,17 +97,18 @@ public static class StateManager
         Logger.System("Saved game state.");
 
         // Write
-        using (var fs = new FileStream("C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\bin\\Release\\net8.0-windows\\World\\Saves\\save.qsv", FileMode.Create, FileAccess.Write))
+        string saveName = $"save-{gameManager.LevelManager.Level.Name}";
+        using (var fs = new FileStream($"C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\bin\\Release\\net8.0-windows\\World\\Saves\\{saveName}.qsv", FileMode.Create, FileAccess.Write))
             fs.Write(data, 0, data.Length);
-        File.Copy("C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\bin\\Release\\net8.0-windows\\World\\Saves\\save.qsv", "C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\bin\\Debug\\net8.0-windows\\World\\Saves\\save.qsv", true);
-        File.Copy("C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\bin\\Release\\net8.0-windows\\World\\Saves\\save.qsv", "C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\World\\Saves\\save.qsv", true);
+        File.Copy($"C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\bin\\Release\\net8.0-windows\\World\\Saves\\{saveName}.qsv", $"C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\bin\\Debug\\net8.0-windows\\World\\Saves\\{saveName}.qsv", true);
+        File.Copy($"C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\bin\\Release\\net8.0-windows\\World\\Saves\\{saveName}.qsv", $"C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\World\\Saves\\{saveName}.qsv", true);
 
         gameManager.UIManager.LootNotifications.AddNotification($"Game Saved", Color.Cyan);
         Logger.System("Wrote game state to save.qsv.");
     }
     public static void ReadGameState(GameManager gameManager, PlayerManager playerManager)
     {
-        using (var fs = new FileStream("World\\Saves\\save.qsv", FileMode.Open, FileAccess.Read))
+        using (var fs = new FileStream($"World\\Saves\\save-{gameManager.LevelManager.Level.Name}.qsv", FileMode.Open, FileAccess.Read))
         //using (var gzip = new GZipStream(fs, CompressionMode.Decompress))
         using (var reader = new BinaryReader(fs))
         {

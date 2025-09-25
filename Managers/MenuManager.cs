@@ -1,6 +1,30 @@
-﻿namespace Quest.Managers;
+﻿using Microsoft.Xna.Framework.Content;
+using MonoGUI;
+
+namespace Quest.Managers;
 public class MenuManager
 {
+    public GUI MainMenu { get; private set; }
+    public MenuManager(Game window, SpriteBatch batch, ContentManager content)
+    {
+        // Main Menu
+        MainMenu = new(window, batch, PixelOperator);
+        MainMenu.LoadContent(content);
+        Button startButton = new(MainMenu, new(Constants.Middle.X - 150, 300), new(300, 75), Color.White, Color.Black, Color.Gray, () => StateManager.State = GameState.Game, [], text: "Start Game", font: PixelOperatorSubtitle);
+        MainMenu.Widgets = [startButton];
+    }
+    public void Update(GameManager gameManager)
+    {
+        switch (StateManager.State)
+        {
+            case GameState.MainMenu:
+                MainMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                break;
+            case GameState.Settings:
+                // DrawSettings(gameManager);
+                break;
+        }
+    }
     public void Draw(GameManager gameManager)
     {
         switch (StateManager.State)
@@ -11,12 +35,6 @@ public class MenuManager
             case GameState.Settings:
                 // DrawSettings(gameManager);
                 break;
-            case GameState.Game or GameState.Editor:
-                // DrawGame(gameManager);
-                break;
-            case GameState.Death:
-                // DrawDeath(gameManager);
-                break;
         }
     }
     private void DrawMenu(GameManager gameManager)
@@ -24,14 +42,15 @@ public class MenuManager
         // Draw the menu screen
         DebugManager.StartBenchmark("DrawMenu");
         FillRectangle(gameManager.Batch, new(Point.Zero, Constants.Window), Color.Black);
-        gameManager.Batch.DrawString(PixelOperator, "Quest", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Quest") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
-        gameManager.Batch.DrawString(PixelOperator, "Press space to start", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to start") / 2 + new Vector2(0, 80), Color.White);
+        MainMenu.Draw();
+        //gameManager.Batch.DrawString(PixelOperator, "Quest", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Quest") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
+        //gameManager.Batch.DrawString(PixelOperator, "Press space to start", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to start") / 2 + new Vector2(0, 80), Color.White);
 
-        // Check start game
-        if (InputManager.KeyDown(Keys.Space))
-        {
-            StateManager.State = GameState.Game;
-        }
+        //// Check start game
+        //if (InputManager.KeyDown(Keys.Space))
+        //{
+        //    StateManager.State = GameState.Game;
+        //}
         DebugManager.EndBenchmark("DrawMenu");
     }
 }
