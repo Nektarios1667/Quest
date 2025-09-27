@@ -5,6 +5,7 @@ public static class RandomManager
     const string upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const string symbols = "!@#$%^&*()-_=+[]{}|;:'\",.<>?/\\`~";
     const string numbers = "1234567890";
+    public readonly static FastNoiseLite Noise = new();
 
     private static Random random = new();
     public static void SetSeed(int seed)

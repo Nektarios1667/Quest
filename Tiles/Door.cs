@@ -7,6 +7,7 @@ public class Door : Tile
     public Door(Point location, string key, bool consumeKey = true) : base(location)
     {
         IsWalkable = false;
+        IsWall = true;
         Key = key;
         ConsumeKey = consumeKey;
     }

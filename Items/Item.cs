@@ -25,6 +25,12 @@ public enum ItemType : byte
     Potato,
     Orange,
     Lantern,
+    WoodPlanks,
+    Stone,
+    GlassBottle,
+    BottledWater,
+    BottledCloud,
+    BottledStorm,
     // ITEMS
 }
 public class Item

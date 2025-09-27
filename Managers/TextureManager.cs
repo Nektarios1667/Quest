@@ -53,6 +53,12 @@ public static class TextureManager
         Chicken,
         Potato,
         Orange,
+        WoodPlanks,
+        Stone,
+        GlassBottle,
+        BottledWater,
+        BottledCloud,
+        BottledStorm,
         // ITEMS ENUM INSERT
         Dirt,
         Flooring,
@@ -65,7 +71,7 @@ public static class TextureManager
         Darkness,
         Door,
         WoodFlooring,
-        Stone,
+        Rock,
         Chest,
         ConcreteWall,
         WoodWall,
@@ -165,6 +171,12 @@ public static class TextureManager
         Textures[TextureID.Chicken] = content.Load<Texture2D>("Images/Items/Chicken");
         Textures[TextureID.Potato] = content.Load<Texture2D>("Images/Items/Potato");
         Textures[TextureID.Orange] = content.Load<Texture2D>("Images/Items/Orange");
+        Textures[TextureID.WoodPlanks] = content.Load<Texture2D>("Images/Items/WoodPlanks");
+        Textures[TextureID.Rock] = content.Load<Texture2D>("Images/Items/Rock");
+        Textures[TextureID.GlassBottle] = content.Load<Texture2D>("Images/Items/GlassBottle");
+        Textures[TextureID.BottledWater] = content.Load<Texture2D>("Images/Items/BottledWater");
+        Textures[TextureID.BottledCloud] = content.Load<Texture2D>("Images/Items/BottledCloud");
+        Textures[TextureID.BottledStorm] = content.Load<Texture2D>("Images/Items/BottledStorm");
         // ITEMS INSERT
         Textures[TextureID.Dirt] = content.Load<Texture2D>("Images/Tiles/Dirt");
         Textures[TextureID.Flooring] = content.Load<Texture2D>("Images/Tiles/Flooring");
@@ -270,6 +282,12 @@ public static class TextureManager
         Metadata[TextureID.Chicken] = new(Textures[TextureID.Chicken].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Potato] = new(Textures[TextureID.Potato].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Orange] = new(Textures[TextureID.Orange].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.WoodPlanks] = new(Textures[TextureID.WoodPlanks].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Rock] = new(Textures[TextureID.Rock].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.GlassBottle] = new(Textures[TextureID.GlassBottle].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.BottledWater] = new(Textures[TextureID.BottledWater].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.BottledCloud] = new(Textures[TextureID.BottledCloud].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.BottledStorm] = new(Textures[TextureID.BottledStorm].Bounds.Size, new(1, 1), "item");
         // ITEMS METADATA INSERT
         Metadata[TextureID.Dirt] = new(Textures[TextureID.Dirt].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Flooring] = new(Textures[TextureID.Flooring].Bounds.Size, new(4, 4), "tile");

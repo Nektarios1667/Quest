@@ -25,8 +25,17 @@ public enum Mood
     Dark,
     Epic,
 }
+
+public enum Weather {
+    Clear,
+    Rain,
+    Storm,
+}
 public static class StateManager
 {
+    // Weather
+    public static readonly FastNoiseLite WeatherNoise = new();
+    // States
     public static bool IsGameState => State == GameState.Game || State == GameState.Editor;
     public static GameState State { get; set; } = GameState.MainMenu;
     public static OverlayState OverlayState { get; set; } = OverlayState.None;
@@ -34,6 +43,26 @@ public static class StateManager
     // Save State changes
     private static readonly HashSet<int> openedDoors = [];
     private static readonly HashSet<Chest> chests = [];
+    static StateManager()
+    {
+        WeatherNoise.SetSeed(Environment.TickCount);
+        WeatherNoise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+        WeatherNoise.SetFrequency(0.01f);
+        WeatherNoise.SetFractalType(FastNoiseLite.FractalType.FBm);
+        WeatherNoise.SetFractalOctaves(3);
+        WeatherNoise.SetFractalLacunarity(2.0f);
+        WeatherNoise.SetFractalGain(0.5f);
+    }
+    public static Weather CurrentWeather(float time)
+    {
+        float noiseValue = WeatherNoise.GetNoise(time * 0.01f, 0) * 0.5f + 0.5f; // Normalize to [0, 1]
+        if (noiseValue < 0.6f)
+            return Weather.Clear;
+        else if (noiseValue < 0.8f)
+            return Weather.Rain;
+        else
+            return Weather.Storm;
+    }
     public static void SaveDoorOpened(int idx)
     {
         openedDoors.Add(idx);

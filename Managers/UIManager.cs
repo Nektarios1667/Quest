@@ -1,4 +1,5 @@
 ﻿using Quest.Gui;
+using System.Diagnostics.Eventing.Reader;
 
 namespace Quest.Managers;
 public class UIManager
@@ -87,6 +88,13 @@ public class UIManager
             text = "Press ESC to resume";
             gameManager.Batch.DrawString(PixelOperator, text, Constants.Middle.ToVector2() - PixelOperator.MeasureString(text) / 2 + new Vector2(0, 80), Color.White);
         }
+
+        // Weather
+        //Weather weather = StateManager.CurrentWeather(gameManager.GameTime);
+        //if (weather == Weather.Rain)
+        //    gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Blue * 0.1f);
+        //else if (weather == Weather.Storm)
+        //    gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * 0.1f);
 
         DebugManager.EndBenchmark("PostProcessing");
     }
