@@ -1,0 +1,8 @@
+.qlp - Quest Loot Preset file
+
+byte - width
+byte - height
+
+for each entry left->right, up->down:
+    byte - itemID - 0 = empty, 1 = ActivePalantir, ...
+    byte - amount

@@ -30,7 +30,6 @@ public class GameManager
         SoundManager.LoadSound(content, "Typing", "Sounds/Effects/Typing");
         SoundManager.LoadSound(content, "Whoosh", "Sounds/Effects/Whoosh");
         SoundManager.LoadSound(content, "Pickup", "Sounds/Effects/Pickup");
-        SoundManager.LoadSound(content, "Spook", "Sounds/Effects/Spook");
         SoundManager.LoadSound(content, "Swoosh", "Sounds/Effects/Swoosh");
     }
     public void Update(float deltaTime)
@@ -51,7 +50,8 @@ public class GameManager
         {
             DeltaTime = deltaTime;
             GameTime += deltaTime;
-            DayTime += deltaTime;
+            if (StateManager.State == GameState.Game)
+                DayTime += deltaTime;
             if (DayTime >= Constants.DayLength) DayTime = 0f;
         } else
             DeltaTime = 0f;

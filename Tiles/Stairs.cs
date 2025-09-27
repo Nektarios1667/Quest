@@ -13,10 +13,17 @@ public class Stairs : Tile
     public override void OnPlayerEnter(GameManager game, PlayerManager _)
     {
         // Load another level
-        game.LevelManager.ReadLevel(game.UIManager, DestLevel, reload:false);
-        game.LevelManager.LoadLevel(game, DestLevel);
+        bool read = game.LevelManager.ReadLevel(game.UIManager, DestLevel, reload:false);
+        bool loaded = game.LevelManager.LoadLevel(game, DestLevel);
+        if (!read || !loaded)
+        {
+            Logger.Error($"Failed to teleport to level '{DestLevel}'");
+            return;
+        }
+
         CameraManager.CameraDest = (DestPosition * Constants.TileSize).ToVector2() + new Vector2(Constants.TileSize.X / 2, 0);
         CameraManager.Camera = CameraManager.CameraDest;
+
         Logger.System($"Teleporting to level '{DestLevel}' @ {DestPosition.X}, {DestPosition.Y}");
     }
 }

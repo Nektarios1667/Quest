@@ -18,18 +18,6 @@ public class LevelManager
         Tile[] skyTiles = new Tile[256 * 256];
         for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) skyTiles[t] = new Sky(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
         Level = new("", skyTiles, new(128, 128), [], [], [], []);
-
-        // Read loot tables and presets
-        string[] qlp = Directory.GetFiles("World\\Loot", "*.qlp");
-        string[] qlt = Directory.GetFiles("World\\Loot", "*.qlt");
-        foreach (string file in qlp.Concat(qlt).ToArray())
-        {
-            if (file.EndsWith(".qlt"))
-                LootGenerators.Add(LootTable.ReadLootTable(file));
-            else if (file.EndsWith(".qlp"))
-                LootGenerators.Add(LootPreset.ReadLootPreset(file));
-            Logger.System($"Loaded Loot file {file}.");
-        }
     }
     public void Update(GameManager gameManager)
     {
@@ -115,13 +103,13 @@ public class LevelManager
         foreach (Enemy enemy in Level.Enemies) enemy.Draw(gameManager);
         DebugManager.EndBenchmark("CharacterDraws");
     }
-    public void LoadLevel(GameManager gameManager, int levelIndex)
+    public bool LoadLevel(GameManager gameManager, int levelIndex)
     {
         // Check index
         if (levelIndex < -Levels.Count || levelIndex >= Levels.Count)
         {
             Logger.Error("Invalid level index.");
-            return;
+            return false;
         }
 
         // Close dialogs
@@ -145,21 +133,23 @@ public class LevelManager
         // Spawn
         CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
         CameraManager.Camera = CameraManager.CameraDest;
+        return true;
     }
-    public void LoadLevel(GameManager gameManager, string levelName)
+    public bool LoadLevel(GameManager gameManager, string name)
     {
         for (int l = 0; l < Levels.Count; l++)
         {
-            if (Levels[l].Name == levelName)
+            if (Levels[l].Name == name)
             {
                 LoadLevel(gameManager, l);
-                return;
+                return true; ;
             }
         }
         // If not found throw an error
-        Logger.Error($"Level '{levelName}' not found in stored levels. Make sure the level file has been read before loading.", false);
+        Logger.Error($"Level '{name}' not found in stored levels.");
+        return false;
     }
-    public void LoadLevelObject(GameManager gameManager, Level level)
+    public bool LoadLevelObject(GameManager gameManager, Level level)
     {
         // Close dialogs
         if (Level != null)
@@ -181,39 +171,86 @@ public class LevelManager
         CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
         CameraManager.Camera = CameraManager.CameraDest;
         Logger.System($"Loaded level '{level.Name}'.");
+        return true;
     }
-    public void UnloadLevel(int levelIndex)
+    public bool UnloadLevel(int levelIndex)
     {
         // Check index
         if (levelIndex < 0 || levelIndex >= Levels.Count)
-            throw new ArgumentOutOfRangeException(nameof(levelIndex), "Invalid level index.");
+        {
+            Logger.Error($"Invalid level index {levelIndex}.");
+            return false;
+        }
         // Unload the level
         string name = Levels[levelIndex].Name;
         if (Level == Levels[levelIndex])
             Level = new("null", [], new Point(128, 128), [], [], [], []);
+
         Levels.RemoveAt(levelIndex);
         Logger.System($"Unloaded level '{name}'.");
+        return true;
     }
-    public void UnloadLevel(string levelName)
+    public bool UnloadLevel(string levelName)
     {
         for (int l = 0; l < Levels.Count; l++)
         {
             if (Levels[l].Name == levelName)
             {
                 UnloadLevel(l);
-                return;
+                return true;
             }
         }
-        // If not found throw an error
-        Logger.Error($"Level '{levelName}' not found in stored levels.", true);
+        
+        Logger.Error($"Level '{levelName}' not found in stored levels.");
+        return false;
     }
-    public void ReadLevel(UIManager uiManager, string filename, bool reload = false)
+    public bool ReadWorld(UIManager uIManager, string folder, bool reload = false)
     {
+        if (!Directory.Exists($"GameData\\Worlds\\{folder}"))
+        {
+            Logger.Error($"World folder '{folder}' does not exist.");
+            return false;
+        }
+
+        // Read loot tables and presets
+        string[] qlp = Directory.GetFiles($"GameData\\Worlds\\{folder}\\loot", "*.qlp");
+        string[] qlt = Directory.GetFiles($"GameData\\Worlds\\{folder}\\loot", "*.qlt");
+        foreach (string file in qlp.Concat(qlt).ToArray())
+        {
+            if (file.EndsWith(".qlt"))
+                LootGenerators.Add(LootTable.ReadLootTable(file));
+            else if (file.EndsWith(".qlp"))
+                LootGenerators.Add(LootPreset.ReadLootPreset(file));
+            Logger.System($"Loaded Loot file {file}.");
+        }
+
+        // Read levels
+        string[] qlv = Directory.GetFiles($"GameData\\Worlds\\{folder}\\levels", "*.qlv");
+        foreach (string file in qlv)
+            ReadLevel(uIManager, $"{folder}\\{System.IO.Path.GetFileNameWithoutExtension(file)}", reload);
+        return true;
+    }
+    public bool ReadLevel(UIManager uiManager, string filename, bool reload = false)
+    {
+        // File checks
+        string[] splitPath = filename.Split('\\', '/');
+        if (splitPath.Length != 2)
+        {
+            Logger.Error($"Invalid file format '{filename}.'");
+            return false;
+        }
+        string path = $"GameData\\Worlds\\{splitPath[0]}\\levels\\{splitPath[1]}.qlv";
+        if (!File.Exists(path))
+        {
+            Logger.Error($"Level file '{filename}' does not exist.");
+            return false;
+        }
+
         // Check if already read
         if (!reload)
             foreach (Level level in Levels)
                 if (level.Name == filename)
-                    return;
+                    return true;
 
         // Make buffers
         Tile[] tilesBuffer = new Tile[Constants.MapSize.X * Constants.MapSize.Y];
@@ -222,7 +259,7 @@ public class LevelManager
         List<Decal> decalBuffer = [];
 
         // Context
-        using FileStream fileStream = File.OpenRead($"World/Levels/{filename}.qlv");
+        using FileStream fileStream = File.OpenRead(path);
         using GZipStream gzipStream = new(fileStream, CompressionMode.Decompress);
         using BinaryReader reader = new(gzipStream);
 
@@ -318,6 +355,7 @@ public class LevelManager
         else
             Levels.Add(created);
         Logger.System($"Successfully read level '{filename}'.");
+        return true;
     }
     public static Tile TileFromId(int id, Point location)
     {

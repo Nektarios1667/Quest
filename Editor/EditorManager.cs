@@ -31,6 +31,7 @@ public class EditorManager
     private RenderTarget2D minimap { get; set; }
     private bool rebuildMinimap { get; set; } = true;
     private DecalType? previousDecal { get; set; } = null;
+    private string world = "";
     public EditorManager(GraphicsDevice graphics, GameManager gameManager, LevelManager levelManager, LevelGenerator levelGenerator, SpriteBatch batch, StringBuilder debugSb)
     {
         this.graphics = graphics;
@@ -172,9 +173,14 @@ public class EditorManager
                 if (!PopupOpen) Logger.Error("Stair edit failed.");
                 return;
             }
+            if (values[0].Contains('\\') || values[0].Contains('/'))
+            {
+                Logger.Error("Invalid level format. Stairs can not go to other worlds.");
+                return;
+            }
 
             // Level
-            stairs.DestLevel = values[0];
+            stairs.DestLevel = $"{world}\\{values[0]}";
             stairs.DestPosition = new(int.Parse(values[1]), int.Parse(values[2]));
         }
         // Door
@@ -198,9 +204,9 @@ public class EditorManager
                 return;
             }
             if (values[1] == "Loot Table")
-                chest.RegenerateLoot(LootTable.ReadLootTable($"World\\Loot\\{values[0]}.qlt"));
+                chest.RegenerateLoot(LootTable.ReadLootTable($"GameData\\Worlds\\{world}\\loot\\{values[0]}.qlt"));
             else if (values[1] == "Loot Preset")
-                chest.RegenerateLoot(LootPreset.ReadLootPreset($"World\\Loot\\{values[0]}.qlp"));
+                chest.RegenerateLoot(LootPreset.ReadLootPreset($"GameData\\Worlds\\{world}\\loot\\{values[0]}.qlp"));
             else
                 Logger.Error("Chest edit failed.");
         }
@@ -420,8 +426,16 @@ public class EditorManager
         }
 
         // Parse
-        Directory.CreateDirectory("../../../World/Levels/");
-        using FileStream fileStream = File.Create($"../../../World/Levels/{values[0]}.qlv");
+        if (values[0].Contains('\\') || values[0].Contains('/'))
+        {
+            Logger.Error($"Invalid level format. File will be outputted in world '{world}' as it can not be part of another world.");
+            return;
+        }
+        Directory.CreateDirectory($"../../../GameData/Worlds/{world}");
+        Directory.CreateDirectory($"../../../GameData/Worlds/{world}/levels");
+        Directory.CreateDirectory($"../../../GameData/Worlds/{world}/loot");
+        Directory.CreateDirectory($"../../../GameData/Worlds/{world}/saves");
+        using FileStream fileStream = File.Create($"../../../GameData/Worlds/{world}/levels/{values[0]}.qlv");
         using GZipStream gzipStream = new(fileStream, CompressionLevel.Optimal);
         using BinaryWriter writer = new(gzipStream);
 
@@ -543,6 +557,12 @@ public class EditorManager
 
         // Open
         string filename = values[0];
+        if (!filename.Contains('/') && !filename.Contains('\\'))
+        {
+            Logger.Error("Invalid level name. Use format 'WorldName/LevelName'.");
+            return;
+        }
+        world = filename.Split('\\', '/')[0];
         try
         {
             levelManager.ReadLevel(gameManager.UIManager, filename, reload:true);

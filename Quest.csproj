@@ -38,7 +38,7 @@
 	<PackageReference Include="MonoGUI" Version="1.6.10" />
   </ItemGroup>
 	<ItemGroup>
-		<None Update="World\**\*">
+		<None Update="GameData\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

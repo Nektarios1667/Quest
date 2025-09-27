@@ -37,7 +37,17 @@ public class LootPreset : ILootGenerator
     public static LootPreset ReadLootPreset(string file)
     {
         // Check
-        if (!file.EndsWith(".qlp")) throw new Exception($"Failed to read preset '{file}'. Expected .qlp file.");
+        if (!file.EndsWith(".qlp"))
+        {
+            Logger.Error($"Failed to read preset '{file}'. Expected .qlp file.");
+            return EmptyPreset;
+        }
+        if (!File.Exists(file))
+        {
+            Logger.Error($"File {file} not found.");
+            return EmptyPreset;
+        }
+
         // Read
         Item?[,] items;
         using (FileStream stream = File.Open(file, FileMode.Open))
@@ -117,8 +127,17 @@ public class LootTable : ILootGenerator
     public static LootTable ReadLootTable(string file)
     {
         // Check
-        if (!file.EndsWith(".qlt")) Logger.Error($"Failed to read preset '{file}'. Expected .qlt file.");
-        if (!File.Exists(file)) Logger.Error($"File {file} not found.", true);
+        if (!file.EndsWith(".qlt"))
+        {
+            Logger.Error($"Failed to read preset '{file}'. Expected .qlt file.");
+            return new([], "");
+        }
+        if (!File.Exists(file))
+        {
+            Logger.Error($"File {file} not found.");
+            return new([], "");
+        }
+
         // Read
         List<LootTableEntry> entries = new();
         using (FileStream stream = File.Open(file, FileMode.Open))

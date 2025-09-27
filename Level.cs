@@ -6,6 +6,7 @@ public class Level
     public List<Decal> Decals { get; private set; }
     public List<NPC> NPCs { get; private set; }
     public string Name { get; private set; }
+    public string World { get; private set; }
     public List<Loot> Loot { get; private set; }
     public Tile[] Tiles { get; private set; }
     public Point Spawn { get; set; }
@@ -14,6 +15,7 @@ public class Level
     {
         // Initialize the level
         Name = name;
+        World = name.Split('\\', '/')[0];
         Tiles = tiles;
         Spawn = spawn;
         NPCs = [.. npcs];

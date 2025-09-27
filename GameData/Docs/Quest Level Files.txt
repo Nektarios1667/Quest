@@ -1,3 +1,6 @@
+.qlv - Quest Level files
+NOTE: .qlv files are gzipped at optimal level
+
 tintR - byte
 tintG - byte
 tintB - byte

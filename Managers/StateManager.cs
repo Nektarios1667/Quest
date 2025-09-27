@@ -1,4 +1,5 @@
-﻿using Quest.Entities;
+﻿using MonoGame.Extended.ECS;
+using Quest.Entities;
 using Quest.Tiles;
 using System;
 using System.IO;
@@ -69,6 +70,8 @@ public static class StateManager
             }
             // Chests
             writer.Write((ushort)chests.Count);
+            writer.Write((byte)Chest.ChestSize.X);
+            writer.Write((byte)Chest.ChestSize.Y);
             foreach (var chest in chests)
             {
                 writer.Write((ushort)chest.TileID); // TileID
@@ -78,7 +81,10 @@ public static class StateManager
                         for (int x = 0; x < chest.Inventory.Items.GetLength(0); x++)
                             WriteItemData(writer, chest.Inventory.Items[x, y]);
                 else
+                {
+                    writer.Write(chest.Seed);
                     writer.Write(chest.LootGenerator.FileName);
+                }
             }
             // Doors
             writer.Write((ushort)openedDoors.Count);
@@ -97,18 +103,18 @@ public static class StateManager
         Logger.System("Saved game state.");
 
         // Write
-        string saveName = $"save-{gameManager.LevelManager.Level.Name}";
-        using (var fs = new FileStream($"C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\bin\\Release\\net8.0-windows\\World\\Saves\\{saveName}.qsv", FileMode.Create, FileAccess.Write))
+        string saveName = $"quicksave";
+        string world = gameManager.LevelManager.Level.World;
+        using (var fs = new FileStream($"../../../GameData/Worlds/{world}\\Saves\\{saveName}.qsv", FileMode.Create, FileAccess.Write))
             fs.Write(data, 0, data.Length);
-        File.Copy($"C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\bin\\Release\\net8.0-windows\\World\\Saves\\{saveName}.qsv", $"C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\bin\\Debug\\net8.0-windows\\World\\Saves\\{saveName}.qsv", true);
-        File.Copy($"C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\bin\\Release\\net8.0-windows\\World\\Saves\\{saveName}.qsv", $"C:\\Users\\nekta\\source\\repos\\CSharp\\Quest\\World\\Saves\\{saveName}.qsv", true);
+        File.Copy($"../../../GameData/Worlds/{world}\\Saves\\{saveName}.qsv", $"GameData/Worlds/{world}/Saves/{saveName}.qsv", true);
 
         gameManager.UIManager.LootNotifications.AddNotification($"Game Saved", Color.Cyan);
         Logger.System("Wrote game state to save.qsv.");
     }
     public static void ReadGameState(GameManager gameManager, PlayerManager playerManager)
     {
-        using (var fs = new FileStream($"World\\Saves\\save-{gameManager.LevelManager.Level.Name}.qsv", FileMode.Open, FileAccess.Read))
+        using (var fs = new FileStream($"GameData\\Worlds\\{gameManager.LevelManager.Level.World}\\saves\\quicksave.qsv", FileMode.Open, FileAccess.Read))
         //using (var gzip = new GZipStream(fs, CompressionMode.Decompress))
         using (var reader = new BinaryReader(fs))
         {
@@ -136,18 +142,38 @@ public static class StateManager
             }
             // Chests
             ushort chestCount = reader.ReadUInt16();
+            byte chestWidth = reader.ReadByte();
+            byte chestHeight = reader.ReadByte();
             for (int c = 0; c < chestCount; c++)
             {
                 int idx = reader.ReadUInt16(); // TileID
                 bool isGenerated = reader.ReadBoolean(); // IsGenerated
                 if (gameManager.LevelManager.Level.Tiles[idx] is Chest chest)
                     if (isGenerated)
-                        for (int s = 0; s < 18; s++)
+                    {
+                        chest.SetGenerated(true);
+                        for (int s = 0; s < chestWidth * chestHeight; s++)
                             chest.Inventory.SetSlot(s, ReadItemData(reader));
+                    }
                     else
+                    {
+                        chest.SetSeed(reader.ReadInt32());
                         chest.RegenerateLoot(LootGeneratorHelper.Read(reader.ReadString()));
+                    }
                 else
+                {
                     Logger.Error($"Tile at index {idx} is not a chest.");
+
+                    // Chew up next bytes
+                    if (isGenerated)
+                        for (int s = 0; s < chestWidth * chestHeight; s++)
+                            ReadItemData(reader);
+                    else
+                    {
+                        reader.ReadInt32();
+                        reader.ReadString();
+                    }
+                }
             }
             // Doors
             ushort doorCount = reader.ReadUInt16();
