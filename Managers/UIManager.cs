@@ -80,15 +80,6 @@ public class UIManager
             gameManager.Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
         }
 
-        // Settings
-        if (StateManager.OverlayState == OverlayState.Pause)
-        {
-            string text = "PAUSED";
-            gameManager.Batch.DrawString(PixelOperator, text, Constants.Middle.ToVector2() - PixelOperator.MeasureString(text) * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
-            text = "Press ESC to resume";
-            gameManager.Batch.DrawString(PixelOperator, text, Constants.Middle.ToVector2() - PixelOperator.MeasureString(text) / 2 + new Vector2(0, 80), Color.White);
-        }
-
         // Weather
         //Weather weather = StateManager.CurrentWeather(gameManager.GameTime);
         //if (weather == Weather.Rain)

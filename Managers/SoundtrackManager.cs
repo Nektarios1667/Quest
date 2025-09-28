@@ -9,7 +9,6 @@ public class Soundtrack(string file, Mood mood)
 }
 public static class SoundtrackManager
 {
-    public static float MusicVolume { get; set; } = 1f;
     public static Soundtrack? Playing { get; private set; }
     private static Soundtrack[] Soundtracks { get; set; } = [];
     private static Dictionary<Mood, Soundtrack[]> SoundtrackCategories { get; set; } = [];

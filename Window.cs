@@ -85,8 +85,8 @@ public class Window : Game
         playerManager = new();
         uiManager = new();
         levelManager = new();
-        menuManager = new(this, spriteBatch, Content);
         gameManager = new(Content, spriteBatch, levelManager, uiManager);
+        menuManager = new(this, spriteBatch, Content, gameManager, playerManager);
         levelManager.LevelLoaded += _ => playerManager.CloseContainer();
         CommandManager.Init(this, gameManager, levelManager, playerManager);
         Pathfinder.Init(gameManager);
@@ -95,7 +95,8 @@ public class Window : Game
         // Levels
         levelManager.ReadWorld(gameManager.UIManager, "islands");
         levelManager.ReadWorld(gameManager.UIManager, "house");
-        levelManager.LoadLevel(gameManager, "islands\\islands");
+        //levelManager.LoadLevel(gameManager, "islands\\islands");
+        menuManager.RefreshWorldList();
         Logger.System("Loaded levels.");
 
         // Shaders
@@ -151,9 +152,9 @@ public class Window : Game
 
         // Save/load
         if (InputManager.KeyPressed(Keys.F1))
-            StateManager.SaveGameState(gameManager, playerManager);
+            StateManager.SaveGameState(gameManager, playerManager, Logger.Input("Save name: "));
         else if (InputManager.KeyPressed(Keys.F2))
-            StateManager.ReadGameState(gameManager, playerManager);
+            StateManager.ReadGameState(gameManager, playerManager, Logger.Input("Save name: "));
 
         // Console commands
         if (Constants.COMMANDS && InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.OemTilde))
@@ -205,7 +206,7 @@ public class Window : Game
 
         // Draw overlays
         uiManager.Draw(GraphicsDevice, gameManager, playerManager);
-        menuManager.Draw(gameManager);
+        menuManager.Draw();
 
         // Text info
         DebugManager.StartBenchmark("DebugTextDraw");

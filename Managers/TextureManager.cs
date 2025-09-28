@@ -28,6 +28,7 @@ public static class TextureManager
         GuiBackground,
         Slot,
         Speech,
+        MenuBackground,
         // GUI ENUM INSERT
         Lantern,
         Pickaxe,
@@ -120,6 +121,7 @@ public static class TextureManager
     private static Texture2D Pixel { get; set; } = null!;
     // Fonts
     public static SpriteFont PixelOperator { get; private set; } = null!;
+    public static SpriteFont PixelOperatorLarge { get; private set; } = null!;
     public static SpriteFont PixelOperatorBold { get; private set; } = null!;
     public static SpriteFont PixelOperatorTitle { get; private set; } = null!;
     public static SpriteFont PixelOperatorSubtitle { get; private set; } = null!;
@@ -146,6 +148,7 @@ public static class TextureManager
         Textures[TextureID.GuiBackground] = content.Load<Texture2D>("Images/Gui/GuiBackground");
         Textures[TextureID.Slot] = content.Load<Texture2D>("Images/Gui/Slot");
         Textures[TextureID.Speech] = content.Load<Texture2D>("Images/Gui/Speech");
+        Textures[TextureID.MenuBackground] = content.Load<Texture2D>("Images/Gui/MenuBackground");
         // GUI INSERT
         Textures[TextureID.Lantern] = content.Load<Texture2D>("Images/Items/Lantern");
         Textures[TextureID.Pickaxe] = content.Load<Texture2D>("Images/Items/Pickaxe");
@@ -257,6 +260,7 @@ public static class TextureManager
         Metadata[TextureID.GuiBackground] = new(Textures[TextureID.GuiBackground].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.Slot] = new(Textures[TextureID.Slot].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.Speech] = new(Textures[TextureID.Speech].Bounds.Size, new(1, 4), "gui");
+        Metadata[TextureID.MenuBackground] = new(Textures[TextureID.MenuBackground].Bounds.Size, new(1, 1), "gui");
         // GUI METADATA INSERT
         Metadata[TextureID.Lantern] = new(Textures[TextureID.Lantern].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Pickaxe] = new(Textures[TextureID.Pickaxe].Bounds.Size, new(1, 1), "item");
@@ -352,6 +356,7 @@ public static class TextureManager
 
         // Fonts
         PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");
+        PixelOperatorLarge = Content.Load<SpriteFont>("Fonts/PixelOperatorLarge");
         PixelOperatorBold = Content.Load<SpriteFont>("Fonts/PixelOperatorBold");
         PixelOperatorTitle = Content.Load<SpriteFont>("Fonts/PixelOperatorTitle");
         PixelOperatorSubtitle = Content.Load<SpriteFont>("Fonts/PixelOperatorSubtitle");

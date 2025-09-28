@@ -3,6 +3,8 @@
 namespace Quest.Utilities;
 public static class ColorTools
 {
+    public static readonly Color NearBlack = new(35, 35, 35);
+    public static readonly Color GrayBlack = new(90, 90, 90);
     public static readonly List<(float pos, Color color)> stops = [
         (0, Color.Transparent),
         (0.2f, Color.Transparent),

@@ -9,6 +9,8 @@ public enum GameState
 {
     MainMenu,
     Settings,
+    Credits,
+    LevelSelect,
     Game,
     Editor,
     Death,
@@ -37,9 +39,18 @@ public static class StateManager
     public static readonly FastNoiseLite WeatherNoise = new();
     // States
     public static bool IsGameState => State == GameState.Game || State == GameState.Editor;
-    public static GameState State { get; set; } = GameState.MainMenu;
+    private static GameState _state = GameState.MainMenu;
+    public static GameState State {
+        get => _state;
+        set {
+            PreviousState = _state;
+            _state = value;
+        }
+    }
+    public static GameState PreviousState { get; private set; } = GameState.MainMenu;
     public static OverlayState OverlayState { get; set; } = OverlayState.None;
     public static Mood Mood { get; set; } = Mood.Calm;
+    public static string CurrentSave { get; set; } = "";
     // Save State changes
     private static readonly HashSet<int> openedDoors = [];
     private static readonly HashSet<Chest> chests = [];
@@ -52,6 +63,10 @@ public static class StateManager
         WeatherNoise.SetFractalOctaves(3);
         WeatherNoise.SetFractalLacunarity(2.0f);
         WeatherNoise.SetFractalGain(0.5f);
+    }
+    public static void RevertGameState()
+    {
+        State = PreviousState;
     }
     public static Weather CurrentWeather(float time)
     {
@@ -71,7 +86,7 @@ public static class StateManager
     {
         chests.Add(chest);
     }
-    public static void SaveGameState(GameManager gameManager, PlayerManager playerManager)
+    public static void SaveGameState(GameManager gameManager, PlayerManager playerManager, string saveName)
     {
         byte[] data;
 
@@ -132,18 +147,26 @@ public static class StateManager
         Logger.System("Saved game state.");
 
         // Write
-        string saveName = $"quicksave";
         string world = gameManager.LevelManager.Level.World;
-        using (var fs = new FileStream($"../../../GameData/Worlds/{world}\\Saves\\{saveName}.qsv", FileMode.Create, FileAccess.Write))
+        using (var fs = new FileStream($"..\\..\\..\\GameData\\Worlds\\{world}\\saves\\{saveName}.qsv", FileMode.Create, FileAccess.Write))
             fs.Write(data, 0, data.Length);
-        File.Copy($"../../../GameData/Worlds/{world}\\Saves\\{saveName}.qsv", $"GameData/Worlds/{world}/Saves/{saveName}.qsv", true);
+        File.Copy($"..\\..\\..\\GameData\\Worlds\\{world}\\saves\\{saveName}.qsv", $"GameData\\Worlds\\{world}\\saves\\{saveName}.qsv", true);
 
         gameManager.UIManager.LootNotifications.AddNotification($"Game Saved", Color.Cyan);
-        Logger.System("Wrote game state to save.qsv.");
+        Logger.System($"Saved game state to '{saveName}.qsv'.");
     }
-    public static void ReadGameState(GameManager gameManager, PlayerManager playerManager)
+    public static bool ReadGameState(GameManager gameManager, PlayerManager playerManager, string save)
     {
-        using (var fs = new FileStream($"GameData\\Worlds\\{gameManager.LevelManager.Level.World}\\saves\\quicksave.qsv", FileMode.Open, FileAccess.Read))
+        var path = StringTools.ParseLevelPath(save);
+        string file = $"GameData\\Worlds\\{path.world}\\saves\\{path.level}.qsv";
+        if (!File.Exists(file))
+        {
+            Logger.Error($"Save file '{file}' does not exist.");
+            return false;
+        }
+        CurrentSave = save;
+
+        using (var fs = new FileStream(file, FileMode.Open, FileAccess.Read))
         //using (var gzip = new GZipStream(fs, CompressionMode.Decompress))
         using (var reader = new BinaryReader(fs))
         {
@@ -224,6 +247,7 @@ public static class StateManager
 
         gameManager.UIManager.LootNotifications.AddNotification($"Save Loaded", Color.Cyan);
         Logger.System("Loaded game state from save.qsv.");
+        return true;
     }
     public static void ClearSavedState()
     {

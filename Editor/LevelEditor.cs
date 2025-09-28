@@ -11,7 +11,6 @@ public class LevelEditor : Game
     private GameManager gameManager = null!;
     private UIManager uiManager = null!;
     private LevelManager levelManager = null!;
-    private MenuManager menuManager = null!;
     private EditorManager editorManager = null!;
     private GUI gui = null!;
 
@@ -72,7 +71,6 @@ public class LevelEditor : Game
         levelGenerator = new(42, 1f / 64);
         uiManager = new();
         levelManager = new();
-        menuManager = new(this, spriteBatch, Content);
         gameManager = new(Content, spriteBatch, levelManager, uiManager);
         editorManager = new(GraphicsDevice, gameManager, levelManager, levelGenerator, spriteBatch, debugSb);
         StateManager.State = GameState.Editor;
@@ -221,7 +219,6 @@ public class LevelEditor : Game
         TimerManager.Update(gameManager);
         gameManager.Update(delta);
         levelManager.Update(gameManager);
-        menuManager.Update(gameManager);
         uiManager.Update(gameManager);
 
         // Final
@@ -237,7 +234,6 @@ public class LevelEditor : Game
         // Draw game
         levelManager.Draw(gameManager);
         uiManager.Draw(GraphicsDevice, gameManager, null);
-        menuManager.Draw(gameManager);
 
         // Text info
         DebugManager.StartBenchmark("DebugTextDraw");
