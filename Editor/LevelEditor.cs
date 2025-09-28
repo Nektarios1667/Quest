@@ -209,7 +209,7 @@ public class LevelEditor : Game
         if (InputManager.Hotkey(Keys.LeftControl, Keys.G)) editorManager.GenerateLevel();
 
         // Managers
-        if (!PopupFactory.PopupOpen) InputManager.Update();
+        if (!PopupFactory.PopupOpen) InputManager.Update(this);
         DebugManager.Update();
         CameraManager.Update(delta);
         CameraManager.CameraDest = Vector2.Clamp(CameraManager.CameraDest, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());

@@ -87,7 +87,7 @@ public static class StringTools
     }
     public static (string world, string level) ParseLevelPath(string path)
     {
-        string[] parts = path.Split('\\', '/');
+        string[] parts = path.Replace(" - ", "\\").Split('\\', '/');
         if (parts.Length < 2)
         {
             Logger.Error("Invalid level path format. Expected 'World/Level' or 'World\\Level'.", true);

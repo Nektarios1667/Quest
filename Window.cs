@@ -54,7 +54,8 @@ public class Window : Game
         };
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
-        IsFixedTimeStep = false;
+        IsFixedTimeStep = Constants.FPS != -1;
+        TargetElapsedTime = TimeSpan.FromSeconds(Constants.FPS != -1 ? 1d / Constants.FPS : 0);
         Logger.System("Initialized game window object.");
     }
 
@@ -138,7 +139,7 @@ public class Window : Game
         delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
         // Managers
-        InputManager.Update();
+        InputManager.Update(this);
         DebugManager.Update();
         CameraManager.Update(delta);
         TimerManager.Update(gameManager);
@@ -149,12 +150,6 @@ public class Window : Game
         levelManager.Update(gameManager);
         menuManager.Update(gameManager);
         uiManager.Update(gameManager);
-
-        // Save/load
-        if (InputManager.KeyPressed(Keys.F1))
-            StateManager.SaveGameState(gameManager, playerManager, Logger.Input("Save name: "));
-        else if (InputManager.KeyPressed(Keys.F2))
-            StateManager.ReadGameState(gameManager, playerManager, Logger.Input("Save name: "));
 
         // Console commands
         if (Constants.COMMANDS && InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.OemTilde))

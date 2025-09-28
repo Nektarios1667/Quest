@@ -15,6 +15,7 @@ public static class Constants
     public static readonly Point Window = new(1400, 900); // Game window resolution
     public static readonly Rectangle WindowRect = new(Point.Zero, Window); // Game window rectangle
     public static readonly float CameraRigidity = .07f; // Camera smoothing weight
+    public const int FPS = 120;
     public const bool VSYNC = false;
 
     // Tile and map
@@ -43,7 +44,7 @@ public static class Constants
     public static readonly Point[] PlayerCorners = [new(-20, -20), new(20, -20), new(-20, 0), new(20, 0)]; // Player bounding box corners, tl, tr, bl, br
     public static readonly Point PlayerBox = new(PlayerCorners[1].X - PlayerCorners[0].X, PlayerCorners[2].Y - PlayerCorners[1].Y);
     public static readonly Point MageSize = new(80, 80); // Size of the mage sprite in pixels
-    public static readonly Point MageHalfSize = new(40, 40); // Half size of the mage sprite in pixels
+    public static readonly Point MageHalfSize = new(MageSize.X / 2, MageSize.Y / 2); // Half size of the mage sprite in pixels
     public static readonly Point MageDrawShift = new(MageHalfSize.X, 0); // Used for center aligning mages
 
     // Colors

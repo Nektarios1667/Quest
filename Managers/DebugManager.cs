@@ -16,32 +16,32 @@ public static class DebugManager
     public static void Update()
     {
         // Debug
-        if (InputManager.KeyPressed(Keys.F1))
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.F1))
         {
             CollisionDebug = !CollisionDebug;
             Logger.System($"CollisionDebug set to: {CollisionDebug}");
         }
-        if (InputManager.KeyPressed(Keys.F2))
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.F2))
         {
             TextInfo = !TextInfo;
             Logger.System($"TextInfo set to: {TextInfo}");
         }
-        if (InputManager.KeyPressed(Keys.F3))
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.F3))
         {
             FrameInfo = !FrameInfo;
             Logger.System($"FrameInfo set to: {FrameInfo}");
         }
-        if (InputManager.KeyPressed(Keys.F4))
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.F4))
         {
             LogInfo = !LogInfo;
             Logger.System($"LogInfo set to: {LogInfo}");
         }
-        if (InputManager.KeyPressed(Keys.F5))
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.F5))
         {
             FrameBar = !FrameBar;
             Logger.System($"FrameBar set to: {FrameBar}");
         }
-        if (InputManager.KeyPressed(Keys.F6))
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.F6))
         {
             DrawHitboxes = !DrawHitboxes;
             Logger.System($"DrawHitboxes set to: {DrawHitboxes}");
