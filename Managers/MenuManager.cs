@@ -186,8 +186,8 @@ public class MenuManager
     }
     private void DrawMenu()
     {
-        Vector2 loc = Vector2.Zero - InputManager.MousePosition.ToVector2() / 50f;
-        gameManager.Batch.Draw(Textures[TextureID.MenuBackground], loc, null, Color.White, 0f, Vector2.Zero, Constants.Window.ToVector2() / TextureManager.Metadata[TextureID.MenuBackground].Size.ToVector2() + Vector2.One * 0.2f, SpriteEffects.None, 0.0f);
+        Vector2 loc = Vector2.Zero - Vector2.Max(InputManager.MousePosition.ToVector2() / 50f, Vector2.Zero);
+        gameManager.Batch.Draw(Textures[TextureID.MenuBackground], loc, null, Color.White, 0f, Vector2.Zero, Constants.Window.ToVector2() / TextureManager.Metadata[TextureID.MenuBackground].Size.ToVector2() + Vector2.One * 0.3f, SpriteEffects.None, 0.0f);
         MainMenu.Draw();
     }
     private void DrawSettings()
