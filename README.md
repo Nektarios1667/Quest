@@ -37,18 +37,6 @@ Clone the repository:
    cd Quest
    ```
 
-### Level Editor
-  Note: Some actions require input from the console and will block the window from updating.  
-  ***Hotkeys***  
-  - `Ctrl + O` - Open new save file.
-  - `Ctrl + E` - Export current level to save file.
-  - `Ctrl + L` - Modify level options.
-  - `Ctrl + F` - Flood fill area with current selection  
-  ***Mouse Actions***
-  - `Primary` - Draw current selection.
-  - `Middle` - Erase current tile (set to Sky).
-  - `Right` - Modify tile options if applicable.
-
 ### Modifying Constants
 - Constants for the game, rendering, settings, etc are stored in `Constants.cs`  
 - Variables like window size and player movement speed can easily be modifed.  
