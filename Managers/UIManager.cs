@@ -1,7 +1,13 @@
-﻿using Quest.Gui;
+﻿using MonoGame.Extended.Particles.Profiles;
+using Quest.Gui;
+using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
+using System.Linq;
 
 namespace Quest.Managers;
+
+
+
 public class UIManager
 {
     public Gui.Gui Gui { get; private set; } // GUI handler
@@ -80,12 +86,36 @@ public class UIManager
             gameManager.Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
         }
 
-        // Weather
-        //Weather weather = StateManager.CurrentWeather(gameManager.GameTime);
-        //if (weather == Weather.Rain)
-        //    gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Blue * 0.1f);
-        //else if (weather == Weather.Storm)
-        //    gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * 0.1f);
+        // Dijkstra's
+        Point start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
+        Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
+
+        bool[,] blocked = new bool[end.X - start.X + 1, end.Y - start.Y + 1];
+        for (int y = start.Y; y <= end.Y; y++)
+            for (int x = start.X; x <= end.X; x++)
+            {
+                Tile? tile = gameManager.LevelManager.GetTile(x, y);
+                blocked[x - start.X, y - start.Y] = tile == null || (tile.IsWall && !tile.IsWalkable);
+            }
+        DijkstraLightGrid lightGrid = new(end.X - start.X + 1, end.Y - start.Y + 1, blocked);
+        foreach (var light in LightingManager.Lights.Values)
+        {
+            Point lightTile = ((light.Position + CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize) - start;
+            if (lightTile.X >= 0 && lightTile.Y >= 0 && lightTile.X < lightGrid.Width && lightTile.Y < lightGrid.Height)
+                lightGrid.SetLightLevel(lightTile, light.Size / Constants.TileSize.X);
+        }
+        lightGrid.Run();
+
+        for (int y = 0; y < lightGrid.Height; y++)
+        {
+            for (int x = 0; x < lightGrid.Width; x++)
+            {
+                float light = lightGrid.GetLightLevel(x, y);
+                float intensity = Math.Clamp((float)Math.Sqrt(light / 10), 0, 1);
+
+                gameManager.Batch.FillRectangle(new Rectangle((new Point(x, y) + start) * Constants.TileSize + Constants.Middle - CameraManager.Camera.ToPoint(), Constants.TileSize), gameManager.LevelManager.SkyLight * (1 - intensity));
+            }
+        }
 
         DebugManager.EndBenchmark("PostProcessing");
     }

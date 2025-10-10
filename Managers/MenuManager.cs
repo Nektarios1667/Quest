@@ -111,7 +111,10 @@ public class MenuManager
     {
         saves.Items.Clear();
         string[] dir = level.Replace(" - ", "\\").Split('\\', '/');
-        var savesList = Directory.GetFiles($"GameData/Worlds/{dir[0]}/saves", "*.qsv").Select(f => System.IO.Path.GetFileNameWithoutExtension(f)).ToArray();
+        string path = $"GameData/Worlds/{dir[0]}/saves";
+        if (!Directory.Exists(path))
+            Directory.CreateDirectory(path);
+        var savesList = Directory.GetFiles(path, "*.qsv").Select(f => System.IO.Path.GetFileNameWithoutExtension(f)).ToArray();
         saves.AddItems(savesList);
         saves.AddItems("(New Save)");
     }
@@ -209,7 +212,6 @@ public class MenuManager
     private void DrawLevelSelection()
     {
         gameManager.Batch.Draw(Textures[TextureID.MenuBackground], new(0, 0), null, Color.White, 0f, Vector2.Zero, Constants.Window.ToVector2() / TextureManager.Metadata[TextureID.MenuBackground].Size.ToVector2(), SpriteEffects.None, 0.0f);
-        gameManager.Batch.FillRectangle(new(Vector2.Zero, Constants.Window), Color.White * 0.1f);
         LevelSelectMenu.Draw();
     }
     private void DrawPauseMenu()

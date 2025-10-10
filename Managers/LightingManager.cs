@@ -1,6 +1,71 @@
 ﻿using System.Linq;
 
 namespace Quest.Managers;
+
+public class DijkstraLightGrid
+{
+    public int Width { get; }
+    public int Height { get; }
+    public DijkstraLightNode[,] Grid { get; }
+    public DijkstraLightGrid(int width, int height, bool[,] blocked)
+    {
+        Width = width;
+        Height = height;
+
+        Grid = new DijkstraLightNode[width, height];
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                Grid[x, y] = new(this, new(x, y), 0, blocked[x, y]);
+    }
+    public void SetLightLevel(Point pos, int light)
+    {
+        if (pos.X < 0 || pos.Y < 0 || pos.X >= Grid.GetLength(0) || pos.Y >= Grid.GetLength(1)) return;
+        Grid[pos.X, pos.Y] = new(this, pos, light, false);
+    }
+    public void Run()
+    {
+        Grid[Width / 2, Height / 2].UpdateLight();
+    }
+    public float GetLightLevel(Point pos)
+    {
+        if (pos.X < 0 || pos.Y < 0 || pos.X >= Grid.GetLength(0) || pos.Y >= Grid.GetLength(1)) return 0;
+        return Grid[pos.X, pos.Y].LightLevel;
+    }
+    public float GetLightLevel(int x, int y)
+    {
+        if (x < 0 || y < 0 || x >= Grid.GetLength(0) || y >= Grid.GetLength(1)) return 0;
+        return Grid[x, y].LightLevel;
+    }
+}
+
+public class DijkstraLightNode(DijkstraLightGrid grid, Point pos, int light, bool isBlocked)
+{
+    public DijkstraLightGrid Grid { get; } = grid;
+    public Point Position { get; } = pos;
+    public float LightLevel { get; set; } = light;
+    public bool IsVisited { get; private set; } = false;
+    public bool IsBlocked { get; } = isBlocked;
+    public void UpdateLight(float light = -1)
+    {
+        LightLevel = Math.Max(LightLevel, light);
+        IsVisited = true;
+
+        if (IsBlocked) return;
+
+        foreach (Point offset in Constants.NeighborTiles)
+        {
+            Point neighborPos = Position + offset;
+            if (neighborPos.X < 0 || neighborPos.Y < 0 || neighborPos.X >= Grid.Grid.GetLength(0) || neighborPos.Y >= Grid.Grid.GetLength(1)) continue;
+            
+            DijkstraLightNode neighbor = Grid.Grid[neighborPos.X, neighborPos.Y];
+            if (neighbor.IsVisited && neighbor.LightLevel >= LightLevel - 1) continue;
+            float decay = (offset.X == 0 || offset.Y == 0) ? 1 : Constants.SQRT2;
+            float newLight = LightLevel - decay;
+            neighbor.UpdateLight(newLight);
+        }
+
+    }
+}
 public readonly struct RadialLight
 {
     public Point Position { get; }

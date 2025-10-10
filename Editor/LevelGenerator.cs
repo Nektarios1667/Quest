@@ -65,9 +65,8 @@ public class LevelGenerator
         return Noise.GetNoise(x, y);
     }
     public float GetNoise(Point point) => GetNoise(point.X, point.Y);
-    public TileType GetGeneratedTile(int x, int y, float? value = null)
+    public TileType GetGeneratedTile(int x, int y, float value)
     {
-        value ??= GetNormNoise(x, y); // Noise
         foreach (var (min, max, tile) in Terrain.Ranges)
         {
             // Check if value is in range
@@ -76,7 +75,7 @@ public class LevelGenerator
         }
         return TileType.Sky;
     }
-    public TileType GetGeneratedTile(Point point, float? value = null) => GetGeneratedTile(point.X, point.Y, value);
+    public TileType GetGeneratedTile(Point point, float value) => GetGeneratedTile(point.X, point.Y, value);
 
     public Tile[] GenerateTerrain(int width, int height)
     {
