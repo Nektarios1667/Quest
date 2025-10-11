@@ -170,7 +170,8 @@ public class Window : Game
     {
         // Shader updates
         DebugManager.StartBenchmark("ShaderUpdate");
-        Lighting.Parameters["skyColor"].SetValue(gameManager.LevelManager.SkyLight.ToVector4());
+        //Lighting.Parameters["skyColor"].SetValue(gameManager.LevelManager.SkyLight.ToVector4());
+        Lighting.Parameters["skyColor"].SetValue(Color.Transparent.ToVector4());
         Lighting.Parameters["numLights"].SetValue(LightingManager.LightColors.Count);
         Lighting.Parameters["lightSources"].SetValue(LightingManager.LightSources.ToArray());
         Lighting.Parameters["lightColors"].SetValue(LightingManager.LightColors.ToArray());

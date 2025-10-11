@@ -7,10 +7,10 @@ public static class DebugManager
     public static Dictionary<string, double> FrameTimes { get; private set; } = [];
     private static Dictionary<string, float> benchmarkTimes = [];
     public static bool CollisionDebug { get; set; } = false;
-    public static bool TextInfo { get; set; } = false;
-    public static bool FrameInfo { get; set; } = false;
+    public static bool TextInfo { get; set; } = true;
+    public static bool FrameInfo { get; set; } = true;
     public static bool LogInfo { get; set; } = false;
-    public static bool FrameBar { get; set; } = false;
+    public static bool FrameBar { get; set; } = true;
     public static bool DrawHitboxes { get; set; } = false;
 
     public static void Update()

@@ -105,7 +105,7 @@ public class PlayerManager : IContainer
 
         // Player lighting
         if (Inventory.Equipped is Light light)
-            LightingManager.SetLight("PlayerLightItem", Constants.Middle + CameraManager.CameraOffset.ToPoint(), light.LightStrength, light.LightColor, 0.7f);
+            LightingManager.SetLight("PlayerLightItem", CameraManager.PlayerFoot - CameraManager.Camera.ToPoint() + Constants.Middle, light.LightStrength, light.LightColor, 0.7f);
         else
             LightingManager.RemoveLight("PlayerLightItem");
     }

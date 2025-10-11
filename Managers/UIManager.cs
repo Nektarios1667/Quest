@@ -86,18 +86,20 @@ public class UIManager
             gameManager.Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
         }
 
-        // Dijkstra's
+        // Flood fill lighting
         Point start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
         Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
+        int width = end.X - start.X + 1;
+        int height = end.Y - start.Y + 1;
 
         bool[,] blocked = new bool[end.X - start.X + 1, end.Y - start.Y + 1];
-        for (int y = start.Y; y <= end.Y; y++)
-            for (int x = start.X; x <= end.X; x++)
+        for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
             {
-                Tile? tile = gameManager.LevelManager.GetTile(x, y);
-                blocked[x - start.X, y - start.Y] = tile == null || (tile.IsWall && !tile.IsWalkable);
+                Tile? tile = gameManager.LevelManager.GetTile(x + start.X, y + start.Y);
+                blocked[x, y] = tile == null || (tile.IsWall && !tile.IsWalkable);
             }
-        DijkstraLightGrid lightGrid = new(end.X - start.X + 1, end.Y - start.Y + 1, blocked);
+        FloodLightingGrid lightGrid = new(width, height, blocked);
         foreach (var light in LightingManager.Lights.Values)
         {
             Point lightTile = ((light.Position + CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize) - start;
@@ -111,8 +113,8 @@ public class UIManager
             for (int x = 0; x < lightGrid.Width; x++)
             {
                 float light = lightGrid.GetLightLevel(x, y);
-                float intensity = Math.Clamp((float)Math.Sqrt(light / 10), 0, 1);
-
+                float intensity = Math.Clamp(light / 10, 0, 1);
+                intensity = (float)Math.Pow(intensity, 0.8);
                 gameManager.Batch.FillRectangle(new Rectangle((new Point(x, y) + start) * Constants.TileSize + Constants.Middle - CameraManager.Camera.ToPoint(), Constants.TileSize), gameManager.LevelManager.SkyLight * (1 - intensity));
             }
         }

@@ -2,17 +2,17 @@
 
 namespace Quest.Managers;
 
-public class DijkstraLightGrid
+public class FloodLightingGrid
 {
     public int Width { get; }
     public int Height { get; }
-    public DijkstraLightNode[,] Grid { get; }
-    public DijkstraLightGrid(int width, int height, bool[,] blocked)
+    public FloodLightingNode[,] Grid { get; }
+    public FloodLightingGrid(int width, int height, bool[,] blocked)
     {
         Width = width;
         Height = height;
 
-        Grid = new DijkstraLightNode[width, height];
+        Grid = new FloodLightingNode[width, height];
         for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++)
                 Grid[x, y] = new(this, new(x, y), 0, blocked[x, y]);
@@ -24,7 +24,13 @@ public class DijkstraLightGrid
     }
     public void Run()
     {
-        Grid[Width / 2, Height / 2].UpdateLight();
+        for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+            {
+                Grid[x, y].IsVisited = false;
+                if (Grid[x, y].LightLevel > 0)
+                    Grid[x, y].UpdateLight();
+            }
     }
     public float GetLightLevel(Point pos)
     {
@@ -38,12 +44,12 @@ public class DijkstraLightGrid
     }
 }
 
-public class DijkstraLightNode(DijkstraLightGrid grid, Point pos, int light, bool isBlocked)
+public class FloodLightingNode(FloodLightingGrid grid, Point pos, int light, bool isBlocked)
 {
-    public DijkstraLightGrid Grid { get; } = grid;
+    public FloodLightingGrid Grid { get; } = grid;
     public Point Position { get; } = pos;
     public float LightLevel { get; set; } = light;
-    public bool IsVisited { get; private set; } = false;
+    public bool IsVisited { get; set; } = false;
     public bool IsBlocked { get; } = isBlocked;
     public void UpdateLight(float light = -1)
     {
@@ -52,12 +58,12 @@ public class DijkstraLightNode(DijkstraLightGrid grid, Point pos, int light, boo
 
         if (IsBlocked) return;
 
-        foreach (Point offset in Constants.NeighborTiles)
+        foreach (Point offset in Constants.AllNeighborTiles)
         {
             Point neighborPos = Position + offset;
             if (neighborPos.X < 0 || neighborPos.Y < 0 || neighborPos.X >= Grid.Grid.GetLength(0) || neighborPos.Y >= Grid.Grid.GetLength(1)) continue;
             
-            DijkstraLightNode neighbor = Grid.Grid[neighborPos.X, neighborPos.Y];
+            FloodLightingNode neighbor = Grid.Grid[neighborPos.X, neighborPos.Y];
             if (neighbor.IsVisited && neighbor.LightLevel >= LightLevel - 1) continue;
             float decay = (offset.X == 0 || offset.Y == 0) ? 1 : Constants.SQRT2;
             float newLight = LightLevel - decay;

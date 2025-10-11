@@ -28,7 +28,7 @@ public class LevelManager
         foreach (Enemy enemy in Level.Enemies) enemy.Update(gameManager);
 
         // SkyTint
-        SkyLight = (Level.Tint != Color.Transparent ? Level.Tint : ColorTools.GetSkyColor(gameManager.DayTime)) * .8f;
+        SkyLight = (Level.Tint != Color.Transparent ? Level.Tint : ColorTools.GetSkyColor(gameManager.DayTime)) * 0.9f;
 
         // Dynamic lighting
         foreach (Loot loot in Level.Loot)
