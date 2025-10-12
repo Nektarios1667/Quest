@@ -97,7 +97,7 @@ public readonly struct RadialLight
 
 public static class LightingManager
 {
-    const int MAX_LIGHTS = 50;
+    const int MAX_LIGHTS = 50; // New lighting system does not have limit, but shader has a limit
     public static Dictionary<string, RadialLight> Lights { get; private set; } = [];
     public static readonly List<Vector3> LightSources = [];
     public static readonly List<Vector4> LightColors = [];

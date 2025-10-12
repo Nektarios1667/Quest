@@ -4,7 +4,7 @@ namespace Quest.Managers;
 public class GameManager
 {
     public LevelManager LevelManager { get; private set; }
-    public UIManager UIManager { get; private set; }
+    public OverlayManager UIManager { get; private set; }
     public float DeltaTime { get; private set; }
     public float GameTime { get; private set; } = 0f;
     public float TotalTime { get; private set; } = 0f;
@@ -13,7 +13,7 @@ public class GameManager
 
     public Inventory Inventory { get; set; }
 
-    public GameManager(ContentManager content, SpriteBatch batch, LevelManager level, UIManager ui)
+    public GameManager(ContentManager content, SpriteBatch batch, LevelManager level, OverlayManager ui)
     {
         Batch = batch;
         LevelManager = level;

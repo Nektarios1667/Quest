@@ -9,7 +9,7 @@ public class LevelEditor : Game
     private GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch = null!;
     private GameManager gameManager = null!;
-    private UIManager uiManager = null!;
+    private OverlayManager uiManager = null!;
     private LevelManager levelManager = null!;
     private EditorManager editorManager = null!;
     private GUI gui = null!;

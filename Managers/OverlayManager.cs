@@ -8,15 +8,17 @@ namespace Quest.Managers;
 
 
 
-public class UIManager
+public class OverlayManager
 {
     public Gui.Gui Gui { get; private set; } // GUI handler
     public NotificationArea LootNotifications { get; private set; } // Loot pickup notifications
     public StatusBar HealthBar { get; private set; }
     public static readonly Point lootStackOffset = new(4, 4);
     private float deathTime = -1;
+
+    private RenderTarget2D lightMap;
     private RenderTarget2D? minimap;
-    public UIManager()
+    public OverlayManager()
     {
         Gui = new()
         {
@@ -43,6 +45,9 @@ public class UIManager
 
         // Darkening
         DrawPostProcessing(gameManager, playerManager);
+
+        // Lighting
+        DrawLighting(gameManager);
 
         // Widgets
         LootNotifications.Offset = (CameraManager.CameraDest - CameraManager.Camera).ToPoint();
@@ -86,13 +91,19 @@ public class UIManager
             gameManager.Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
         }
 
+        DebugManager.EndBenchmark("PostProcessing");
+    }
+    public void DrawLighting(GameManager gameManager)
+    {
+        DebugManager.StartBenchmark("Lighting");
+
         // Flood fill lighting
         Point start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
         Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
         int width = end.X - start.X + 1;
         int height = end.Y - start.Y + 1;
 
-        bool[,] blocked = new bool[end.X - start.X + 1, end.Y - start.Y + 1];
+        bool[,] blocked = new bool[width, height];
         for (int y = 0; y < height; y++)
             for (int x = 0; x < width; x++)
             {
@@ -119,7 +130,7 @@ public class UIManager
             }
         }
 
-        DebugManager.EndBenchmark("PostProcessing");
+        DebugManager.EndBenchmark("Lighting");
     }
     public void DrawMiniMap(GraphicsDevice device, GameManager gameManager)
     {

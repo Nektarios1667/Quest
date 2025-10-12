@@ -26,10 +26,11 @@ public class MenuManager
         MainMenu = new(window, batch, PixelOperator);
         MainMenu.LoadContent(content, "Images\\Gui");
         Button startButton = new(MainMenu, new(Constants.Middle.X - 150, 300), new(300, 75), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => StateManager.State = GameState.LevelSelect, [], text: "Start", font: PixelOperatorSubtitle, border: 0);
-        Button settingsButton = new(MainMenu, new(Constants.Middle.X - 150, 400), new(300, 75), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => StateManager.State = GameState.Settings, [], text: "Settings", font: PixelOperatorSubtitle, border: 0);
-        Button creditsButton = new(MainMenu, new(Constants.Middle.X - 150, 500), new(300, 75), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => StateManager.State = GameState.Credits, [], text: "Credits", font: PixelOperatorSubtitle, border: 0);
-        Button exitButton = new(MainMenu, new(Constants.Middle.X - 150, 600), new(300, 75), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => window.Exit(), [], text: "Exit", font: PixelOperatorSubtitle, border: 0);
-        MainMenu.Widgets = [startButton, settingsButton, creditsButton, exitButton];
+        Button continueButton = new(MainMenu, new(Constants.Middle.X - 150, 400), new(300, 75), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, ContinueSave, [], text: "Continue", font: PixelOperatorSubtitle, border: 0);
+        Button settingsButton = new(MainMenu, new(Constants.Middle.X - 150, 500), new(300, 75), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => StateManager.State = GameState.Settings, [], text: "Settings", font: PixelOperatorSubtitle, border: 0);
+        Button creditsButton = new(MainMenu, new(Constants.Middle.X - 150, 600), new(300, 75), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => StateManager.State = GameState.Credits, [], text: "Credits", font: PixelOperatorSubtitle, border: 0);
+        Button exitButton = new(MainMenu, new(Constants.Middle.X - 150, 700), new(300, 75), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => window.Exit(), [], text: "Exit", font: PixelOperatorSubtitle, border: 0);
+        MainMenu.Widgets = [startButton, continueButton, settingsButton, creditsButton, exitButton];
 
         // Settings Menu
         SettingsMenu = new(window, batch, PixelOperator);
@@ -91,7 +92,23 @@ public class MenuManager
         
         PauseMenu.Widgets = [resumeButton, quicksaveButton, pauseSettingsButton, mainMenuButton, quitButton, pauseLabel];
     }
+    public void ContinueSave()
+    {
+        if (StateManager.ContinueSave != "")
+        {
+            var (world, save) = StringTools.ParseLevelPath(StateManager.ContinueSave);
 
+            gameManager.LevelManager.ReadLevel(gameManager.UIManager, world, reload: true);
+            gameManager.LevelManager.LoadLevel(gameManager, world);
+            StateManager.ReadGameState(gameManager, playerManager, $"{world}\\{save}");
+
+            StateManager.CurrentSave = StateManager.ContinueSave;
+            StateManager.State = GameState.Game;
+        } else
+        {
+            StateManager.State = GameState.LevelSelect;
+        }
+    }
     public void RefreshWorldList()
     {
         worlds.Items.Clear();

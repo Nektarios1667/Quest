@@ -1,0 +1,6 @@
+.qkv - Quest Key Value files
+
+uint32 - count
+[foreach pair]
+	string - key
+	string - value

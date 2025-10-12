@@ -18,7 +18,7 @@ public class NPC
     private Point tilemap;
     private Point tilesize;
 
-    public NPC(UIManager uiManager, TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1, bool important = true)
+    public NPC(OverlayManager uiManager, TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1, bool important = true)
     {
         HasSpoken = false;
         Important = important;

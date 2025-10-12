@@ -10,7 +10,7 @@ public class Window : Game
     private SpriteBatch spriteBatch;
     private GameManager gameManager;
     private PlayerManager playerManager;
-    private UIManager uiManager;
+    private OverlayManager overlayManager;
     private LevelManager levelManager;
     private MenuManager menuManager;
 
@@ -35,7 +35,8 @@ public class Window : Game
         Color.Purple, new(255, 128, 128), new(128, 255, 128), new(255, 255, 180), new(128, 255, 255),
         Color.Brown, Color.Gray, new(192, 128, 64), new(64, 128, 192), new(192, 192, 64),
         new(64, 192, 128), new(192, 64, 128), new(160, 80, 0), new(80, 160, 0), new(0, 160, 80),
-        new(160, 0, 80), new(96, 96, 192), new(192, 96, 96), new(96, 192, 96), new(192, 192, 96)
+        new(160, 0, 80), new(96, 96, 192), new(192, 96, 96), new(96, 192, 96), new(192, 192, 96),
+        Color.Lime, Color.Cyan, Color.Magenta, Color.Orange, Color.Yellow, Color.Blue, Color.Red
     };
     private float debugUpdateTime;
     private float cacheDelta;
@@ -66,6 +67,8 @@ public class Window : Game
         debugUpdateTime = 0;
         cacheDelta = 0f;
 
+        Exiting += OnExiting;
+
         base.Initialize();
     }
 
@@ -84,9 +87,9 @@ public class Window : Game
 
         // Managers
         playerManager = new();
-        uiManager = new();
+        overlayManager = new();
         levelManager = new();
-        gameManager = new(Content, spriteBatch, levelManager, uiManager);
+        gameManager = new(Content, spriteBatch, levelManager, overlayManager);
         menuManager = new(this, spriteBatch, Content, gameManager, playerManager);
         levelManager.LevelLoaded += _ => playerManager.CloseContainer();
         CommandManager.Init(this, gameManager, levelManager, playerManager);
@@ -149,7 +152,7 @@ public class Window : Game
         playerManager.Update(gameManager);
         levelManager.Update(gameManager);
         menuManager.Update(gameManager);
-        uiManager.Update(gameManager);
+        overlayManager.Update(gameManager);
 
         // Console commands
         if (Constants.COMMANDS && InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.OemTilde))
@@ -168,17 +171,6 @@ public class Window : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        // Shader updates
-        DebugManager.StartBenchmark("ShaderUpdate");
-        //Lighting.Parameters["skyColor"].SetValue(gameManager.LevelManager.SkyLight.ToVector4());
-        Lighting.Parameters["skyColor"].SetValue(Color.Transparent.ToVector4());
-        Lighting.Parameters["numLights"].SetValue(LightingManager.LightColors.Count);
-        Lighting.Parameters["lightSources"].SetValue(LightingManager.LightSources.ToArray());
-        Lighting.Parameters["lightColors"].SetValue(LightingManager.LightColors.ToArray());
-        DebugManager.EndBenchmark("ShaderUpdate");
-
-        // Start shader target
-        GraphicsDevice.SetRenderTarget(ShaderTarget);
         GraphicsDevice.Clear(Color.Magenta);
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
 
@@ -186,22 +178,8 @@ public class Window : Game
         levelManager.Draw(gameManager);
         playerManager.Draw(gameManager);
 
-        spriteBatch.End();
-
-        // Draw shader target
-        DebugManager.StartBenchmark("ShaderDraw");
-        GraphicsDevice.SetRenderTarget(null); // back to screen
-        GraphicsDevice.Clear(Color.Magenta);
-        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, Lighting);
-        spriteBatch.Draw(ShaderTarget, Vector2.Zero, Color.White);
-        DebugManager.EndBenchmark("ShaderDraw");
-
-        // Switch to normal
-        spriteBatch.End();
-        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
-
         // Draw overlays
-        uiManager.Draw(GraphicsDevice, gameManager, playerManager);
+        overlayManager.Draw(GraphicsDevice, gameManager, playerManager);
         menuManager.Draw();
 
         // Text info
@@ -226,6 +204,15 @@ public class Window : Game
         // Final
         spriteBatch.End();
         base.Draw(gameTime);
+    }
+    protected void OnExiting(object? sender, EventArgs args)
+    {
+        Logger.System("Exiting game.");
+
+        if (StateManager.CurrentSave != "")
+            StateManager.WriteKeyValueFile("continue", new() { { "lastSave", StateManager.CurrentSave} });
+
+        Logger.System("Game exited successfully.");
     }
     // For cleaner code
     public void DrawFrameInfo()
@@ -267,7 +254,7 @@ public class Window : Game
         debugSb.Append("\nInventory: ");
         debugSb.Append(playerManager.Inventory.Opened);
         debugSb.Append("\nGUI: ");
-        debugSb.Append(uiManager.Gui.Widgets.Count);
+        debugSb.Append(overlayManager.Gui.Widgets.Count);
         debugSb.Append("\nMood: ");
         debugSb.Append(StateManager.Mood);
         debugSb.Append("\nMusic: ");

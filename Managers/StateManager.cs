@@ -51,6 +51,7 @@ public static class StateManager
     public static OverlayState OverlayState { get; set; } = OverlayState.None;
     public static Mood Mood { get; set; } = Mood.Calm;
     public static string CurrentSave { get; set; } = "";
+    public static string ContinueSave { get; set; } = "";
     // Save State changes
     private static readonly HashSet<int> openedDoors = [];
     private static readonly HashSet<Chest> chests = [];
@@ -63,6 +64,10 @@ public static class StateManager
         WeatherNoise.SetFractalOctaves(3);
         WeatherNoise.SetFractalLacunarity(2.0f);
         WeatherNoise.SetFractalGain(0.5f);
+
+        var continuePersist = ReadKeyValueFile("continue");
+        if (continuePersist.ContainsKey("lastSave"))
+            ContinueSave = continuePersist["lastSave"];
     }
     public static void RevertGameState()
     {
@@ -267,5 +272,45 @@ public static class StateManager
         ItemType itemType = (ItemType)(id - 1);
         byte amount = reader.ReadByte();
         return Item.ItemFromItemType(itemType, amount);
+    }
+    public static Dictionary<string, string> ReadKeyValueFile(string name)
+    {
+        // Check if file exists
+        Directory.CreateDirectory("GameData/Persistent");
+        if (!File.Exists($"GameData/Persistent/{name}.qkv"))
+        {
+            Logger.Error("Quest Key Value file does not exist.");
+            return [];
+        }
+
+        // Read key-value pairs from file
+        Dictionary<string, string> data = [];
+        using (var fs = new FileStream($"GameData/Persistent/{name}.qkv", FileMode.Open, FileAccess.Read))
+        using (var reader = new BinaryReader(fs))
+        {
+
+            uint pairs = reader.ReadUInt32();
+            for (int p = 0; p < pairs; p++)
+            {
+                string key = reader.ReadString();
+                string value = reader.ReadString();
+                data[key] = value;
+            }
+        }
+        return data;
+    }
+    public static void WriteKeyValueFile(string name, Dictionary<string, string> data)
+    {
+        // Write key-value pairs to file
+        using (var fs = new FileStream($"..\\..\\..\\GameData\\Persistent\\{name}.qkv", FileMode.Create, FileAccess.Write))
+        using (var writer = new BinaryWriter(fs))
+        {
+            writer.Write((uint)data.Count);
+            foreach (var pair in data)
+            {
+                writer.Write(pair.Key);
+                writer.Write(pair.Value);
+            }
+        }
     }
 }

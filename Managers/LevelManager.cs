@@ -204,7 +204,7 @@ public class LevelManager
         Logger.Error($"Level '{levelName}' not found in stored levels.");
         return false;
     }
-    public bool ReadWorld(UIManager uIManager, string folder, bool reload = false)
+    public bool ReadWorld(OverlayManager uIManager, string folder, bool reload = false)
     {
         if (!Directory.Exists($"GameData\\Worlds\\{folder}"))
         {
@@ -230,7 +230,7 @@ public class LevelManager
             ReadLevel(uIManager, $"{folder}\\{System.IO.Path.GetFileNameWithoutExtension(file)}", reload);
         return true;
     }
-    public bool ReadLevel(UIManager uiManager, string filename, bool reload = false)
+    public bool ReadLevel(OverlayManager uiManager, string filename, bool reload = false)
     {
         // File checks
         string[] splitPath = filename.Split('\\', '/');
