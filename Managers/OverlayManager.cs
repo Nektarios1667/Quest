@@ -16,9 +16,16 @@ public class OverlayManager
     public static readonly Point lootStackOffset = new(4, 4);
     private float deathTime = -1;
 
-    private RenderTarget2D lightMap;
     private RenderTarget2D? minimap;
-    public OverlayManager()
+
+    // Lighting
+    private FloodLightingGrid lightGrid = new(0, 0, new bool[0, 0]);
+    private bool[,] blocked = new bool[0, 0];
+    private Point start;
+    private const int lightDivisions = 2;
+    private const float invLightDivisions = 1f / lightDivisions;
+    private bool updateLighting = true;
+    public OverlayManager(LevelManager levelManager)
     {
         Gui = new()
         {
@@ -27,6 +34,9 @@ public class OverlayManager
                 LootNotifications = new NotificationArea(Constants.Middle - new Point(0, Constants.MageHalfSize.Y + 15), 5, PixelOperatorBold)
             ]
         };
+
+        //TimerManager.SetTimer("lightingUpdates", 0.05f, () => { RecalculateLighting(levelManager); }, int.MaxValue);
+        CameraManager.CameraMove += (_, _) => updateLighting = true;
     }
     public void Update(GameManager gameManager)
     {
@@ -41,18 +51,16 @@ public class OverlayManager
     }
     public void Draw(GraphicsDevice device, GameManager gameManager, PlayerManager? playerManager)
     {
-        DebugManager.StartBenchmark("GuiDraw");
-
         // Darkening
         DrawPostProcessing(gameManager, playerManager);
 
         // Lighting
-        DrawLighting(gameManager);
+        if (StateManager.State == GameState.Game)
+            DrawLighting(gameManager);
 
         // Widgets
         LootNotifications.Offset = (CameraManager.CameraDest - CameraManager.Camera).ToPoint();
         Gui.Draw(gameManager.Batch);
-        DebugManager.EndBenchmark("GuiDraw");
 
         // Minimap
         if (StateManager.OverlayState == OverlayState.Container)
@@ -95,40 +103,63 @@ public class OverlayManager
     }
     public void DrawLighting(GameManager gameManager)
     {
+
         DebugManager.StartBenchmark("Lighting");
+        if (updateLighting)
+            RecalculateLighting(gameManager.LevelManager);
+        DebugManager.EndBenchmark("Lighting");
 
-        // Flood fill lighting
-        Point start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
-        Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
-        int width = end.X - start.X + 1;
-        int height = end.Y - start.Y + 1;
-
-        bool[,] blocked = new bool[width, height];
-        for (int y = 0; y < height; y++)
-            for (int x = 0; x < width; x++)
-            {
-                Tile? tile = gameManager.LevelManager.GetTile(x + start.X, y + start.Y);
-                blocked[x, y] = tile == null || (tile.IsWall && !tile.IsWalkable);
-            }
-        FloodLightingGrid lightGrid = new(width, height, blocked);
-        foreach (var light in LightingManager.Lights.Values)
-        {
-            Point lightTile = ((light.Position + CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize) - start;
-            if (lightTile.X >= 0 && lightTile.Y >= 0 && lightTile.X < lightGrid.Width && lightTile.Y < lightGrid.Height)
-                lightGrid.SetLightLevel(lightTile, light.Size / Constants.TileSize.X);
-        }
-        lightGrid.Run();
-
+        DebugManager.StartBenchmark("DrawLighting");
+        // Draw shadows
         for (int y = 0; y < lightGrid.Height; y++)
         {
             for (int x = 0; x < lightGrid.Width; x++)
             {
                 float light = lightGrid.GetLightLevel(x, y);
-                float intensity = Math.Clamp(light / 10, 0, 1);
+                float intensity = Math.Clamp(light / (10 * lightDivisions), 0, 1);
                 intensity = (float)Math.Pow(intensity, 0.8);
-                gameManager.Batch.FillRectangle(new Rectangle((new Point(x, y) + start) * Constants.TileSize + Constants.Middle - CameraManager.Camera.ToPoint(), Constants.TileSize), gameManager.LevelManager.SkyLight * (1 - intensity));
+                gameManager.Batch.FillRectangle(new Rectangle((new Point(x, y) + start.Scaled(lightDivisions)) * Constants.TileSize.Scaled(invLightDivisions) + Constants.Middle - CameraManager.Camera.ToPoint(), Constants.TileSize.Scaled(invLightDivisions)), gameManager.LevelManager.SkyLight * (1 - intensity));
             }
         }
+
+        DebugManager.EndBenchmark("DrawLighting");
+    }
+    public void RecalculateLighting(LevelManager levelManager)
+    {
+        updateLighting = false;
+
+        // Flood fill lighting
+        start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
+        Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
+        int tileWidth = end.X - start.X + 1;
+        int tileHeight = end.Y - start.Y + 1;
+
+        int lightWidth = tileWidth * lightDivisions;
+        int lightHeight = tileHeight * lightDivisions;
+
+        if (blocked.GetLength(0) != lightWidth || blocked.GetLength(1) != lightHeight)
+            blocked = new bool[lightWidth, lightHeight];
+        for (int y = 0; y < tileHeight; y++)
+            for (int x = 0; x < tileWidth; x++)
+            {
+                Tile? tile = levelManager.GetTile(x + start.X, y + start.Y);
+                bool isBlocked = tile == null || (tile.IsWall && !tile.IsWalkable);
+                for (int dy = 0; dy < lightDivisions; dy++)
+                    for (int dx = 0; dx < lightDivisions; dx++)
+                        blocked[x * lightDivisions + dx, y * lightDivisions + dy] = isBlocked;
+            }
+        lightGrid = new(lightWidth, lightHeight, blocked);
+        foreach (var light in LightingManager.Lights.Values)
+        {
+            Point lightTile = ((light.Position + CameraManager.Camera.ToPoint() - Constants.Middle).ToVector2() / Constants.TileSize.ToVector2()).ToPoint() - start;
+            if (lightTile.X >= 0 && lightTile.Y >= 0 && lightTile.X < lightGrid.Width && lightTile.Y < lightGrid.Height)
+            {
+                for (int dy = 0; dy < lightDivisions; dy++)
+                    for (int dx = 0; dx < lightDivisions; dx++)
+                        lightGrid.SetLightLevel(lightTile.Scaled(lightDivisions) + new Point(dx, dy), (light.Size * lightDivisions) / Constants.TileSize.X);
+            }
+        }
+        lightGrid.Run();
 
         DebugManager.EndBenchmark("Lighting");
     }

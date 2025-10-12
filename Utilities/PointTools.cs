@@ -10,6 +10,10 @@ public static class PointExtensions
     {
         return PointTools.DistanceSquared(point, other);
     }
+    public static Point Scaled(this Point point, float scale)
+    {
+        return new((int)(point.X * scale), (int)(point.Y * scale));
+    }
 }
 public static class PointTools
 {

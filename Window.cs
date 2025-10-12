@@ -36,7 +36,7 @@ public class Window : Game
         Color.Brown, Color.Gray, new(192, 128, 64), new(64, 128, 192), new(192, 192, 64),
         new(64, 192, 128), new(192, 64, 128), new(160, 80, 0), new(80, 160, 0), new(0, 160, 80),
         new(160, 0, 80), new(96, 96, 192), new(192, 96, 96), new(96, 192, 96), new(192, 192, 96),
-        Color.Lime, Color.Cyan, Color.Magenta, Color.Orange, Color.Yellow, Color.Blue, Color.Red
+        Color.DarkRed, Color.Cyan, Color.Magenta, Color.Orange, Color.Yellow, Color.Blue, Color.Red
     };
     private float debugUpdateTime;
     private float cacheDelta;
@@ -87,8 +87,8 @@ public class Window : Game
 
         // Managers
         playerManager = new();
-        overlayManager = new();
         levelManager = new();
+        overlayManager = new(levelManager);
         gameManager = new(Content, spriteBatch, levelManager, overlayManager);
         menuManager = new(this, spriteBatch, Content, gameManager, playerManager);
         levelManager.LevelLoaded += _ => playerManager.CloseContainer();
@@ -99,7 +99,7 @@ public class Window : Game
         // Levels
         levelManager.ReadWorld(gameManager.UIManager, "islands");
         levelManager.ReadWorld(gameManager.UIManager, "house");
-        //levelManager.LoadLevel(gameManager, "islands\\islands");
+        //levelManager.LoadLevel(gameManager, "islands\\islands");zzzzzzzzzzzzzzzzzzz
         menuManager.RefreshWorldList();
         Logger.System("Loaded levels.");
 

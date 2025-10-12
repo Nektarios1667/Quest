@@ -1,4 +1,5 @@
 ﻿using MonoGUI;
+using Quest.Managers;
 using System.Text;
 
 namespace Quest.Editor;
@@ -69,8 +70,8 @@ public class LevelEditor : Game
 
         // Managers
         levelGenerator = new(42, 1f / 64);
-        uiManager = new();
         levelManager = new();
+        uiManager = new(levelManager);
         gameManager = new(Content, spriteBatch, levelManager, uiManager);
         editorManager = new(GraphicsDevice, gameManager, levelManager, levelGenerator, spriteBatch, debugSb);
         StateManager.State = GameState.Editor;
