@@ -35,7 +35,8 @@ public class OverlayManager
             ]
         };
 
-        //TimerManager.SetTimer("lightingUpdates", 0.05f, () => { RecalculateLighting(levelManager); }, int.MaxValue);
+       
+        TimerManager.SetTimer("lightingUpdates", 0.1f, () => updateLighting = true, int.MaxValue);
         CameraManager.CameraMove += (_, _) => updateLighting = true;
     }
     public void Update(GameManager gameManager)
