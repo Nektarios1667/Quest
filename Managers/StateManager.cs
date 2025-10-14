@@ -30,8 +30,8 @@ public enum Mood
 
 public enum Weather {
     Clear,
-    Rain,
-    Storm,
+    Light,
+    Heavy,
 }
 public static class StateManager
 {
@@ -73,15 +73,16 @@ public static class StateManager
     {
         State = PreviousState;
     }
+    public static float GetWeatherNoiseValue(float time) => WeatherNoise.GetNoise(time, 0) * 0.5f + 0.5f; // Normalize to [0, 1]
     public static Weather CurrentWeather(float time)
     {
-        float noiseValue = WeatherNoise.GetNoise(time * 0.01f, 0) * 0.5f + 0.5f; // Normalize to [0, 1]
+        float noiseValue = GetWeatherNoiseValue(time);
         if (noiseValue < 0.6f)
             return Weather.Clear;
         else if (noiseValue < 0.8f)
-            return Weather.Rain;
+            return Weather.Light;
         else
-            return Weather.Storm;
+            return Weather.Heavy;
     }
     public static void SaveDoorOpened(int idx)
     {

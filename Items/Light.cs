@@ -7,6 +7,6 @@ public class Light : Item
     public Light(int amount) : base(amount)
     {
         Description = "A light source.";
-        LightStrength = 200;
+        LightStrength = 8;
     }
 }

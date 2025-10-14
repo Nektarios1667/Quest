@@ -28,14 +28,34 @@ public class LevelManager
         foreach (Enemy enemy in Level.Enemies) enemy.Update(gameManager);
 
         // SkyTint
-        SkyLight = (Level.Tint != Color.Transparent ? Level.Tint : ColorTools.GetSkyColor(gameManager.DayTime)) * 0.9f;
+        if (Level.Tint != Color.Transparent)
+            SkyLight = Level.Tint;
+        else
+        {
+            Color sky = ColorTools.GetSkyColor(gameManager.DayTime) * 0.9f;
+            
+            Weather weather = StateManager.CurrentWeather(gameManager.GameTime);
+            Color weatherTint = Color.Transparent;
+            Tile tileBelow = GetTile(CameraManager.TileCoord)!;
+            // Weather tints
+            if (weather == Weather.Light && tileBelow is ICold)
+                weatherTint = Color.LightBlue;
+            else if (weather == Weather.Light)
+                weatherTint = Color.CornflowerBlue;
+            else if (weather == Weather.Heavy && tileBelow is ICold)
+                weatherTint = ColorTools.NearWhite;
+            else if (weather == Weather.Heavy)
+                weatherTint = Color.Gray;
+
+            SkyLight = Color.Lerp(sky, weatherTint, weatherTint != Color.Transparent ? 0.5f : 0);
+        }
 
         // Dynamic lighting
         foreach (Loot loot in Level.Loot)
             if (loot.Item == "Lantern")
             {
                 Point loc = loot.Location - CameraManager.Camera.ToPoint() + Constants.Middle + TextureManager.Metadata[loot.Texture].Size;
-                LightingManager.SetLight($"Loot_{loot.UID}", loc, 100, Color.Transparent, 0.6f);
+                LightingManager.SetLight($"Loot_{loot.UID}", loc, 2, Color.Transparent);
             }
     }
     public void Draw(GameManager gameManager)

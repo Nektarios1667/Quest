@@ -6,7 +6,7 @@ public class Lantern : Light
     {
         MaxAmount = 1;
         Description = "A burning lantern used for light.";
-        LightStrength = 400;
+        LightStrength = 5;
         LightColor = new(10, 10, 0, 255);
     }
 }

@@ -17,6 +17,10 @@ public static class PointExtensions
 }
 public static class PointTools
 {
+    public static readonly Point Up = new(0, -1);
+    public static readonly Point Down = new(0, 1);
+    public static readonly Point Left = new(-1, 0);
+    public static readonly Point Right = new(1, 0);
     public static float DistanceSquared(Point a, Point b)
     {
         int dx = a.X - b.X;

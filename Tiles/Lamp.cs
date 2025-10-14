@@ -10,7 +10,7 @@ public class Lamp : Tile
     }
     public int LightRadius { get; set; }
     private Color tintColor;
-    public Lamp(Point location, Color? lightColor = null, int lightRadius = 500) : base(location)
+    public Lamp(Point location, Color? lightColor = null, int lightRadius = 10) : base(location)
     {
         IsWalkable = true;
         LightColor = lightColor ?? new(10, 10, 0, 255);
@@ -30,6 +30,6 @@ public class Lamp : Tile
 
         gameManager.Batch.FillRectangle(new((Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle).ToVector2(), Constants.TileSize), tintColor);
 
-        LightingManager.SetLight($"LampTile_{Location.X}_{Location.Y}", Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle, LightRadius, LightColor, 0.8f);
+        LightingManager.SetLight($"LampTile_{Location.X}_{Location.Y}", Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle, LightRadius, LightColor);
     }
 }

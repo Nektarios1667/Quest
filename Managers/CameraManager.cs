@@ -14,7 +14,6 @@ public static class CameraManager
     public static Vector2 CameraOffset => CameraDest - Camera;
     public static Point PlayerFoot => CameraDest.ToPoint() + new Point(0, Constants.MageHalfSize.Y);
     public static Point TileCoord => PlayerFoot / Constants.TileSize;
-
     // Events
     public static event Action<Vector2, Vector2>? CameraMove;
     public static event Action<Vector2, Vector2>? CameraDestMove;

@@ -1,5 +1,6 @@
 ﻿using Quest.Managers;
 using System.Text;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace Quest;
 public class Window : Game
@@ -262,10 +263,10 @@ public class Window : Game
         debugSb.Append("\nDaylight: ");
         debugSb.AppendFormat("{0:0}%", ColorTools.GetDaylightPercent(gameManager.DayTime));
         debugSb.Append("\nLighting: ");
-        debugSb.Append(LightingManager.LightSources.Count);
+        debugSb.Append(LightingManager.Lights.Count);
         debugSb.Append("\nWeather: ");
         debugSb.Append(StateManager.CurrentWeather(gameManager.GameTime));
-        debugSb.AppendFormat(" [{0:0.00}]", StateManager.WeatherNoise.GetNoise(gameManager.GameTime * 10, 0) * 0.5f + 0.5f);
+        debugSb.AppendFormat(" [{0:0.00}]", StateManager.GetWeatherNoiseValue(gameManager.GameTime));
 
         FillRectangle(spriteBatch, new(0, 0, 220, debugSb.ToString().Split('\n').Length * 20), Color.Black * 0.8f);
         spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);

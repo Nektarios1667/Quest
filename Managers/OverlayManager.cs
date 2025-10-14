@@ -19,7 +19,7 @@ public class OverlayManager
     private RenderTarget2D? minimap;
 
     // Lighting
-    private FloodLightingGrid lightGrid = new(0, 0, new bool[0, 0]);
+    private FloodLightingGrid lightGrid = null!;
     private bool[,] blocked = new bool[0, 0];
     private Point start;
     private const int lightDivisions = 2;
@@ -116,7 +116,7 @@ public class OverlayManager
         {
             for (int x = 0; x < lightGrid.Width; x++)
             {
-                float light = lightGrid.GetLightLevel(x, y);
+                float light = lightGrid.Grid[x, y].LightLevel;
                 float intensity = Math.Clamp(light / (10 * lightDivisions), 0, 1);
                 intensity = (float)Math.Pow(intensity, 0.8);
                 gameManager.Batch.FillRectangle(new Rectangle((new Point(x, y) + start.Scaled(lightDivisions)) * Constants.TileSize.Scaled(invLightDivisions) + Constants.Middle - CameraManager.Camera.ToPoint(), Constants.TileSize.Scaled(invLightDivisions)), gameManager.LevelManager.SkyLight * (1 - intensity));
@@ -138,6 +138,7 @@ public class OverlayManager
         int lightWidth = tileWidth * lightDivisions;
         int lightHeight = tileHeight * lightDivisions;
 
+        // Blocked
         if (blocked.GetLength(0) != lightWidth || blocked.GetLength(1) != lightHeight)
             blocked = new bool[lightWidth, lightHeight];
         for (int y = 0; y < tileHeight; y++)
@@ -149,7 +150,12 @@ public class OverlayManager
                     for (int dx = 0; dx < lightDivisions; dx++)
                         blocked[x * lightDivisions + dx, y * lightDivisions + dy] = isBlocked;
             }
-        lightGrid = new(lightWidth, lightHeight, blocked);
+
+        // Lighting
+        if (lightGrid == null || lightGrid.Width != lightWidth || lightGrid.Height != lightHeight)
+            lightGrid = new(lightWidth, lightHeight, blocked);
+        else
+            lightGrid.Reset(blocked: blocked);
         foreach (var light in LightingManager.Lights.Values)
         {
             Point lightTile = ((light.Position + CameraManager.Camera.ToPoint() - Constants.Middle).ToVector2() / Constants.TileSize.ToVector2()).ToPoint() - start;
@@ -157,7 +163,7 @@ public class OverlayManager
             {
                 for (int dy = 0; dy < lightDivisions; dy++)
                     for (int dx = 0; dx < lightDivisions; dx++)
-                        lightGrid.SetLightLevel(lightTile.Scaled(lightDivisions) + new Point(dx, dy), (light.Size * lightDivisions) / Constants.TileSize.X);
+                        lightGrid.SetLight(lightTile.Scaled(lightDivisions) + new Point(dx, dy), (light.Size * lightDivisions) / Constants.TileSize.X);
             }
         }
         lightGrid.Run();
