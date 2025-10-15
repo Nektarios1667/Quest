@@ -59,7 +59,7 @@ public static class StateManager
     {
         WeatherNoise.SetSeed(Environment.TickCount);
         WeatherNoise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-        WeatherNoise.SetFrequency(0.01f);
+        WeatherNoise.SetFrequency(0.002f);
         WeatherNoise.SetFractalType(FastNoiseLite.FractalType.FBm);
         WeatherNoise.SetFractalOctaves(3);
         WeatherNoise.SetFractalLacunarity(2.0f);
