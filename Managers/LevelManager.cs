@@ -1,3 +1,4 @@
+using SharpDX.XAPO.Fx;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -17,7 +18,7 @@ public class LevelManager
         Levels = [];
         Tile[] skyTiles = new Tile[256 * 256];
         for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) skyTiles[t] = new Sky(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
-        Level = new("", skyTiles, new(128, 128), [], [], [], []);
+        Level = new("", skyTiles, [], new(128, 128), [], [], [], []);
     }
     public void Update(GameManager gameManager)
     {
@@ -204,7 +205,7 @@ public class LevelManager
         // Unload the level
         string name = Levels[levelIndex].Name;
         if (Level == Levels[levelIndex])
-            Level = new("null", [], new Point(128, 128), [], [], [], []);
+            Level = new("", [], [], new Point(128, 128), [], [], [], []);
 
         Levels.RemoveAt(levelIndex);
         Logger.System($"Unloaded level '{name}'.");
@@ -274,6 +275,7 @@ public class LevelManager
 
         // Make buffers
         Tile[] tilesBuffer = new Tile[Constants.MapSize.X * Constants.MapSize.Y];
+        BiomeType[] biomeBuffer = new BiomeType[Constants.MapSize.X * Constants.MapSize.Y];
         List<NPC> npcBuffer = [];
         List<Loot> lootBuffer = [];
         List<Decal> decalBuffer = [];
@@ -336,6 +338,10 @@ public class LevelManager
             tilesBuffer[idx] = tile;
         }
 
+        // Biomes
+        for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
+            biomeBuffer[i] = (BiomeType)reader.ReadByte();
+
         // NPCs
         int npcCount = reader.ReadByte();
         for (int n = 0; n < npcCount; n++)
@@ -369,7 +375,7 @@ public class LevelManager
         }
 
         // Make and add the level
-        Level created = new(filename, tilesBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, [], tint);
+        Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, [], tint);
         if (reload && Levels.Contains(Level))
             Levels[Levels.IndexOf(Level)] = created;
         else
@@ -457,13 +463,33 @@ public class LevelManager
 
         Tile? left = GetTile(x - 1, y);
         Tile? right = GetTile(x + 1, y);
-        Tile? down = GetTile(x, y + 1);
         Tile? up = GetTile(x, y - 1);
+        Tile? down = GetTile(x, y + 1);
 
         if (left == null || left.Type == tile.Type || (tile.IsWall && left.IsWall)) mask |= 1; // left
         if (down == null || down.Type == tile.Type || (tile.IsWall && down.IsWall)) mask |= 2; // down
         if (right == null || right.Type == tile.Type || (tile.IsWall && right.IsWall)) mask |= 4; // right
         if (up == null || up.Type == tile.Type || (tile.IsWall && up.IsWall)) mask |= 8; // up
+
+        return mask;
+    }
+    public int BiomeConnectionsMask(Point loc)
+    {
+        int mask = 0;
+        int x = loc.X;
+        int y = loc.Y;
+
+        BiomeType? center = GetBiome(x, y);
+        BiomeType? left = GetBiome(x - 1, y);
+        BiomeType? right = GetBiome(x + 1, y);
+        BiomeType? up = GetBiome(x, y - 1);
+        BiomeType? down = GetBiome(x, y + 1);
+
+        if (center == null) return mask;
+        if (left == null || left == center) mask |= 1; // left
+        if (down == null || down == center) mask |= 2; // down
+        if (right == null || right == center) mask |= 4; // right
+        if (up == null || up == center) mask |= 8; // up
 
         return mask;
     }
@@ -476,6 +502,28 @@ public class LevelManager
         int srcY = (mask / Constants.TileMapDim.X) * Constants.TilePixelSize.Y;
 
         return new(srcX, srcY, Constants.TilePixelSize.X, Constants.TilePixelSize.Y);
+    }
+    public Rectangle BiomeTextureSource(Point loc)
+    {
+
+        int mask = BiomeConnectionsMask(loc);
+
+        int srcX = (mask % Constants.TileMapDim.X) * Constants.TilePixelSize.X;
+        int srcY = (mask / Constants.TileMapDim.X) * Constants.TilePixelSize.Y;
+
+        return new(srcX, srcY, Constants.TilePixelSize.X, Constants.TilePixelSize.Y);
+    }
+    public BiomeType? GetBiome(Point coord)
+    {
+        if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
+            return null;
+        return Level.Biome[coord.X + coord.Y * Constants.MapSize.X];
+    }
+    public BiomeType? GetBiome(int x, int y)
+    {
+        if (x < 0 || x >= Constants.MapSize.X || y < 0 || y >= Constants.MapSize.Y)
+            return null;
+        return Level.Biome[x + y * Constants.MapSize.X];
     }
     public Tile? GetTile(Point coord)
     {

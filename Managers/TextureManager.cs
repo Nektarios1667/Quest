@@ -30,6 +30,7 @@ public static class TextureManager
         Speech,
         MenuBackground,
         QuestTitle,
+        TileOutline,
         // GUI ENUM INSERT
         Lantern,
         Pickaxe,
@@ -151,6 +152,7 @@ public static class TextureManager
         Textures[TextureID.Speech] = content.Load<Texture2D>("Images/Gui/Speech");
         Textures[TextureID.MenuBackground] = content.Load<Texture2D>("Images/Gui/MenuBackground");
         Textures[TextureID.QuestTitle] = content.Load<Texture2D>("Images/Gui/QuestTitle");
+        Textures[TextureID.TileOutline] = content.Load<Texture2D>("Images/Gui/TileOutline");
         // GUI INSERT
         Textures[TextureID.Lantern] = content.Load<Texture2D>("Images/Items/Lantern");
         Textures[TextureID.Pickaxe] = content.Load<Texture2D>("Images/Items/Pickaxe");
@@ -264,6 +266,7 @@ public static class TextureManager
         Metadata[TextureID.Speech] = new(Textures[TextureID.Speech].Bounds.Size, new(1, 4), "gui");
         Metadata[TextureID.MenuBackground] = new(Textures[TextureID.MenuBackground].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.QuestTitle] = new(Textures[TextureID.QuestTitle].Bounds.Size, new(1, 1), "gui");
+        Metadata[TextureID.TileOutline] = new(Textures[TextureID.TileOutline].Bounds.Size, new(4, 4), "tile");
         // GUI METADATA INSERT
         Metadata[TextureID.Lantern] = new(Textures[TextureID.Lantern].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Pickaxe] = new(Textures[TextureID.Pickaxe].Bounds.Size, new(1, 1), "item");

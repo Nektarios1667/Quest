@@ -5,6 +5,12 @@ using System.Text;
 using static Quest.Editor.PopupFactory;
 
 namespace Quest.Editor;
+public enum EditorTool
+{
+    Tile,
+    Decal,
+    Biome,
+}
 public class EditorManager
 {
     // Debug
@@ -27,7 +33,9 @@ public class EditorManager
     private Point mouseCoord { get; set; }
     private Point mouseSelection { get; set; }
     private Point mouseSelectionCoord { get; set; }
-    private TileType Material { get; set; }
+    private TileType tileSelection { get; set; }
+    private EditorTool currentTool { get; set; }
+    private BiomeType biomeSelection { get; set; }
     private RenderTarget2D minimap { get; set; }
     private bool rebuildMinimap { get; set; } = true;
     private DecalType? previousDecal { get; set; } = null;
@@ -42,14 +50,16 @@ public class EditorManager
         this.spriteBatch = batch;
         cacheDelta = delta;
     }
-    public void Update(TileType material, float deltaTime, Tile? mouseTile, Point mouseCoord, Point mouseSelection, Point mouseSelectionCoord)
+    public void Update(TileType material, BiomeType biome, EditorTool tool, float deltaTime, Tile? mouseTile, Point mouseCoord, Point mouseSelection, Point mouseSelectionCoord)
     {
         delta = deltaTime;
         this.mouseTile = mouseTile;
         this.mouseCoord = mouseCoord;
         this.mouseSelection = mouseSelection;
         this.mouseSelectionCoord = mouseSelectionCoord;
-        Material = material;
+        currentTool = tool;
+        tileSelection = material;
+        biomeSelection = biome;
 
         if (rebuildMinimap) RebuildMiniMap();
     }
@@ -225,10 +235,16 @@ public class EditorManager
     }
     public void FloodFill()
     {
+        if (currentTool == EditorTool.Tile) FloodFillTiles();
+        else if (currentTool == EditorTool.Decal) { } // TODO
+        else if (currentTool == EditorTool.Biome) FloodFillBiome();
+    }
+    public void FloodFillTiles()
+    {
         // Fill with current material
         int count = 0;
         Tile tileBelow = GetTile(mouseCoord);
-        if (tileBelow.Type != Material)
+        if (tileBelow.Type != tileSelection)
         {
             Queue<Tile> queue = new();
             HashSet<Point> visited = []; // Track visited tiles
@@ -237,9 +253,9 @@ public class EditorManager
             while (queue.Count > 0)
             {
                 Tile current = queue.Dequeue();
-                if (current.Type == Material || visited.Contains(current.Location)) continue; // Skip if already filled
+                if (current.Type == tileSelection || visited.Contains(current.Location)) continue; // Skip if already filled
                 count++;
-                SetTile(LevelManager.TileFromId((int)Material, current.Location));
+                SetTile(LevelManager.TileFromId((int)tileSelection, current.Location));
                 visited.Add(current.Location); // Mark as visited
                 // Check neighbors
                 foreach (Point neighbor in Constants.NeighborTiles)
@@ -247,13 +263,46 @@ public class EditorManager
                     Point neighborCoord = current.Location + neighbor;
                     if (neighborCoord.X < 0 || neighborCoord.X >= Constants.MapSize.X || neighborCoord.Y < 0 || neighborCoord.Y >= Constants.MapSize.Y) continue;
                     Tile neighborTile = GetTile(neighborCoord);
-                    if (neighborTile.Type == tileBelow.Type && neighborTile.Type != Material)
+                    if (neighborTile.Type == tileBelow.Type && neighborTile.Type != tileSelection)
                     {
                         queue.Enqueue(neighborTile);
                     }
                 }
             }
-            Logger.Log($"Filled {count} tiles with '{Material}' starting from {mouseCoord.X}, {mouseCoord.Y}.");
+            Logger.Log($"Filled {count} tiles with '{tileSelection}' starting from {mouseCoord.X}, {mouseCoord.Y}.");
+        }
+    }
+    public void FloodFillBiome()
+    {
+        // Fill with current material
+        int count = 0;
+        BiomeType? startBiome = levelManager.GetBiome(mouseCoord);
+        if (startBiome != biomeSelection)
+        {
+            Queue<Point> queue = new();
+            HashSet<Point> visited = []; // Track visited tiles
+            queue.Enqueue(mouseCoord);
+            count++;
+            while (queue.Count > 0)
+            {
+                Point current = queue.Dequeue();
+                if (levelManager.GetBiome(current) == biomeSelection || visited.Contains(current)) continue; // Skip if already filled
+                visited.Add(current); // Mark as visited
+                count++;
+                levelManager.Level.Biome[LevelManager.Flatten(current)] = biomeSelection;
+                // Check neighbors
+                foreach (Point neighbor in Constants.NeighborTiles)
+                {
+                    Point neighborCoord = current + neighbor;
+                    if (neighborCoord.X < 0 || neighborCoord.X >= Constants.MapSize.X || neighborCoord.Y < 0 || neighborCoord.Y >= Constants.MapSize.Y) continue;
+                    BiomeType? biome = levelManager.GetBiome(neighborCoord);
+                    if (biome == startBiome && biome != biomeSelection)
+                    {
+                        queue.Enqueue(neighborCoord);
+                    }
+                }
+            }
+            Logger.Log($"Set {count} tiles to biome '{biomeSelection}' starting from {mouseCoord.X}, {mouseCoord.Y}.");
         }
     }
     public void SetSpawn()
@@ -484,6 +533,10 @@ public class EditorManager
 
         }
 
+        // Biome
+        for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
+            writer.Write((byte)(int)levelManager.Level.Biome[i]);
+
         // NPCs
         writer.Write((byte)Math.Min(levelManager.Level.NPCs.Count, 255));
         for (int n = 0; n < Math.Min(levelManager.Level.NPCs.Count, 255); n++)
@@ -540,7 +593,7 @@ public class EditorManager
         Tile[] tiles = levelGenerator.GenerateLevel(Constants.MapSize, int.Parse(values[2]));
 
         Level current = levelManager.Level;
-        Level level = new(current.Name, tiles, current.Spawn, current.NPCs, current.Loot, current.Decals, current.Enemies, current.Tint);
+        Level level = new(current.Name, tiles, [], current.Spawn, current.NPCs, current.Loot, current.Decals, current.Enemies, current.Tint);
 
         levelManager.LoadLevelObject(gameManager, level);
         FlagRebuildMinimap();

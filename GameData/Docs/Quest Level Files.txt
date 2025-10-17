@@ -22,6 +22,9 @@ spawnY - byte
 	chest:
 		lootGeneratorFile - string
 
+[for each tile (65536)]
+	biomeID - byte
+
 npcNumber - byte
 [for each npc (<256)]
 	npcName - string

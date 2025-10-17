@@ -4,7 +4,7 @@ public class Door : Tile
 {
     public string Key { get; set; }
     public bool ConsumeKey { get; set; }
-    public Door(Point location, string key, bool consumeKey = true) : base(location)
+    public Door(Point location, string key = "", bool consumeKey = true) : base(location)
     {
         IsWalkable = false;
         IsWall = true;

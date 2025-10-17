@@ -47,4 +47,6 @@ public static class InputManager
     public static bool MMouseDown => MouseState.MiddleButton == ButtonState.Pressed;
     public static int ScrollWheelValue => MouseState.ScrollWheelValue;
     public static int ScrollWheelChange => MouseState.ScrollWheelValue - LastMouseState.ScrollWheelValue;
+    public static bool ScrolledUp => ScrollWheelChange > 0;
+    public static bool ScrolledDown => ScrollWheelChange < 0;
 }

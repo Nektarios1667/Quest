@@ -1,5 +1,8 @@
-﻿using MonoGUI;
+﻿using Microsoft.VisualBasic.ApplicationServices;
+using MonoGUI;
+using Quest.Decals;
 using Quest.Managers;
+using System.Linq;
 using System.Text;
 
 namespace Quest.Editor;
@@ -16,14 +19,17 @@ public class LevelEditor : Game
     private GUI gui = null!;
 
     // Editing
-    private TileType Material;
-    private int Selection;
+    private TileType TileSelection;
+    private DecalType DecalSelection;
+    private BiomeType BiomeSelection;
+
     private Point mouseCoord;
-    private Tile mouseTile = null!;
+    private Tile mouseTile = null!; 
     private Point mouseSelectionCoord;
     private Point mouseSelection;
     private LevelGenerator levelGenerator = null!;
     private MouseMenu mouseMenu;
+    private EditorTool currentTool = EditorTool.Tile;
 
     // Time
     private float delta = 0;
@@ -80,7 +86,7 @@ public class LevelEditor : Game
         // Gui
         gui = new(this, spriteBatch, Arial);
         mouseMenu = new(gui, Point.Zero, new(100, 300), Color.White, GUI.NearBlack, Color.Gray, border: 1, seperation: 3, borderColor: Color.White);
-        mouseMenu.AddItem("Pick", () => { Selection = (int)mouseTile.Type; Material = mouseTile.Type; Logger.Log($"Picked tile '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}."); }, []);
+        mouseMenu.AddItem("Pick", () => { TileSelection = mouseTile.Type; Logger.Log($"Picked tile '{TileSelection}' @ {mouseCoord.X}, {mouseCoord.Y}."); }, []);
         mouseMenu.AddItem("Open", editorManager.OpenFile, []);
         mouseMenu.AddItem("Fill", editorManager.FloodFill, []);
         mouseMenu.AddItem("Edit", editorManager.EditTile, []);
@@ -104,7 +110,12 @@ public class LevelEditor : Game
         mouseMenu.AddItem("Tint", editorManager.SetTint, []);
         mouseMenu.AddItem("Generate", editorManager.GenerateLevel, []);
         mouseMenu.AddItem("Exit", Exit, []);
-        gui.Widgets.Add(mouseMenu);
+        gui.AddWidget(mouseMenu);
+
+        Button tileDrawSelect = new(gui, new(Constants.Middle.X - 100, 10), new(90, 25), Color.White, ColorTools.NearBlack, Color.Gray, () => currentTool = EditorTool.Tile, [], "Tiles");
+        Button decalDrawSelect = new(gui, new(Constants.Middle.X, 10), new(90, 25), Color.White, ColorTools.NearBlack, Color.Gray, () => currentTool = EditorTool.Decal, [], "Decals");
+        Button biomeDrawSelect = new(gui, new(Constants.Middle.X + 100, 10), new(90, 25), Color.White, ColorTools.NearBlack, Color.Gray, () => currentTool = EditorTool.Biome, [], "Biomes");
+        gui.AddWidgets(tileDrawSelect, decalDrawSelect, biomeDrawSelect);
 
         gui.LoadContent(Content, "Images/Gui");
         Logger.System("Initialized GUI.");
@@ -150,37 +161,54 @@ public class LevelEditor : Game
         DebugManager.EndBenchmark("InputUpdate");
 
         // Manager
-        editorManager.Update(Material, delta, mouseTile, mouseCoord, mouseSelection, mouseSelectionCoord);
+        editorManager.Update(TileSelection, BiomeSelection, currentTool, delta, mouseTile, mouseCoord, mouseSelection, mouseSelectionCoord);
 
         // Change material
-        if (InputManager.ScrollWheelChange > 0 || InputManager.KeyPressed(Keys.OemCloseBrackets))
+        if (InputManager.ScrolledUp || InputManager.KeyPressed(Keys.OemOpenBrackets))
         {
-            Selection = (Selection + 1) % Constants.TileTypeNames.Length;
-            Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileTypeNames[Selection]);
-            Logger.Log($"Material set to '{Material}'.");
+            if (currentTool == EditorTool.Tile) NumberTools.CycleUp(ref TileSelection);
+            else if (currentTool == EditorTool.Decal) NumberTools.CycleUp(ref DecalSelection);
+            else if (currentTool == EditorTool.Biome) NumberTools.CycleUp(ref BiomeSelection);
         }
-        if (InputManager.ScrollWheelChange < 0 || InputManager.KeyPressed(Keys.OemCloseBrackets))
+        if (InputManager.ScrolledDown || InputManager.KeyPressed(Keys.OemCloseBrackets))
         {
-            Selection = (Selection - 1) % Constants.TileTypeNames.Length;
-            if (Selection < 0) Selection += Constants.TileTypeNames.Length;
-            Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileTypeNames[Selection]);
-            Logger.Log($"Material set to '{Material}'.");
+            if (currentTool == EditorTool.Tile) NumberTools.CycleDown(ref TileSelection);
+            else if (currentTool == EditorTool.Decal) NumberTools.CycleDown(ref DecalSelection);
+            else if (currentTool == EditorTool.Biome) NumberTools.CycleDown(ref BiomeSelection);
         }
 
         // Draw
-        if (InputManager.LMouseDown && mouseTile.Type != Material && !mouseMenu.Visible)
+        if (InputManager.LMouseDown && !mouseMenu.Visible)
         {
             // Add tile
-            Tile tile;
-            if (Selection == (int)TileType.Stairs)
-                tile = new Stairs(mouseCoord, "", Constants.MiddleCoord);
-            else if (Selection == (int)TileType.Door)
-                tile = new Door(mouseCoord, "");
-            else
-                tile = LevelManager.TileFromId(Selection, mouseCoord);
+            if (currentTool == EditorTool.Tile)
+            {
+                Tile tile;
+                if (TileSelection == TileType.Stairs)
+                    tile = new Stairs(mouseCoord, "", Constants.MiddleCoord);
+                else
+                    tile = LevelManager.TileFromId(TileSelection, mouseCoord);
 
-            editorManager.SetTile(tile);
-            Logger.Log($"Set tile to '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}.");
+                editorManager.SetTile(tile);
+            }
+            // Add decal
+            else if (currentTool == EditorTool.Decal && InputManager.LMouseClicked)
+            {
+                // Check existing decal
+                Decal? current = levelManager.Level.Decals.FirstOrDefault(d => d.Location == mouseCoord);
+                bool alreadyThere = current != null && current.Type == DecalSelection;
+                if (current != null && current.Type != DecalSelection) levelManager.Level.Decals.Remove(current!); // Remove current one
+
+                // Add
+                if (!alreadyThere && levelManager.Level.Decals.Count < 255)
+                    levelManager.Level.Decals.Add(LevelManager.DecalFromId(DecalSelection, mouseCoord));
+            }
+            // Set biome
+            else if (currentTool == EditorTool.Biome)
+            {
+                int idx = LevelManager.Flatten(mouseCoord);
+                levelManager.Level.Biome[idx] = BiomeSelection;
+            }
         }
 
         // Edit options
@@ -232,9 +260,26 @@ public class LevelEditor : Game
         GraphicsDevice.Clear(Color.Magenta);
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
+        Point mouseCoordDraw = mouseCoord * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
+
         // Draw game
         levelManager.Draw(gameManager);
         uiManager.Draw(GraphicsDevice, gameManager, null);
+
+        // Render biome markers
+        Point start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
+        Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
+        for (int y = start.Y; y <= end.Y; y++)
+        {
+            for (int x = start.X; x <= end.X; x++)
+            {
+                Point loc = new(x, y);
+                Point dest = loc * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
+                BiomeType? biome = levelManager.GetBiome(loc);
+                Color color = biome == null ? Color.Magenta : Biome.Colors[(int)biome];
+                spriteBatch.Draw(Textures[TextureID.TileOutline], dest.ToVector2(), levelManager.BiomeTextureSource(loc), color, 0, Vector2.Zero, Constants.TileSizeScale, SpriteEffects.None, 1.0f);
+            }
+        }
 
         // Text info
         DebugManager.StartBenchmark("DebugTextDraw");
@@ -256,11 +301,21 @@ public class LevelEditor : Game
         editorManager.DrawMiniMap();
 
         // Ghost tile
-        if (mouseTile != null)
+        if (currentTool == EditorTool.Tile)
         {
-            TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), Material.ToString());
-            DrawTexture(spriteBatch, texture, mouseTile.Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle, source: new(Point.Zero, Constants.TilePixelSize), scale: Constants.TileSizeScale, color: Constants.SemiTransparent);
+            TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), TileSelection.ToString());
+            DrawTexture(spriteBatch, texture, mouseCoordDraw, source: new(Point.Zero, Constants.TilePixelSize), scale: Constants.TileSizeScale, color: Constants.SemiTransparent);
+        } else if (currentTool == EditorTool.Decal)
+        {
+            TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), DecalSelection.ToString());
+            DrawTexture(spriteBatch, texture, mouseCoordDraw, source: new(Point.Zero, Constants.TilePixelSize), scale: Constants.TileSizeScale, color: Constants.SemiTransparent);
+        } else if (currentTool == EditorTool.Biome)
+        {
+            DrawTexture(spriteBatch, TextureID.TileOutline, mouseCoordDraw, source: new(Point.Zero, Constants.TilePixelSize), scale: Constants.TileSizeScale, color: Biome.Colors[(int)BiomeSelection]);
+            Vector2 textCenter = Arial.MeasureString(BiomeSelection.ToString()) / 2;
+            spriteBatch.DrawString(Arial, BiomeSelection.ToString(), (mouseCoordDraw + Constants.TileHalfSize).ToVector2(), Color.Black, MathHelper.PiOver4, textCenter, 1.0f, SpriteEffects.None, 1.0f);
         }
+
 
         // Tile info
         if (mouseTile is Stairs stair)
@@ -286,9 +341,13 @@ public class LevelEditor : Game
     }
     public void PickTile()
     {
-        Selection = (int)mouseTile.Type;
-        Material = (TileType)Enum.Parse(typeof(TileType), Constants.TileTypeNames[Selection]);
-        Logger.Log($"Picked tile '{Material}' @ {mouseCoord.X}, {mouseCoord.Y}.");
+        if (currentTool == EditorTool.Tile) TileSelection = mouseTile.Type;
+        else if (currentTool == EditorTool.Decal)
+        {
+            Decal? picked = levelManager.Level.Decals.FirstOrDefault(d => d.Location == mouseCoord);
+            if (picked != null) DecalSelection = picked.Type;
+        }
+        else if (currentTool == EditorTool.Biome) BiomeSelection = levelManager.GetBiome(mouseCoord)!.Value;
     }
     public void MouseSelect()
     {
