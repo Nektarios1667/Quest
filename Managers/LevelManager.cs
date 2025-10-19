@@ -10,7 +10,7 @@ public class LevelManager
     public List<Level> Levels { get; private set; }
     public Level Level { get; private set; }
     public Color SkyLight { get; set; }
-    public event Action<string> LevelLoaded;
+    public event Action<string>? LevelLoaded;
     public static readonly Point lootStackOffset = new(4, 4);
     public LevelManager()
     {
@@ -29,27 +29,8 @@ public class LevelManager
         foreach (Enemy enemy in Level.Enemies) enemy.Update(gameManager);
 
         // SkyTint
-        if (Level.Tint != Color.Transparent)
-            SkyLight = Level.Tint;
-        else
-        {
-            Color sky = ColorTools.GetSkyColor(gameManager.DayTime) * 0.9f;
-            
-            Weather weather = StateManager.CurrentWeather(gameManager.GameTime);
-            Color weatherTint = Color.Transparent;
-            Tile tileBelow = GetTile(CameraManager.TileCoord)!;
-            // Weather tints
-            if (weather == Weather.Light && tileBelow is ICold)
-                weatherTint = Color.LightBlue;
-            else if (weather == Weather.Light)
-                weatherTint = Color.CornflowerBlue;
-            else if (weather == Weather.Heavy && tileBelow is ICold)
-                weatherTint = ColorTools.NearWhite;
-            else if (weather == Weather.Heavy)
-                weatherTint = Color.Gray;
+        UpdateSky(gameManager);
 
-            SkyLight = Color.Lerp(sky, weatherTint, weatherTint != Color.Transparent ? 0.5f : 0);
-        }
 
         // Dynamic lighting
         foreach (Loot loot in Level.Loot)
@@ -58,6 +39,43 @@ public class LevelManager
                 Point loc = loot.Location - CameraManager.Camera.ToPoint() + Constants.Middle + TextureManager.Metadata[loot.Texture].Size;
                 LightingManager.SetLight($"Loot_{loot.UID}", loc, 2, Color.Transparent);
             }
+    }
+    public void UpdateSky(GameManager gameManager)
+    {
+        // Custom tint
+        if (Level.Tint != Color.Transparent)
+        {
+            SkyLight = Level.Tint;
+            return;
+        }
+
+        // Calculate sky colors from weather, biome, and time
+        BiomeType? currentBiome = GetBiome(CameraManager.TileCoord);
+        Color sky = ColorTools.GetSkyColor(gameManager.DayTime) * 0.9f;
+        Weather weather = StateManager.CurrentWeather(gameManager.GameTime);
+        Color weatherTint = Color.Transparent;
+
+        if (currentBiome == null || currentBiome == BiomeType.Indoors || weather == Weather.Clear) { }
+        else if (weather == Weather.Light)
+        {
+            switch (currentBiome)
+            {
+                case BiomeType.Temperate: weatherTint = Color.LightBlue; break;
+                case BiomeType.Snowy: weatherTint = Color.White; break;
+                case BiomeType.Desert: weatherTint = Color.Yellow; break;
+                case BiomeType.Ocean: weatherTint = Color.LightBlue; break;
+            }
+        } else if (weather == Weather.Heavy)
+        {
+            switch (currentBiome)
+            {
+                case BiomeType.Temperate: weatherTint = Color.Blue; break;
+                case BiomeType.Snowy: weatherTint = Color.Gray; break;
+                case BiomeType.Desert: weatherTint = Color.OrangeRed; break;
+                case BiomeType.Ocean: weatherTint = Color.Blue; break;
+            }
+        }
+        SkyLight = Color.Lerp(sky, weatherTint, weatherTint != Color.Transparent ? 0.2f : 0);
     }
     public void Draw(GameManager gameManager)
     {

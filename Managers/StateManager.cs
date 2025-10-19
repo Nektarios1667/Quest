@@ -73,7 +73,8 @@ public static class StateManager
     {
         State = PreviousState;
     }
-    public static float GetWeatherNoiseValue(float time) => WeatherNoise.GetNoise(time, 0) * 0.5f + 0.5f; // Normalize to [0, 1]
+    // public static float GetWeatherNoiseValue(float time) => WeatherNoise.GetNoise(time, 0) * 0.5f + 0.5f; // Normalize to [0, 1]
+    public static float GetWeatherNoiseValue(float time) => ((time % 30) + 30) / 60;
     public static Weather CurrentWeather(float time)
     {
         float noiseValue = GetWeatherNoiseValue(time);
