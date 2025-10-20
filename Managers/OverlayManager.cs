@@ -119,7 +119,9 @@ public class OverlayManager
                 float light = lightGrid.Grid[x, y].LightLevel;
                 float intensity = Math.Clamp(light / (10 * lightDivisions), 0, 1);
                 intensity = (float)Math.Pow(intensity, 0.8);
-                gameManager.Batch.FillRectangle(new Rectangle((new Point(x, y) + start.Scaled(lightDivisions)) * Constants.TileSize.Scaled(invLightDivisions) + Constants.Middle - CameraManager.Camera.ToPoint(), Constants.TileSize.Scaled(invLightDivisions)), gameManager.LevelManager.SkyLight * (1 - intensity));
+                Rectangle rect = new((new Point(x, y) + start.Scaled(lightDivisions)) * Constants.TileSize.Scaled(invLightDivisions) + Constants.Middle - CameraManager.Camera.ToPoint(), Constants.TileSize.Scaled(invLightDivisions));
+                gameManager.Batch.FillRectangle(rect, gameManager.LevelManager.SkyColor * (1 - intensity));
+                gameManager.Batch.FillRectangle(rect, gameManager.LevelManager.WeatherColor * (1 - intensity));
             }
         }
 

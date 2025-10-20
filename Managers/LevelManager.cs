@@ -9,7 +9,8 @@ public class LevelManager
     public List<ILootGenerator> LootGenerators = new();
     public List<Level> Levels { get; private set; }
     public Level Level { get; private set; }
-    public Color SkyLight { get; set; }
+    public Color SkyColor { get; set; }
+    public Color WeatherColor { get; set; }
     public event Action<string>? LevelLoaded;
     public static readonly Point lootStackOffset = new(4, 4);
     public LevelManager()
@@ -45,37 +46,36 @@ public class LevelManager
         // Custom tint
         if (Level.Tint != Color.Transparent)
         {
-            SkyLight = Level.Tint;
+            SkyColor = Level.Tint;
             return;
         }
 
         // Calculate sky colors from weather, biome, and time
         BiomeType? currentBiome = GetBiome(CameraManager.TileCoord);
-        Color sky = ColorTools.GetSkyColor(gameManager.DayTime) * 0.9f;
         Weather weather = StateManager.CurrentWeather(gameManager.GameTime);
-        Color weatherTint = Color.Transparent;
+        SkyColor = ColorTools.GetSkyColor(gameManager.DayTime) * 0.9f;
 
-        if (currentBiome == null || currentBiome == BiomeType.Indoors || weather == Weather.Clear) { }
+        if (currentBiome == null || currentBiome == BiomeType.Indoors || weather == Weather.Clear) WeatherColor = Color.Transparent;
         else if (weather == Weather.Light)
         {
             switch (currentBiome)
             {
-                case BiomeType.Temperate: weatherTint = Color.LightBlue; break;
-                case BiomeType.Snowy: weatherTint = Color.White; break;
-                case BiomeType.Desert: weatherTint = Color.Yellow; break;
-                case BiomeType.Ocean: weatherTint = Color.LightBlue; break;
+                case BiomeType.Temperate: WeatherColor = Color.LightBlue; break;
+                case BiomeType.Snowy: WeatherColor = Color.White; break;
+                case BiomeType.Desert: WeatherColor = Color.Yellow; break;
+                case BiomeType.Ocean: WeatherColor = Color.LightBlue; break;
             }
         } else if (weather == Weather.Heavy)
         {
             switch (currentBiome)
             {
-                case BiomeType.Temperate: weatherTint = Color.Blue; break;
-                case BiomeType.Snowy: weatherTint = Color.Gray; break;
-                case BiomeType.Desert: weatherTint = Color.OrangeRed; break;
-                case BiomeType.Ocean: weatherTint = Color.Blue; break;
+                case BiomeType.Temperate: WeatherColor = Color.LightBlue; break;
+                case BiomeType.Snowy: WeatherColor = Color.White; break;
+                case BiomeType.Desert: WeatherColor = Color.OrangeRed; break;
+                case BiomeType.Ocean: WeatherColor = Color.Blue; break;
             }
         }
-        SkyLight = Color.Lerp(sky, weatherTint, weatherTint != Color.Transparent ? 0.2f : 0);
+        WeatherColor *= weather == Weather.Light ? 0.4f : 0.6f;
     }
     public void Draw(GameManager gameManager)
     {
