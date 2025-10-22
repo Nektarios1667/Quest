@@ -1,4 +1,3 @@
-using SharpDX.XAPO.Fx;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -56,7 +55,8 @@ public class LevelManager
         SkyColor = ColorTools.GetSkyColor(gameManager.DayTime) * 0.9f;
 
         if (currentBiome == null || currentBiome == BiomeType.Indoors || blend == 0) WeatherColor = Color.Transparent;
-        else {
+        else
+        {
             switch (currentBiome)
             {
                 case BiomeType.Temperate: WeatherColor = Color.MediumBlue; break;
@@ -229,7 +229,7 @@ public class LevelManager
                 return true;
             }
         }
-        
+
         Logger.Error($"Level '{levelName}' not found in stored levels.");
         return false;
     }

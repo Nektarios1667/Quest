@@ -3,9 +3,11 @@ public static class CameraManager
 {
     public static Vector2 Camera { get; set; } = (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2();
     private static Vector2 _cameraDest { get; set; } = Camera;
-    public static Vector2 CameraDest {
+    public static Vector2 CameraDest
+    {
         get => _cameraDest;
-        set {
+        set
+        {
             if (value == _cameraDest) return;
             CameraDestMove?.Invoke(_cameraDest, value);
             _cameraDest = value;
@@ -30,7 +32,7 @@ public static class CameraManager
         // Lerp camera
         if (Vector2.DistanceSquared(Camera, CameraDest) < 4 * deltaTime * 60) Camera = CameraDest; // If close enough snap to destination
         if (CameraDest != Camera)
-        { 
+        {
             Vector2 beforeCamera = Camera;
             Camera = Vector2.Lerp(Camera, CameraDest, 1f - MathF.Pow(1f - Constants.CameraRigidity, deltaTime * 60f));
 

@@ -1,8 +1,4 @@
-﻿using MonoGame.Extended.Particles.Profiles;
-using Quest.Gui;
-using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
-using System.Linq;
+﻿using Quest.Gui;
 
 namespace Quest.Managers;
 
@@ -35,7 +31,7 @@ public class OverlayManager
             ]
         };
 
-       
+
         TimerManager.SetTimer("lightingUpdates", 0.1f, () => updateLighting = true, int.MaxValue);
         CameraManager.CameraMove += (_, _) => updateLighting = true;
     }

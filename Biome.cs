@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Quest;
+﻿namespace Quest;
 
 // Limited to 16 biome types b/c of save files
 public enum BiomeType

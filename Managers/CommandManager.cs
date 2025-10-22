@@ -82,7 +82,8 @@ public static class CommandManager
             new("mood [calm|dark|epic]", CMood, "Set mood to '|1|'.", "Failed to set mood to '|1|.'"),
             new("say **", CSay, "|*|", "Failed to speak."),
             new($"daytime <modify> {{-{Constants.DayLength}:{Constants.DayLength}}}", CDaytime, "Daytime |1| |2|", "Failed |1| daytime |2|"),
-            new("store * *", CStore, "Stored |2| to '|1|'", "Failed to store |2| to '|1|'")
+            new("store * *", CStore, "Stored |2| to '|1|'", "Failed to store |2| to '|1|'"),
+            new("gametime <modify> {-999999:999999}", CGameTime, "Game time|1| |2|", "Failed |1| gametime |2|")
         ];
     }
     public static (bool success, string output) Execute(string command)
@@ -218,7 +219,7 @@ public static class CommandManager
             }
             else if (parts[1] == "read")
             {
-                levelManager!.ReadLevel(gameManager!.UIManager, parts[2], reload:true);
+                levelManager!.ReadLevel(gameManager!.UIManager, parts[2], reload: true);
                 return true;
             }
             else if (parts[1] == "open")
@@ -259,5 +260,22 @@ public static class CommandManager
         Variables[name] = value;
 
         return true;
+    }
+    private static bool CGameTime(string command)
+    {
+        string[] parts = command.Split(' ');
+        if (parts.Length < 2) return false;
+        int daytime = int.Parse(parts[1]);
+        if (parts[0] == "set")
+        {
+            gameManager!.GameTime = daytime;
+            return true;
+        }
+        else if (parts[0] == "change")
+        {
+            gameManager!.GameTime += daytime;
+            return true;
+        }
+        return false;
     }
 }

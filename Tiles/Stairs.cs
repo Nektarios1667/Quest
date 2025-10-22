@@ -13,7 +13,7 @@ public class Stairs : Tile
     public override void OnPlayerEnter(GameManager game, PlayerManager _)
     {
         // Load another level
-        bool read = game.LevelManager.ReadLevel(game.UIManager, DestLevel, reload:false);
+        bool read = game.LevelManager.ReadLevel(game.UIManager, DestLevel, reload: false);
         bool loaded = game.LevelManager.LoadLevel(game, DestLevel);
         if (!read || !loaded)
         {

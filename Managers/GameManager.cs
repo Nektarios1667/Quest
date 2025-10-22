@@ -6,7 +6,7 @@ public class GameManager
     public LevelManager LevelManager { get; private set; }
     public OverlayManager UIManager { get; private set; }
     public float DeltaTime { get; private set; } = 0f;
-    public float GameTime { get; private set; } = 0f;
+    public float GameTime { get; set; } = 0f;
     public float TotalTime { get; private set; } = 0f;
     public float DayTime { get; set; } = 0f;
     public SpriteBatch Batch { get; private set; }
@@ -50,13 +50,14 @@ public class GameManager
             if (StateManager.State == GameState.Game)
                 DayTime += deltaTime;
             if (DayTime >= Constants.DayLength) DayTime = 0f;
-        } else
+        }
+        else
             DeltaTime = 0f;
     }
     public void Respawn()
     {
         string level = LevelManager.Level.Name;
-        LevelManager.ReadLevel(UIManager, level, reload:true);
+        LevelManager.ReadLevel(UIManager, level, reload: true);
         LevelManager.LoadLevel(this, level);
 
         UIManager.HealthBar.CurrentValue = UIManager.HealthBar.MaxValue;

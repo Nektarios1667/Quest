@@ -1,6 +1,4 @@
-﻿using Quest.Managers;
-using System.Text;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
+﻿using System.Text;
 
 namespace Quest;
 public class Window : Game
@@ -211,7 +209,7 @@ public class Window : Game
         Logger.System("Exiting game.");
 
         if (StateManager.CurrentSave != "")
-            StateManager.WriteKeyValueFile("continue", new() { { "lastSave", StateManager.CurrentSave} });
+            StateManager.WriteKeyValueFile("continue", new() { { "lastSave", StateManager.CurrentSave } });
 
         Logger.System("Game exited successfully.");
     }

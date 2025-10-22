@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using MonoGUI;
-using Quest.Utilities;
 using System.IO;
 using System.Linq;
 
@@ -67,7 +66,7 @@ public class MenuManager
         // Level select
         LevelSelectMenu = new(window, batch, PixelOperator);
         LevelSelectMenu.LoadContent(content, "Images\\Gui");
-        
+
         worlds = new(LevelSelectMenu, new(220, 100), new(520, 700), Color.White, Color.Black * .6f, Color.LightBlue * .5f, border: 2, borderColor: Color.Cyan * .2f, seperation: 0);
         saves = new(LevelSelectMenu, new(800, 100), new(300, 700), Color.White, Color.Black * .6f, Color.LightBlue * .5f, border: 2, borderColor: Color.Cyan * .2f, seperation: 0);
         worlds.ItemSelected += (item) => { LoadSaves(item); };
@@ -88,9 +87,9 @@ public class MenuManager
         Button resumeButton = new(PauseMenu, new(Constants.Middle.X - 150, 300), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => StateManager.OverlayState = OverlayState.None, [], text: "Resume", font: PixelOperatorSubtitle, border: 0);
         Button quicksaveButton = new(PauseMenu, new(Constants.Middle.X - 150, 380), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.SaveGameState(gameManager, playerManager, StringTools.ParseLevelPath(StateManager.CurrentSave).level); }, [], text: "Quick Save", font: PixelOperatorSubtitle, border: 0);
         Button pauseSettingsButton = new(PauseMenu, new(Constants.Middle.X - 150, 460), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.State = GameState.Settings; }, [], text: "Settings", font: PixelOperatorSubtitle, border: 0);
-        Button mainMenuButton = new(PauseMenu, new(Constants.Middle.X - 150, 540), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.State = GameState.MainMenu;  }, [], text: "Main Menu", font: PixelOperatorSubtitle, border: 0);
+        Button mainMenuButton = new(PauseMenu, new(Constants.Middle.X - 150, 540), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.State = GameState.MainMenu; }, [], text: "Main Menu", font: PixelOperatorSubtitle, border: 0);
         Button quitButton = new(PauseMenu, new(Constants.Middle.X - 150, 620), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => window.Exit(), [], text: "Quit", font: PixelOperatorSubtitle);
-        
+
         PauseMenu.Widgets = [resumeButton, quicksaveButton, pauseSettingsButton, mainMenuButton, quitButton, pauseLabel];
 
         // In-game debug
@@ -116,7 +115,8 @@ public class MenuManager
 
             StateManager.CurrentSave = StateManager.ContinueSave;
             StateManager.State = GameState.Game;
-        } else
+        }
+        else
         {
             StateManager.State = GameState.LevelSelect;
         }
@@ -182,7 +182,7 @@ public class MenuManager
                 //DebugMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
         }
-        
+
         switch (StateManager.OverlayState)
         {
             case OverlayState.Pause:

@@ -1,6 +1,4 @@
-﻿using Xna = Microsoft.Xna.Framework;
-
-namespace Quest.Tiles;
+﻿namespace Quest.Tiles;
 
 public class WoodWall : Tile
 {

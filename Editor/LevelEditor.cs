@@ -1,7 +1,4 @@
-﻿using Microsoft.VisualBasic.ApplicationServices;
-using MonoGUI;
-using Quest.Decals;
-using Quest.Managers;
+﻿using MonoGUI;
 using System.Linq;
 using System.Text;
 
@@ -24,7 +21,7 @@ public class LevelEditor : Game
     private BiomeType BiomeSelection;
 
     private Point mouseCoord;
-    private Tile mouseTile = null!; 
+    private Tile mouseTile = null!;
     private Point mouseSelectionCoord;
     private Point mouseSelection;
     private LevelGenerator levelGenerator = null!;
@@ -305,11 +302,13 @@ public class LevelEditor : Game
         {
             TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), TileSelection.ToString());
             DrawTexture(spriteBatch, texture, mouseCoordDraw, source: new(Point.Zero, Constants.TilePixelSize), scale: Constants.TileSizeScale, color: Constants.SemiTransparent);
-        } else if (currentTool == EditorTool.Decal)
+        }
+        else if (currentTool == EditorTool.Decal)
         {
             TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), DecalSelection.ToString());
             DrawTexture(spriteBatch, texture, mouseCoordDraw, source: new(Point.Zero, Constants.TilePixelSize), scale: Constants.TileSizeScale, color: Constants.SemiTransparent);
-        } else if (currentTool == EditorTool.Biome)
+        }
+        else if (currentTool == EditorTool.Biome)
         {
             DrawTexture(spriteBatch, TextureID.TileOutline, mouseCoordDraw, source: new(Point.Zero, Constants.TilePixelSize), scale: Constants.TileSizeScale, color: Biome.Colors[(int)BiomeSelection]);
             Vector2 textCenter = Arial.MeasureString(BiomeSelection.ToString()) / 2;

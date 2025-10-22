@@ -4,7 +4,8 @@ namespace Quest.Tiles;
 public class Lamp : Tile
 {
     private Color _lightColor { get; set; }
-    public Color LightColor {
+    public Color LightColor
+    {
         get => _lightColor;
         set { _lightColor = value; RecalculateTint(); }
     }

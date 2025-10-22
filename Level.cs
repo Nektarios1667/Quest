@@ -1,6 +1,4 @@
-﻿using System.Security.Policy;
-
-namespace Quest;
+﻿namespace Quest;
 
 public class Level
 {

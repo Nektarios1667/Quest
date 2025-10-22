@@ -1,5 +1,4 @@
-﻿using Quest.Decals;
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
 using System.Text;
 using static Quest.Editor.PopupFactory;
@@ -521,7 +520,8 @@ public class EditorManager
             {
                 // Write chest loot
                 writer.Write(chest.LootGenerator.FileName);
-            } else if (tile is Lamp lamp)
+            }
+            else if (tile is Lamp lamp)
             {
                 // Write lamp data
                 writer.Write(lamp.LightColor.R);
@@ -618,7 +618,7 @@ public class EditorManager
         world = filename.Split('\\', '/')[0];
         try
         {
-            levelManager.ReadLevel(gameManager.UIManager, filename, reload:true);
+            levelManager.ReadLevel(gameManager.UIManager, filename, reload: true);
             levelManager.LoadLevel(gameManager, filename);
             Logger.Log($"Opened level '{filename}'.");
         }

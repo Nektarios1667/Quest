@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Quest.Managers;
+﻿namespace Quest.Managers;
 
 public class FloodLightingGrid
 {

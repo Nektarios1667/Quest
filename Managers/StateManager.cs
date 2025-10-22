@@ -1,7 +1,4 @@
-﻿using Quest.Entities;
-using Quest.Tiles;
-using System;
-using System.IO;
+﻿using System.IO;
 
 namespace Quest.Managers;
 public enum GameState
@@ -27,7 +24,8 @@ public enum Mood
     Epic,
 }
 
-public enum Weather {
+public enum Weather
+{
     Clear,
     Light,
     Heavy,
@@ -41,9 +39,11 @@ public static class StateManager
     // States
     public static bool IsGameState => State == GameState.Game || State == GameState.Editor;
     private static GameState _state = GameState.MainMenu;
-    public static GameState State {
+    public static GameState State
+    {
         get => _state;
-        set {
+        set
+        {
             PreviousState = _state;
             _state = value;
         }
@@ -60,11 +60,8 @@ public static class StateManager
     {
         WeatherNoise.SetSeed(Environment.TickCount);
         WeatherNoise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-        WeatherNoise.SetFrequency(0.001f);
-        WeatherNoise.SetFractalType(FastNoiseLite.FractalType.FBm);
-        WeatherNoise.SetFractalOctaves(3);
-        WeatherNoise.SetFractalLacunarity(2.0f);
-        WeatherNoise.SetFractalGain(0.5f);
+        WeatherNoise.SetFrequency(0.002f);
+        WeatherNoise.SetFractalType(FastNoiseLite.FractalType.None);
 
         var continuePersist = ReadKeyValueFile("continue");
         if (continuePersist.ContainsKey("lastSave"))
@@ -75,7 +72,7 @@ public static class StateManager
         State = PreviousState;
     }
     //public static float WeatherNoiseValue(float time) => ((time % 30) + 30) / 60;
-    public static float WeatherNoiseValue(float time) => WeatherNoise.GetNoise(time, 50) * 0.5f + 0.5f;
+    public static float WeatherNoiseValue(float time) => WeatherNoise.GetNoise(time, 0) * 0.5f + 0.5f;
     //public static float WeatherNoiseValue(float time) => currentWeatherNoise;
     public static float WeatherIntensity(float time) => Math.Min(Math.Max(WeatherNoiseValue(time) - rainThreshold, 0) / (1 - rainThreshold), 0.8f);
     public static void SaveDoorOpened(int idx)
