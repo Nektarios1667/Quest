@@ -12,6 +12,7 @@ public class MenuManager
     public GUI CreditsMenu { get; private set; }
     public GUI LevelSelectMenu { get; private set; }
     public GUI PauseMenu { get; private set; }
+    public GUI DebugMenu { get; private set; }
     private readonly GameManager gameManager;
     private readonly PlayerManager playerManager;
     // Widgets
@@ -91,6 +92,17 @@ public class MenuManager
         Button quitButton = new(PauseMenu, new(Constants.Middle.X - 150, 620), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => window.Exit(), [], text: "Quit", font: PixelOperatorSubtitle);
         
         PauseMenu.Widgets = [resumeButton, quicksaveButton, pauseSettingsButton, mainMenuButton, quitButton, pauseLabel];
+
+        // In-game debug
+        DebugMenu = new(window, batch, PixelOperator);
+        DebugMenu.LoadContent(content, "Images\\Gui");
+        HorizontalSlider timeSlider = new(DebugMenu, new(Constants.Middle.X, 20), 200, Color.Black, Color.Gray);
+        timeSlider.ValueChanged += (value) => gameManager.DayTime = value * 500;
+        Label timeLabel = new(DebugMenu, new(Constants.Middle.X - 100, 0), Color.Black, "Daytime");
+        HorizontalSlider weatherSlider = new(DebugMenu, new(Constants.Middle.X, 40), 200, Color.Black, Color.Gray);
+        //weatherSlider.ValueChanged += (value) => StateManager.currentWeatherNoise = value;
+        Label weatherLabel = new(DebugMenu, new(Constants.Middle.X - 100, 20), Color.Black, "Weather");
+        DebugMenu.Widgets = [timeSlider, timeLabel, weatherLabel, weatherSlider];
     }
     public void ContinueSave()
     {
@@ -166,6 +178,9 @@ public class MenuManager
             case GameState.LevelSelect:
                 LevelSelectMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
+            case GameState.Game:
+                //DebugMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                break;
         }
         
         switch (StateManager.OverlayState)
@@ -174,6 +189,7 @@ public class MenuManager
                 PauseMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
         }
+
 
         DebugManager.EndBenchmark("MenuUpdate");
     }
@@ -193,6 +209,9 @@ public class MenuManager
                 break;
             case GameState.LevelSelect:
                 DrawLevelSelection();
+                break;
+            case GameState.Game:
+                //DebugMenu.Draw();
                 break;
         }
 

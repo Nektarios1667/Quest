@@ -265,8 +265,8 @@ public class Window : Game
         debugSb.Append("\nLighting: ");
         debugSb.Append(LightingManager.Lights.Count);
         debugSb.Append("\nWeather: ");
-        debugSb.Append(StateManager.CurrentWeather(gameManager.GameTime));
-        debugSb.AppendFormat(" [{0:0.00}]", StateManager.GetWeatherNoiseValue(gameManager.GameTime));
+        debugSb.Append(StateManager.WeatherIntensity(gameManager.GameTime));
+        debugSb.AppendFormat(" [{0:0.00}]", StateManager.WeatherNoiseValue(gameManager.GameTime));
 
         FillRectangle(spriteBatch, new(0, 0, 220, debugSb.ToString().Split('\n').Length * 20), Color.Black * 0.8f);
         spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);

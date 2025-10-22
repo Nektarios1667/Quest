@@ -37,4 +37,12 @@ public static class ColorTools
     {
         return Math.Max(color.R, Math.Max(color.G, color.B));
     }
+    public static float Luminance(Color color)
+    {
+        float r = color.R / 255f;
+        float g = color.G / 255f;
+        float b = color.B / 255f;
+
+        return 0.2126f * r + 0.7152f * g + 0.0722f * b;
+    }
 }

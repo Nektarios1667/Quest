@@ -1,6 +1,8 @@
 ﻿using MonoGame.Extended;
 using SharpDX.MediaFoundation;
 using System.IO;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace Quest.Editor;
 public static class CodeGenerator
@@ -36,11 +38,30 @@ public static class CodeGenerator
                 WriteItemCode();
             else if (resp == "l" || resp == "loot table")
                 WriteLootTable();
+            else if (resp == "w" || resp == "weather noise")
+                TestWeatherNoise();
             else if (resp == "exit" || resp == "quit")
                 return;
             else
                 Console.WriteLine("Unknown response");
         }
+    }
+    public static void TestWeatherNoise()
+    {
+        float[] values = new float[600];
+        string data = "";
+        for (int t = 0; t < values.Length; t++)
+        {
+            values[t] = StateManager.WeatherNoiseValue(t + (int)DateTime.Now.Ticks);
+            data += values[t] < StateManager.rainThreshold ? "_" : "#";
+        }
+
+        float weatherPercent = values.Where(f => f >= 0.6).Sum() / values.Length;
+        float lightPercent = values.Where(f => f >= 0.6 && f < .75).Sum() / values.Length;
+        float heavyPercent = values.Where(f => f >= 0.75).Sum() / values.Length;
+
+        Console.WriteLine($"Weather: {weatherPercent*100:0.0}%\n  Light: {lightPercent*100:0.0}%\n  Heavy: {heavyPercent*100:0.0}%");
+        Console.WriteLine($"  String: {data}");
     }
     public static void ReloadSource()
     {

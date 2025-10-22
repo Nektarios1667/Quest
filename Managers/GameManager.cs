@@ -5,20 +5,17 @@ public class GameManager
 {
     public LevelManager LevelManager { get; private set; }
     public OverlayManager UIManager { get; private set; }
-    public float DeltaTime { get; private set; }
+    public float DeltaTime { get; private set; } = 0f;
     public float GameTime { get; private set; } = 0f;
     public float TotalTime { get; private set; } = 0f;
     public float DayTime { get; set; } = 0f;
     public SpriteBatch Batch { get; private set; }
-
-    public Inventory Inventory { get; set; }
 
     public GameManager(ContentManager content, SpriteBatch batch, LevelManager level, OverlayManager ui)
     {
         Batch = batch;
         LevelManager = level;
         UIManager = ui;
-        DeltaTime = 0;
 
         // Load sounds
         SoundManager.LoadSound(content, "Footstep", "Sounds/Effects/Footstep");

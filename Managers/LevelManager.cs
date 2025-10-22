@@ -52,30 +52,20 @@ public class LevelManager
 
         // Calculate sky colors from weather, biome, and time
         BiomeType? currentBiome = GetBiome(CameraManager.TileCoord);
-        Weather weather = StateManager.CurrentWeather(gameManager.GameTime);
+        float blend = StateManager.WeatherIntensity(gameManager.GameTime);
         SkyColor = ColorTools.GetSkyColor(gameManager.DayTime) * 0.9f;
 
-        if (currentBiome == null || currentBiome == BiomeType.Indoors || weather == Weather.Clear) WeatherColor = Color.Transparent;
-        else if (weather == Weather.Light)
-        {
+        if (currentBiome == null || currentBiome == BiomeType.Indoors || blend == 0) WeatherColor = Color.Transparent;
+        else {
             switch (currentBiome)
             {
-                case BiomeType.Temperate: WeatherColor = Color.LightBlue; break;
-                case BiomeType.Snowy: WeatherColor = Color.White; break;
-                case BiomeType.Desert: WeatherColor = Color.Yellow; break;
-                case BiomeType.Ocean: WeatherColor = Color.LightBlue; break;
-            }
-        } else if (weather == Weather.Heavy)
-        {
-            switch (currentBiome)
-            {
-                case BiomeType.Temperate: WeatherColor = Color.LightBlue; break;
+                case BiomeType.Temperate: WeatherColor = Color.MediumBlue; break;
                 case BiomeType.Snowy: WeatherColor = Color.White; break;
                 case BiomeType.Desert: WeatherColor = Color.OrangeRed; break;
                 case BiomeType.Ocean: WeatherColor = Color.Blue; break;
             }
         }
-        WeatherColor *= weather == Weather.Light ? 0.4f : 0.6f;
+        WeatherColor *= blend;
     }
     public void Draw(GameManager gameManager)
     {

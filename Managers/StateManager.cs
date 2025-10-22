@@ -1,5 +1,4 @@
-﻿using MonoGame.Extended.ECS;
-using Quest.Entities;
+﻿using Quest.Entities;
 using Quest.Tiles;
 using System;
 using System.IO;
@@ -36,7 +35,9 @@ public enum Weather {
 public static class StateManager
 {
     // Weather
-    public static readonly FastNoiseLite WeatherNoise = new();
+    public static readonly FastNoiseLite WeatherNoise = new((int)(DateTime.Now.Ticks ^ (DateTime.Now.Ticks >> 32)));
+    public const float rainThreshold = 0.66f;
+    //public static float currentWeatherNoise { get; set; }
     // States
     public static bool IsGameState => State == GameState.Game || State == GameState.Editor;
     private static GameState _state = GameState.MainMenu;
@@ -59,7 +60,7 @@ public static class StateManager
     {
         WeatherNoise.SetSeed(Environment.TickCount);
         WeatherNoise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-        WeatherNoise.SetFrequency(0.002f);
+        WeatherNoise.SetFrequency(0.001f);
         WeatherNoise.SetFractalType(FastNoiseLite.FractalType.FBm);
         WeatherNoise.SetFractalOctaves(3);
         WeatherNoise.SetFractalLacunarity(2.0f);
@@ -73,18 +74,10 @@ public static class StateManager
     {
         State = PreviousState;
     }
-    // public static float GetWeatherNoiseValue(float time) => WeatherNoise.GetNoise(time, 0) * 0.5f + 0.5f; // Normalize to [0, 1]
-    public static float GetWeatherNoiseValue(float time) => ((time % 30) + 30) / 60;
-    public static Weather CurrentWeather(float time)
-    {
-        float noiseValue = GetWeatherNoiseValue(time);
-        if (noiseValue < 0.6f)
-            return Weather.Clear;
-        else if (noiseValue < 0.8f)
-            return Weather.Light;
-        else
-            return Weather.Heavy;
-    }
+    //public static float WeatherNoiseValue(float time) => ((time % 30) + 30) / 60;
+    public static float WeatherNoiseValue(float time) => WeatherNoise.GetNoise(time, 50) * 0.5f + 0.5f;
+    //public static float WeatherNoiseValue(float time) => currentWeatherNoise;
+    public static float WeatherIntensity(float time) => Math.Min(Math.Max(WeatherNoiseValue(time) - rainThreshold, 0) / (1 - rainThreshold), 0.8f);
     public static void SaveDoorOpened(int idx)
     {
         openedDoors.Add(idx);
