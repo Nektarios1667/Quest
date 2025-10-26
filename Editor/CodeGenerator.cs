@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
+using ScottPlot;
+using ScottPlot.TickGenerators;
 
 namespace Quest.Editor;
 public static class CodeGenerator
@@ -45,20 +47,58 @@ public static class CodeGenerator
     }
     public static void TestWeatherNoise()
     {
-        float[] values = new float[3600];
-        string data = "";
-        for (int t = 0; t < values.Length; t++)
+        const int seconds = 3600;
+
+        float[] values = new float[seconds];
+        int[] times = new int[seconds];
+        float[] boost = new float[seconds];
+        float[] intensity = new float[seconds];
+
+        int offset = DateTime.Now.Millisecond;
+        StateManager.SetWeatherPersistent(lastTimeValue:offset);
+        for (int t = 0; t < seconds; t++)
         {
-            values[t] = StateManager.WeatherNoiseValue(t + (int)DateTime.Now.Ticks);
-            data += values[t] < StateManager.rainThreshold ? "_" : "#";
+            values[t] = StateManager.WeatherNoiseValue(t + offset);
+            times[t] = t;
+            boost[t] = StateManager.WeatherBoost(t + offset);
+            intensity[t] = StateManager.WeatherIntensity(t + offset);
         }
 
-        float weatherPercent = values.Where(f => f >= StateManager.rainThreshold).Count() / (float)values.Length;
-        float lightPercent = values.Where(f => f >= StateManager.rainThreshold && f < StateManager.rainThreshold + 0.1f).Count() / (float)values.Length;
-        float heavyPercent = values.Where(f => f >= StateManager.rainThreshold + 0.1f).Count() / (float)values.Length;
+        float weatherPercent = values.Where(f => f >= StateManager.weatherThreshold).Count() / (float)seconds;
+        float lightPercent = values.Where(f => f >= StateManager.weatherThreshold && f < StateManager.weatherThreshold + 0.1f).Count() / (float)seconds;
+        float heavyPercent = values.Where(f => f >= 1 - StateManager.weatherThreshold / 2).Count() / (float)seconds;
 
         Console.WriteLine($"Weather: {weatherPercent * 100:0.0}%\n  Light: {lightPercent * 100:0.0}%\n  Heavy: {heavyPercent * 100:0.0}%");
-        Console.WriteLine($"  String: {data}");
+
+        Plot plot = new();
+        plot.Axes.Bottom.TickGenerator = new NumericFixedInterval(120);
+
+        var intensityVal = plot.Add.Scatter(times, intensity, color: Colors.Orange);
+        intensityVal.MarkerShape = MarkerShape.None;
+        intensityVal.LineWidth = 2;
+
+        var boostVal = plot.Add.Scatter(times, boost, color: Colors.Green);
+        boostVal.MarkerShape = MarkerShape.None;
+        boostVal.LineWidth = 2;
+
+        var weatherVal = plot.Add.Scatter(times, values, color: Colors.Blue);
+        weatherVal.MarkerShape = MarkerShape.None;
+        weatherVal.LineWidth = 3;
+
+        var lightLine = plot.Add.HorizontalLine(StateManager.weatherThreshold, pattern: LinePattern.Dotted);
+        lightLine.Color = Colors.Orange;
+        lightLine.LineWidth = 2;
+
+        var heavyLine = plot.Add.HorizontalLine(1 - StateManager.weatherThreshold / 2, pattern: LinePattern.Dotted);
+        heavyLine.Color = Colors.Red;
+        heavyLine.LineWidth = 2;
+
+        var info = plot.Add.Text($"Weather: {weatherPercent * 100:0.0}% Light: {lightPercent * 100:0.0}% Heavy: {heavyPercent * 100:0.0}%", 1, 0);
+        info.LabelFontSize = 16;
+        info.LabelFontColor = Colors.Green;
+
+        plot.SavePng("weather.png", 1200, 400);
+
     }
     public static void ReloadSource()
     {

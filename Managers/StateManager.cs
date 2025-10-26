@@ -32,10 +32,17 @@ public enum Weather
 }
 public static class StateManager
 {
+    // Weather controls
+    private const float mu = .1f; // Max boost
+    private const float zeta = 2; // Rain boost depletion
+    private const float alpha = 300; // Rain boost acivation time
     // Weather
     public static readonly FastNoiseLite WeatherNoise = new((int)(DateTime.Now.Ticks ^ (DateTime.Now.Ticks >> 32)));
-    public const float rainThreshold = 0.66f;
-    //public static float currentWeatherNoise { get; set; }
+    private static int _weatherSeed = Environment.TickCount;
+    public static int WeatherSeed { get => _weatherSeed; set { _weatherSeed = value; WeatherNoise.SetSeed(value); } }
+    public const float weatherThreshold = 0.65f;
+    private static float lastWeather = 0f;
+    private static float lastTime = -1f;
     // States
     public static bool IsGameState => State == GameState.Game || State == GameState.Editor;
     private static GameState _state = GameState.MainMenu;
@@ -58,23 +65,50 @@ public static class StateManager
     private static readonly HashSet<Chest> chests = [];
     static StateManager()
     {
-        WeatherNoise.SetSeed(Environment.TickCount);
-        WeatherNoise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-        WeatherNoise.SetFrequency(0.002f);
-        WeatherNoise.SetFractalType(FastNoiseLite.FractalType.None);
+        WeatherNoise.SetSeed(WeatherSeed);
+        WeatherNoise.SetNoiseType(FastNoiseLite.NoiseType.ValueCubic);
+        WeatherNoise.SetFrequency(0.005f);
+        WeatherNoise.SetFractalType(FastNoiseLite.FractalType.FBm);
+        WeatherNoise.SetFractalOctaves(3);
 
         var continuePersist = ReadKeyValueFile("continue");
-        if (continuePersist.ContainsKey("lastSave"))
-            ContinueSave = continuePersist["lastSave"];
+        if (continuePersist.TryGetValue("lastSave", out string? value))
+            ContinueSave = value;
+    }
+    public static void SetWeatherPersistent(int seed = -1, float lastWeatherTime = 0f, float lastTimeValue = -1f)
+    {
+        if (seed != -1)
+            WeatherNoise.SetSeed(seed);
+        lastWeather = lastWeatherTime;
+        lastTime = lastTimeValue;
     }
     public static void RevertGameState()
     {
         State = PreviousState;
     }
-    //public static float WeatherNoiseValue(float time) => ((time % 30) + 30) / 60;
-    public static float WeatherNoiseValue(float time) => WeatherNoise.GetNoise(time, 0) * 0.5f + 0.5f;
-    //public static float WeatherNoiseValue(float time) => currentWeatherNoise;
-    public static float WeatherIntensity(float time) => Math.Min(Math.Max(WeatherNoiseValue(time) - rainThreshold, 0) / (1 - rainThreshold), 0.8f);
+    public static float WeatherNoiseValue(float time)
+    {
+        float val = WeatherNoise.GetNoise(time, 0) * 0.5f + 0.5f;
+        val = 1f / (1 + (float)Math.Pow(MathHelper.E, -8 * (val - 0.5f)));
+        float delta = lastTime == -1 ? 0 : (time - lastTime);
+
+        // Weather buildup
+        val += WeatherBoost(time);
+        if (val >= weatherThreshold)
+        {
+            lastWeather += Math.Min(12 * delta * (val - weatherThreshold) / (1 - weatherThreshold), time - lastWeather);
+        }
+
+        lastTime = time;
+
+        return val;
+    }
+    public static float WeatherBoost(float time)
+    {
+        if (time - lastWeather > 600) return Math.Min((time - lastWeather - 600) / 1800f, 0.1f);
+        return 0;
+    }
+    public static float WeatherIntensity(float time) => Math.Min((float)Math.Sqrt(Math.Max(WeatherNoiseValue(time) - weatherThreshold, 0) / (1 - weatherThreshold)), 0.8f);
     public static void SaveDoorOpened(int idx)
     {
         openedDoors.Add(idx);
@@ -93,6 +127,9 @@ public static class StateManager
             // Write GameManager data
             writer.Write(gameManager.LevelManager.Level.Name);
             writer.Write(gameManager.DayTime);
+            writer.Write(gameManager.GameTime);
+            writer.Write(WeatherSeed);
+            writer.Write(lastWeather);
             // Write CameraManager data
             writer.Write(CameraManager.CameraDest.X);
             writer.Write(CameraManager.CameraDest.Y);
@@ -173,6 +210,10 @@ public static class StateManager
             gameManager.LevelManager.LoadLevel(gameManager, level);
 
             gameManager.DayTime = reader.ReadSingle();
+            gameManager.GameTime = reader.ReadSingle();
+            WeatherSeed = reader.ReadInt32();
+            lastWeather = reader.ReadSingle();
+            SetWeatherPersistent(lastWeatherTime:lastWeather, lastTimeValue: gameManager.GameTime);
             // Read CameraManager data
             CameraManager.CameraDest = new(reader.ReadSingle(), reader.ReadSingle());
             CameraManager.Camera = CameraManager.CameraDest;

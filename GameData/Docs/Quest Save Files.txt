@@ -1,5 +1,8 @@
 string - level
 float - daytime
+float - gametime
+int - weather seed
+float - last weather
 
 float - cameraX
 float - cameraY
