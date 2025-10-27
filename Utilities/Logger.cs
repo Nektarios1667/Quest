@@ -4,7 +4,7 @@ public static class Logger
 {
     private static readonly List<string> MessageLevels = ["Input", "System", "Log", "Warning", "Error"];
     private static readonly List<ConsoleColor> MessageColors = [ConsoleColor.Cyan, ConsoleColor.Blue, ConsoleColor.Green, ConsoleColor.Yellow, ConsoleColor.Red];
-    private static string timestamp => DateTime.Now.ToString("HH:mm:ss.fff");
+    private static string Timestamp => DateTime.Now.ToString("HH:mm:ss.fff");
     public static void CreateLevel(string levelName, ConsoleColor color)
     {
         if (!MessageLevels.Contains(levelName))
@@ -18,7 +18,7 @@ public static class Logger
         if (MessageLevels.Contains(type))
         {
             Console.ForegroundColor = MessageColors[MessageLevels.IndexOf(type)];
-            Console.WriteLine($"({timestamp}) [{type}] {message}");
+            Console.WriteLine($"({Timestamp}) [{type}] {message}");
             Console.ForegroundColor = ConsoleColor.White; // Reset color
         }
         else
@@ -31,14 +31,18 @@ public static class Logger
             return result;
         else
         {
-            Error("Invalid input- expected an integer.");
+            Error($"Invalid input {resp} - expected an integer.");
             return fallback; // Default value or handle as needed
         }
     }
     public static byte InputByte(string message, byte fallback = 0)
     {
         int resp = InputInt(message);
-        if (resp < 0 || resp > 255) return fallback;
+        if (resp < 0 || resp > 255)
+        {
+            Error("Invalid input- expected a byte value (0-255).");
+            return fallback;
+        }
         return (byte)resp;
     }
     public static TextureID InputTexture(string message, TextureID fallback = TextureID.Null)
@@ -48,7 +52,7 @@ public static class Logger
             return texture;
         else
         {
-            Error("Invalid input- expected a valid character texture name.");
+            Error($"Invalid input {resp}- expected a valid character texture name.");
             return fallback;
         }
     }
@@ -72,7 +76,7 @@ public static class Logger
     public static string Input(string message)
     {
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Input")];
-        Console.WriteLine($"({timestamp}) [Input] {message}");
+        Console.WriteLine($"({Timestamp}) [Input] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color
         return Console.ReadLine() ?? "";
     }
@@ -83,7 +87,7 @@ public static class Logger
     public static void System(string message)
     {
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("System")];
-        Console.WriteLine($"({timestamp}) [System] {message}");
+        Console.WriteLine($"({Timestamp}) [System] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color
     }
     public static void Log(string message)
@@ -91,19 +95,19 @@ public static class Logger
         if (!DebugManager.LogInfo) return; // Skip logging if not enabled
 
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Log")];
-        Console.WriteLine($"({timestamp}) [Log] {message}");
+        Console.WriteLine($"({Timestamp}) [Log] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color
     }
     public static void Warning(string message)
     {
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Warning")];
-        Console.WriteLine($"({timestamp}) [Warning] {message}");
+        Console.WriteLine($"({Timestamp}) [Warning] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color
     }
     public static void Error(string message, bool exit = false)
     {
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Error")];
-        Console.WriteLine($"({timestamp}) [Error] {message}");
+        Console.WriteLine($"({Timestamp}) [Error] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color
         if (exit) Environment.Exit(1);
     }

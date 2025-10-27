@@ -1,0 +1,5 @@
+.qmc file - Quest Macro file - text based command macro
+
+[Example]
+daytime set 200
+move_speed 999

@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using Quest.Editor;
+using System.IO;
+using System.Linq;
 using SysColor = System.Drawing.Color;
 namespace Quest.Managers;
 
@@ -83,7 +85,8 @@ public static class CommandManager
             new("say **", CSay, "|*|", "Failed to speak."),
             new($"daytime <modify> {{-{Constants.DayLength}:{Constants.DayLength}}}", CDaytime, "Daytime |1| |2|", "Failed |1| daytime |2|"),
             new("store * *", CStore, "Stored |2| to '|1|'", "Failed to store |2| to '|1|'"),
-            new("gametime <modify> {-999999:999999}", CGameTime, "Game time|1| |2|", "Failed |1| gametime |2|")
+            new("gametime <modify> {-999999:999999}", CGameTime, "Game time |1| |2|", "Failed |1| gametime |2|"),
+            new("macro *", CMacro, "Executed macro '|1|'.", "Failed to execute macro '|1|'."),
         ];
     }
     public static (bool success, string output) Execute(string command)
@@ -98,12 +101,12 @@ public static class CommandManager
     public static (bool success, string output) OpenCommandPrompt()
     {
         string[]? result = null;
-        Editor.PopupFactory.ShowInputForm("Command", [new("Enter command")], false, values =>
+        PopupFactory.ShowInputForm("Command", [new("Enter command")], false, values =>
         {
             string command = values[0].Trim();
             var (success, output) = Execute(command);
             if (output != "$noout")
-                Editor.PopupFactory.SetOutputLabel(output, success ? SysColor.Green : SysColor.Red);
+                PopupFactory.SetOutputLabel(output, success ? SysColor.Green : SysColor.Red);
         });
 
         if (result == null)
@@ -265,17 +268,36 @@ public static class CommandManager
     {
         string[] parts = command.Split(' ');
         if (parts.Length < 2) return false;
-        int daytime = int.Parse(parts[1]);
-        if (parts[0] == "set")
+        int daytime = int.Parse(parts[2]);
+        if (parts[1] == "set")
         {
             gameManager!.GameTime = daytime;
             return true;
         }
-        else if (parts[0] == "change")
+        else if (parts[1] == "change")
         {
             gameManager!.GameTime += daytime;
             return true;
         }
         return false;
+    }
+    private static bool CMacro(string command)
+    {
+        string macroName = command.Split(' ')[1];
+
+        // Read
+        if (!File.Exists($"GameData\\Persistent\\{macroName}.qmc")) return false;
+        string[] macroLines = File.ReadAllLines($"GameData\\Persistent\\{macroName}.qmc");
+        for (int s = 0; s < macroLines.Length; s++)
+        {
+            var (success, output) = Execute(macroLines[s]);
+            if (!success)
+            {
+                PopupFactory.ShowMessage("Macro Error", $"Error in macro '{macroName}' on line {s + 1}:\n{output}");
+                return false;
+            }
+        }
+
+        return true;
     }
 }

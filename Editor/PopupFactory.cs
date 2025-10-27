@@ -13,7 +13,6 @@ public static class PopupFactory
 {
     public static bool PopupOpen { get; private set; } = false;
     public static Form? Form { get; private set; }
-
     public static (bool success, string[] values) ShowInputForm(string title, InputField[] fields, bool closeOnEnter = true, Action<string[]>? onSubmit = null)
     {
         if (PopupOpen) return (false, Array.Empty<string>());
@@ -138,6 +137,10 @@ public static class PopupFactory
         }
 
         return (false, Array.Empty<string>());
+    }
+    public static void ShowMessage(string title, string message)
+    {
+        System.Windows.Forms.MessageBox.Show(title, message);
     }
     private static string[] GetValues(List<Control> inputs)
     {

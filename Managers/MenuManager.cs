@@ -103,7 +103,7 @@ public class MenuManager
         Label weatherLabel = new(DebugMenu, new(Constants.Middle.X - 100, 20), Color.Black, "Weather");
         DebugMenu.Widgets = [timeSlider, timeLabel, weatherLabel, weatherSlider];
     }
-    public void ContinueSave()
+    private void ContinueSave()
     {
         if (StateManager.ContinueSave != "")
         {
@@ -126,7 +126,7 @@ public class MenuManager
         worlds.Items.Clear();
         worlds.AddItems([.. gameManager.LevelManager.Levels.Select(l => l.Name.Replace("\\", " - "))]);
     }
-    public void DeleteSelectedSave()
+    private void DeleteSelectedSave()
     {
         if (saves.Selected != null && saves.Selected != "(New Save)")
         {
@@ -136,7 +136,7 @@ public class MenuManager
             LoadSaves(worlds.Selected);
         }
     }
-    public void LoadSaves(string level)
+    private void LoadSaves(string level)
     {
         saves.Items.Clear();
         string[] dir = level.Replace(" - ", "\\").Split('\\', '/');
@@ -147,7 +147,7 @@ public class MenuManager
         saves.AddItems(savesList);
         saves.AddItems("(New Save)");
     }
-    public void OpenSave()
+    private void OpenSave()
     {
         string world = StringTools.ParseLevelPath(worlds.Selected).world;
 
@@ -252,7 +252,6 @@ public class MenuManager
     }
     private void DrawPauseMenu()
     {
-
         gameManager.Batch.FillRectangle(new(Vector2.Zero, Constants.Window), Color.Black * 0.6f);
         PauseMenu.Draw();
     }

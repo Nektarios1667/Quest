@@ -24,7 +24,7 @@ public static class CodeGenerator
         {
             ReloadSource();
             // CLI
-            Console.WriteLine("New [t]ile, [d]ecal, [i]tem, or [l]oot table: ");
+            Console.WriteLine("[t]ile, [d]ecal, [i]tem, [l]oot table, or [w]eather test: ");
             string? resp = Console.ReadLine()?.ToLower();
             if (resp == null || resp == "") continue;
 
