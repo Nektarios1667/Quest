@@ -55,7 +55,8 @@ public class Window : Game
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
         IsFixedTimeStep = Constants.FPS != -1;
-        TargetElapsedTime = TimeSpan.FromSeconds(Constants.FPS != -1 ? 1d / Constants.FPS : 0);
+        if (IsFixedTimeStep)
+            TargetElapsedTime = TimeSpan.FromSeconds(1d / Constants.FPS);
         Logger.System("Initialized game window object.");
     }
 
@@ -87,7 +88,7 @@ public class Window : Game
         // Managers
         playerManager = new();
         levelManager = new();
-        overlayManager = new(levelManager);
+        overlayManager = new(levelManager, playerManager);
         gameManager = new(Content, spriteBatch, levelManager, overlayManager);
         menuManager = new(this, spriteBatch, Content, gameManager, playerManager);
         levelManager.LevelLoaded += _ => playerManager.CloseContainer();

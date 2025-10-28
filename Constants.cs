@@ -15,7 +15,7 @@ public static class Constants
     public static readonly Point Window = new(1400, 900); // Game window resolution
     public static readonly Rectangle WindowRect = new(Point.Zero, Window); // Game window rectangle
     public static readonly float CameraRigidity = .07f; // Camera smoothing weight
-    public const int FPS = 120;
+    public const int FPS = -1; // -1 = unlimited
     public const bool VSYNC = false;
 
     // Tile and map

@@ -17,11 +17,12 @@ public class OverlayManager
     // Lighting
     private FloodLightingGrid lightGrid = null!;
     private bool[,] blocked = new bool[0, 0];
+    private Color[,] biomeColors = new Color[0, 0];
     private Point start;
     private const int lightDivisions = 2;
     private const float invLightDivisions = 1f / lightDivisions;
     private bool updateLighting = true;
-    public OverlayManager(LevelManager levelManager)
+    public OverlayManager(LevelManager levelManager, PlayerManager? playerManager)
     {
         Gui = new()
         {
@@ -31,8 +32,13 @@ public class OverlayManager
             ]
         };
 
-
-        TimerManager.SetTimer("lightingUpdates", 0.1f, () => updateLighting = true, int.MaxValue);
+        // Trigger lighting updates
+        if (playerManager != null)
+        {
+            playerManager.Inventory.EquippedSlotChanged += (_) => updateLighting = true;
+            playerManager.Inventory.ItemDropped += (_) => updateLighting = true;
+        }
+        TimerManager.SetTimer("LightingUpdate", 1f, () => updateLighting = true, int.MaxValue);
         CameraManager.CameraMove += (_, _) => updateLighting = true;
     }
     public void Update(GameManager gameManager)
@@ -103,7 +109,9 @@ public class OverlayManager
 
         DebugManager.StartBenchmark("Lighting");
         if (updateLighting)
-            RecalculateLighting(gameManager.LevelManager);
+            Logger.Log("OverlayManager: Lighting update requested.");
+        if (updateLighting)
+            RecalculateLighting(gameManager);
         DebugManager.EndBenchmark("Lighting");
 
         DebugManager.StartBenchmark("DrawLighting");
@@ -112,18 +120,23 @@ public class OverlayManager
         {
             for (int x = 0; x < lightGrid.Width; x++)
             {
+                // Light
                 float light = lightGrid.Grid[x, y].LightLevel;
                 float intensity = Math.Clamp(light / (10 * lightDivisions), 0, 1);
                 intensity = (float)Math.Pow(intensity, 0.8);
+
+                // Draw
                 Rectangle rect = new((new Point(x, y) + start.Scaled(lightDivisions)) * Constants.TileSize.Scaled(invLightDivisions) + Constants.Middle - CameraManager.Camera.ToPoint(), Constants.TileSize.Scaled(invLightDivisions));
                 gameManager.Batch.FillRectangle(rect, gameManager.LevelManager.SkyColor * (1 - intensity));
-                gameManager.Batch.FillRectangle(rect, gameManager.LevelManager.WeatherColor * (1 - intensity));
+
+                // Biome
+                gameManager.Batch.FillRectangle(rect, biomeColors[x / lightDivisions, y / lightDivisions] * (1 - intensity));
             }
         }
 
         DebugManager.EndBenchmark("DrawLighting");
     }
-    public void RecalculateLighting(LevelManager levelManager)
+    public void RecalculateLighting(GameManager gameManager)
     {
         updateLighting = false;
 
@@ -142,7 +155,7 @@ public class OverlayManager
         for (int y = 0; y < tileHeight; y++)
             for (int x = 0; x < tileWidth; x++)
             {
-                Tile? tile = levelManager.GetTile(x + start.X, y + start.Y);
+                Tile? tile = gameManager.LevelManager.GetTile(x + start.X, y + start.Y);
                 bool isBlocked = tile == null || (tile.IsWall && !tile.IsWalkable);
                 for (int dy = 0; dy < lightDivisions; dy++)
                     for (int dx = 0; dx < lightDivisions; dx++)
@@ -166,7 +179,19 @@ public class OverlayManager
         }
         lightGrid.Run();
 
-        DebugManager.EndBenchmark("Lighting");
+        // Biome
+        if (biomeColors.GetLength(0) != tileWidth || biomeColors.GetLength(1) != tileHeight)
+            biomeColors = new Color[tileWidth, tileHeight];
+        float blend = StateManager.WeatherIntensity(gameManager.GameTime);
+        for (int y = 0; y < tileHeight; y++)
+        {
+            for (int x = 0; x < tileWidth; x++)
+            {
+                // Biome
+                Point worldLoc = ((new Point(x, y) + start) * Constants.TileSize) / Constants.TileSize;
+                biomeColors[x, y] = gameManager.LevelManager.GetWeatherColor(gameManager, worldLoc, blend);
+            }
+        }
     }
     public void DrawMiniMap(GraphicsDevice device, GameManager gameManager)
     {

@@ -9,7 +9,6 @@ public class LevelManager
     public List<Level> Levels { get; private set; }
     public Level Level { get; private set; }
     public Color SkyColor { get; set; }
-    public Color WeatherColor { get; set; }
     public event Action<string>? LevelLoaded;
     public static readonly Point lootStackOffset = new(4, 4);
     public LevelManager()
@@ -48,24 +47,28 @@ public class LevelManager
             SkyColor = Level.Tint;
             return;
         }
-
-        // Calculate sky colors from weather, biome, and time
-        BiomeType? currentBiome = GetBiome(CameraManager.TileCoord);
-        float blend = StateManager.WeatherIntensity(gameManager.GameTime);
         SkyColor = ColorTools.GetSkyColor(gameManager.DayTime) * 0.9f;
+    }
+    public Color GetWeatherColor(GameManager gameManager, Point loc, float? blend = null)
+    {
+        // Calculate sky colors from weather, biome, and time
+        BiomeType? currentBiome = GetBiome(loc);
+        blend ??= StateManager.WeatherIntensity(gameManager.GameTime);
 
-        if (currentBiome == null || currentBiome == BiomeType.Indoors || blend == 0) WeatherColor = Color.Transparent;
+        Color weatherColor = default;
+        if (currentBiome == null || currentBiome == BiomeType.Indoors || blend == 0) weatherColor = Color.Transparent;
         else
         {
             switch (currentBiome)
             {
-                case BiomeType.Temperate: WeatherColor = Color.MediumBlue; break;
-                case BiomeType.Snowy: WeatherColor = Color.White; break;
-                case BiomeType.Desert: WeatherColor = Color.OrangeRed; break;
-                case BiomeType.Ocean: WeatherColor = Color.Blue; break;
+                case BiomeType.Temperate: weatherColor = Color.MediumBlue; break;
+                case BiomeType.Snowy: weatherColor = Color.White; break;
+                case BiomeType.Desert: weatherColor = Color.OrangeRed; break;
+                case BiomeType.Ocean: weatherColor = Color.Blue; break;
             }
         }
-        WeatherColor *= blend;
+        weatherColor *= blend.Value;
+        return weatherColor;
     }
     public void Draw(GameManager gameManager)
     {

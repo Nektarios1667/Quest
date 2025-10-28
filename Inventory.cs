@@ -8,9 +8,15 @@ public interface IContainer
 
 public class Inventory
 {
+    public event Action<int>? EquippedSlotChanged;
+    public event Action<Item>? ItemDropped;
     public Item?[,] Items { get; private set; }
     public bool Opened { get; set; } = false;
-    public int EquippedSlot { get; set; }
+    private int _equippedSlot;
+    public int EquippedSlot {
+        get => _equippedSlot;
+        set { _equippedSlot = value; EquippedSlotChanged?.Invoke(value); }
+    }
     public Item? Equipped => Items.Length > 0 ? Items[EquippedSlot, 0] : null;
     public int HoverSlot { get; set; }
     public int Width { get; }
@@ -166,7 +172,11 @@ public class Inventory
         if (Opened && HoverSlot >= 0 && isPlayer && InputManager.KeyDown(Keys.D))
         {
             Item? item = GetItem(HoverSlot);
-            if (item != null) gameManager.LevelManager.DropLoot(gameManager, new Loot(item.Name, item.Amount, CameraManager.PlayerFoot + Constants.MageDrawShift, gameManager.GameTime));
+            if (item != null)
+            {
+                gameManager.LevelManager.DropLoot(gameManager, new Loot(item.Name, item.Amount, CameraManager.PlayerFoot + Constants.MageDrawShift, gameManager.GameTime));
+                ItemDropped?.Invoke(item);
+            }
             SetSlot(HoverSlot, null);
             SoundManager.PlaySoundInstance("Trinkets");
         }

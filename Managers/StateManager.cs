@@ -108,7 +108,8 @@ public static class StateManager
         if (time - lastWeather > 600) return Math.Min((time - lastWeather - 600) / 1800f, 0.1f);
         return 0;
     }
-    public static float WeatherIntensity(float time) => Math.Min((float)Math.Sqrt(Math.Max(WeatherNoiseValue(time) - weatherThreshold, 0) / (1 - weatherThreshold)), 0.8f);
+    public static float NoiseToIntensity(float noise) => Math.Min((float)Math.Sqrt(Math.Max(noise - weatherThreshold, 0) / (1 - weatherThreshold)), 0.8f);
+    public static float WeatherIntensity(float time) => NoiseToIntensity(WeatherNoiseValue(time));
     public static void SaveDoorOpened(int idx)
     {
         openedDoors.Add(idx);
