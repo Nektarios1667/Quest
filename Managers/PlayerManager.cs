@@ -50,6 +50,10 @@ public class PlayerManager : IContainer
             if (OpenedContainer != null) CloseContainer();
             else OpenContainer(this);
         }
+        if (InputManager.KeyPressed(Keys.Escape))
+        {
+            if (OpenedContainer != null) CloseContainer();
+        }
 
         // Loot
         DebugManager.StartBenchmark("UpdateLoot");

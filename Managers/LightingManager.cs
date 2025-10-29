@@ -1,4 +1,6 @@
-﻿namespace Quest.Managers;
+﻿using System.Linq;
+
+namespace Quest.Managers;
 
 public class FloodLightingGrid
 {
@@ -74,34 +76,45 @@ public readonly struct RadialLight
     public Point Position { get; }
     public int Size { get; }
     public Color Color { get; }
-    public float Importance { get; }
-    public RadialLight(Point pos, int size, Color color)
+    public bool SingleFrame { get; init; }
+    public RadialLight(Point pos, int size, Color color, bool singleFrame = false)
     {
         Position = pos;
         Size = size;
         Color = color;
+        SingleFrame = singleFrame;
     }
 }
 
 public static class LightingManager
 {
     public static Dictionary<string, RadialLight> Lights { get; private set; } = [];
+    public static void Update()
+    {
+        foreach (var key in Lights.Keys.ToList())
+        {
+            var light = Lights[key];
+            if (light.SingleFrame)
+                Lights.Remove(key);
+        }
+    }
     public static void CreateLight(string name, Point pos, float tileSize, Color color)
     {
         if (Lights.ContainsKey(name)) return;
         Lights[name] = new(pos, (int)(tileSize * Constants.TileSize.X), color);
     }
-    public static void SetLight(string name, Point pos, float tileSize, Color color) => Lights[name] = new(pos, (int)(tileSize * Constants.TileSize.X), color);
+    public static void SetLight(string name, Point pos, float tileSize, Color color, bool singleFrame = false) => Lights[name] = new(pos, (int)(tileSize * Constants.TileSize.X), color, singleFrame);
+    public static RadialLight[] GetVisibleLights() => [.. Lights.Values.Where(LightAffectsScreen)];
     public static void RemoveLight(string name) => Lights.Remove(name);
     public static void ClearLights() => Lights.Clear();
     public static bool LightAffectsScreen(RadialLight light)
     {
         // Light's circular bounds
         float radius = light.Size;
-        float left = light.Position.X - radius;
-        float right = light.Position.X + radius;
-        float top = light.Position.Y - radius;
-        float bottom = light.Position.Y + radius;
+        float left = light.Position.X - radius * Constants.TileSize.X;
+        float right = light.Position.X + radius * Constants.TileSize.X;
+        float top = light.Position.Y - radius * Constants.TileSize.Y;
+        float bottom = light.Position.Y + radius * Constants.TileSize.Y;
 
         // AABB check
         return right > 0 && left < Constants.Window.X && bottom > 0 && top < Constants.Window.Y;

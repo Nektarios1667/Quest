@@ -147,6 +147,7 @@ public class Window : Game
         CameraManager.Update(delta);
         TimerManager.Update(gameManager);
         SoundtrackManager.Update();
+        LightingManager.Update();
 
         gameManager.Update(delta);
         playerManager.Update(gameManager);
@@ -262,7 +263,7 @@ public class Window : Game
         debugSb.Append("\nDaylight: ");
         debugSb.AppendFormat("{0:0}%", ColorTools.GetDaylightPercent(gameManager.DayTime));
         debugSb.Append("\nLighting: ");
-        debugSb.Append(LightingManager.Lights.Count);
+        debugSb.AppendFormat("{0}/{1}", LightingManager.GetVisibleLights().Length, LightingManager.Lights.Count);
         debugSb.Append("\nWeather: ");
         debugSb.Append(StateManager.WeatherIntensity(gameManager.GameTime));
         debugSb.AppendFormat(" [{0:0.00}]", StateManager.WeatherNoiseValue(gameManager.GameTime));

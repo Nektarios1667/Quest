@@ -1,4 +1,4 @@
-teleport 15,15
+teleport 30,130
 daytime set 200
 gametime set 1000
 move_speed 999
