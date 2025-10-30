@@ -122,8 +122,11 @@ public class OverlayManager
             {
                 // Light
                 float light = lightGrid.Grid[x, y].LightLevel;
-                float intensity = Math.Clamp(light / (10 * lightDivisions), 0, 1);
-                intensity = (float)Math.Pow(intensity, 0.8);
+                //float intensity = Math.Clamp(light / (10 * lightDivisions), 0, 1);
+                //intensity = (float)Math.Pow(intensity, 0.8);
+                const float lightScale = 10;
+                float intensity = 1f - MathF.Exp(-light / lightScale);
+                intensity = Math.Clamp(intensity, 0f, 1f);
 
                 // Draw
                 Rectangle rect = new((new Point(x, y) + start.Scaled(lightDivisions)) * Constants.TileSize.Scaled(invLightDivisions) + Constants.Middle - CameraManager.Camera.ToPoint(), Constants.TileSize.Scaled(invLightDivisions));
