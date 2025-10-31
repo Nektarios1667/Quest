@@ -15,8 +15,8 @@ public class MenuManager
     private readonly GameManager gameManager;
     private readonly PlayerManager playerManager;
     // Widgets
-    private readonly ListBox worlds;
-    private readonly ListBox saves;
+    private readonly ScrollBox worlds;
+    private readonly ScrollBox saves;
     public MenuManager(Game window, SpriteBatch batch, ContentManager content, GameManager gameManager, PlayerManager playerManager)
     {
         this.gameManager = gameManager;
@@ -25,11 +25,11 @@ public class MenuManager
         // Main Menu
         MainMenu = new(window, batch, PixelOperator);
         MainMenu.LoadContent(content, "Images\\Gui");
-        Button startButton = new(MainMenu, new(Constants.Middle.X - 150, 300), new(300, 75), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => StateManager.State = GameState.LevelSelect, [], text: "Start", font: PixelOperatorSubtitle, border: 0);
-        Button continueButton = new(MainMenu, new(Constants.Middle.X - 150, 400), new(300, 75), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, ContinueSave, [], text: "Continue", font: PixelOperatorSubtitle, border: 0);
-        Button settingsButton = new(MainMenu, new(Constants.Middle.X - 150, 500), new(300, 75), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => StateManager.State = GameState.Settings, [], text: "Settings", font: PixelOperatorSubtitle, border: 0);
-        Button creditsButton = new(MainMenu, new(Constants.Middle.X - 150, 600), new(300, 75), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => StateManager.State = GameState.Credits, [], text: "Credits", font: PixelOperatorSubtitle, border: 0);
-        Button exitButton = new(MainMenu, new(Constants.Middle.X - 150, 700), new(300, 75), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => window.Exit(), [], text: "Exit", font: PixelOperatorSubtitle, border: 0);
+        Button startButton = new(MainMenu, new(Constants.Middle.X - 150, 220), new(300, 70), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => StateManager.State = GameState.LevelSelect, [], text: "Start", font: PixelOperatorSubtitle, border: 0);
+        Button continueButton = new(MainMenu, new(Constants.Middle.X - 150, 310), new(300, 70), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, ContinueSave, [], text: "Continue", font: PixelOperatorSubtitle, border: 0);
+        Button settingsButton = new(MainMenu, new(Constants.Middle.X - 150, 400), new(300, 70), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => StateManager.State = GameState.Settings, [], text: "Settings", font: PixelOperatorSubtitle, border: 0);
+        Button creditsButton = new(MainMenu, new(Constants.Middle.X - 150, 490), new(300, 70), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => StateManager.State = GameState.Credits, [], text: "Credits", font: PixelOperatorSubtitle, border: 0);
+        Button exitButton = new(MainMenu, new(Constants.Middle.X - 150, 580), new(300, 70), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => window.Exit(), [], text: "Exit", font: PixelOperatorSubtitle, border: 0);
         MainMenu.Widgets = [startButton, continueButton, settingsButton, creditsButton, exitButton];
 
         // Settings Menu
@@ -67,16 +67,16 @@ public class MenuManager
         LevelSelectMenu = new(window, batch, PixelOperator);
         LevelSelectMenu.LoadContent(content, "Images\\Gui");
 
-        worlds = new(LevelSelectMenu, new(220, 100), new(520, 700), Color.White, Color.Black * .6f, Color.LightBlue * .5f, border: 2, borderColor: Color.Cyan * .2f, seperation: 0);
-        saves = new(LevelSelectMenu, new(800, 100), new(300, 700), Color.White, Color.Black * .6f, Color.LightBlue * .5f, border: 2, borderColor: Color.Cyan * .2f, seperation: 0);
+        worlds = new(LevelSelectMenu, new(220, 50), new(520, 600), Color.White, Color.Black * .6f, Color.LightBlue * .5f, border: 2, borderColor: Color.Cyan * .2f, troughColor: Color.Black * .6f, seperation: 0);
+        saves = new(LevelSelectMenu, new(800, 50), new(300, 600), Color.White, Color.Black * .6f, Color.LightBlue * .5f, border: 2, borderColor: Color.Cyan * .2f, troughColor: Color.Black * .6f, seperation: 0);
         worlds.ItemSelected += (item) => { LoadSaves(item); };
 
-        Label worldListLabel = new(LevelSelectMenu, new(435, 40), Color.White, "Worlds", PixelOperatorLarge);
-        Label saveListLabel = new(LevelSelectMenu, new(900, 40), Color.White, "Saves", PixelOperatorLarge);
+        Label worldListLabel = new(LevelSelectMenu, new(435, 5), Color.White, "Worlds", PixelOperatorLarge);
+        Label saveListLabel = new(LevelSelectMenu, new(900, 5), Color.White, "Saves", PixelOperatorLarge);
         Button levelSelectBackButton = new(LevelSelectMenu, new(20, 20), new(100, 40), Color.White, Color.Black * 0.5f, ColorTools.NearBlack * 0.5f, StateManager.RevertGameState, [], text: "Back", font: PixelOperator, border: 0);
-        Button openButton = new(LevelSelectMenu, new(400, 820), new(180, 50), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, OpenSave, [], text: "Open", border: 0);
-        Button refreshButton = new(LevelSelectMenu, new(600, 820), new(180, 50), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => LoadSaves(worlds.Selected), [], text: "Refresh", border: 0);
-        Button deleteButton = new(LevelSelectMenu, new(800, 820), new(180, 50), Color.White, Color.DarkRed * 0.6f, Color.Red * 0.6f, DeleteSelectedSave, [], text: "Delete", border: 0);
+        Button openButton = new(LevelSelectMenu, new(400, 660), new(180, 40), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, OpenSave, [], text: "Open", border: 0);
+        Button refreshButton = new(LevelSelectMenu, new(600, 660), new(180, 40), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => LoadSaves(worlds.Selected), [], text: "Refresh", border: 0);
+        Button deleteButton = new(LevelSelectMenu, new(800, 660), new(180, 40), Color.White, Color.DarkRed * 0.6f, Color.Red * 0.6f, DeleteSelectedSave, [], text: "Delete", border: 0);
 
         LevelSelectMenu.Widgets = [levelSelectBackButton, worlds, saves, openButton, deleteButton, refreshButton, worldListLabel, saveListLabel];
 
@@ -88,7 +88,7 @@ public class MenuManager
         Button quicksaveButton = new(PauseMenu, new(Constants.Middle.X - 150, 380), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.SaveGameState(gameManager, playerManager, StringTools.ParseLevelPath(StateManager.CurrentSave).level); }, [], text: "Quick Save", font: PixelOperatorSubtitle, border: 0);
         Button pauseSettingsButton = new(PauseMenu, new(Constants.Middle.X - 150, 460), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.State = GameState.Settings; }, [], text: "Settings", font: PixelOperatorSubtitle, border: 0);
         Button mainMenuButton = new(PauseMenu, new(Constants.Middle.X - 150, 540), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.State = GameState.MainMenu; }, [], text: "Main Menu", font: PixelOperatorSubtitle, border: 0);
-        Button quitButton = new(PauseMenu, new(Constants.Middle.X - 150, 620), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => window.Exit(), [], text: "Quit", font: PixelOperatorSubtitle);
+        Button quitButton = new(PauseMenu, new(Constants.Middle.X - 150, 620), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => window.Exit(), [], text: "Quit", font: PixelOperatorSubtitle, border: 0);
 
         PauseMenu.Widgets = [resumeButton, quicksaveButton, pauseSettingsButton, mainMenuButton, quitButton, pauseLabel];
 
@@ -228,7 +228,7 @@ public class MenuManager
 
         Vector2 loc = Vector2.Zero - Vector2.Max(InputManager.MousePosition.ToVector2() / 50f, Vector2.Zero);
         gameManager.Batch.Draw(Textures[TextureID.MenuBackground], loc, null, Color.White, 0f, Vector2.Zero, Constants.Window.ToVector2() / TextureManager.Metadata[TextureID.MenuBackground].Size.ToVector2() + Vector2.One * 0.3f, SpriteEffects.None, 0.0f);
-        Vector2 logoCenter = new(Constants.Middle.X - TextureManager.Metadata[TextureID.QuestTitle].Size.X / 2, 50);
+        Vector2 logoCenter = new(Constants.Middle.X - TextureManager.Metadata[TextureID.QuestTitle].Size.X / 2, 20);
         gameManager.Batch.Draw(Textures[TextureID.QuestTitle], logoCenter, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.0f);
 
         MainMenu.Draw();
