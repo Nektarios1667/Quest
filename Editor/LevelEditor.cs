@@ -47,8 +47,8 @@ public class LevelEditor : Game
         {
             //PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
             //PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height,
-            PreferredBackBufferWidth = Constants.Window.X,
-            PreferredBackBufferHeight = Constants.Window.Y,
+            PreferredBackBufferWidth = Constants.NativeResolution.X,
+            PreferredBackBufferHeight = Constants.NativeResolution.Y,
             IsFullScreen = false,
             SynchronizeWithVerticalRetrace = Constants.VSYNC,
             PreferHalfPixelOffset = false,
@@ -368,7 +368,7 @@ public class LevelEditor : Game
     public void DrawBottomInfo(string text)
     {
         Vector2 textSize = Arial.MeasureString(text);
-        Vector2 pos = new(Constants.Middle.X - textSize.X / 2, Constants.Window.Y - textSize.Y - 3);
+        Vector2 pos = new(Constants.Middle.X - textSize.X / 2, Constants.NativeResolution.Y - textSize.Y - 3);
         spriteBatch.FillRectangle(new(pos - Vector2.One * 4, textSize + Vector2.One * 8), Color.Gray * 0.5f);
         spriteBatch.DrawRectangle(new(pos - Vector2.One * 4, textSize + Vector2.One * 8), Color.Black * 0.5f);
         spriteBatch.DrawString(Arial, text, pos, Color.Black);

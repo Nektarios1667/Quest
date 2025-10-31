@@ -27,7 +27,7 @@ public class OverlayManager
         Gui = new()
         {
             Widgets = [
-                HealthBar = new StatusBar(new(10, Constants.Window.Y - 35), new(300, 25), Color.Green, Color.Red, 100, 100),
+                HealthBar = new StatusBar(new(10, Constants.NativeResolution.Y - 35), new(300, 25), Color.Green, Color.Red, 100, 100),
                 LootNotifications = new NotificationArea(Constants.Middle - new Point(0, Constants.MageHalfSize.Y + 15), 5, PixelOperatorBold)
             ]
         };
@@ -200,7 +200,7 @@ public class OverlayManager
     {
         DebugManager.StartBenchmark("DrawMinimap");
         // Frame
-        gameManager.Batch.DrawRectangle(new(7, Constants.Window.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
+        gameManager.Batch.DrawRectangle(new(7, Constants.NativeResolution.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
 
         // Create render if not done already
         if (minimap == null)
@@ -230,10 +230,10 @@ public class OverlayManager
 
         }
         else
-            gameManager.Batch.Draw(minimap, new Rectangle(10, Constants.Window.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
+            gameManager.Batch.Draw(minimap, new Rectangle(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
 
         // Player
-        Point dest = CameraManager.TileCoord + new Point(10, Constants.Window.Y - Constants.MapSize.Y - 10);
+        Point dest = CameraManager.TileCoord + new Point(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10);
         gameManager.Batch.DrawPoint(dest.ToVector2(), Color.Red, size: 2);
 
         DebugManager.EndBenchmark("DrawMinimap");

@@ -117,6 +117,6 @@ public static class LightingManager
         float bottom = light.Position.Y + radius * Constants.TileSize.Y;
 
         // AABB check
-        return right > 0 && left < Constants.Window.X && bottom > 0 && top < Constants.Window.Y;
+        return right > 0 && left < Constants.NativeResolution.X && bottom > 0 && top < Constants.NativeResolution.Y;
     }
 }

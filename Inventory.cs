@@ -37,7 +37,7 @@ public class Inventory
         Width = width;
         Height = height;
         HoverSlot = 0;
-        itemStart = new(Constants.Middle.X - (slotSize.X * Width / 2), Constants.Window.Y - (slotSize.Y + 8) - (isPlayer ? 4 : (slotSize.Y + 8) * 4 + 50));
+        itemStart = new(Constants.Middle.X - (slotSize.X * Width / 2), Constants.NativeResolution.Y - (slotSize.Y + 8) - (isPlayer ? 4 : (slotSize.Y + 8) * 4 + 50));
 
         // Precalculate hitboxes
         for (int x = 0; x < Width; x++)

@@ -67,14 +67,14 @@ public class EditorManager
         DebugManager.StartBenchmark("DrawMinimap");
 
         // Frame
-        gameManager.Batch.DrawRectangle(new(7, Constants.Window.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
+        gameManager.Batch.DrawRectangle(new(7, Constants.NativeResolution.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
 
         // Draw minimap texture
         if (minimap != null)
-            spriteBatch.Draw(minimap, new Rectangle(10, Constants.Window.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
+            spriteBatch.Draw(minimap, new Rectangle(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
 
         // Player
-        Point dest = CameraManager.TileCoord + new Point(10, Constants.Window.Y - Constants.MapSize.Y - 10);
+        Point dest = CameraManager.TileCoord + new Point(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10);
         spriteBatch.DrawPoint(dest.ToVector2(), Color.Red, size: 2);
 
         DebugManager.EndBenchmark("DrawMinimap");
@@ -103,7 +103,7 @@ public class EditorManager
     public void DrawFrameInfo()
     {
         float boxHeight = DebugManager.FrameTimes.Count * 20;
-        FillRectangle(spriteBatch, new(Constants.Window.X - 190, 0, 190, (int)boxHeight), Color.Black * 0.8f);
+        FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 190, 0, 190, (int)boxHeight), Color.Black * 0.8f);
 
         debugSb.Clear();
         foreach (var kv in frameTimes)
@@ -114,7 +114,7 @@ public class EditorManager
             debugSb.Append('\n');
         }
 
-        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.Window.X - 180, 10), Color.White);
+        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.NativeResolution.X - 180, 10), Color.White);
     }
     public void DrawTextInfo()
     {
@@ -150,16 +150,16 @@ public class EditorManager
     public void DrawFrameBar()
     {
         // Background
-        FillRectangle(spriteBatch, new(Constants.Window.X - 320, Constants.Window.Y - frameTimes.Count * 20 - 50, 320, 1000), Color.Black * .8f);
+        FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 320, Constants.NativeResolution.Y - frameTimes.Count * 20 - 50, 320, 1000), Color.Black * .8f);
 
         // Labels and bars
         int start = 0;
         int c = 0;
-        FillRectangle(spriteBatch, new(Constants.Window.X - 310, Constants.Window.Y - 40, 300, 25), Color.White);
+        FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 310, Constants.NativeResolution.Y - 40, 300, 25), Color.White);
         foreach (KeyValuePair<string, double> process in frameTimes)
         {
-            spriteBatch.DrawString(Arial, process.Key, new Vector2(Constants.Window.X - Arial.MeasureString(process.Key).X - 5, Constants.Window.Y - 20 * c - 60), colors[c]);
-            FillRectangle(spriteBatch, new Rectangle(Constants.Window.X - 310 + start, Constants.Window.Y - 40, (int)(process.Value / (cacheDelta * 1000) * 300), 25), colors[c]);
+            spriteBatch.DrawString(Arial, process.Key, new Vector2(Constants.NativeResolution.X - Arial.MeasureString(process.Key).X - 5, Constants.NativeResolution.Y - 20 * c - 60), colors[c]);
+            FillRectangle(spriteBatch, new Rectangle(Constants.NativeResolution.X - 310 + start, Constants.NativeResolution.Y - 40, (int)(process.Value / (cacheDelta * 1000) * 300), 25), colors[c]);
             start += (int)(process.Value / (cacheDelta * 1000)) * 300;
             c++;
         }

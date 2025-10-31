@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using SharpDX.Direct2D1.Effects;
+using System.Text;
 
 namespace Quest;
 public class Window : Game
@@ -12,6 +13,7 @@ public class Window : Game
     private OverlayManager overlayManager;
     private LevelManager levelManager;
     private MenuManager menuManager;
+    private Matrix scale = Matrix.CreateScale(Constants.ScreenScale.X, Constants.ScreenScale.Y, 1f);
 
     // Time
     private float delta;
@@ -45,8 +47,8 @@ public class Window : Game
         {
             //PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
             //PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height,
-            PreferredBackBufferWidth = Constants.Window.X,
-            PreferredBackBufferHeight = Constants.Window.Y,
+            PreferredBackBufferWidth = Constants.ScreenResolution.X,
+            PreferredBackBufferHeight = Constants.ScreenResolution.Y,
             IsFullScreen = false,
             SynchronizeWithVerticalRetrace = Constants.VSYNC,
             PreferHalfPixelOffset = false,
@@ -105,15 +107,15 @@ public class Window : Game
 
         // Shaders
         Lighting = Content.Load<Effect>("Shaders/Lighting");
-        Lighting.Parameters["dim"].SetValue(Constants.Window.ToVector2());
+        Lighting.Parameters["dim"].SetValue(Constants.NativeResolution.ToVector2());
         Lighting.Parameters["numLights"].SetValue(0);
 
         // Render Targets
-        ShaderTarget = new(GraphicsDevice, Constants.Window.X, Constants.Window.Y);
+        ShaderTarget = new(GraphicsDevice, Constants.NativeResolution.X, Constants.NativeResolution.Y);
         ShaderTarget = new(
             GraphicsDevice,
-            width: Constants.Window.X,
-            height: Constants.Window.Y,
+            width: Constants.NativeResolution.X,
+            height: Constants.NativeResolution.Y,
             mipMap: false,
             preferredFormat: SurfaceFormat.Color,
             preferredDepthFormat: DepthFormat.None,
@@ -173,7 +175,7 @@ public class Window : Game
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.Magenta);
-        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: scale);
 
         // Draw game
         levelManager.Draw(gameManager);
@@ -219,7 +221,7 @@ public class Window : Game
     public void DrawFrameInfo()
     {
         float boxHeight = DebugManager.FrameTimes.Count * 20;
-        FillRectangle(spriteBatch, new(Constants.Window.X - 190, 0, 180, (int)boxHeight), Color.Black * 0.8f);
+        FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 190, 0, 180, (int)boxHeight), Color.Black * 0.8f);
 
         debugSb.Clear();
         foreach (var kv in frameTimes)
@@ -230,7 +232,7 @@ public class Window : Game
             debugSb.Append('\n');
         }
 
-        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.Window.X - 180, 0), Color.White);
+        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.NativeResolution.X - 180, 0), Color.White);
     }
     public void DrawTextInfo()
     {
@@ -281,16 +283,16 @@ public class Window : Game
             debugUpdateTime = 0;
         }
         // Background
-        FillRectangle(spriteBatch, new(Constants.Window.X - 320, Constants.Window.Y - frameTimes.Count * 20 - 50, 320, 1000), Color.Black * .8f);
+        FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 320, Constants.NativeResolution.Y - frameTimes.Count * 20 - 50, 320, 1000), Color.Black * .8f);
 
         // Labels and bars
         int start = 0;
         int c = 0;
-        FillRectangle(spriteBatch, new(Constants.Window.X - 310, Constants.Window.Y - 40, 300, 25), Color.White);
+        FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 310, Constants.NativeResolution.Y - 40, 300, 25), Color.White);
         foreach (KeyValuePair<string, double> process in frameTimes)
         {
-            spriteBatch.DrawString(Arial, process.Key, new(Constants.Window.X - Arial.MeasureString(process.Key).X - 5, Constants.Window.Y - 20 * c - 60), colors[c]);
-            FillRectangle(spriteBatch, new(Constants.Window.X - 310 + start, Constants.Window.Y - 40, (int)(process.Value / (cacheDelta * 1000) * 300), 25), colors[c]);
+            spriteBatch.DrawString(Arial, process.Key, new(Constants.NativeResolution.X - Arial.MeasureString(process.Key).X - 5, Constants.NativeResolution.Y - 20 * c - 60), colors[c]);
+            FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 310 + start, Constants.NativeResolution.Y - 40, (int)(process.Value / (cacheDelta * 1000) * 300), 25), colors[c]);
             start += (int)(process.Value / (cacheDelta * 1000)) * 300;
             c++;
         }

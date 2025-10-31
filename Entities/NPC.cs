@@ -33,7 +33,7 @@ public class NPC
         Dialog = dialog;
         TextureColor = textureColor == default ? Color.White : textureColor;
         Scale = scale;
-        DialogBox = new Dialog(uiManager.Gui, new(Constants.Middle.X - 600, Constants.Window.Y - 190), new(1200, 100), new(100, 100, 100), Color.Black, $"[{name}] {dialog}", PixelOperator, borderColor: new(40, 40, 40)) { IsVisible = false };
+        DialogBox = new Dialog(uiManager.Gui, new(Constants.Middle.X - 600, Constants.NativeResolution.Y - 190), new(1200, 100), new(100, 100, 100), Color.Black, $"[{name}] {dialog}", PixelOperator, borderColor: new(40, 40, 40)) { IsVisible = false };
         uiManager.Gui.Widgets.Add(DialogBox);
     }
     public void Draw(GameManager gameManager)
