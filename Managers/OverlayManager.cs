@@ -109,8 +109,6 @@ public class OverlayManager
 
         DebugManager.StartBenchmark("Lighting");
         if (updateLighting)
-            Logger.Log("OverlayManager: Lighting update requested.");
-        if (updateLighting)
             RecalculateLighting(gameManager);
         DebugManager.EndBenchmark("Lighting");
 
@@ -122,11 +120,12 @@ public class OverlayManager
             {
                 // Light
                 float light = lightGrid.Grid[x, y].LightLevel;
-                //float intensity = Math.Clamp(light / (10 * lightDivisions), 0, 1);
-                //intensity = (float)Math.Pow(intensity, 0.8);
-                const float lightScale = 10;
-                float intensity = 1f - MathF.Exp(-light / lightScale);
-                intensity = Math.Clamp(intensity, 0f, 1f);
+                int intensityLookup = Math.Clamp((int)Math.Floor(light * 2), 0, LightingManager.LightScale * 2);
+                float intensity = LightingManager.LightToIntensityCache[intensityLookup];
+
+                // Skip full light
+                if (intensity >= 1f)
+                    continue;
 
                 // Draw
                 Rectangle rect = new((new Point(x, y) + start.Scaled(lightDivisions)) * Constants.TileSize.Scaled(invLightDivisions) + Constants.Middle - CameraManager.Camera.ToPoint(), Constants.TileSize.Scaled(invLightDivisions));

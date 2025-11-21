@@ -34,6 +34,7 @@ public class FloodLightingGrid
     }
     public void Run()
     {
+        // Queue all lights
         Queue<FloodLightingNode> toVisit = new();
         foreach (FloodLightingNode node in Grid)
         {
@@ -41,18 +42,23 @@ public class FloodLightingGrid
                 toVisit.Enqueue(node);
         }
 
+        // Solve
         while (toVisit.Count > 0)
         {
+            // Get current node
             var current = toVisit.Dequeue();
             if (current.IsBlocked) continue;
 
+            // Spread light to neighbors
             foreach (Point offset in Constants.AllNeighborTiles)
             {
+                // Get neighbor
                 Point neighbor = current.Position + offset;
                 if (neighbor.X < 0 || neighbor.Y < 0 || neighbor.X >= Width || neighbor.Y >= Height) continue;
                 var neighborNode = Grid[neighbor.X, neighbor.Y];
 
-                float newLightLevel = current.LightLevel - ((offset.X == 0 || offset.Y == 0) ? 1f : Constants.SQRT2);
+                // Calculate new light level
+                float newLightLevel = current.LightLevel - ((offset.X == 0 || offset.Y == 0) ? 1f : 1.5f); // 1.5 is an estimate of sqrt(2)
                 if (newLightLevel > neighborNode.LightLevel && newLightLevel > 0.05)
                 {
                     neighborNode.LightLevel = newLightLevel;
@@ -88,7 +94,21 @@ public readonly struct RadialLight
 
 public static class LightingManager
 {
+    public const int LightScale = 10;
     public static Dictionary<string, RadialLight> Lights { get; private set; } = [];
+    public static float[] LightToIntensityCache { get; private set; } = [];
+    static LightingManager()
+    {
+        // Precompute light to intensity mapping
+        LightToIntensityCache = new float[LightScale * 2 + 1];
+        for (float i = 0; i <= LightScale; i += 0.5f)
+        {
+            float intensity = 1f - MathF.Exp(-i / LightScale);
+            intensity = Math.Clamp(intensity, 0f, 1f);
+            LightToIntensityCache[(int)(i * 2)] = intensity;
+        }
+        Logger.System("Precomputed light to intensity mapping.");
+    }
     public static void Update()
     {
         foreach (var key in Lights.Keys.ToList())
