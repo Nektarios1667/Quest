@@ -136,7 +136,7 @@ public class EditorManager
         if (mouseTile != null)
         {
             debugSb.Append("\nMouse Tile: ");
-            debugSb.AppendFormat("{0:0},{1:0}", mouseTile.Location.X, mouseTile.Location.Y);
+            debugSb.AppendFormat("{0:0},{1:0}", mouseTile.X, mouseTile.Y);
         }
         debugSb.Append("\nCoord: ");
         debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.TileCoord.X, CameraManager.TileCoord.Y);
@@ -637,7 +637,7 @@ public class EditorManager
     }
     public void SetTile(Tile tile)
     {
-        levelManager.Level.Tiles[tile.Location.X + tile.Location.Y * Constants.MapSize.X] = tile;
+        levelManager.Level.Tiles[tile.X + tile.Y * Constants.MapSize.X] = tile;
         FlagRebuildMinimap();
     }
     public void FlagRebuildMinimap() { rebuildMinimap = true; }

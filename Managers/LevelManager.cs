@@ -345,7 +345,7 @@ public class LevelManager
             }
             else // Regular tile
                 tile = TileFromId(type, loc);
-            int idx = tile.Location.X + tile.Location.Y * Constants.MapSize.X;
+            int idx = tile.X + tile.Y * Constants.MapSize.X;
             tilesBuffer[idx] = tile;
         }
 
@@ -469,8 +469,8 @@ public class LevelManager
     public int TileConnectionsMask(Tile tile)
     {
         int mask = 0;
-        int x = tile.Location.X;
-        int y = tile.Location.Y;
+        int x = tile.X;
+        int y = tile.Y;
 
         Tile? left = GetTile(x - 1, y);
         Tile? right = GetTile(x + 1, y);

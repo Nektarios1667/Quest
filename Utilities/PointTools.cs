@@ -1,5 +1,28 @@
 ﻿namespace Quest.Utilities;
 
+public class BytePoint
+{
+    public byte X { get; set; }
+    public byte Y { get; set; }
+    public BytePoint(byte x, byte y)
+    {
+        X = x;
+        Y = y;
+    }
+    public BytePoint(Point point)
+    {
+        X = (byte)point.X;
+        Y = (byte)point.Y;
+    }
+    public Point ToPoint()
+    {
+        return new(X, Y);
+    }
+    public override string ToString()
+    {
+        return $"({X}, {Y})";
+    }
+}
 public static class PointExtensions
 {
     public static float Distance(this Point point, Point other)

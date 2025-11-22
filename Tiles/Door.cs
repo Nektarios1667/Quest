@@ -41,7 +41,7 @@ public class Door : Tile
             game.UIManager.Notification($"{StringTools.FillCamelSpaces(Key)} needed to unlock.", Color.Red, 5);
 
             // Sound fx
-            string timerName = $"DoorLocked_{Location.X + Location.Y * Constants.MapSize.X}";
+            string timerName = $"DoorLocked_{X + Y * Constants.MapSize.X}";
             if (TimerManager.IsCompleteOrMissing(timerName))
             {
                 SoundManager.PlaySoundInstance("DoorLocked");

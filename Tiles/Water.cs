@@ -14,7 +14,7 @@ public class Water : Tile
 
         dest += Constants.Middle;
         // Draw tile
-        Color color = Marked ? Color.Red : Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(gameManager.GameTime + Location.X + Location.Y));
+        Color color = Marked ? Color.Red : Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(gameManager.GameTime + X + Y));
         DrawTexture(gameManager.Batch, TextureID.Water, dest, source: gameManager.LevelManager.TileTextureSource(this), color: color, scale: Constants.TileSizeScale);
 
         Marked = false; // Reset marked state for next frame

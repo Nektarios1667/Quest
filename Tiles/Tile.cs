@@ -107,8 +107,10 @@ public class Tile
     // Debug
     public bool Marked { get; set; }
     // Auto generated - no setter
-    public Point Location { get; }
-    public ushort TileID => (ushort)(Location.X + Location.Y * Constants.MapSize.X);
+    public byte X { get; }
+    public byte Y { get; }
+    public Point Location => new(X, Y);
+    public ushort TileID => (ushort)(X + Y * Constants.MapSize.X);
     // Type
     public TileType Type { get; }
     public TextureID Texture => Type.Texture;
@@ -117,7 +119,8 @@ public class Tile
     // Private 
     public Tile(Point location, TileType type)
     {
-        Location = location;
+        X = (byte)location.X;
+        Y = (byte)location.Y;
         Type = type;
         Marked = false;
     }
