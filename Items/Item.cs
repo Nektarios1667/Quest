@@ -33,10 +33,11 @@ public enum ItemType : byte
     BottledStorm,
     // ITEMS
 }
+
 public class Item
 {
-    public string Name { get; protected set; }
-    public string Description { get; protected set; }
+    public string Name { get; protected set; } = "NUL_ITEM";
+    public string Description { get; protected set; } = "NUL_DESCR";
     public byte Amount { get; set; }
     public byte MaxAmount { get; protected set; }
     public TextureID Texture { get; protected set; }
@@ -46,7 +47,6 @@ public class Item
         Amount = (byte)amount;
         MaxAmount = Constants.MaxStack;
         Name = GetType().Name;
-        Description = "Inventory item";
         Texture = (TextureID)Enum.Parse(typeof(TextureID), GetType().Name);
         UID = UIDManager.NewUID("Items");
     }

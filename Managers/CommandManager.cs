@@ -80,7 +80,7 @@ public static class CommandManager
             new("move_speed {0:999}", CMoveSpeed, "Set player speed to |1|.", "Failed to set player speed to |1|."),
             new("force_quit", CForceQuit, "Force quit application.", "Failed to force quit application."),
             new("quit", CQuit, "Quit application.", "Failed to quit application."),
-            new("level [load|read|open] <string>", CLevel, "Ran |1| level '|2|'.", "Failed to |1| level '|2|'."),
+            new("level [load|read|open|unload] <string>", CLevel, "Ran |1| level '|2|'.", "Failed to |1| level '|2|'."),
             new("mood [calm|dark|epic]", CMood, "Set mood to '|1|'.", "Failed to set mood to '|1|.'"),
             new("say **", CSay, "|*|", "Failed to speak."),
             new($"daytime <modify> {{-{Constants.DayLength}:{Constants.DayLength}}}", CDaytime, "Daytime |1| |2|", "Failed |1| daytime |2|"),
@@ -231,7 +231,12 @@ public static class CommandManager
                 levelManager!.LoadLevel(gameManager!, parts[2]);
                 return true;
             }
-        }
+            else if (parts[1] == "unload")
+            {
+                levelManager!.UnloadLevel(parts[2]);
+                return true;
+            }
+            }
         catch { }
         return false;
     }
