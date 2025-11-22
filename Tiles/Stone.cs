@@ -2,8 +2,7 @@
 
 public class Stone : Tile
 {
-    public Stone(Point location) : base(location)
+    public Stone(Point location) : base(location, TileTypes.Stone)
     {
-        IsWalkable = true;
     }
 }

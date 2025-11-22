@@ -2,10 +2,8 @@
 
 public class Lava : Tile
 {
-    public Lava(Point location) : base(location)
-    {
-        IsWalkable = false;
-    }
+    public Lava(Point location) : base(location, TileTypes.Lava)
+    {}
     public override void Draw(GameManager gameManager)
     {
         // Draw each tile using the sprite batch

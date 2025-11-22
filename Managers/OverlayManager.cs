@@ -73,7 +73,7 @@ public class OverlayManager
         DebugManager.StartBenchmark("InventoryGuiDraw");
         if (playerManager != null)
         {
-            playerManager.OpenedContainer?.Inventory.Draw(gameManager, playerManager);
+            playerManager.OpenedContainer?.Inventory?.Draw(gameManager, playerManager);
             playerManager.Inventory.Draw(gameManager, playerManager);
         }
         DebugManager.EndBenchmark("InventoryGuiDraw");
@@ -218,7 +218,7 @@ public class OverlayManager
                 {
                     // Get tile
                     Tile tile = gameManager.LevelManager.GetTile(new Point(x, y))!;
-                    gameManager.Batch.DrawPoint(new(x, y), Constants.MiniMapColors[(int)tile.Type]);
+                    gameManager.Batch.DrawPoint(new(x, y), Constants.MiniMapColors[(int)tile.Type.ID]);
                 }
             }
 

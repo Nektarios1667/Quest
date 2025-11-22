@@ -9,11 +9,10 @@ public class Lamp : Tile
         get => _lightColor;
         set { _lightColor = value; RecalculateTint(); }
     }
-    public int LightRadius { get; set; }
+    public ushort LightRadius { get; set; }
     private Color tintColor;
-    public Lamp(Point location, Color? lightColor = null, int lightRadius = 10) : base(location)
+    public Lamp(Point location, Color? lightColor = null, ushort lightRadius = 10) : base(location, TileTypes.Lamp)
     {
-        IsWalkable = true;
         LightColor = lightColor ?? new(10, 10, 0, 255);
         LightRadius = lightRadius;
 

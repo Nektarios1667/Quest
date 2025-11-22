@@ -2,14 +2,14 @@
 using System.Linq;
 
 namespace Quest.Editor;
-public class Terrain(params (float min, float max, TileType tile)[] ranges)
+public class Terrain(params (float min, float max, TileTypeID tile)[] ranges)
 {
-    public (float min, float max, TileType tile)[] Ranges { get; private set; } = ranges;
+    public (float min, float max, TileTypeID tile)[] Ranges { get; private set; } = ranges;
 }
-public class Structure(TileType?[] tiles, Point size, TileType? spawnTile)
+public class Structure(TileTypeID?[] tiles, Point size, TileTypeID? spawnTile)
 {
-    public TileType?[] Tiles { get; private set; } = tiles;
-    public TileType? SpawnTile { get; private set; } = spawnTile;
+    public TileTypeID?[] Tiles { get; private set; } = tiles;
+    public TileTypeID? SpawnTile { get; private set; } = spawnTile;
     public Point Size { get; private set; } = size;
 }
 public class LevelGenerator
@@ -65,7 +65,7 @@ public class LevelGenerator
         return Noise.GetNoise(x, y);
     }
     public float GetNoise(Point point) => GetNoise(point.X, point.Y);
-    public TileType GetGeneratedTile(int x, int y, float value)
+    public TileTypeID GetGeneratedTile(int x, int y, float value)
     {
         foreach (var (min, max, tile) in Terrain.Ranges)
         {
@@ -73,9 +73,9 @@ public class LevelGenerator
             if (value >= min && value < max)
                 return tile;
         }
-        return TileType.Sky;
+        return TileTypeID.Sky;
     }
-    public TileType GetGeneratedTile(Point point, float value) => GetGeneratedTile(point.X, point.Y, value);
+    public TileTypeID GetGeneratedTile(Point point, float value) => GetGeneratedTile(point.X, point.Y, value);
 
     public Tile[] GenerateTerrain(int width, int height)
     {
@@ -86,7 +86,7 @@ public class LevelGenerator
             {
                 // Generate tile type based on noise value
                 float value = GetNormNoise(x, y);
-                TileType tileType = GetGeneratedTile(x, y, value);
+                TileTypeID tileType = GetGeneratedTile(x, y, value);
                 level[y * width + x] = LevelManager.TileFromId(tileType, new(x, y));
             }
         }
@@ -109,7 +109,7 @@ public class LevelGenerator
             Point spawnPoint = new(RandomManager.RandomIntRange(0, width - structure.Size.X), RandomManager.RandomIntRange(0, height - structure.Size.Y));
 
             // Check if on valid tile
-            if (structure.SpawnTile != null && level[spawnPoint.Y * width + spawnPoint.X].Type != structure.SpawnTile) continue;
+            if (structure.SpawnTile != null && level[spawnPoint.Y * width + spawnPoint.X].Type.ID != structure.SpawnTile) continue;
             // Intersects other structures
             Rectangle rect = new(spawnPoint.X - 1, spawnPoint.Y - 1, structure.Size.X + 1, structure.Size.Y + 1);
             if (GeneratedStructures.Any(r => r.Intersects(rect))) continue; // Overlap
@@ -119,7 +119,7 @@ public class LevelGenerator
             {
                 for (int x = 0; x < structure.Size.X; x++)
                 {
-                    TileType? tileType = structure.Tiles[y * structure.Size.X + x];
+                    TileTypeID? tileType = structure.Tiles[y * structure.Size.X + x];
                     if (!tileType.HasValue) continue;
                     level[(spawnPoint.Y + y) * width + (spawnPoint.X + x)] = LevelManager.TileFromId(tileType.Value, new(spawnPoint.X + x, spawnPoint.Y + y));
                 }
@@ -141,22 +141,22 @@ public class LevelGenerator
         if (!File.Exists(file)) Logger.Error($"File {file} not found.", true);
 
         // Setup
-        List<TileType?> tileTypesBuffer = [];
-        TileType? spawn;
+        List<TileTypeID?> tileTypesBuffer = [];
+        TileTypeID? spawn;
         Point size = Point.Zero;
         using (FileStream stream = File.Open(file, FileMode.Open))
         using (BinaryReader reader = new(stream))
         {
             // Header
             byte b = reader.ReadByte();
-            spawn = b == 0 ? null : (TileType)(b - 1);
+            spawn = b == 0 ? null : (TileTypeID)(b - 1);
             size = new(reader.ReadByte(), reader.ReadByte());
 
             // Tiles
             for (int i = 0; i < size.X * size.Y; i++)
             {
                 b = reader.ReadByte();
-                TileType? type = b == 0 ? null : (TileType)(b - 1);
+                TileTypeID? type = b == 0 ? null : (TileTypeID)(b - 1);
                 tileTypesBuffer.Add(type);
             }
         }
@@ -173,7 +173,7 @@ public class LevelGenerator
         if (!File.Exists(file)) Logger.Error($"File {file} not found.", true);
 
         // Read
-        List<(float min, float max, TileType tile)> ranges = [];
+        List<(float min, float max, TileTypeID tile)> ranges = [];
         using (FileStream stream = File.Open(file, FileMode.Open))
         using (BinaryReader reader = new(stream))
         {
@@ -184,7 +184,7 @@ public class LevelGenerator
             {
                 float min = reader.ReadByte() / 100f;
                 float max = reader.ReadByte() / 100f;
-                TileType tile = (TileType)reader.ReadByte();
+                TileTypeID tile = (TileTypeID)reader.ReadByte();
                 ranges.Add((min, max, tile));
             }
         }

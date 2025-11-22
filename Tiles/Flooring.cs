@@ -2,8 +2,7 @@
 
 public class Flooring : Tile
 {
-    public Flooring(Point location) : base(location)
+    public Flooring(Point location) : base(location, TileTypes.Flooring)
     {
-        IsWalkable = true;
     }
 }

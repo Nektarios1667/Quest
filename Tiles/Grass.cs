@@ -2,8 +2,7 @@
 
 public class Grass : Tile
 {
-    public Grass(Point location) : base(location)
+    public Grass(Point location) : base(location, TileTypes.Grass)
     {
-        IsWalkable = true;
     }
 }

@@ -5,10 +5,10 @@ namespace Quest.Managers;
 public class LootTableEntry
 {
     public Item Item { get; }
-    public int MinAmount { get; }
-    public int MaxAmount { get; }
+    public byte MinAmount { get; }
+    public byte MaxAmount { get; }
     public float Chance { get; }
-    public LootTableEntry(Item item, int minAmount, int maxAmount, float chance)
+    public LootTableEntry(Item item, byte minAmount, byte maxAmount, float chance)
     {
         Item = item;
         MinAmount = minAmount;
@@ -104,13 +104,14 @@ public class LootTable : ILootGenerator
 
             // Get random empty slot
             Point dest;
+            Point invSize = new(inv.Width, inv.Height);
             do
-                dest = RandomManager.RandomPoint(Point.Zero, inv.Size);
+                dest = RandomManager.RandomPoint(Point.Zero, invSize);
             while (inv.GetItem(dest) != null);
 
             // Set item
             Item item = table.Item.ShallowCopy();
-            item.Amount = Math.Clamp(RandomManager.RandomIntRange(table.MinAmount, table.MaxAmount + 1), 0, table.Item.MaxAmount);
+            item.Amount = (byte)Math.Clamp(RandomManager.RandomIntRange(table.MinAmount, table.MaxAmount + 1), 0, table.Item.MaxAmount);
             inv.SetSlot(dest, item);
         }
         return inv;

@@ -2,8 +2,7 @@
 
 public class WoodFlooring : Tile
 {
-    public WoodFlooring(Point location) : base(location)
+    public WoodFlooring(Point location) : base(location, TileTypes.WoodFlooring)
     {
-        IsWalkable = true;
     }
 }

@@ -2,9 +2,7 @@
 
 public class WoodWall : Tile
 {
-    public WoodWall(Point location) : base(location)
+    public WoodWall(Point location) : base(location, TileTypes.WoodWall)
     {
-        IsWalkable = false;
-        IsWall = true;
     }
 }

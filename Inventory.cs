@@ -3,14 +3,16 @@
 
 public interface IContainer
 {
-    Inventory Inventory { get; }
+    Inventory? Inventory { get; }
 }
 
 public class Inventory
 {
+    // Events
     public event Action<int>? EquippedSlotChanged;
     public event Action<Item>? ItemDropped;
-    public Item?[,] Items { get; private set; }
+    // Properties
+    public Item?[,] Items { get; }
     public bool Opened { get; set; } = false;
     private int _equippedSlot;
     public int EquippedSlot {
@@ -18,24 +20,24 @@ public class Inventory
         set { _equippedSlot = value; EquippedSlotChanged?.Invoke(value); }
     }
     public Item? Equipped => Items.Length > 0 ? Items[EquippedSlot, 0] : null;
-    public int HoverSlot { get; set; }
-    public int Width { get; }
-    public int Height { get; }
-    public Point Size { get; }
-    private Rectangle[,] slotHitboxes;
-    private readonly Point itemOffset = new(14, 14);
+    private int HoverSlot;
+    public byte Width { get; }
+    public byte Height { get; }
+    public readonly bool IsPlayer;
+    private readonly Rectangle[,] slotHitboxes;
+    // Consts/statics
+    private static readonly Point itemOffset = new(14, 14);
     private const float itemScale = 3;
-    private readonly Point slotSize = TextureManager.Metadata[TextureID.Slot].Size;
+    private static readonly Point slotSize = TextureManager.Metadata[TextureID.Slot].Size;
+    // Helpers
     private readonly Point itemStart;
-    private readonly bool isPlayer;
     public Inventory(int width, int height, Item?[,]? items = null, bool isPlayer = false)
     {
-        this.isPlayer = isPlayer;
-        Size = new(width, height);
+        IsPlayer = isPlayer;
         Items = items ?? new Item?[width, height];
         slotHitboxes = new Rectangle[width, height];
-        Width = width;
-        Height = height;
+        Width = (byte)width;
+        Height = (byte)height;
         HoverSlot = 0;
         itemStart = new(Constants.Middle.X - (slotSize.X * Width / 2), Constants.NativeResolution.Y - (slotSize.Y + 8) - (isPlayer ? 4 : (slotSize.Y + 8) * 4 + 50));
 
@@ -60,20 +62,20 @@ public class Inventory
     }
     public void Draw(GameManager gameManager, PlayerManager playerManager)
     {
-        if (!Opened && !isPlayer) return; // Don't draw if not opened
+        if (!Opened && !IsPlayer) return; // Don't draw if not opened
 
         if (Width < 1 || Height < 1) return; // No slots to draw
 
         // Draw
-        for (int x = 0; x < Width; x++)
+        for (byte x = 0; x < Width; x++)
         {
-            for (int y = 0; y < (Opened ? Height : 1); y++) // If not opened but player owned draw hotbar
+            for (byte y = 0; y < (Opened ? Height : 1); y++) // If not opened but player owned draw hotbar
             {
                 // Item
                 Item? item = Items[x, y];
 
                 // Draw inventory slots
-                Vector2 itemDest = new(itemStart.X + (slotSize.X + 4) * x, itemStart.Y - (slotSize.Y + 8) * y - (y != 0 && isPlayer ? 15 : 0));
+                Vector2 itemDest = new(itemStart.X + (slotSize.X + 4) * x, itemStart.Y - (slotSize.Y + 8) * y - (y != 0 && IsPlayer ? 15 : 0));
                 DrawTexture(gameManager.Batch, TextureID.Slot, itemDest.ToPoint(), color: SlotColor(playerManager, x, y));
 
                 // Draw inventory items
@@ -169,7 +171,7 @@ public class Inventory
         }
 
         // Drop items
-        if (Opened && HoverSlot >= 0 && isPlayer && InputManager.KeyDown(Keys.D))
+        if (Opened && HoverSlot >= 0 && IsPlayer && InputManager.KeyDown(Keys.D))
         {
             Item? item = GetItem(HoverSlot);
             if (item != null)
@@ -182,10 +184,10 @@ public class Inventory
         }
     }
     // Slot interactions
-    private Color SlotColor(PlayerManager playerManager, int x, int y)
+    private Color SlotColor(PlayerManager playerManager, byte x, byte y)
     {
         int slot = Flatten(x, y);
-        if (slot == EquippedSlot && isPlayer) return Constants.CottonCandy; // Equipped
+        if (slot == EquippedSlot && IsPlayer) return Constants.CottonCandy; // Equipped
         if (Opened && slot == playerManager.SelectedSlot && this == playerManager.SelectedInventory) return Constants.FocusBlue; // Selected
         if (Opened && slot == HoverSlot) return Color.LightGray; // Hovered
         return Color.White; // Default
@@ -205,9 +207,9 @@ public class Inventory
     public void AddItem(Item item)
     {
         if (item == null || IsFull()) return;
-        for (int y = 0; y < Height; y++)
+        for (byte y = 0; y < Height; y++)
         {
-            for (int x = 0; x < Width; x++)
+            for (byte x = 0; x < Width; x++)
             {
                 Item? current = Items[x, y];
                 if (current == null)
@@ -292,7 +294,7 @@ public class Inventory
         Items[pos.X, pos.Y] = repl;
     }
     // Swap
-    public void Swap(Inventory inv1, int slot1, Inventory inv2, int slot2)
+    public static void Swap(Inventory inv1, int slot1, Inventory inv2, int slot2)
     {
         Point pos1 = inv1.Expand(slot1);
         Point pos2 = inv2.Expand(slot2);
@@ -347,8 +349,8 @@ public class Inventory
     // MouseSlot
     public Point GetMouseSlot()
     {
-        for (int x = 0; x < Width; x++)
-            for (int y = 0; y < Height; y++)
+        for (byte x = 0; x < Width; x++)
+            for (byte y = 0; y < Height; y++)
                 if (slotHitboxes[x, y].Contains(InputManager.MousePosition))
                     return new(x, y);
 
@@ -357,7 +359,6 @@ public class Inventory
     // Utilites
     // Flatten
     public int Flatten(int x, int y) { return y * Width + x; }
-    public int Flatten(Vector2 pos) { return Flatten((int)pos.X, (int)pos.Y); }
     public int Flatten(Point pos) { return Flatten(pos.X, pos.Y); }
     // Expand
     public Point Expand(int slot)

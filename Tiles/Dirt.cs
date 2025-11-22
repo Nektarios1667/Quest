@@ -2,8 +2,7 @@
 
 public class Dirt : Tile
 {
-    public Dirt(Point location) : base(location)
+    public Dirt(Point location) : base(location, TileTypes.Dirt)
     {
-        IsWalkable = true;
     }
 }

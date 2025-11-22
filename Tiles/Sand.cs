@@ -2,8 +2,7 @@
 
 public class Sand : Tile
 {
-    public Sand(Point location) : base(location)
+    public Sand(Point location) : base(location, TileTypes.Sand)
     {
-        IsWalkable = true;
     }
 }

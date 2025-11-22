@@ -11,7 +11,7 @@ public class Metadata(Point size, Point tileMap, string type)
 }
 public static class TextureManager
 {
-    public enum TextureID
+    public enum TextureID : ushort
     {
         Null,
         Pixel,

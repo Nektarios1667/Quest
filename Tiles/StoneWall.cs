@@ -2,9 +2,7 @@
 
 public class StoneWall : Tile
 {
-    public StoneWall(Point location) : base(location)
+    public StoneWall(Point location) : base(location, TileTypes.StoneWall)
     {
-        IsWalkable = false;
-        IsWall = true;
     }
 }

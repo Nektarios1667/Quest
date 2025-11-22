@@ -2,9 +2,5 @@
 
 public class ConcreteWall : Tile
 {
-    public ConcreteWall(Point location) : base(location)
-    {
-        IsWalkable = false;
-        IsWall = true;
-    }
+    public ConcreteWall(Point location) : base(location, TileTypes.ConcreteWall) {}
 }

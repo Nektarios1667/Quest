@@ -2,8 +2,7 @@ namespace Quest.Tiles;
 
 public class BrownTiles : Tile
 {
-    public BrownTiles(Point location) : base(location)
+    public BrownTiles(Point location) : base(location, TileTypes.BrownTiles)
     {
-        IsWalkable = true;
     }
 }

@@ -2,8 +2,7 @@ namespace Quest.Tiles;
 
 public class StoneTiles : Tile
 {
-    public StoneTiles(Point location) : base(location)
+    public StoneTiles(Point location) : base(location, TileTypes.StoneTiles)
     {
-        IsWalkable = true;
     }
 }

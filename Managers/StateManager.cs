@@ -153,11 +153,11 @@ public static class StateManager
             writer.Write((byte)Chest.ChestSize.Y);
             foreach (var chest in chests)
             {
-                writer.Write((ushort)chest.TileID); // TileID
+                writer.Write(chest.TileID); // TileID
                 writer.Write(chest.Generated); // IsGenerated
                 if (chest.Generated)
-                    for (int y = 0; y < chest.Inventory.Items.GetLength(1); y++)
-                        for (int x = 0; x < chest.Inventory.Items.GetLength(0); x++)
+                    for (int y = 0; y < chest.Inventory!.Items.GetLength(1); y++)
+                        for (int x = 0; x < chest.Inventory!.Items.GetLength(0); x++)
                             WriteItemData(writer, chest.Inventory.Items[x, y]);
                 else
                 {
@@ -244,7 +244,7 @@ public static class StateManager
                     {
                         chest.SetGenerated(true);
                         for (int s = 0; s < chestWidth * chestHeight; s++)
-                            chest.Inventory.SetSlot(s, ReadItemData(reader));
+                            chest.Inventory!.SetSlot(s, ReadItemData(reader));
                     }
                     else
                     {

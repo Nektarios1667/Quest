@@ -2,9 +2,7 @@ namespace Quest.Tiles;
 
 public class IronWall : Tile
 {
-    public IronWall(Point location) : base(location)
+    public IronWall(Point location) : base(location, TileTypes.IronWall)
     {
-        IsWalkable = false;
-        IsWall = true;
     }
 }

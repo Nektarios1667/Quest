@@ -16,7 +16,7 @@ public class LevelEditor : Game
     private GUI gui = null!;
 
     // Editing
-    private TileType TileSelection;
+    private TileTypeID TileSelection;
     private DecalType DecalSelection;
     private BiomeType BiomeSelection;
 
@@ -83,7 +83,7 @@ public class LevelEditor : Game
         // Gui
         gui = new(this, spriteBatch, Arial);
         mouseMenu = new(gui, Point.Zero, new(100, 300), Color.White, GUI.NearBlack, Color.Gray, border: 1, seperation: 3, borderColor: Color.White);
-        mouseMenu.AddItem("Pick", () => { TileSelection = mouseTile.Type; Logger.Log($"Picked tile '{TileSelection}' @ {mouseCoord.X}, {mouseCoord.Y}."); }, []);
+        mouseMenu.AddItem("Pick", () => { TileSelection = mouseTile.Type.ID; Logger.Log($"Picked tile '{TileSelection}' @ {mouseCoord.X}, {mouseCoord.Y}."); }, []);
         mouseMenu.AddItem("Open", editorManager.OpenFile, []);
         mouseMenu.AddItem("Fill", editorManager.FloodFill, []);
         mouseMenu.AddItem("Edit", editorManager.EditTile, []);
@@ -181,7 +181,7 @@ public class LevelEditor : Game
             if (currentTool == EditorTool.Tile)
             {
                 Tile tile;
-                if (TileSelection == TileType.Stairs)
+                if (TileSelection == TileTypeID.Stairs)
                     tile = new Stairs(mouseCoord, "", Constants.MiddleCoord);
                 else
                     tile = LevelManager.TileFromId(TileSelection, mouseCoord);
@@ -340,7 +340,7 @@ public class LevelEditor : Game
     }
     public void PickTile()
     {
-        if (currentTool == EditorTool.Tile) TileSelection = mouseTile.Type;
+        if (currentTool == EditorTool.Tile) TileSelection = mouseTile.Type.ID;
         else if (currentTool == EditorTool.Decal)
         {
             Decal? picked = levelManager.Level.Decals.FirstOrDefault(d => d.Location == mouseCoord);

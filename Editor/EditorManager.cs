@@ -32,7 +32,7 @@ public class EditorManager
     private Point mouseCoord { get; set; }
     private Point mouseSelection { get; set; }
     private Point mouseSelectionCoord { get; set; }
-    private TileType tileSelection { get; set; }
+    private TileTypeID tileSelection { get; set; }
     private EditorTool currentTool { get; set; }
     private BiomeType biomeSelection { get; set; }
     private RenderTarget2D minimap { get; set; }
@@ -49,7 +49,7 @@ public class EditorManager
         this.spriteBatch = batch;
         cacheDelta = delta;
     }
-    public void Update(TileType material, BiomeType biome, EditorTool tool, float deltaTime, Tile? mouseTile, Point mouseCoord, Point mouseSelection, Point mouseSelectionCoord)
+    public void Update(TileTypeID material, BiomeType biome, EditorTool tool, float deltaTime, Tile? mouseTile, Point mouseCoord, Point mouseSelection, Point mouseSelectionCoord)
     {
         delta = deltaTime;
         this.mouseTile = mouseTile;
@@ -92,7 +92,7 @@ public class EditorManager
             for (int x = 0; x < Constants.MapSize.X; x++)
             {
                 Tile tile = gameManager.LevelManager.GetTile(new Point(x, y))!;
-                spriteBatch.DrawPoint(new(x, y), Constants.MiniMapColors[(int)tile.Type]);
+                spriteBatch.DrawPoint(new(x, y), Constants.MiniMapColors[(byte)tile.Type.ID]);
             }
         }
 
@@ -229,7 +229,7 @@ public class EditorManager
                 return;
             }
             lamp.LightColor = new(byte.Parse(values[0]), byte.Parse(values[1]), byte.Parse(values[2]), byte.Parse(values[3]));
-            lamp.LightRadius = int.Parse(values[4]);
+            lamp.LightRadius = ushort.Parse(values[4]);
         }
     }
     public void FloodFill()
@@ -243,7 +243,7 @@ public class EditorManager
         // Fill with current material
         int count = 0;
         Tile tileBelow = GetTile(mouseCoord);
-        if (tileBelow.Type != tileSelection)
+        if (tileBelow.Type.ID != tileSelection)
         {
             Queue<Tile> queue = new();
             HashSet<Point> visited = []; // Track visited tiles
@@ -252,7 +252,7 @@ public class EditorManager
             while (queue.Count > 0)
             {
                 Tile current = queue.Dequeue();
-                if (current.Type == tileSelection || visited.Contains(current.Location)) continue; // Skip if already filled
+                if (current.Type.ID == tileSelection || visited.Contains(current.Location)) continue; // Skip if already filled
                 count++;
                 SetTile(LevelManager.TileFromId((int)tileSelection, current.Location));
                 visited.Add(current.Location); // Mark as visited
@@ -262,7 +262,7 @@ public class EditorManager
                     Point neighborCoord = current.Location + neighbor;
                     if (neighborCoord.X < 0 || neighborCoord.X >= Constants.MapSize.X || neighborCoord.Y < 0 || neighborCoord.Y >= Constants.MapSize.Y) continue;
                     Tile neighborTile = GetTile(neighborCoord);
-                    if (neighborTile.Type == tileBelow.Type && neighborTile.Type != tileSelection)
+                    if (neighborTile.Type == tileBelow.Type && neighborTile.Type.ID != tileSelection)
                     {
                         queue.Enqueue(neighborTile);
                     }
@@ -502,7 +502,7 @@ public class EditorManager
         {
             Tile tile = levelManager.Level.Tiles[i];
             // Write tile data
-            writer.Write(LevelEditor.IntToByte((int)tile.Type));
+            writer.Write((byte)tile.Type.ID);
             // Extra properties
             if (tile is Stairs stairs)
             {

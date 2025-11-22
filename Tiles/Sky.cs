@@ -2,8 +2,7 @@
 
 public class Sky : Tile
 {
-    public Sky(Point location) : base(location)
+    public Sky(Point location) : base(location, TileTypes.Sky)
     {
-        IsWalkable = false;
     }
 }

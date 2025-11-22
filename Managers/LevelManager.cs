@@ -308,19 +308,19 @@ public class LevelManager
             // Read tile data
             int type = reader.ReadByte();
             // Check if valid tile type
-            if (type < 0 || type >= Enum.GetValues(typeof(TileType)).Length)
+            if (type < 0 || type >= Enum.GetValues(typeof(TileTypeID)).Length)
                 throw new ArgumentException($"Invalid tile type {type} @ {i % Constants.MapSize.X}, {i / Constants.MapSize.X} in level file.");
             // Extra properties
             Tile tile;
             Point loc = new(i % Constants.MapSize.X, i / Constants.MapSize.X);
             // Stairs
-            if (type == (int)TileType.Stairs)
+            if (type == (int)TileTypeID.Stairs)
                 tile = new Stairs(loc, reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
             // Doors
-            else if (type == (int)TileType.Door)
+            else if (type == (int)TileTypeID.Door)
                 tile = new Door(loc, reader.ReadString());
             // Chests
-            else if (type == (int)TileType.Chest)
+            else if (type == (int)TileTypeID.Chest)
             {
                 string lootGenFile = reader.ReadString();
                 ILootGenerator? lootGen = null;
@@ -337,10 +337,10 @@ public class LevelManager
                     tile = new Chest(loc, lootGen);
             }
             // Lamps
-            else if (type == (int)TileType.Lamp)
+            else if (type == (int)TileTypeID.Lamp)
             {
                 Color lampTint = new(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
-                int lampRadius = reader.ReadUInt16();
+                ushort lampRadius = reader.ReadUInt16();
                 tile = new Lamp(loc, lampTint, lampRadius);
             }
             else // Regular tile
@@ -397,48 +397,48 @@ public class LevelManager
     public static Tile TileFromId(int id, Point location)
     {
         // Create a tile from an id
-        TileType type = (TileType)id;
+        TileTypeID type = (TileTypeID)id;
         return type switch
         {
-            TileType.Sky => new Sky(location),
-            TileType.Grass => new Grass(location),
-            TileType.Water => new Water(location),
-            TileType.StoneWall => new StoneWall(location),
-            TileType.Stairs => new Stairs(location, "", Constants.MiddleCoord),
-            TileType.Flooring => new Flooring(location),
-            TileType.Sand => new Sand(location),
-            TileType.Dirt => new Dirt(location),
-            TileType.Darkness => new Darkness(location),
-            TileType.WoodFlooring => new WoodFlooring(location),
-            TileType.Stone => new Stone(location),
-            TileType.Door => new Door(location, ""),
-            TileType.Chest => new Chest(location, LootPreset.EmptyPreset),
-            TileType.ConcreteWall => new ConcreteWall(location),
-            TileType.WoodWall => new WoodWall(location),
-            TileType.Path => new Tiles.Path(location),
-            TileType.Lava => new Lava(location),
-            TileType.StoneTiles => new StoneTiles(location),
-            TileType.RedTiles => new RedTiles(location),
-            TileType.OrangeTiles => new OrangeTiles(location),
-            TileType.YellowTiles => new YellowTiles(location),
-            TileType.LimeTiles => new LimeTiles(location),
-            TileType.GreenTiles => new GreenTiles(location),
-            TileType.CyanTiles => new CyanTiles(location),
-            TileType.BlueTiles => new BlueTiles(location),
-            TileType.PurpleTiles => new PurpleTiles(location),
-            TileType.PinkTiles => new PinkTiles(location),
-            TileType.BlackTiles => new BlackTiles(location),
-            TileType.BrownTiles => new BrownTiles(location),
-            TileType.IronWall => new IronWall(location),
-            TileType.Snow => new Snow(location),
-            TileType.Ice => new Ice(location),
-            TileType.SnowyGrass => new SnowyGrass(location),
-            TileType.Lamp => new Lamp(location),
+            TileTypeID.Sky => new Sky(location),
+            TileTypeID.Grass => new Grass(location),
+            TileTypeID.Water => new Water(location),
+            TileTypeID.StoneWall => new StoneWall(location),
+            TileTypeID.Stairs => new Stairs(location, "", Constants.MiddleCoord),
+            TileTypeID.Flooring => new Flooring(location),
+            TileTypeID.Sand => new Sand(location),
+            TileTypeID.Dirt => new Dirt(location),
+            TileTypeID.Darkness => new Darkness(location),
+            TileTypeID.WoodFlooring => new WoodFlooring(location),
+            TileTypeID.Stone => new Stone(location),
+            TileTypeID.Door => new Door(location, ""),
+            TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset),
+            TileTypeID.ConcreteWall => new ConcreteWall(location),
+            TileTypeID.WoodWall => new WoodWall(location),
+            TileTypeID.Path => new Tiles.Path(location),
+            TileTypeID.Lava => new Lava(location),
+            TileTypeID.StoneTiles => new StoneTiles(location),
+            TileTypeID.RedTiles => new RedTiles(location),
+            TileTypeID.OrangeTiles => new OrangeTiles(location),
+            TileTypeID.YellowTiles => new YellowTiles(location),
+            TileTypeID.LimeTiles => new LimeTiles(location),
+            TileTypeID.GreenTiles => new GreenTiles(location),
+            TileTypeID.CyanTiles => new CyanTiles(location),
+            TileTypeID.BlueTiles => new BlueTiles(location),
+            TileTypeID.PurpleTiles => new PurpleTiles(location),
+            TileTypeID.PinkTiles => new PinkTiles(location),
+            TileTypeID.BlackTiles => new BlackTiles(location),
+            TileTypeID.BrownTiles => new BrownTiles(location),
+            TileTypeID.IronWall => new IronWall(location),
+            TileTypeID.Snow => new Snow(location),
+            TileTypeID.Ice => new Ice(location),
+            TileTypeID.SnowyGrass => new SnowyGrass(location),
+            TileTypeID.Lamp => new Lamp(location),
             // TILEFROMID INSERT
             _ => throw new ArgumentException($"Unknown TileFromId TileType '{id}'.")
         };
     }
-    public static Tile TileFromId(TileType id, Point location) => TileFromId((int)id, location);
+    public static Tile TileFromId(TileTypeID id, Point location) => TileFromId((int)id, location);
     public static Decal DecalFromId(DecalType id, Point location)
     {
         // Create a decal from an id

@@ -4,9 +4,8 @@ public class Stairs : Tile
 {
     public string DestLevel { get; set; }
     public Point DestPosition { get; set; }
-    public Stairs(Point location, string destLevel, Point destPosition) : base(location)
+    public Stairs(Point location, string destLevel, Point destPosition) : base(location, TileTypes.Stairs)
     {
-        IsWalkable = true;
         DestLevel = destLevel;
         DestPosition = destPosition;
     }

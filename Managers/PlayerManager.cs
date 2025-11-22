@@ -104,7 +104,7 @@ public class PlayerManager : IContainer
         // Inventory
         DebugManager.StartBenchmark("InventoryUpdate");
         Inventory.Update(gameManager, this);
-        OpenedContainer?.Inventory.Update(gameManager, this);
+        OpenedContainer?.Inventory?.Update(gameManager, this);
         DebugManager.EndBenchmark("InventoryUpdate");
 
         // Player lighting
@@ -224,7 +224,8 @@ public class PlayerManager : IContainer
     {
         Inventory.Opened = true;
         OpenedContainer = container;
-        container.Inventory.Opened = true;
+        if (container.Inventory != null)
+            container.Inventory.Opened = true;
         StateManager.OverlayState = OverlayState.Container;
         SoundManager.PlaySound("Click");
     }
@@ -233,7 +234,7 @@ public class PlayerManager : IContainer
         if (OpenedContainer != null || Inventory.Opened)
             SoundManager.PlaySound("Click");
 
-        if (OpenedContainer != null)
+        if (OpenedContainer != null && OpenedContainer.Inventory != null)
             OpenedContainer.Inventory.Opened = false;
         Inventory.Opened = false;
         OpenedContainer = null;

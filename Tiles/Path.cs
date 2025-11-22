@@ -2,8 +2,7 @@
 
 public class Path : Tile
 {
-    public Path(Point location) : base(location)
+    public Path(Point location) : base(location, TileTypes.Path)
     {
-        IsWalkable = true;
     }
 }

@@ -2,8 +2,7 @@ namespace Quest.Tiles;
 
 public class RedTiles : Tile
 {
-    public RedTiles(Point location) : base(location)
+    public RedTiles(Point location) : base(location, TileTypes.RedTiles)
     {
-        IsWalkable = true;
     }
 }

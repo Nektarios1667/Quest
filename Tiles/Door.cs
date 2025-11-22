@@ -4,10 +4,10 @@ public class Door : Tile
 {
     public string Key { get; set; }
     public bool ConsumeKey { get; set; }
-    public Door(Point location, string key = "", bool consumeKey = true) : base(location)
+    public bool IsOpened { get; set; }
+    public override bool IsWalkable => Type.IsWalkable || IsOpened;
+    public Door(Point location, string key = "", bool consumeKey = true) : base(location, TileTypes.Door)
     {
-        IsWalkable = false;
-        IsWall = true;
         Key = key;
         ConsumeKey = consumeKey;
     }
@@ -32,7 +32,7 @@ public class Door : Tile
                 game.UIManager.Notification($"-1 {StringTools.FillCamelSpaces(Key)}", Color.Red, 3);
                 SoundManager.PlaySoundInstance("DoorUnlock");
             }
-            IsWalkable = true;
+            IsOpened = true;
             StateManager.SaveDoorOpened(TileID);
         }
         else
@@ -51,10 +51,10 @@ public class Door : Tile
     }
     public void Open()
     {
-        IsWalkable = true;
+        IsOpened = true;
     }
     public void Close()
     {
-        IsWalkable = false;
+        IsOpened = false;
     }
 }

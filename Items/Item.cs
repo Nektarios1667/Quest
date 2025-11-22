@@ -35,16 +35,15 @@ public enum ItemType : byte
 }
 public class Item
 {
-    public string DisplayName => $"{Amount} {StringTools.FillCamelSpaces(Name)}";
     public string Name { get; protected set; }
     public string Description { get; protected set; }
-    public int Amount { get; set; }
-    public int MaxAmount { get; protected set; }
+    public byte Amount { get; set; }
+    public byte MaxAmount { get; protected set; }
     public TextureID Texture { get; protected set; }
     public int UID { get; protected set; }
     public Item(int amount)
     {
-        Amount = amount;
+        Amount = (byte)amount;
         MaxAmount = Constants.MaxStack;
         Name = GetType().Name;
         Description = "Inventory item";

@@ -4,9 +4,8 @@ namespace Quest.Tiles;
 
 public class Water : Tile
 {
-    public Water(Xna.Point location) : base(location)
+    public Water(Point location) : base(location, TileTypes.Water)
     {
-        IsWalkable = false;
     }
     public override void Draw(GameManager gameManager)
     {
