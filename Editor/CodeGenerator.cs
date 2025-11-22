@@ -6,7 +6,7 @@ using ScottPlot.TickGenerators;
 namespace Quest.Editor;
 public static class CodeGenerator
 {
-    private const string tileCodeTemplate = "namespace Quest.Tiles;\r\n\r\npublic class $name : Tile\r\n{\r\n    public $name(Point location) : base(location)\r\n    {\r\n        IsWalkable = $iswalkable;\r\n$iswall    }\r\n}\r\n";
+    private const string tileCodeTemplate = "namespace Quest.Tiles;\r\n\r\npublic class $name : Tile\r\n{\r\n    public $name(Point location) : base(location, TileTypes.$name) { }\r\n}\r\n";
     private const string decalCodeTemplate = "namespace Quest.Decals;\r\npublic class $name(Point location) : Decal(location) {}\r\n";
     private const string itemCodeTemplate = "namespace Quest.Items;\r\npublic class $name : Item\r\n{\r\n    public $name(int amount) : base(amount)\r\n    {\r\n        MaxAmount = $maxamount;\r\n        Description = \"$description\";\r\n    }\r\n}\r\n";
 
@@ -132,8 +132,10 @@ public static class CodeGenerator
         newTextureManagerSource = newTextureManagerSource.Replace("        // TILES METADATA INSERT", $"        {metadataSource}        // TILES METADATA INSERT");
         File.WriteAllText($"{sourceDirectory}/Managers/TextureManager.cs", newTextureManagerSource);
 
-        // TileType enum in Tile.cs
-        string newTileSource = tileSource.Replace("    // TILES", $"    {name},\r\n    // TILES");
+        // TileTypeID enum in Tile.cs
+        string newTileSource = tileSource.Replace("    // TILES ID", $"    {name},\r\n    // TILES ID");
+        // TileType variable in TileTypes class in Tile.cs
+        newTileSource = newTileSource.Replace("    // TILES REGISTER", $"    public static readonly TileType {name} = new(TileTypeID.{name}, TextureID.{name}, {isWalkable.ToString().ToLower()}, {isWall.ToString().ToLower()});\r\n    // TILES REGISTER");
         File.WriteAllText($"{sourceDirectory}/Tiles/Tile.cs", newTileSource);
 
         // TileFromID in LevelManager.cs

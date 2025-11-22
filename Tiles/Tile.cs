@@ -39,7 +39,7 @@ public enum TileTypeID : byte
     Ice,
     SnowyGrass,
     Lamp,
-    // TILES
+    // TILES ID
 }
 
 public class TileType
@@ -93,9 +93,8 @@ public static class TileTypes
     public static readonly TileType Ice            = new(TileTypeID.Ice, TextureID.Ice, true, false);
     public static readonly TileType SnowyGrass     = new(TileTypeID.SnowyGrass, TextureID.SnowyGrass, true, false);
     public static readonly TileType Lamp           = new(TileTypeID.Lamp, TextureID.Lamp, true, false);
+    // TILES REGISTER
 }
-
-
 public class Tile
 {
     protected static readonly Dictionary<TileTypeID, TextureID> TileToTexture = Enum.GetValues<TileTypeID>()
