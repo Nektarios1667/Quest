@@ -102,12 +102,12 @@ public static class CodeGenerator
     }
     public static void ReloadSource()
     {
-        textureManagerSource = File.ReadAllText($"{sourceDirectory}\\Managers\\TextureManager.cs");
-        levelManagerSource = File.ReadAllText($"{sourceDirectory}\\Managers\\LevelManager.cs");
-        constantsSource = File.ReadAllText($"{sourceDirectory}\\Constants.cs");
-        tileSource = File.ReadAllText($"{sourceDirectory}\\Tiles\\Tile.cs");
-        decalSource = File.ReadAllText($"{sourceDirectory}\\Decals\\Decal.cs");
-        itemSource = File.ReadAllText($"{sourceDirectory}\\Items\\Item.cs");
+        textureManagerSource = File.ReadAllText($"{sourceDirectory}/Managers/TextureManager.cs");
+        levelManagerSource = File.ReadAllText($"{sourceDirectory}/Managers/LevelManager.cs");
+        constantsSource = File.ReadAllText($"{sourceDirectory}/Constants.cs");
+        tileSource = File.ReadAllText($"{sourceDirectory}/Tiles/Tile.cs");
+        decalSource = File.ReadAllText($"{sourceDirectory}/Decals/Decal.cs");
+        itemSource = File.ReadAllText($"{sourceDirectory}/Items/Item.cs");
     }
     public static void WriteTileCode()
     {
@@ -120,7 +120,7 @@ public static class CodeGenerator
 
         // Source code
         string classSource = tileCodeTemplate.Replace("$name", name).Replace("$iswalkable", isWalkable ? "true" : "false").Replace("$iswall", isWall ? "        IsWall = true;\r\n" : "");
-        File.WriteAllText($"{sourceDirectory}\\Tiles\\{name}.cs", classSource);
+        File.WriteAllText($"{sourceDirectory}/Tiles/{name}.cs", classSource);
 
         // TextureManager TextureID enum
         string newTextureManagerSource = textureManagerSource.Replace("        // TILES ENUM INSERT", $"        {name},\r\n        // TILES ENUM INSERT");
@@ -130,19 +130,19 @@ public static class CodeGenerator
         string metadataSource = $"Metadata[TextureID.{name}] = new(Textures[TextureID.{name}].Bounds.Size, new(4, 4), \"tile\");\r\n";
         newTextureManagerSource = newTextureManagerSource.Replace("        // TILES INSERT", $"        {loadSource}        // TILES INSERT");
         newTextureManagerSource = newTextureManagerSource.Replace("        // TILES METADATA INSERT", $"        {metadataSource}        // TILES METADATA INSERT");
-        File.WriteAllText($"{sourceDirectory}\\Managers\\TextureManager.cs", newTextureManagerSource);
+        File.WriteAllText($"{sourceDirectory}/Managers/TextureManager.cs", newTextureManagerSource);
 
         // TileType enum in Tile.cs
         string newTileSource = tileSource.Replace("    // TILES", $"    {name},\r\n    // TILES");
-        File.WriteAllText($"{sourceDirectory}\\Tiles\\Tile.cs", newTileSource);
+        File.WriteAllText($"{sourceDirectory}/Tiles/Tile.cs", newTileSource);
 
         // TileFromID in LevelManager.cs
         string newLevelManagerSource = levelManagerSource.Replace("            // TILEFROMID INSERT", $"            TileType.{name} => new {name}(location),\r\n            // TILEFROMID INSERT");
-        File.WriteAllText($"{sourceDirectory}\\Managers\\LevelManager.cs", newLevelManagerSource);
+        File.WriteAllText($"{sourceDirectory}/Managers/LevelManager.cs", newLevelManagerSource);
 
         // Minimap color
         string newConstantsSource = constantsSource.Replace("        // MINIMAPCOLORS", $"        {color}, // {name}\r\n        // MINIMAPCOLORS");
-        File.WriteAllText($"{sourceDirectory}\\Constants.cs", newConstantsSource);
+        File.WriteAllText($"{sourceDirectory}/Constants.cs", newConstantsSource);
     }
     public static void WriteDecalCode()
     {
@@ -151,7 +151,7 @@ public static class CodeGenerator
 
         // Source code
         string classSource = decalCodeTemplate.Replace("$name", name);
-        File.WriteAllText($"{sourceDirectory}\\Decals\\{name}.cs", classSource);
+        File.WriteAllText($"{sourceDirectory}/Decals/{name}.cs", classSource);
 
         // TextureManager TextureID enum
         string newTextureManagerSource = textureManagerSource.Replace("        // DECALS ENUM INSERT", $"        {name},\r\n        // DECALS ENUM INSERT");
@@ -161,15 +161,15 @@ public static class CodeGenerator
         string metadataSource = $"Metadata[TextureID.{name}] = new(Textures[TextureID.{name}].Bounds.Size, new(1, 1), \"decal\");\r\n";
         newTextureManagerSource = newTextureManagerSource.Replace("        // DECALS INSERT", $"        {loadSource}        // DECALS INSERT");
         newTextureManagerSource = newTextureManagerSource.Replace("        // DECALS METADATA INSERT", $"        {metadataSource}        // DECALS METADATA INSERT");
-        File.WriteAllText($"{sourceDirectory}\\Managers\\TextureManager.cs", newTextureManagerSource);
+        File.WriteAllText($"{sourceDirectory}/Managers/TextureManager.cs", newTextureManagerSource);
 
         // DecalType enum in Decal.cs
         string newDecalSource = decalSource.Replace("    // DECALS", $"    {name},\r\n    // DECALS");
-        File.WriteAllText($"{sourceDirectory}\\Decals\\Decal.cs", newDecalSource);
+        File.WriteAllText($"{sourceDirectory}/Decals/Decal.cs", newDecalSource);
 
         // DecalFromID in LevelManager.cs
         string newLevelManagerSource = levelManagerSource.Replace("            // DECALFROMID INSERT", $"            DecalType.{name} => new {name}(location),\r\n            // DECALFROMID INSERT");
-        File.WriteAllText($"{sourceDirectory}\\Managers\\LevelManager.cs", newLevelManagerSource);
+        File.WriteAllText($"{sourceDirectory}/Managers/LevelManager.cs", newLevelManagerSource);
     }
     public static void WriteItemCode()
     {
@@ -181,7 +181,7 @@ public static class CodeGenerator
 
         // Source code
         string classSource = itemCodeTemplate.Replace("$name", name).Replace("$maxamount", maxAmount).Replace("$description", description);
-        File.WriteAllText($"{sourceDirectory}\\Items\\{name}.cs", classSource);
+        File.WriteAllText($"{sourceDirectory}/Items/{name}.cs", classSource);
 
         // TextureManager TextureID enum
         string newTextureManagerSource = textureManagerSource.Replace("        // ITEMS ENUM INSERT", $"        {name},\r\n        // ITEMS ENUM INSERT");
@@ -191,11 +191,11 @@ public static class CodeGenerator
         string metadataSource = $"Metadata[TextureID.{name}] = new(Textures[TextureID.{name}].Bounds.Size, new(1, 1), \"item\");\r\n";
         newTextureManagerSource = newTextureManagerSource.Replace("        // ITEMS INSERT", $"        {loadSource}        // ITEMS INSERT");
         newTextureManagerSource = newTextureManagerSource.Replace("        // ITEMS METADATA INSERT", $"        {metadataSource}        // ITEMS METADATA INSERT");
-        File.WriteAllText($"{sourceDirectory}\\Managers\\TextureManager.cs", newTextureManagerSource);
+        File.WriteAllText($"{sourceDirectory}/Managers/TextureManager.cs", newTextureManagerSource);
 
         // ItemType enum in item.cs
         string newItemSource = itemSource.Replace("    // ITEMS", $"    {name},\r\n    // ITEMS");
-        File.WriteAllText($"{sourceDirectory}\\Items\\Item.cs", newItemSource);
+        File.WriteAllText($"{sourceDirectory}/Items/Item.cs", newItemSource);
     }
     public static void WriteLootTable()
     {
@@ -248,7 +248,7 @@ public static class CodeGenerator
         }
 
         // Write
-        File.WriteAllBytes($"{sourceDirectory}\\World\\Loot\\{tableName}.qlt", data);
+        File.WriteAllBytes($"{sourceDirectory}/World/Loot/{tableName}.qlt", data);
     }
     public static int ParseItemEnumOrInt(string input, int offset = 0)
     {

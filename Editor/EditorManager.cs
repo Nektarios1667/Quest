@@ -189,7 +189,7 @@ public class EditorManager
             }
 
             // Level
-            stairs.DestLevel = $"{world}\\{values[0]}";
+            stairs.DestLevel = $"{world}/{values[0]}";
             stairs.DestPosition = new(int.Parse(values[1]), int.Parse(values[2]));
         }
         // Door
@@ -213,9 +213,9 @@ public class EditorManager
                 return;
             }
             if (values[1] == "Loot Table")
-                chest.RegenerateLoot(LootTable.ReadLootTable($"GameData\\Worlds\\{world}\\loot\\{values[0]}.qlt"));
+                chest.RegenerateLoot(LootTable.ReadLootTable($"GameData/Worlds/{world}/loot/{values[0]}.qlt"));
             else if (values[1] == "Loot Preset")
-                chest.RegenerateLoot(LootPreset.ReadLootPreset($"GameData\\Worlds\\{world}\\loot\\{values[0]}.qlp"));
+                chest.RegenerateLoot(LootPreset.ReadLootPreset($"GameData/Worlds/{world}/loot/{values[0]}.qlp"));
             else
                 Logger.Error("Chest edit failed.");
         }

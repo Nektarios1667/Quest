@@ -6,7 +6,7 @@ public class Stairs : Tile
     public Point DestPosition { get; set; }
     public Stairs(Point location, string destLevel, Point destPosition) : base(location, TileTypes.Stairs)
     {
-        DestLevel = destLevel;
+        DestLevel = destLevel.Replace('\\', '/'); // For consistency
         DestPosition = destPosition;
     }
     public override void OnPlayerEnter(GameManager game, PlayerManager _)

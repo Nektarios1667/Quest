@@ -238,15 +238,15 @@ public class LevelManager
     }
     public bool ReadWorld(OverlayManager uIManager, string folder, bool reload = false)
     {
-        if (!Directory.Exists($"GameData\\Worlds\\{folder}"))
+        if (!Directory.Exists($"GameData/Worlds/{folder}"))
         {
             Logger.Error($"World folder '{folder}' does not exist.");
             return false;
         }
 
         // Read loot tables and presets
-        string[] qlp = Directory.GetFiles($"GameData\\Worlds\\{folder}\\loot", "*.qlp");
-        string[] qlt = Directory.GetFiles($"GameData\\Worlds\\{folder}\\loot", "*.qlt");
+        string[] qlp = Directory.GetFiles($"GameData/Worlds/{folder}/loot", "*.qlp");
+        string[] qlt = Directory.GetFiles($"GameData/Worlds/{folder}/loot", "*.qlt");
         foreach (string file in qlp.Concat(qlt).ToArray())
         {
             if (file.EndsWith(".qlt"))
@@ -257,9 +257,9 @@ public class LevelManager
         }
 
         // Read levels
-        string[] qlv = Directory.GetFiles($"GameData\\Worlds\\{folder}\\levels", "*.qlv");
+        string[] qlv = Directory.GetFiles($"GameData/Worlds/{folder}/levels", "*.qlv");
         foreach (string file in qlv)
-            ReadLevel(uIManager, $"{folder}\\{System.IO.Path.GetFileNameWithoutExtension(file)}", reload);
+            ReadLevel(uIManager, $"{folder}/{System.IO.Path.GetFileNameWithoutExtension(file)}", reload);
         return true;
     }
     public bool ReadLevel(OverlayManager uiManager, string filename, bool reload = false)
@@ -271,7 +271,7 @@ public class LevelManager
             Logger.Error($"Invalid file format '{filename}.'");
             return false;
         }
-        string path = $"GameData\\Worlds\\{splitPath[0]}\\levels\\{splitPath[1]}.qlv";
+        string path = $"GameData/Worlds/{splitPath[0]}/levels/{splitPath[1]}.qlv";
         if (!File.Exists(path))
         {
             Logger.Error($"Level file '{filename}' does not exist.");
@@ -281,7 +281,7 @@ public class LevelManager
         // Check if already read
         if (!reload)
             foreach (Level level in Levels)
-                if (level.Name == filename)
+                if (level.Name.ToLower() == filename.ToLower())
                     return true;
 
         // Make buffers

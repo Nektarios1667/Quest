@@ -101,7 +101,6 @@ public class Window : Game
         // Levels
         levelManager.ReadWorld(gameManager.UIManager, "islands");
         levelManager.ReadWorld(gameManager.UIManager, "house");
-        //levelManager.LoadLevel(gameManager, "islands\\islands");zzzzzzzzzzzzzzzzzzz
         menuManager.RefreshWorldList();
         Logger.System("Loaded levels.");
 

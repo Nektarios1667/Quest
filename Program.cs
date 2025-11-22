@@ -26,7 +26,7 @@ static class Program
         }
         else if (args.Contains("--code-generator"))
         {
-            CodeGenerator.Run("C:\\Users\\nekta\\source\\repos\\CSharp\\Quest");
+            CodeGenerator.Run("C:/Users/nekta/source/repos/CSharp/Quest");
         }
         else
         {

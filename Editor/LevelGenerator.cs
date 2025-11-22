@@ -38,14 +38,14 @@ public class LevelGenerator
         Noise.SetFrequency(freq);
 
         // Read each structure
-        foreach (string file in Directory.GetFiles("GameData\\Structures", "*.qst"))
+        foreach (string file in Directory.GetFiles("GameData/Structures", "*.qst"))
         {
             string name = System.IO.Path.GetFileNameWithoutExtension(file);
             Structures[name] = ReadStructure(file);
         }
 
         // Read each terrain preset
-        foreach (string file in Directory.GetFiles("GameData\\Terrain", "*.qtr"))
+        foreach (string file in Directory.GetFiles("GameData/Terrain", "*.qtr"))
         {
             string name = System.IO.Path.GetFileNameWithoutExtension(file);
             Terrains[name] = ReadTerrainPreset(file);

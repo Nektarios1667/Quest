@@ -286,8 +286,8 @@ public static class CommandManager
         string macroName = command.Split(' ')[1];
 
         // Read
-        if (!File.Exists($"GameData\\Persistent\\{macroName}.qmc")) return false;
-        string[] macroLines = File.ReadAllLines($"GameData\\Persistent\\{macroName}.qmc");
+        if (!File.Exists($"GameData/Persistent/{macroName}.qmc")) return false;
+        string[] macroLines = File.ReadAllLines($"GameData/Persistent/{macroName}.qmc");
         for (int s = 0; s < macroLines.Length; s++)
         {
             var (success, output) = Execute(macroLines[s]);
