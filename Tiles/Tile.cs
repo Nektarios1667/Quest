@@ -50,7 +50,7 @@ public class Tile
     );
 
     // Debug
-    public int TileID { get; }
+    public ushort TileID { get; }
     public bool Marked { get; set; }
     // Auto generated - no setter
     public Point Location { get; }
@@ -60,7 +60,6 @@ public class Tile
     public bool IsWall { get; protected set; }
     public TileType Type { get; protected set; }
     // Private 
-    protected Color lightCache { get; set; }
     public Tile(Point location)
     {
         Location = location;
@@ -69,7 +68,7 @@ public class Tile
         Type = (TileType)Enum.Parse(typeof(TileType), GetType().Name);
         Texture = TileToTexture[Type];
         Marked = false;
-        TileID = location.X + location.Y * Constants.MapSize.X;
+        TileID = (ushort)(location.X + location.Y * Constants.MapSize.X);
     }
     public virtual void Draw(GameManager gameManager)
     {
