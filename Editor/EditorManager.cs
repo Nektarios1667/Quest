@@ -487,6 +487,10 @@ public class EditorManager
         using GZipStream gzipStream = new(fileStream, CompressionLevel.Optimal);
         using BinaryWriter writer = new(gzipStream);
 
+        // Metadata
+        writer.Write(Encoding.UTF8.GetBytes("QLVL")); // Magic number
+        writer.Write((byte)1); // Version
+
         // Write tint
         writer.Write(levelManager.Level.Tint.R);
         writer.Write(levelManager.Level.Tint.G);
@@ -593,7 +597,7 @@ public class EditorManager
         Tile[] tiles = levelGenerator.GenerateLevel(Constants.MapSize, int.Parse(values[2]));
 
         Level current = levelManager.Level;
-        Level level = new(current.Name, tiles, [], current.Spawn, current.NPCs, current.Loot, current.Decals, current.Enemies, current.Tint);
+        Level level = new(current.Name, tiles, [], current.Spawn, current.NPCs, current.Loot, current.Decals, current.Enemies, [], current.Tint);
 
         levelManager.LoadLevelObject(gameManager, level);
         FlagRebuildMinimap();

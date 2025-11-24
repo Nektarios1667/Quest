@@ -1,6 +1,7 @@
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
 
 namespace Quest.Managers;
 public class LevelManager
@@ -17,7 +18,7 @@ public class LevelManager
         Levels = [];
         Tile[] skyTiles = new Tile[256 * 256];
         for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) skyTiles[t] = new Sky(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
-        Level = new("", skyTiles, [], new(128, 128), [], [], [], []);
+        Level = new("", skyTiles, [], new(128, 128), [], [], [], [], []);
     }
     public void Update(GameManager gameManager)
     {
@@ -216,7 +217,7 @@ public class LevelManager
         // Unload the level
         string name = Levels[levelIndex].Name;
         if (Level == Levels[levelIndex])
-            Level = new("", [], [], new Point(128, 128), [], [], [], []);
+            Level = new("", [], [], new Point(128, 128), [], [], [], [], []);
 
         Levels.RemoveAt(levelIndex);
         Logger.System($"Unloaded level '{name}'.");
@@ -281,7 +282,7 @@ public class LevelManager
         // Check if already read
         if (!reload)
             foreach (Level level in Levels)
-                if (level.Name.ToLower() == filename.ToLower())
+                if (level.Name.Equals(filename, StringComparison.CurrentCultureIgnoreCase))
                     return true;
 
         // Make buffers
@@ -290,11 +291,21 @@ public class LevelManager
         List<NPC> npcBuffer = [];
         List<Loot> lootBuffer = [];
         List<Decal> decalBuffer = [];
+        List<QuillScript> scriptBuffer = [];
 
         // Context
         using FileStream fileStream = File.OpenRead(path);
         using GZipStream gzipStream = new(fileStream, CompressionMode.Decompress);
         using BinaryReader reader = new(gzipStream);
+
+        // Metadata
+        byte[] magic = reader.ReadBytes(4);
+        if (Encoding.UTF8.GetString(magic) != "QLVL")
+        {
+            Logger.Error($"Invalid file format for file '{filename}'.");
+            return false;
+        }
+        byte version = reader.ReadByte();
 
         // Tint
         Color tint = new(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
@@ -309,7 +320,10 @@ public class LevelManager
             int type = reader.ReadByte();
             // Check if valid tile type
             if (type < 0 || type >= Enum.GetValues(typeof(TileTypeID)).Length)
-                throw new ArgumentException($"Invalid tile type {type} @ {i % Constants.MapSize.X}, {i / Constants.MapSize.X} in level file.");
+            {
+                Logger.Error($"Invalid tile type {type} @ {i % Constants.MapSize.X}, {i / Constants.MapSize.X} in level file.");
+                return false;
+            }
             // Extra properties
             Tile tile;
             Point loc = new(i % Constants.MapSize.X, i / Constants.MapSize.X);
@@ -385,8 +399,20 @@ public class LevelManager
             decalBuffer.Add(DecalFromId((DecalType)type, location));
         }
 
+        // Scripts
+        if (version >= 2)
+        {
+            byte scriptCount = reader.ReadByte();
+            for (int s = 0; s < scriptCount; s++)
+            {
+                string scriptName = reader.ReadString();
+                string scriptContent = reader.ReadString();
+                scriptBuffer.Add(new QuillScript(scriptName, scriptContent));
+            }
+        }
+
         // Make and add the level
-        Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, [], tint);
+        Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, [], scriptBuffer, tint);
         if (reload && Levels.Contains(Level))
             Levels[Levels.IndexOf(Level)] = created;
         else

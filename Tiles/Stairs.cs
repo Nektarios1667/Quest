@@ -1,4 +1,6 @@
-﻿namespace Quest.Tiles;
+﻿using System.IO;
+
+namespace Quest.Tiles;
 
 public class Stairs : Tile
 {
@@ -9,7 +11,7 @@ public class Stairs : Tile
         DestLevel = destLevel.Replace('\\', '/'); // For consistency
         DestPosition = destPosition;
     }
-    public override void OnPlayerEnter(GameManager game, PlayerManager _)
+    public override void OnPlayerEnter(GameManager game, PlayerManager player)
     {
         // Load another level
         bool read = game.LevelManager.ReadLevel(game.UIManager, DestLevel, reload: false);

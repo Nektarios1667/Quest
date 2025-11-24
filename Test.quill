@@ -1,0 +1,5 @@
+﻿.while true
+	.wait =<playercoord_x> == 0
+	.built warn output:'hello'
+	.sleep 1000
+.endwhile

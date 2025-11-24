@@ -1,4 +1,5 @@
 ﻿using SharpDX.Direct2D1.Effects;
+using System.IO;
 using System.Text;
 
 namespace Quest;
@@ -122,6 +123,11 @@ public class Window : Game
             usage: RenderTargetUsage.DiscardContents
         );
 
+        // Run test script - DELETEME after testing
+        //Quill.Interpreter.UpdateSymbols(gameManager, playerManager);
+        //string content = File.ReadAllText("Test.quill");
+        //_ = Quill.Interpreter.RunScriptAsync(content);
+
         // Other
         CursorArrow = Content.Load<Texture2D>("Images/Gui/CursorArrow");
 
@@ -143,6 +149,7 @@ public class Window : Game
         delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
         // Managers
+        Quill.Interpreter.UpdateSymbols(gameManager, playerManager);
         InputManager.Update(this);
         DebugManager.Update();
         CameraManager.Update(delta);

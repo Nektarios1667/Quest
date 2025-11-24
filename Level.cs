@@ -1,5 +1,16 @@
 ﻿namespace Quest;
 
+public class QuillScript
+{
+    public string ScriptName { get; private set; }
+    public string SourceCode { get; private set; }
+    public QuillScript(string scriptName, string sourceCode)
+    {
+        ScriptName = scriptName;
+        SourceCode = sourceCode;
+    }
+}
+
 public class Level
 {
     public List<Enemy> Enemies { get; private set; }
@@ -12,7 +23,8 @@ public class Level
     public BiomeType[] Biome { get; private set; }
     public Point Spawn { get; set; }
     public Color Tint { get; set; }
-    public Level(string name, Tile[] tiles, BiomeType[] biome, Point spawn, List<NPC> npcs, List<Loot> loot, List<Decal> decals, List<Enemy> enemies, Color? tint = null)
+    public List<QuillScript> Scripts { get; private set; }
+    public Level(string name, Tile[] tiles, BiomeType[] biome, Point spawn, List<NPC> npcs, List<Loot> loot, List<Decal> decals, List<Enemy> enemies, List<QuillScript> scripts, Color? tint = null)
     {
         // Initialize the level
         Name = name;
@@ -24,6 +36,7 @@ public class Level
         Loot = [.. loot];
         Decals = [.. decals];
         Enemies = [.. enemies];
+        Scripts = [.. scripts];
         Tint = tint ?? Color.Transparent;
     }
 }

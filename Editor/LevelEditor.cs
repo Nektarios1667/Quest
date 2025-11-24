@@ -233,6 +233,8 @@ public class LevelEditor : Game
         if (InputManager.Hotkey(Keys.LeftControl, Keys.T)) editorManager.SetTint();
         // Generate level
         if (InputManager.Hotkey(Keys.LeftControl, Keys.G)) editorManager.GenerateLevel();
+        // Script
+        //if (InputManager.Hotkey(Keys.LeftControl, Keys.P)) editorManager.EditScript();
 
         // Managers
         if (!PopupFactory.PopupOpen) InputManager.Update(this);

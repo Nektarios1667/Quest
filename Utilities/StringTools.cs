@@ -96,3 +96,11 @@ public static class StringTools
         return (parts[0], parts[1]);
     }
 }
+
+public static class StringExtensions
+{
+    public static string WrapSingleQuotes(this string str)
+    {
+        return $"'{str}'";
+    }
+}
