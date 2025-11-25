@@ -132,7 +132,7 @@ public class EditorManager
         debugSb.Append("\nCamera: ");
         debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.Camera.X, CameraManager.Camera.Y);
         debugSb.Append("\nTile Below: ");
-        debugSb.Append(mouseTile == null ? "none" : mouseTile.Type);
+        debugSb.Append(mouseTile == null ? "none" : mouseTile.Type.Texture);
         if (mouseTile != null)
         {
             debugSb.Append("\nMouse Tile: ");

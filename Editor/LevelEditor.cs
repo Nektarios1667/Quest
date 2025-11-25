@@ -329,7 +329,7 @@ public class LevelEditor : Game
         else if (mouseTile is Lamp lamp)
             DrawBottomInfo($"[Lamp] color: {lamp.LightColor} | radius: {lamp.LightRadius}");
         else
-            DrawBottomInfo($"[{mouseTile?.Type}]");
+            DrawBottomInfo($"[{mouseTile?.Type.Texture}]");
 
         // Gui
         gui.Draw();
@@ -370,6 +370,7 @@ public class LevelEditor : Game
     }
     public void DrawBottomInfo(string text)
     {
+        text = $"{TileSelection} | {text}";
         Vector2 textSize = Arial.MeasureString(text);
         Vector2 pos = new(Constants.Middle.X - textSize.X / 2, Constants.NativeResolution.Y - textSize.Y - 3);
         spriteBatch.FillRectangle(new(pos - Vector2.One * 4, textSize + Vector2.One * 8), Color.Gray * 0.5f);

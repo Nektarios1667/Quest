@@ -30,6 +30,6 @@ public class Lamp : Tile
 
         gameManager.Batch.FillRectangle(new((Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle).ToVector2(), Constants.TileSize), tintColor);
 
-        LightingManager.SetLight($"LampTile_{X}_{Y}", Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle, LightRadius, LightColor);
+        LightingManager.SetLight($"LampTile_{X}_{Y}", Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle, LightRadius, Color.Transparent, singleFrame:true);
     }
 }

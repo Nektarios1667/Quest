@@ -139,7 +139,7 @@ public static class CodeGenerator
         File.WriteAllText($"{sourceDirectory}/Tiles/Tile.cs", newTileSource);
 
         // TileFromID in LevelManager.cs
-        string newLevelManagerSource = levelManagerSource.Replace("            // TILEFROMID INSERT", $"            TileType.{name} => new {name}(location),\r\n            // TILEFROMID INSERT");
+        string newLevelManagerSource = levelManagerSource.Replace("            // TILEFROMID INSERT", $"            TileTypeID.{name} => new {name}(location),\r\n            // TILEFROMID INSERT");
         File.WriteAllText($"{sourceDirectory}/Managers/LevelManager.cs", newLevelManagerSource);
 
         // Minimap color

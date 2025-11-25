@@ -256,7 +256,7 @@ public class Window : Game
         debugSb.Append("\nCamera: ");
         debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.Camera.X, CameraManager.Camera.Y);
         debugSb.Append("\nTile Below: ");
-        debugSb.Append(playerManager.TileBelow == null ? "none" : playerManager.TileBelow.Type);
+        debugSb.Append(playerManager.TileBelow == null ? "none" : playerManager.TileBelow.Type.ToString());
         debugSb.Append("\nCoord: ");
         debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.TileCoord.X, CameraManager.TileCoord.Y);
         debugSb.Append("\nLevel: ");

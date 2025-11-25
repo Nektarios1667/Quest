@@ -486,6 +486,8 @@ public class LevelManager
             TileTypeID.Ice => new Ice(location),
             TileTypeID.SnowyGrass => new SnowyGrass(location),
             TileTypeID.Lamp => new Lamp(location),
+            TileTypeID.Sandstone => new Sandstone(location),
+            TileTypeID.SandstoneWall => new SandstoneWall(location),
             // TILEFROMID INSERT
             _ => throw new ArgumentException($"Unknown TileFromId TileType '{id}'.")
         };

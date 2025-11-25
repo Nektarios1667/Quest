@@ -171,9 +171,12 @@ public class MenuManager
             string oldPath = $"GameData/Worlds/{worlds.Selected}/saves/{saves.Selected}.qsv";
             string newPath = $"GameData/Worlds/{worlds.Selected}/saves/{values[0]}.qsv";
             if (!File.Exists(newPath))
+            {
                 File.Move(oldPath, newPath);
+                File.Move(oldPath.Replace("GameData", "../../../GameData"), newPath.Replace("GameData", "../../../GameData"));
+            }
             else
-                PopupFactory.ShowMessage("Error", "A save with that name already exists.");
+                PopupFactory.ShowMessage("A save with that name already exists.", "Error");
         }
         LoadSaves(worlds.Selected);
     }

@@ -39,6 +39,8 @@ public enum TileTypeID : byte
     Ice,
     SnowyGrass,
     Lamp,
+    Sandstone,
+    SandstoneWall,
     // TILES ID
 }
 
@@ -93,6 +95,8 @@ public static class TileTypes
     public static readonly TileType Ice            = new(TileTypeID.Ice, TextureID.Ice, true, false);
     public static readonly TileType SnowyGrass     = new(TileTypeID.SnowyGrass, TextureID.SnowyGrass, true, false);
     public static readonly TileType Lamp           = new(TileTypeID.Lamp, TextureID.Lamp, true, false);
+    public static readonly TileType Sandstone = new(TileTypeID.Sandstone, TextureID.Sandstone, true, false);
+    public static readonly TileType SandstoneWall = new(TileTypeID.SandstoneWall, TextureID.SandstoneWall, false, true);
     // TILES REGISTER
 }
 public class Tile
