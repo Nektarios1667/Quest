@@ -136,6 +136,14 @@ public class LevelManager
         foreach (Enemy enemy in Level.Enemies) enemy.Draw(gameManager);
         DebugManager.EndBenchmark("CharacterDraws");
     }
+    public Level GetLevel(string name)
+    {
+        foreach (Level level in Levels)
+            if (level.Name == name)
+                return level;
+        Logger.Error($"Level '{name}' not found in stored levels.");
+        return new("", [], [], new Point(128, 128), [], [], [], [], []);
+    }
     public bool LoadLevel(GameManager gameManager, int levelIndex)
     {
         // Check index
@@ -347,10 +355,10 @@ public class LevelManager
                     if (lootGen == null)
                     {
                         Logger.Warning($"Invalid loot generator file '{lootGenFile}' for chest at {loc}.");
-                        tile = new Chest(loc, LootPreset.EmptyPreset);
+                        tile = new Chest(loc, LootPreset.EmptyPreset, filename);
                     }
                     else
-                        tile = new Chest(loc, lootGen);
+                        tile = new Chest(loc, lootGen, filename);
                 }
                 // Lamps
                 else if (type == (int)TileTypeID.Lamp)
@@ -446,7 +454,7 @@ public class LevelManager
             TileTypeID.WoodFlooring => new WoodFlooring(location),
             TileTypeID.Stone => new Stone(location),
             TileTypeID.Door => new Door(location, ""),
-            TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset),
+            TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, ""),
             TileTypeID.ConcreteWall => new ConcreteWall(location),
             TileTypeID.WoodWall => new WoodWall(location),
             TileTypeID.Path => new Tiles.Path(location),

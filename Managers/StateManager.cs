@@ -56,9 +56,10 @@ public static class StateManager
     public static Mood Mood { get; set; } = Mood.Calm;
     public static string CurrentSave { get; set; } = "";
     public static string ContinueSave { get; set; } = "";
+    private static GameManager GameManager;
     // Save State changes
     private static readonly HashSet<int> openedDoors = [];
-    private static readonly HashSet<Chest> chests = [];
+    private static readonly HashSet<(Chest Chest, string Level)> chests = [];
     static StateManager()
     {
         WeatherNoise.SetSeed(WeatherSeed);
@@ -70,6 +71,10 @@ public static class StateManager
         var continuePersist = ReadKeyValueFile("continue");
         if (continuePersist.TryGetValue("lastSave", out string? value))
             ContinueSave = value;
+    }
+    public static void Init(GameManager gameManager)
+    {
+        GameManager = gameManager;
     }
     public static void SetWeatherPersistent(int seed = -1, float lastWeatherTime = 0f, float lastTimeValue = -1f)
     {
@@ -110,12 +115,14 @@ public static class StateManager
     {
         openedDoors.Add(idx);
     }
-    public static void SaveChestGenerator(Chest chest)
+    public static void SaveChestGenerator(Chest chest, string levelPath)
     {
-        chests.Add(chest);
+        chests.Add((chest, levelPath));
     }
     public static void SaveGameState(GameManager gameManager, PlayerManager playerManager, string saveName)
     {
+        WriteKeyValueFile("continue", new() { { "lastSave", CurrentSave } });
+
         byte[] data;
 
         using (var ms = new MemoryStream())
@@ -149,16 +156,17 @@ public static class StateManager
             writer.Write((byte)Chest.ChestSize.Y);
             foreach (var chest in chests)
             {
-                writer.Write(chest.TileID); // TileID
-                writer.Write(chest.Generated); // IsGenerated
-                if (chest.Generated)
-                    for (int y = 0; y < chest.Inventory!.Items.GetLength(1); y++)
-                        for (int x = 0; x < chest.Inventory!.Items.GetLength(0); x++)
-                            WriteItemData(writer, chest.Inventory.Items[x, y]);
+                writer.Write(chest.Level); // Chest level
+                writer.Write(chest.Chest.TileID); // TileID
+                writer.Write(chest.Chest.Generated); // IsGenerated
+                if (chest.Chest.Generated)
+                    for (int y = 0; y < chest.Chest.Inventory!.Items.GetLength(1); y++)
+                        for (int x = 0; x < chest.Chest.Inventory!.Items.GetLength(0); x++)
+                            WriteItemData(writer, chest.Chest.Inventory.Items[x, y]);
                 else
                 {
-                    writer.Write(chest.Seed);
-                    writer.Write(chest.LootGenerator.FileName);
+                    writer.Write(chest.Chest.Seed);
+                    writer.Write(chest.Chest.LootGenerator.FileName);
                 }
             }
             // Doors
@@ -233,12 +241,13 @@ public static class StateManager
             byte chestHeight = reader.ReadByte();
             for (int c = 0; c < chestCount; c++)
             {
+                string lvl = reader.ReadString(); // Chest level
                 int idx = reader.ReadUInt16(); // TileID
                 bool isGenerated = reader.ReadBoolean(); // IsGenerated
-                if (gameManager.LevelManager.Level.Tiles[idx] is Chest chest)
+                if (gameManager.LevelManager.GetLevel(lvl).Tiles[idx] is Chest chest)
                     if (isGenerated)
                     {
-                        chest.SetGenerated(true);
+                        chest.SetEmpty();
                         for (int s = 0; s < chestWidth * chestHeight; s++)
                             chest.Inventory!.SetSlot(s, ReadItemData(reader));
                     }

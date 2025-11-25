@@ -534,7 +534,6 @@ public class EditorManager
                 writer.Write(lamp.LightColor.A);
                 writer.Write((ushort)lamp.LightRadius);
             }
-
         }
 
         // Biome

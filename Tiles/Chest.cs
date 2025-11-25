@@ -7,10 +7,10 @@ public class Chest : Tile, IContainer
     public Inventory? Inventory { get; private set; } = null;
     public bool Generated { get; private set; } = false;
     public int Seed { get; private set; } = Random.Shared.Next();
-    public Chest(Point location, ILootGenerator lootGenerator) : base(location, TileTypes.Chest)
+    public Chest(Point location, ILootGenerator lootGenerator, string levelPath) : base(location, TileTypes.Chest)
     {
         LootGenerator = lootGenerator;
-        StateManager.SaveChestGenerator(this);
+        StateManager.SaveChestGenerator(this, levelPath);
     }
     public override void OnPlayerCollide(GameManager game, PlayerManager player)
     {
@@ -29,6 +29,10 @@ public class Chest : Tile, IContainer
         Inventory = LootGenerator.Generate(6, 3, Seed);
         Generated = true;
     }
-    public void SetGenerated(bool generated) => Generated = generated;
+    public void SetEmpty()
+    {
+        Generated = true;
+        Inventory = new(6, 3);
+    }
     public void SetSeed(int seed) => Seed = seed;
 }

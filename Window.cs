@@ -97,6 +97,7 @@ public class Window : Game
         levelManager.LevelLoaded += _ => playerManager.CloseContainer();
         CommandManager.Init(this, gameManager, levelManager, playerManager);
         Pathfinder.Init(gameManager);
+        StateManager.Init(gameManager);
         Logger.System("Initialized managers.");
 
         // Levels

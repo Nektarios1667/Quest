@@ -1,7 +1,7 @@
 ﻿str currentLevel = =<currentlevel>
 
 while true
-	wait currentLevel != =<currentlevel> and =<gamestate> == 'Game'
+	wait =currentLevel != =<currentlevel> and =<gamestate> == 'Game'
 	log 'Level changed to ' + =<currentlevel>
 	str currentLevel = =<currentlevel>
 	sleep 500

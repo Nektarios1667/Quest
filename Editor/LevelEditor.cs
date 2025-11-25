@@ -77,6 +77,7 @@ public class LevelEditor : Game
         uiManager = new(levelManager, null);
         gameManager = new(Content, spriteBatch, levelManager, uiManager);
         editorManager = new(GraphicsDevice, gameManager, levelManager, levelGenerator, spriteBatch, debugSb);
+        StateManager.Init(gameManager);
         StateManager.State = GameState.Editor;
         Logger.System("Initialized managers.");
 

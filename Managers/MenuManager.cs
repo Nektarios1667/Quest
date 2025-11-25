@@ -110,7 +110,6 @@ public class MenuManager
             var (world, save) = StringTools.ParseLevelPath(StateManager.ContinueSave);
 
             gameManager.LevelManager.ReadWorld(gameManager.UIManager, world, reload: true);
-            gameManager.LevelManager.LoadLevel(gameManager, world);
             StateManager.ReadGameState(gameManager, playerManager, $"{world}/{save}");
 
             StateManager.CurrentSave = StateManager.ContinueSave;
