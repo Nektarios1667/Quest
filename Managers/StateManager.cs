@@ -32,10 +32,6 @@ public enum Weather
 }
 public static class StateManager
 {
-    // Weather controls
-    private const float mu = .1f; // Max boost
-    private const float zeta = 2; // Rain boost depletion
-    private const float alpha = 300; // Rain boost acivation time
     // Weather
     public static readonly FastNoiseLite WeatherNoise = new((int)(DateTime.Now.Ticks ^ (DateTime.Now.Ticks >> 32)));
     private static int _weatherSeed = Environment.TickCount;

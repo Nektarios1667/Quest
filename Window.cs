@@ -126,7 +126,7 @@ public class Window : Game
         // Run test script - DELETEME after testing
         Quill.Interpreter.UpdateSymbols(gameManager, playerManager);
         string content = File.ReadAllText("Test.quill");
-        //_ = Quill.Interpreter.RunScriptAsync(content);
+        _ = Quill.Interpreter.RunScriptAsync(content);
 
         // Other
         CursorArrow = Content.Load<Texture2D>("Images/Gui/CursorArrow");

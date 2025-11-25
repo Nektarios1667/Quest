@@ -169,7 +169,7 @@ public static class LootGeneratorHelper
         else if (file.EndsWith(".qlp"))
             return LootPreset.ReadLootPreset(file);
         else
-            Logger.Error($"Failed to read loot generator '{file}'. Expected .qlt or .qlp file.");
+            Logger.Warning($"Failed to read loot generator '{file}'. Expected .qlt or .qlp file.");
         return LootPreset.EmptyPreset;
     }
 }

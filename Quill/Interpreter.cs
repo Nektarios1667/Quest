@@ -31,6 +31,7 @@ public static class Interpreter
         ExternalSymbols["<gametime>"] = game.GameTime.ToString();
         ExternalSymbols["<daytime>"] = game.DayTime.ToString();
         ExternalSymbols["<totaltime>"] = game.TotalTime.ToString();
+        ExternalSymbols["<gamestate>"] = StateManager.State.ToString().WrapSingleQuotes();
         // Inventory
         ExternalSymbols["<inventorysize_x>"] = player.Inventory.Width.ToString();
         ExternalSymbols["<inventorysize_y>"] = player.Inventory.Height.ToString();

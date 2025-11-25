@@ -1,14 +1,8 @@
-﻿num time = 0
+﻿str currentLevel = =<currentlevel>
 
 while true
-	wait =<isstuck>
-	num time = =time + 1
-
-	if =time > 2
-		teleport {=<playercoord_x> + 1},=<playercoord_y>
-		warn 'Unstuck activated'
-		num time = 0
-	endif
-
-	sleep 1000
+	wait currentLevel != =<currentlevel> and =<gamestate> == 'Game'
+	log 'Level changed to ' + =<currentlevel>
+	str currentLevel = =<currentlevel>
+	sleep 500
 endwhile
