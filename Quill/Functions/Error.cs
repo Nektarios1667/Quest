@@ -5,16 +5,14 @@ using System.IO;
 namespace Quest.Quill.Functions;
 public class Error : IBuiltinFunction
 {
-    public FunctionResponse Run(Dictionary<string, string> args)
+    public FunctionResponse Run(string[] args)
     {
-        if (!args.TryGetValue("output", out string? cmd))
-            return new(false, "ParameterMismatch", $"Parameter 'output' is undefined");
-        if (!args.TryGetValue("exit", out string? exitStr))
-            return new(false, "ParameterMismatch", $"Parameter 'exit' is undefined");
-        if (!bool.TryParse(exitStr, out bool exit))
-            return new(false, "ParameterMismatch", $"Parameter 'exit' is not a valid boolean");
-        Expression expr = new(cmd);
-        object? output = cmd;
+        if (args.Length != 2)
+            return new(false, "ParameterMismatch", $"Expected 2 parameters, got {args.Length}");
+        if (!bool.TryParse(args[1], out bool exit))
+            return new(false, "ParameterMismatch", $"Expected second parameter to be a boolean, got {args[1]}");
+        Expression expr = new(args[0]);
+        object? output = args[0];
         try
         {
             output = expr.Evaluate();

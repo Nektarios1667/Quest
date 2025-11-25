@@ -5,12 +5,12 @@ using System.IO;
 namespace Quest.Quill.Functions;
 public class Log : IBuiltinFunction
 {
-    public FunctionResponse Run(Dictionary<string, string> args)
+    public FunctionResponse Run(string[] args)
     {
-        if (!args.TryGetValue("output", out string? cmd))
-            return new(false, "ParameterMismatch", $"Parameter 'output' is undefined");
-        Expression expr = new(cmd);
-        object? output = cmd;
+        if (args.Length != 1)
+            return new(false, "ParameterMismatch", $"Expected 1 parameter, got {args.Length}");
+        Expression expr = new(args[0]);
+        object? output = args[0];
         try
         {
             output = expr.Evaluate();

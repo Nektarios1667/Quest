@@ -19,5 +19,5 @@ public struct FunctionResponse
 
 public interface IBuiltinFunction
 {
-    public FunctionResponse Run(Dictionary<string, string> args);
+    public FunctionResponse Run(string[] args);
 }

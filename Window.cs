@@ -124,8 +124,8 @@ public class Window : Game
         );
 
         // Run test script - DELETEME after testing
-        //Quill.Interpreter.UpdateSymbols(gameManager, playerManager);
-        //string content = File.ReadAllText("Test.quill");
+        Quill.Interpreter.UpdateSymbols(gameManager, playerManager);
+        string content = File.ReadAllText("Test.quill");
         //_ = Quill.Interpreter.RunScriptAsync(content);
 
         // Other

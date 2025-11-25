@@ -5,12 +5,12 @@ using System.IO;
 namespace Quest.Quill.Functions;
 public class Warn : IBuiltinFunction
 {
-    public FunctionResponse Run(Dictionary<string, string> args)
+    public FunctionResponse Run(string[] args)
     {
-        if (!args.TryGetValue("output", out string? cmd))
-            Logger.Error("Warn function missing 'output' parameter.", true);
-        Expression expr = new(cmd);
-        object? output = cmd;
+        if (args.Length != 1)
+            return new(false, "ParameterMismatch", $"Expected 1 parameter, got {args.Length}");
+        Expression expr = new(args[0]);
+        object? output = args[0];
         try
         {
             output = expr.Evaluate();

@@ -16,7 +16,7 @@ public static class PointExtensions
     }
     public static string CoordString(this Point point)
     {
-        return $"({point.X}, {point.Y})";
+        return $"{point.X},{point.Y}";
     }
 }
 public static class PointTools

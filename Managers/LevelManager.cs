@@ -297,128 +297,136 @@ public class LevelManager
         using FileStream fileStream = File.OpenRead(path);
         using GZipStream gzipStream = new(fileStream, CompressionMode.Decompress);
         using BinaryReader reader = new(gzipStream);
-
-        // Metadata
-        byte[] magic = reader.ReadBytes(4);
-        if (Encoding.UTF8.GetString(magic) != "QLVL")
+        try
         {
-            Logger.Error($"Invalid file format for file '{filename}'.");
-            return false;
-        }
-        byte version = reader.ReadByte();
 
-        // Tint
-        Color tint = new(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
-
-        // Spawn
-        Point spawn = new(reader.ReadByte(), reader.ReadByte());
-
-        // Tiles
-        for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
-        {
-            // Read tile data
-            int type = reader.ReadByte();
-            // Check if valid tile type
-            if (type < 0 || type >= Enum.GetValues(typeof(TileTypeID)).Length)
+            // Metadata
+            byte[] magic = reader.ReadBytes(4);
+            if (Encoding.UTF8.GetString(magic) != "QLVL")
             {
-                Logger.Error($"Invalid tile type {type} @ {i % Constants.MapSize.X}, {i / Constants.MapSize.X} in level file.");
+                Logger.Error($"Invalid file format for file '{filename}'.");
                 return false;
             }
-            // Extra properties
-            Tile tile;
-            Point loc = new(i % Constants.MapSize.X, i / Constants.MapSize.X);
-            // Stairs
-            if (type == (int)TileTypeID.Stairs)
-                tile = new Stairs(loc, reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
-            // Doors
-            else if (type == (int)TileTypeID.Door)
-                tile = new Door(loc, reader.ReadString());
-            // Chests
-            else if (type == (int)TileTypeID.Chest)
+            byte version = reader.ReadByte();
+
+            // Tint
+            Color tint = new(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
+
+            // Spawn
+            Point spawn = new(reader.ReadByte(), reader.ReadByte());
+
+            // Tiles
+            for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
             {
-                string lootGenFile = reader.ReadString();
-                ILootGenerator? lootGen = null;
-                if (lootGenFile.EndsWith(".qlt"))
-                    lootGen = LootTable.ReadLootTable(lootGenFile);
-                else if (lootGenFile.EndsWith(".qlp"))
-                    lootGen = LootPreset.ReadLootPreset(lootGenFile);
-                if (lootGen == null)
+                // Read tile data
+                int type = reader.ReadByte();
+                // Check if valid tile type
+                if (type < 0 || type >= Enum.GetValues(typeof(TileTypeID)).Length)
                 {
-                    Logger.Error($"Invalid loot generator file '{lootGenFile}' for chest at {loc}.");
-                    tile = new Chest(loc, LootPreset.EmptyPreset);
+                    Logger.Error($"Invalid tile type {type} @ {i % Constants.MapSize.X}, {i / Constants.MapSize.X} in level file.");
+                    return false;
                 }
-                else
-                    tile = new Chest(loc, lootGen);
+                // Extra properties
+                Tile tile;
+                Point loc = new(i % Constants.MapSize.X, i / Constants.MapSize.X);
+                // Stairs
+                if (type == (int)TileTypeID.Stairs)
+                    tile = new Stairs(loc, reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
+                // Doors
+                else if (type == (int)TileTypeID.Door)
+                    tile = new Door(loc, reader.ReadString());
+                // Chests
+                else if (type == (int)TileTypeID.Chest)
+                {
+                    string lootGenFile = reader.ReadString();
+                    ILootGenerator? lootGen = null;
+                    if (lootGenFile.EndsWith(".qlt"))
+                        lootGen = LootTable.ReadLootTable(lootGenFile);
+                    else if (lootGenFile.EndsWith(".qlp"))
+                        lootGen = LootPreset.ReadLootPreset(lootGenFile);
+                    if (lootGen == null)
+                    {
+                        Logger.Error($"Invalid loot generator file '{lootGenFile}' for chest at {loc}.");
+                        tile = new Chest(loc, LootPreset.EmptyPreset);
+                    }
+                    else
+                        tile = new Chest(loc, lootGen);
+                }
+                // Lamps
+                else if (type == (int)TileTypeID.Lamp)
+                {
+                    Color lampTint = new(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
+                    ushort lampRadius = reader.ReadUInt16();
+                    tile = new Lamp(loc, lampTint, lampRadius);
+                }
+                else // Regular tile
+                    tile = TileFromId(type, loc);
+                int idx = tile.X + tile.Y * Constants.MapSize.X;
+                tilesBuffer[idx] = tile;
             }
-            // Lamps
-            else if (type == (int)TileTypeID.Lamp)
+
+            // Biomes
+            for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
+                biomeBuffer[i] = (BiomeType)reader.ReadByte();
+
+            // NPCs
+            int npcCount = reader.ReadByte();
+            for (int n = 0; n < npcCount; n++)
             {
-                Color lampTint = new(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
-                ushort lampRadius = reader.ReadUInt16();
-                tile = new Lamp(loc, lampTint, lampRadius);
+                string name = reader.ReadString();
+                string dialog = reader.ReadString();
+                Point location = new(reader.ReadByte(), reader.ReadByte());
+                byte scale = reader.ReadByte();
+                int texId = reader.ReadByte();
+                TextureID texture = (TextureID)texId;
+                npcBuffer.Add(new NPC(uiManager, texture, location, name, dialog, Color.White, scale / 10f));
             }
-            else // Regular tile
-                tile = TileFromId(type, loc);
-            int idx = tile.X + tile.Y * Constants.MapSize.X;
-            tilesBuffer[idx] = tile;
-        }
 
-        // Biomes
-        for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
-            biomeBuffer[i] = (BiomeType)reader.ReadByte();
-
-        // NPCs
-        int npcCount = reader.ReadByte();
-        for (int n = 0; n < npcCount; n++)
-        {
-            string name = reader.ReadString();
-            string dialog = reader.ReadString();
-            Point location = new(reader.ReadByte(), reader.ReadByte());
-            byte scale = reader.ReadByte();
-            int texId = reader.ReadByte();
-            TextureID texture = (TextureID)texId;
-            npcBuffer.Add(new NPC(uiManager, texture, location, name, dialog, Color.White, scale / 10f));
-        }
-
-        // Loot
-        byte lootCount = reader.ReadByte();
-        for (int n = 0; n < lootCount; n++)
-        {
-            string name = reader.ReadString();
-            byte amount = reader.ReadByte();
-            Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
-            lootBuffer.Add(new Loot(name, amount, location, 0f));
-        }
-
-        // Decals
-        byte decalCount = reader.ReadByte();
-        for (int n = 0; n < decalCount; n++)
-        {
-            int type = reader.ReadByte();
-            Point location = new(reader.ReadByte(), reader.ReadByte());
-            decalBuffer.Add(DecalFromId((DecalType)type, location));
-        }
-
-        // Scripts
-        if (version >= 2)
-        {
-            byte scriptCount = reader.ReadByte();
-            for (int s = 0; s < scriptCount; s++)
+            // Loot
+            byte lootCount = reader.ReadByte();
+            for (int n = 0; n < lootCount; n++)
             {
-                string scriptName = reader.ReadString();
-                string scriptContent = reader.ReadString();
-                scriptBuffer.Add(new QuillScript(scriptName, scriptContent));
+                string name = reader.ReadString();
+                byte amount = reader.ReadByte();
+                Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
+                lootBuffer.Add(new Loot(name, amount, location, 0f));
             }
-        }
 
-        // Make and add the level
-        Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, [], scriptBuffer, tint);
-        if (reload && Levels.Contains(Level))
-            Levels[Levels.IndexOf(Level)] = created;
-        else
-            Levels.Add(created);
-        Logger.System($"Successfully read level '{filename}'.");
-        return true;
+            // Decals
+            byte decalCount = reader.ReadByte();
+            for (int n = 0; n < decalCount; n++)
+            {
+                int type = reader.ReadByte();
+                Point location = new(reader.ReadByte(), reader.ReadByte());
+                decalBuffer.Add(DecalFromId((DecalType)type, location));
+            }
+
+            // Scripts
+            if (version >= 2)
+            {
+                byte scriptCount = reader.ReadByte();
+                for (int s = 0; s < scriptCount; s++)
+                {
+                    string scriptName = reader.ReadString();
+                    string scriptContent = reader.ReadString();
+                    scriptBuffer.Add(new QuillScript(scriptName, scriptContent));
+                }
+            }
+
+            // Make and add the level
+            Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, [], scriptBuffer, tint);
+            if (reload && Levels.Contains(Level))
+                Levels[Levels.IndexOf(Level)] = created;
+            else
+                Levels.Add(created);
+            Logger.System($"Successfully read level '{filename}'.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Logger.Error($"Failed to read level file '{filename}': {ex.Message}");
+            return false;
+        }
     }
     public static Tile TileFromId(int id, Point location)
     {

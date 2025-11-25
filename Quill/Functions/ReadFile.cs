@@ -4,10 +4,11 @@ using System.IO;
 namespace Quest.Quill.Functions;
 public class ReadFile : IBuiltinFunction
 {
-    public FunctionResponse Run(Dictionary<string, string> args)
+    public FunctionResponse Run(string[] args)
     {
-        if (!args.TryGetValue("path", out string? path))
-            return new(false, "ParameterMismatch", $"Parameter 'path' is undefined");
+        if (args.Length != 1)
+            return new(false, "ParameterMismatch", $"Expected 1 parameter, got {args.Length}");
+        string path = args[0];
         try
         {
             string content = File.ReadAllText(path);

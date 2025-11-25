@@ -1,5 +1,14 @@
-﻿.while true
-	.wait =<playercoord_x> == 0
-	.built warn output:'hello'
-	.sleep 1000
-.endwhile
+﻿num time = 0
+
+while true
+	wait =<isstuck>
+	num time = =time + 1
+
+	if =time > 2
+		teleport {=<playercoord_x> + 1},=<playercoord_y>
+		warn 'Unstuck activated'
+		num time = 0
+	endif
+
+	sleep 1000
+endwhile
