@@ -12,13 +12,13 @@ public static class Constants
     public const int DayLength = 600; // Length of a day in seconds
 
     // Screen
-    public static readonly Point ScreenResolution = new(1280, 720); // Actual screen resolution
+    public static readonly Point ScreenResolution = new(1920, 1080); // Actual screen resolution
     public static readonly Point NativeResolution = new(1280, 720); // Game window resolution
     public static readonly Vector2 ScreenScale = ScreenResolution.ToVector2() / NativeResolution.ToVector2(); // Scale factor from native resolution to actual screen resolution
     public static readonly Rectangle WindowRect = new(Point.Zero, NativeResolution); // Game window rectangle
     public static readonly float CameraRigidity = .07f; // Camera smoothing weight
-    public const int FPS = -1; // -1 = unlimited
-    public const bool VSYNC = false;
+    public const int FPS = 60; // -1 = unlimited
+    public const bool VSYNC = true;
 
     // Tile and map
     public static readonly Point TileSize = new(64, 64); // In-game tile size

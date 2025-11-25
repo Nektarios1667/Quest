@@ -14,6 +14,7 @@ public class LevelEditor : Game
     private LevelManager levelManager = null!;
     private EditorManager editorManager = null!;
     private GUI gui = null!;
+    private Matrix scale = Matrix.CreateScale(Constants.ScreenScale.X, Constants.ScreenScale.Y, 1f);
 
     // Editing
     private TileTypeID TileSelection;
@@ -47,15 +48,17 @@ public class LevelEditor : Game
         {
             //PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
             //PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height,
-            PreferredBackBufferWidth = Constants.NativeResolution.X,
-            PreferredBackBufferHeight = Constants.NativeResolution.Y,
+            PreferredBackBufferWidth = Constants.ScreenResolution.X,
+            PreferredBackBufferHeight = Constants.ScreenResolution.Y,
             IsFullScreen = false,
             SynchronizeWithVerticalRetrace = Constants.VSYNC,
             PreferHalfPixelOffset = false,
         };
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
-        IsFixedTimeStep = false;
+        IsFixedTimeStep = Constants.FPS != -1;
+        if (IsFixedTimeStep)
+            TargetElapsedTime = TimeSpan.FromSeconds(1d / Constants.FPS);
         Logger.System("Initialized level editor window object.");
     }
 
@@ -258,7 +261,7 @@ public class LevelEditor : Game
     {
         // Clear and start
         GraphicsDevice.Clear(Color.Magenta);
-        spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix:scale);
 
         Point mouseCoordDraw = mouseCoord * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
 
