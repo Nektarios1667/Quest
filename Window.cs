@@ -228,7 +228,7 @@ public class Window : Game
     public void DrawFrameInfo()
     {
         float boxHeight = DebugManager.FrameTimes.Count * 20;
-        FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 190, 0, 180, (int)boxHeight), Color.Black * 0.8f);
+        FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 200, 0, 200, (int)boxHeight), Color.Black * 0.8f);
 
         debugSb.Clear();
         foreach (var kv in frameTimes)
@@ -239,7 +239,7 @@ public class Window : Game
             debugSb.Append('\n');
         }
 
-        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.NativeResolution.X - 180, 0), Color.White);
+        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.NativeResolution.X - 190, 0), Color.White);
     }
     public void DrawTextInfo()
     {

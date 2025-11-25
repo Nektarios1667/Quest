@@ -7,6 +7,7 @@ public enum GameState
     Settings,
     Credits,
     LevelSelect,
+    Loading,
     Game,
     Editor,
     Death,

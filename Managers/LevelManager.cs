@@ -252,6 +252,16 @@ public class LevelManager
             Logger.Error($"World folder '{folder}' does not exist.");
             return false;
         }
+        if (!Directory.Exists($"GameData/Worlds/{folder}/loot"))
+        {
+            Logger.Error($"World loot folder '{folder}/loot' does not exist.");
+            return false;
+        }
+        if (!Directory.Exists($"GameData/Worlds/{folder}/levels"))
+        {
+            Logger.Error($"World levels folder '{folder}/levels' does not exist.");
+            return false;
+        }
 
         // Read loot tables and presets
         string[] qlp = Directory.GetFiles($"GameData/Worlds/{folder}/loot", "*.qlp");

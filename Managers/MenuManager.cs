@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using MonoGUI;
+using Quest.Editor;
 using System.IO;
 using System.Linq;
 
@@ -74,11 +75,12 @@ public class MenuManager
         Label worldListLabel = new(LevelSelectMenu, new(435, 5), Color.White, "Worlds", PixelOperatorLarge);
         Label saveListLabel = new(LevelSelectMenu, new(900, 5), Color.White, "Saves", PixelOperatorLarge);
         Button levelSelectBackButton = new(LevelSelectMenu, new(20, 20), new(100, 40), Color.White, Color.Black * 0.5f, ColorTools.NearBlack * 0.5f, StateManager.RevertGameState, [], text: "Back", font: PixelOperator, border: 0);
-        Button openButton = new(LevelSelectMenu, new(400, 660), new(180, 40), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, OpenSave, [], text: "Open", border: 0);
+        Button openButton = new(LevelSelectMenu, new(200, 660), new(180, 40), Color.White, Color.DarkGreen * 0.6f, Color.Green * 0.6f, OpenSave, [], text: "Open", border: 0);
+        Button renameButton = new(LevelSelectMenu, new(400, 660), new(180, 40), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, Rename, [], text: "Rename", border: 0);
         Button refreshButton = new(LevelSelectMenu, new(600, 660), new(180, 40), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => LoadSaves(worlds.Selected), [], text: "Refresh", border: 0);
         Button deleteButton = new(LevelSelectMenu, new(800, 660), new(180, 40), Color.White, Color.DarkRed * 0.6f, Color.Red * 0.6f, DeleteSelectedSave, [], text: "Delete", border: 0);
 
-        LevelSelectMenu.Widgets = [levelSelectBackButton, worlds, saves, openButton, deleteButton, refreshButton, worldListLabel, saveListLabel];
+        LevelSelectMenu.Widgets = [levelSelectBackButton, worlds, saves, openButton, deleteButton, renameButton, refreshButton, worldListLabel, saveListLabel];
 
         // Pause Menu
         PauseMenu = new(window, batch, PixelOperator);
@@ -123,15 +125,14 @@ public class MenuManager
     public void RefreshWorldList()
     {
         worlds.Items.Clear();
-        worlds.AddItems([.. gameManager.LevelManager.Levels.Select(l => l.Name.Replace("/", " - "))]);
+        worlds.AddItems([.. Directory.GetDirectories("GameData\\Worlds").Select(d => d.Split('\\')[^1])]);
     }
     private void DeleteSelectedSave()
     {
         if (saves.Selected != null && saves.Selected != "(New Save)")
         {
-            string world = StringTools.ParseLevelPath(worlds.Selected).world;
-            File.Delete($"../../../GameData/Worlds/{world}/saves/{saves.Selected}.qsv");
-            File.Delete($"GameData/Worlds/{world}/saves/{saves.Selected}.qsv");
+            File.Delete($"../../../GameData/Worlds/{worlds.Selected}/saves/{saves.Selected}.qsv");
+            File.Delete($"GameData/Worlds/{worlds.Selected}/saves/{saves.Selected}.qsv");
             LoadSaves(worlds.Selected);
         }
     }
@@ -148,17 +149,33 @@ public class MenuManager
     }
     private void OpenSave()
     {
-        string world = StringTools.ParseLevelPath(worlds.Selected).world;
+        gameManager.LevelManager.ReadWorld(gameManager.UIManager, worlds.Selected, reload: true);
 
-        gameManager.LevelManager.ReadLevel(gameManager.UIManager, worlds.Selected.Replace(" - ", "/"), reload: true);
-        gameManager.LevelManager.LoadLevel(gameManager, worlds.Selected.Replace(" - ", "/"));
-
+        StateManager.State = GameState.Loading;
         if (saves.Selected != "(New Save)")
-            StateManager.ReadGameState(gameManager, playerManager, $"{world}/{saves.Selected}");
+            _ = StateManager.ReadGameState(gameManager, playerManager, $"{worlds.Selected}/{saves.Selected}");
         else
-            StateManager.CurrentSave = $"{world}/{DateTime.Now:Save MM-dd-yy HH-mm-ss}";
+            StateManager.CurrentSave = $"{worlds.Selected}/{DateTime.Now:Save MM-dd-yy HH-mm-ss}";
 
         StateManager.State = GameState.Game;
+    }
+    private void Rename()
+    {
+        // Check
+        if (saves.Selected == null || saves.Selected == "(New Save)") return;
+        
+        // Rename
+        var (success, values) = PopupFactory.ShowInputForm("Rename Save", [new("Name:", PopupFactory.IsAlphaNumeric)]);
+        if (success && values.Length > 0 && !string.IsNullOrWhiteSpace(values[0]))
+        {
+            string oldPath = $"GameData/Worlds/{worlds.Selected}/saves/{saves.Selected}.qsv";
+            string newPath = $"GameData/Worlds/{worlds.Selected}/saves/{values[0]}.qsv";
+            if (!File.Exists(newPath))
+                File.Move(oldPath, newPath);
+            else
+                PopupFactory.ShowMessage("Error", "A save with that name already exists.");
+        }
+        LoadSaves(worlds.Selected);
     }
     public void Update(GameManager gameManager)
     {
@@ -179,6 +196,9 @@ public class MenuManager
                 break;
             case GameState.Game:
                 //DebugMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                break;
+            case GameState.Loading:
+                DrawLoading();
                 break;
         }
 
@@ -253,5 +273,13 @@ public class MenuManager
     {
         gameManager.Batch.FillRectangle(new(Vector2.Zero, Constants.NativeResolution), Color.Black * 0.6f);
         PauseMenu.Draw();
+    }
+    private void DrawLoading()
+    {
+        gameManager.Batch.FillRectangle(new(Vector2.Zero, Constants.NativeResolution), Color.Black);
+        string loadingText = "Loading...";
+        Vector2 textSize = PixelOperatorTitle.MeasureString(loadingText);
+        Vector2 position = new((Constants.NativeResolution.X - textSize.X) / 2, (Constants.NativeResolution.Y - textSize.Y) / 2);
+        gameManager.Batch.DrawString(PixelOperatorTitle, loadingText, position, Color.White);
     }
 }

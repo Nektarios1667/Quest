@@ -90,7 +90,7 @@ public static class StringTools
         string[] parts = path.Replace(" - ", "/").Split('\\', '/');
         if (parts.Length < 2)
         {
-            Logger.Error("Invalid level path format. Expected 'World/Level' or 'World/Level'.", true);
+            Logger.Error("Invalid level path format. Expected 'World/Level' or 'World\\Level'.");
             return ("", "");
         }
         return (parts[0], parts[1]);

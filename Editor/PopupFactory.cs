@@ -215,4 +215,9 @@ public static class PopupFactory
         if (string.IsNullOrWhiteSpace(value)) return false;
         return Enum.GetNames(typeof(DecalType)).Any(t => t.Equals(value, StringComparison.OrdinalIgnoreCase));
     }
+    public static bool IsAlphaNumeric(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        return value.All(char.IsLetterOrDigit);
+    }
 }
