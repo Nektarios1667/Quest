@@ -324,7 +324,7 @@ public class LevelEditor : Game
 
         // Tile info
         if (mouseTile is Stairs stair)
-            DrawBottomInfo($"[Stairs] dest: '{stair.DestLevel}' @ {stair.DestPosition.X},{stair.DestPosition.Y}");
+            DrawBottomInfo($"[Stairs] dest: '{stair.DestLevel}' @ {stair.DestX},{stair.DestY}");
         else if (mouseTile is Door door)
             DrawBottomInfo($"[Door] key: '{door.Key}'");
         else if (mouseTile is Chest chest)

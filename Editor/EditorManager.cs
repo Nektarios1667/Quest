@@ -190,7 +190,8 @@ public class EditorManager
 
             // Level
             stairs.DestLevel = $"{world}/{values[0]}";
-            stairs.DestPosition = new(int.Parse(values[1]), int.Parse(values[2]));
+            stairs.DestX = byte.Parse(values[1]);
+            stairs.DestY = byte.Parse(values[2]);
         }
         // Door
         else if (tile is Door door)
@@ -512,8 +513,8 @@ public class EditorManager
             {
                 // Write destination
                 writer.Write(stairs.DestLevel);
-                writer.Write(LevelEditor.IntToByte(stairs.DestPosition.X));
-                writer.Write(LevelEditor.IntToByte(stairs.DestPosition.Y));
+                writer.Write(LevelEditor.IntToByte(stairs.DestX));
+                writer.Write(LevelEditor.IntToByte(stairs.DestY));
             }
             else if (tile is Door door)
             {
