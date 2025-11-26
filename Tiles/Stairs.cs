@@ -24,6 +24,7 @@ public class Stairs : Tile
 
         CameraManager.CameraDest = (DestPosition * Constants.TileSize).ToVector2() + new Vector2(Constants.TileSize.X / 2, 0);
         CameraManager.Camera = CameraManager.CameraDest;
+        CameraManager.Update(0f); // Force update to avoid visual glitches
 
         Logger.System($"Teleporting to level '{DestLevel}' @ {DestPosition.X}, {DestPosition.Y}");
     }

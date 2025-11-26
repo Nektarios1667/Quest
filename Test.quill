@@ -1,8 +1,5 @@
-﻿str currentLevel = =<currentlevel>
-
-while true
-	wait =currentLevel != =<currentlevel> and =<gamestate> == 'Game'
-	log 'Level changed to ' + =<currentlevel>
-	str currentLevel = =<currentlevel>
-	sleep 500
+﻿while true
+	wait =<fps> <= 30
+	log 'Low FPS:' + =<fps>
+	sleep 2000
 endwhile

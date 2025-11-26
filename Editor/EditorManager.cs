@@ -562,8 +562,8 @@ public class EditorManager
             // Write loot data
             writer.Write(loot.Item);
             writer.Write(LevelEditor.IntToByte(loot.Amount));
-            writer.Write((UInt16)loot.Location.X);
-            writer.Write((UInt16)loot.Location.Y);
+            writer.Write((ushort)loot.Location.X);
+            writer.Write((ushort)loot.Location.Y);
         }
 
         // Decals
@@ -575,6 +575,15 @@ public class EditorManager
             writer.Write((byte)decal.Type);
             writer.Write(LevelEditor.IntToByte(decal.Location.X));
             writer.Write(LevelEditor.IntToByte(decal.Location.Y));
+        }
+
+        // Scripts
+        writer.Write((byte)levelManager.Level.Scripts.Count);
+        for (int s = 0; s < levelManager.Level.Scripts.Count; s++)
+        {
+            QuillScript script = levelManager.Level.Scripts[s];
+            writer.Write(script.ScriptName);
+            writer.Write(script.SourceCode);
         }
 
         // Log

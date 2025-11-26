@@ -364,7 +364,8 @@ public class LevelManager
                         lootGen = LootPreset.ReadLootPreset(lootGenFile);
                     if (lootGen == null)
                     {
-                        Logger.Warning($"Invalid loot generator file '{lootGenFile}' for chest at {loc}.");
+                        if (lootGenFile != "_")
+                            Logger.Warning($"Invalid loot generator file '{lootGenFile}' for chest at {loc}.");
                         tile = new Chest(loc, LootPreset.EmptyPreset, filename);
                     }
                     else
