@@ -1,13 +1,11 @@
-﻿using Xna = Microsoft.Xna.Framework;
-
-namespace Quest.Gui;
+﻿namespace Quest.Gui;
 
 public abstract class Widget
 {
     public bool Expired { get; protected set; } = false;
-    public Xna.Point Location { get; set; }
+    public Point Location { get; set; }
     public bool IsVisible { get; set; } = true;
-    public Widget(Xna.Point location)
+    public Widget(Point location)
     {
         Location = location;
     }

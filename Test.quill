@@ -1,5 +1,2 @@
-﻿while true
-	wait =<fps> <= 30
-	log 'Low FPS:' + =<fps>
-	sleep 2000
-endwhile
+﻿wait =<playercoord_y> <= 10
+give Skull, 1

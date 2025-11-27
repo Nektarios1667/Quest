@@ -64,7 +64,8 @@ public static class CommandManager
         { "string", value => true },
         { "bool", value => bool.TryParse(value, out _) },
         { "coordinate", value => IsCoordinate(value) },
-        { "modify", value => value == "set" || value == "change" }
+        { "modify", value => value == "set" || value == "change" },
+        { "item", value => Item.ItemFromName(value, 1).Amount != 0 },
     };
     public static void Init(Game game, GameManager gameManager, LevelManager levelManager, PlayerManager playerManager)
     {
@@ -87,6 +88,7 @@ public static class CommandManager
             new("store * *", CStore, "Stored |2| to '|1|'", "Failed to store |2| to '|1|'"),
             new("gametime <modify> {-999999:999999}", CGameTime, "Game time |1| |2|", "Failed |1| gametime |2|"),
             new("macro *", CMacro, "Executed macro '|1|'.", "Failed to execute macro '|1|'."),
+            new("give <item> {1:255}", CGive, "Gave |2| |1| to player", "Failed to give |2| |1| to player"),
         ];
     }
     public static (bool success, string output) Execute(string command)
@@ -303,6 +305,18 @@ public static class CommandManager
             }
         }
 
+        return true;
+    }
+    private static bool CGive(string command)
+    {
+        string[] parts = command.Split(' ');
+        string itemName = parts[1];
+        int quantity = int.Parse(parts[2]);
+        var item = Item.ItemFromName(itemName, quantity);
+        if (item == null) return false;
+        (bool success, Item leftover) = playerManager!.Inventory.AddItem(item);
+        if (!success)
+            levelManager!.Level.Loot.Add(new(itemName, leftover.Amount, CameraManager.PlayerFoot, gameManager!.GameTime));
         return true;
     }
 }

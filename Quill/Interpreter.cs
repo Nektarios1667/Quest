@@ -1,6 +1,7 @@
 ﻿using MonoGUI;
 using NCalc;
 using Quest.Quill.Functions;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -59,6 +60,9 @@ public static class Interpreter
         { "warn", new Warn() },
         { "error", new Error() },
         { "teleport", new Teleport() },
+        { "loadlevel", new LoadLevel() },
+        { "readlevel", new ReadLevel() },
+        { "give", new Give() },
     };
     static void FillParameters(ref Expression expr, Dictionary<string, string> vars)
     {
@@ -258,13 +262,9 @@ public static class Interpreter
                 FillParameters(ref expr, variables);
                 var result = expr.Evaluate();
                 if (result is int ms)
-                {
                     await Task.Delay(ms);
-                }
                 else
-                {
                     Console.WriteLine($"Invalid sleep time: {waitTimeStr}");
-                }
             }
             // Wait until
             else if (parts[0] == "wait")
@@ -283,7 +283,7 @@ public static class Interpreter
             else if (BuiltinFunctions.TryGetValue(parts[0], out var func))
             {
                 // Get parameters
-                string[] externalParams = parts.Length <= 1 ? [] : string.Join(' ', parts[1..]).Split(',');
+                string[] externalParams = parts.Length <= 1 ? [] : string.Join(' ', parts[1..]).Split(',', StringSplitOptions.TrimEntries);
                 
                 // Run
                 var resp = func.Run(externalParams);

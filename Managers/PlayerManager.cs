@@ -57,21 +57,7 @@ public class PlayerManager : IContainer
 
         // Loot
         DebugManager.StartBenchmark("UpdateLoot");
-        // Check if can pick up and search
-        if (Inventory.IsFull()) return;
-        for (int l = 0; l < gameManager.LevelManager.Level.Loot.Count; l++)
-        {
-            Loot loot = gameManager.LevelManager.Level.Loot[l];
-            // Pick up loot
-            if (PointTools.DistanceSquared(CameraManager.PlayerFoot, loot.Location + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
-            {
-                gameManager.UIManager.LootNotifications.AddNotification($"+{loot.DisplayName}");
-                Inventory.AddItem(Item.ItemFromName(loot.Item, loot.Amount));
-                gameManager.LevelManager.Level.Loot.Remove(loot);
-                LightingManager.RemoveLight($"Loot_{loot.UID}");
-                SoundManager.PlaySound("Pickup", pitch: RandomManager.RandomFloat() / 2 - .25f);
-            }
-        }
+        CheckForLoot(gameManager);
         DebugManager.EndBenchmark("UpdateLoot");
 
         // Movement
@@ -104,7 +90,8 @@ public class PlayerManager : IContainer
         // Inventory
         DebugManager.StartBenchmark("InventoryUpdate");
         Inventory.Update(gameManager, this);
-        OpenedContainer?.Inventory?.Update(gameManager, this);
+        if (OpenedContainer != this)
+            OpenedContainer?.Inventory?.Update(gameManager, this);
         DebugManager.EndBenchmark("InventoryUpdate");
 
         // Player lighting
@@ -112,6 +99,29 @@ public class PlayerManager : IContainer
             LightingManager.SetLight("PlayerLightItem", CameraManager.PlayerFoot - CameraManager.Camera.ToPoint() + Constants.Middle, light.LightStrength, light.LightColor);
         else
             LightingManager.RemoveLight("PlayerLightItem");
+    }
+    public void CheckForLoot(GameManager gameManager)
+    {
+        // Check if can pick up and search
+        if (Inventory.IsFull()) return;
+        for (int l = 0; l < gameManager.LevelManager.Level.Loot.Count; l++)
+        {
+            Loot loot = gameManager.LevelManager.Level.Loot[l];
+            // Pick up loot
+            if (PointTools.DistanceSquared(CameraManager.PlayerFoot, loot.Location + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
+            {
+                gameManager.UIManager.LootNotifications.AddNotification($"+{loot.DisplayName}");
+                (bool success, Item leftover) = Inventory.AddItem(Item.ItemFromName(loot.Item, loot.Amount));
+                if (success)
+                    gameManager.LevelManager.Level.Loot.Remove(loot);
+                else if (leftover.Amount < loot.Amount)
+                {
+                    loot.Amount = leftover.Amount;
+                    LightingManager.RemoveLight($"Loot_{loot.UID}");
+                    SoundManager.PlaySound("Pickup", pitch: RandomManager.RandomFloat() / 2 - .25f);
+                }
+            }
+        }
     }
     public void Draw(GameManager gameManager)
     {

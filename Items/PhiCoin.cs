@@ -4,6 +4,6 @@ public class PhiCoin : Item
 {
     public PhiCoin(int amount) : base(amount)
     {
-        Description = "A gold coin.";
+        Description = "A bronze coin.";
     }
 }

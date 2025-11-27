@@ -4,6 +4,6 @@ public class DeltaCoin : Item
 {
     public DeltaCoin(int amount) : base(amount)
     {
-        Description = "A copper coin.";
+        Description = "A gold coin.";
     }
 }

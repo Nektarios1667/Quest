@@ -1,4 +1,6 @@
-﻿namespace Quest;
+﻿using System.Transactions;
+
+namespace Quest;
 
 
 public interface IContainer
@@ -204,9 +206,8 @@ public class Inventory
         }
     }
     // AddItem
-    public void AddItem(Item item)
+    public (bool success, Item leftover) AddItem(Item item)
     {
-        if (item == null || IsFull()) return;
         for (byte y = 0; y < Height; y++)
         {
             for (byte x = 0; x < Width; x++)
@@ -215,17 +216,19 @@ public class Inventory
                 if (current == null)
                 {
                     SetSlot(Flatten(x, y), item);
-                    return;
+                    return (true, item);
                 }
                 if (SameItem(current, item))
                 {
                     byte moved = (byte)Math.Min(item.Amount, current.MaxAmount - current.Amount);
                     current!.Amount += moved; // Add to existing item
                     item.Amount -= moved; // Reduce amount of new item
-                    if (item.Amount < 1) return; // If item is fully added exit
+                    if (item.Amount < 1) return (true, item); // If item is fully added exit
                 }
             }
         }
+        // Not enough space
+        return (false, item);
     }
     // SameItem
     public static bool SameItem(Item? item1, Item? item2)

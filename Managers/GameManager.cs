@@ -10,10 +10,12 @@ public class GameManager
     public float TotalTime { get; private set; } = 0f;
     public float DayTime { get; set; } = 0f;
     public SpriteBatch Batch { get; private set; }
+    public SpriteBatch MinimapBatch { get; private set; }
 
     public GameManager(ContentManager content, SpriteBatch batch, LevelManager level, OverlayManager ui)
     {
         Batch = batch;
+        MinimapBatch = new SpriteBatch(batch.GraphicsDevice);
         LevelManager = level;
         UIManager = ui;
 

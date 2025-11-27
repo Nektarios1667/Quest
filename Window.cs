@@ -14,7 +14,7 @@ public class Window : Game
     private OverlayManager overlayManager;
     private LevelManager levelManager;
     private MenuManager menuManager;
-    private Matrix scale = Matrix.CreateScale(Constants.ScreenScale.X, Constants.ScreenScale.Y, 1f);
+    public static readonly Matrix Scale = Matrix.CreateScale(Constants.ScreenScale.X, Constants.ScreenScale.Y, 1f);
 
     // Time
     private float delta;
@@ -182,7 +182,7 @@ public class Window : Game
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.Magenta);
-        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: scale);
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: Scale);
 
         // Draw game
         levelManager.Draw(gameManager);

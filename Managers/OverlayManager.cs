@@ -208,8 +208,7 @@ public class OverlayManager
             minimap = new RenderTarget2D(device, Constants.MapSize.X, Constants.MapSize.Y);
             device.SetRenderTarget(minimap);
             device.Clear(Color.Transparent);
-            gameManager.Batch.End();
-            gameManager.Batch.Begin();
+            gameManager.MinimapBatch.Begin();
 
             // Pixels
             for (int y = 0; y < Constants.MapSize.Y; y++)
@@ -218,15 +217,13 @@ public class OverlayManager
                 {
                     // Get tile
                     Tile tile = gameManager.LevelManager.GetTile(new Point(x, y))!;
-                    gameManager.Batch.DrawPoint(new(x, y), Constants.MiniMapColors[(int)tile.Type.ID]);
+                    gameManager.MinimapBatch.DrawPoint(new(x, y), Constants.MiniMapColors[(int)tile.Type.ID]);
                 }
             }
 
             // Resume normal render
-            gameManager.Batch.End();
+            gameManager.MinimapBatch.End();
             device.SetRenderTarget(null);
-            gameManager.Batch.Begin();
-
         }
         else
             gameManager.Batch.Draw(minimap, new Rectangle(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
