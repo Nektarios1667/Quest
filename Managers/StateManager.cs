@@ -188,9 +188,10 @@ public static class StateManager
 
         // Write
         string world = gameManager.LevelManager.Level.World;
-        using (var fs = new FileStream($"../../../GameData/Worlds/{world}/saves/{saveName}.qsv", FileMode.Create, FileAccess.Write))
+        using (var fs = new FileStream($"GameData/Worlds/{world}/saves/{saveName}.qsv", FileMode.Create, FileAccess.Write))
             fs.Write(data, 0, data.Length);
-        File.Copy($"../../../GameData/Worlds/{world}/saves/{saveName}.qsv", $"GameData/Worlds/{world}/saves/{saveName}.qsv", true);
+        if (Constants.DEVMODE)
+            File.Copy($"GameData/Worlds/{world}/saves/{saveName}.qsv", $"../../../GameData/Worlds/{world}/saves/{saveName}.qsv", true);
 
         gameManager.UIManager.LootNotifications.AddNotification($"Game Saved", Color.Cyan);
         Logger.System($"Saved game state to '{saveName}.qsv'.");
@@ -342,7 +343,8 @@ public static class StateManager
     public static void WriteKeyValueFile(string name, Dictionary<string, string> data)
     {
         // Write key-value pairs to file
-        using (var fs = new FileStream($"../../../GameData/Persistent/{name}.qkv", FileMode.Create, FileAccess.Write))
+        string prefix = Constants.DEVMODE ? "../../../" : "";
+        using (var fs = new FileStream($"{prefix}GameData/Persistent/{name}.qkv", FileMode.Create, FileAccess.Write))
         using (var writer = new BinaryWriter(fs))
         {
             writer.Write((uint)data.Count);

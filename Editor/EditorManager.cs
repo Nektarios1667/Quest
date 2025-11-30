@@ -475,16 +475,18 @@ public class EditorManager
         }
 
         // Parse
-        if (values[0].Contains('\\') || values[0].Contains('/'))
+        if ((values[0].Contains('\\') || values[0].Contains('/')) && world != "")
         {
-            Logger.Error($"Invalid level format. File will be outputted in world '{world}' as it can not be part of another world.");
+            Logger.Error($"Invalid level format. File has to be in the same world.");
             return;
         }
-        Directory.CreateDirectory($"../../../GameData/Worlds/{world}");
-        Directory.CreateDirectory($"../../../GameData/Worlds/{world}/levels");
-        Directory.CreateDirectory($"../../../GameData/Worlds/{world}/loot");
-        Directory.CreateDirectory($"../../../GameData/Worlds/{world}/saves");
-        using FileStream fileStream = File.Create($"../../../GameData/Worlds/{world}/levels/{values[0]}.qlv");
+        string prefix = Constants.DEVMODE ? "../../../" : "";
+
+        Directory.CreateDirectory($"{prefix}GameData/Worlds/{world}");
+        Directory.CreateDirectory($"{prefix}GameData/Worlds/{world}/levels");
+        Directory.CreateDirectory($"{prefix}GameData/Worlds/{world}/loot");
+        Directory.CreateDirectory($"{prefix}GameData/Worlds/{world}/saves");
+        using FileStream fileStream = File.Create($"{prefix}GameData/Worlds/{world}/levels/{values[0]}.qlv");
         using GZipStream gzipStream = new(fileStream, CompressionLevel.Optimal);
         using BinaryWriter writer = new(gzipStream);
 

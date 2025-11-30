@@ -131,7 +131,8 @@ public class MenuManager
     {
         if (saves.Selected != null && saves.Selected != "(New Save)")
         {
-            File.Delete($"../../../GameData/Worlds/{worlds.Selected}/saves/{saves.Selected}.qsv");
+            if (Constants.DEVMODE)
+                File.Delete($"../../../GameData/Worlds/{worlds.Selected}/saves/{saves.Selected}.qsv");
             File.Delete($"GameData/Worlds/{worlds.Selected}/saves/{saves.Selected}.qsv");
             LoadSaves(worlds.Selected);
         }
@@ -173,7 +174,8 @@ public class MenuManager
             if (!File.Exists(newPath))
             {
                 File.Move(oldPath, newPath);
-                File.Move(oldPath.Replace("GameData", "../../../GameData"), newPath.Replace("GameData", "../../../GameData"));
+                if (Constants.DEVMODE)
+                    File.Move(oldPath.Replace("GameData", "../../../GameData"), newPath.Replace("GameData", "../../../GameData"));
             }
             else
                 PopupFactory.ShowMessage("A save with that name already exists.", "Error");
