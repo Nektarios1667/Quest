@@ -511,6 +511,16 @@ public class LevelManager
             DecalType.SnowyBush1 => new SnowyBush1(location),
             DecalType.SnowyBush2 => new SnowyBush2(location),
             DecalType.SnowyBush3 => new SnowyBush3(location),
+            DecalType.Cracks1 => new Cracks1(location),
+            DecalType.Cracks2 => new Cracks2(location),
+            DecalType.Cracks3 => new Cracks3(location),
+            DecalType.Mushrooms1 => new Mushrooms1(location),
+            DecalType.Mushrooms2 => new Mushrooms2(location),
+            DecalType.Splat1 => new Splat1(location),
+            DecalType.Splotch1 => new Splotch1(location),
+            DecalType.Splotch2 => new Splotch2(location),
+            DecalType.Splotch3 => new Splotch3(location),
+            DecalType.Splotch4 => new Splotch4(location),
             // DECALFROMID INSERT
             _ => null,
         };

@@ -113,6 +113,16 @@ public static class TextureManager
         SnowyBush1,
         SnowyBush2,
         SnowyBush3,
+        Cracks1,
+        Cracks2,
+        Cracks3,
+        Mushrooms1,
+        Mushrooms2,
+        Splat1,
+        Splotch1,
+        Splotch2,
+        Splotch3,
+        Splotch4,
         // DECALS ENUM INSERT
         Glow,
         Slash,
@@ -238,6 +248,16 @@ public static class TextureManager
         Textures[TextureID.SnowyBush1] = content.Load<Texture2D>("Images/Decals/SnowyBush1");
         Textures[TextureID.SnowyBush2] = content.Load<Texture2D>("Images/Decals/SnowyBush2");
         Textures[TextureID.SnowyBush3] = content.Load<Texture2D>("Images/Decals/SnowyBush3");
+        Textures[TextureID.Cracks1] = content.Load<Texture2D>("Images/Decals/Cracks1");
+        Textures[TextureID.Cracks2] = content.Load<Texture2D>("Images/Decals/Cracks2");
+        Textures[TextureID.Cracks3] = content.Load<Texture2D>("Images/Decals/Cracks3");
+        Textures[TextureID.Mushrooms1] = content.Load<Texture2D>("Images/Decals/Mushrooms1");
+        Textures[TextureID.Mushrooms2] = content.Load<Texture2D>("Images/Decals/Mushrooms2");
+        Textures[TextureID.Splat1] = content.Load<Texture2D>("Images/Decals/Splat1");
+        Textures[TextureID.Splotch1] = content.Load<Texture2D>("Images/Decals/Splotch1");
+        Textures[TextureID.Splotch2] = content.Load<Texture2D>("Images/Decals/Splotch2");
+        Textures[TextureID.Splotch3] = content.Load<Texture2D>("Images/Decals/Splotch3");
+        Textures[TextureID.Splotch4] = content.Load<Texture2D>("Images/Decals/Splotch4");
         // DECALS INSERT
         Textures[TextureID.Glow] = content.Load<Texture2D>("Images/Effects/Glow");
         Textures[TextureID.Slash] = content.Load<Texture2D>("Images/Effects/Slash");
@@ -354,6 +374,16 @@ public static class TextureManager
         Metadata[TextureID.SnowyBush1] = new(Textures[TextureID.SnowyBush1].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.SnowyBush2] = new(Textures[TextureID.SnowyBush2].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.SnowyBush3] = new(Textures[TextureID.SnowyBush3].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Cracks1] = new(Textures[TextureID.Cracks1].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Cracks2] = new(Textures[TextureID.Cracks2].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Cracks3] = new(Textures[TextureID.Cracks3].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Mushrooms1] = new(Textures[TextureID.Mushrooms1].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Mushrooms2] = new(Textures[TextureID.Mushrooms2].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Splat1] = new(Textures[TextureID.Splat1].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Splotch1] = new(Textures[TextureID.Splotch1].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Splotch2] = new(Textures[TextureID.Splotch2].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Splotch3] = new(Textures[TextureID.Splotch3].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Splotch4] = new(Textures[TextureID.Splotch4].Bounds.Size, new(1, 1), "decal");
         // DECALS METADATA INSERT
         Metadata[TextureID.Glow] = new(Textures[TextureID.Glow].Bounds.Size, new(1, 1), "effect");
         Metadata[TextureID.Slash] = new(Textures[TextureID.Slash].Bounds.Size, new(1, 1), "effect");

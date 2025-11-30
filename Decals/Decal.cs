@@ -15,6 +15,16 @@ public enum DecalType
     SnowyBush1,
     SnowyBush2,
     SnowyBush3,
+    Cracks1,
+    Cracks2,
+    Cracks3,
+    Mushrooms1,
+    Mushrooms2,
+    Splat1,
+    Splotch1,
+    Splotch2,
+    Splotch3,
+    Splotch4,
     // DECALS
 }
 public class Decal

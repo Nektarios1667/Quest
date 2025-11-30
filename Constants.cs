@@ -17,7 +17,7 @@ public static class Constants
     public static readonly Point NativeResolution = new(1280, 720); // Game window resolution
     public static readonly Vector2 ScreenScale = ScreenResolution.ToVector2() / NativeResolution.ToVector2(); // Scale factor from native resolution to actual screen resolution
     public static readonly Rectangle WindowRect = new(Point.Zero, NativeResolution); // Game window rectangle
-    public static readonly float CameraRigidity = .07f; // Camera smoothing weight
+    public static readonly float CameraRigidity = 0.07f; // Camera smoothing weight - 1 = no smoothing
     public const int FPS = 60; // -1 = unlimited
     public const bool VSYNC = true;
 
