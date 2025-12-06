@@ -1,9 +1,4 @@
-﻿using HarfBuzzSharp;
-using NCalc;
-using System;
-using System.IO;
-
-namespace Quest.Quill.Functions;
+﻿namespace Quest.Quill.Functions;
 public class ReadLevel : IBuiltinFunction
 {
     public FunctionResponse Run(string[] args)

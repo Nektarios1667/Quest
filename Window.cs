@@ -1,5 +1,4 @@
-﻿using SharpDX.Direct2D1.Effects;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 
 namespace Quest;
@@ -26,11 +25,6 @@ public class Window : Game
     // Movements
     public int moveX;
     public int moveY;
-    // Shaders
-    public Effect Grayscale { get; private set; }
-    public Effect Lighting { get; private set; }
-    // Render targets
-    private RenderTarget2D? ShaderTarget { get; set; }
 
     // Debug
     private static readonly Color[] colors = {
@@ -46,8 +40,6 @@ public class Window : Game
     {
         graphics = new GraphicsDeviceManager(this)
         {
-            //PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
-            //PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height,
             PreferredBackBufferWidth = Constants.ScreenResolution.X,
             PreferredBackBufferHeight = Constants.ScreenResolution.Y,
             IsFullScreen = false,
@@ -107,22 +99,8 @@ public class Window : Game
         Logger.System("Loaded levels.");
 
         // Shaders
-        Lighting = Content.Load<Effect>("Shaders/Lighting");
-        Lighting.Parameters["dim"].SetValue(Constants.NativeResolution.ToVector2());
-        Lighting.Parameters["numLights"].SetValue(0);
 
         // Render Targets
-        ShaderTarget = new(GraphicsDevice, Constants.NativeResolution.X, Constants.NativeResolution.Y);
-        ShaderTarget = new(
-            GraphicsDevice,
-            width: Constants.NativeResolution.X,
-            height: Constants.NativeResolution.Y,
-            mipMap: false,
-            preferredFormat: SurfaceFormat.Color,
-            preferredDepthFormat: DepthFormat.None,
-            preferredMultiSampleCount: 0,
-            usage: RenderTargetUsage.DiscardContents
-        );
 
         // Run test script - DELETEME after testing
         Quill.Interpreter.UpdateSymbols(gameManager, playerManager);
@@ -167,13 +145,6 @@ public class Window : Game
         // Console commands
         if (Constants.COMMANDS && InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.OemTilde))
             CommandManager.OpenCommandPrompt();
-        // Spawn enemy
-        if (Constants.COMMANDS && InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.E))
-        {
-            Enemy enemy = new(CameraManager.Camera.ToPoint() + InputManager.MousePosition - Constants.Middle);
-            gameManager.LevelManager.Level.Enemies.Add(enemy);
-            Logger.Log($"Spawned {enemy.Name} at {enemy.Location}");
-        }
 
         // Final
         base.Update(gameTime);

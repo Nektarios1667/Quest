@@ -1,9 +1,7 @@
 namespace Quest.Items;
 public class BottledStorm : Item
 {
-    public BottledStorm(int amount) : base(amount)
+    public BottledStorm(int amount) : base(ItemTypes.BottledStorm, amount)
     {
-        MaxAmount = 3;
-        Description = "A storm somehow trapped in a glass bottle...";
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace Quest.Quill.Functions;
 public class ReadFile : IBuiltinFunction
@@ -12,7 +11,7 @@ public class ReadFile : IBuiltinFunction
         try
         {
             string content = File.ReadAllText(path);
-            return new(true, null, null, new() {{ "[content]", $"'{content}'" }});
+            return new(true, null, null, new() { { "[content]", $"'{content}'" } });
         }
         catch (FileNotFoundException)
         {

@@ -1,12 +1,12 @@
 ﻿namespace Quest.Quill.Functions;
-public class LoadLevel : IBuiltinFunction
+public class UnloadLevel : IBuiltinFunction
 {
     public FunctionResponse Run(string[] args)
     {
         if (args.Length != 1)
             return new(false, "ParameterMismatch", $"Expected 1 parameter, got {args.Length}");
-        if (CommandManager.Execute($"level load {args[0]}").success)
+        if (CommandManager.Execute($"level unload {args[0]}").success)
             return new(true);
-        return new(false, "CommandError", $"Failed to load level '{args[0]}'");
+        return new(false, "CommandError", $"Failed to uload level '{args[0]}'");
     }
 }

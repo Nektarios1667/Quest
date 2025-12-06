@@ -1,10 +1,8 @@
-﻿namespace Quest.Items;
+namespace Quest.Items;
 public class InactivePalantir : Item
 {
-    public InactivePalantir(int amount) : base(amount)
+    public InactivePalantir(int amount) : base(ItemTypes.InactivePalantir, amount)
     {
-        MaxAmount = 1;
-        Description = "A seeing stone used to communicate with sauron.";
     }
     public override void PrimaryUse(PlayerManager player)
     {

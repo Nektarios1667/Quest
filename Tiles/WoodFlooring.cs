@@ -1,8 +1,8 @@
-﻿namespace Quest.Tiles;
+namespace Quest.Tiles;
 
 public class WoodFlooring : Tile
 {
-    public WoodFlooring(Point location) : base(location, TileTypes.WoodFlooring)
+    public WoodFlooring(Point location) : base(location, TileTypeID.WoodFlooring)
     {
     }
 }

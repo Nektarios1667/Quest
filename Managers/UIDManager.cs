@@ -1,36 +1,39 @@
-﻿namespace Quest.Managers;
+﻿using SharpDX.MediaFoundation.DirectX;
+
+namespace Quest.Managers;
+
+public enum UIDCategory
+{
+    Items,
+    Loot,
+    Enemies,
+}
+
 public static class UIDManager
 {
-    private static Dictionary<string, int> uids = new()
+    private static readonly Queue<ushort>[] uids;
+    private static readonly ushort[] uidCounters;
+    static UIDManager()
     {
-        { "Items", 0 },
-        { "Enemies", 0 },
-        { "Tiles", 0 },
-        { "Loot", 0 },
-        { "Decals", 0 },
-    };
-    public static void NewUIDCategory(string name)
-    {
-        if (uids.ContainsKey(name))
-            throw new ArgumentException($"UID with name '{name}' already exists");
-        uids[name] = 0;
+        int categories = Enum.GetNames(typeof(UIDCategory)).Length;
+        uids = new Queue<ushort>[categories];
+        uidCounters = new ushort[categories];
+        for (int i = 0; i < categories; i++)
+        {
+            uids[i] = new Queue<ushort>();
+            uidCounters[i] = 0;
+        }
     }
-    public static void TryNewUIDCategory(string name)
+    public static ushort Get(UIDCategory category)
     {
-        if (!uids.ContainsKey(name))
-            uids[name] = 0;
+        int c = (int)category;
+        if (uids[c].Count > 0)
+            return uids[c].Dequeue();
+        else
+            return ++uidCounters[c];
     }
-    public static int NewUID(string category)
+    public static void Release(UIDCategory category, ushort uid)
     {
-        if (!uids.TryGetValue(category, out int value))
-            throw new KeyNotFoundException($"No UID category with name '{category}' found");
-        uids[category] = ++value;
-        return value;
-    }
-    public static bool IsUIDUsed(int uid, string category)
-    {
-        if (!uids.TryGetValue(category, out int value))
-            throw new KeyNotFoundException($"No UID category with name '{category}' found");
-        return value >= uid && uid > 0;
+        uids[(int)category].Enqueue(uid);
     }
 }

@@ -238,7 +238,7 @@ public static class CommandManager
                 levelManager!.UnloadLevel(parts[2]);
                 return true;
             }
-            }
+        }
         catch { }
         return false;
     }

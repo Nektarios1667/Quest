@@ -1,9 +1,7 @@
 namespace Quest.Items;
 public class GlassBottle : Item
 {
-    public GlassBottle(int amount) : base(amount)
+    public GlassBottle(int amount) : base(ItemTypes.GlassBottle, amount)
     {
-        MaxAmount = 3;
-        Description = "An empty bottle made of glass.";
     }
 }

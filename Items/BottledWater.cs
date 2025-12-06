@@ -1,9 +1,7 @@
 namespace Quest.Items;
 public class BottledWater : Item
 {
-    public BottledWater(int amount) : base(amount)
+    public BottledWater(int amount) : base(ItemTypes.BottledWater, amount)
     {
-        MaxAmount = 3;
-        Description = "A glass bottle of potable water.";
     }
 }

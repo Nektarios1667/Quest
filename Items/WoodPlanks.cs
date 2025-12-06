@@ -1,9 +1,7 @@
 namespace Quest.Items;
 public class WoodPlanks : Item
 {
-    public WoodPlanks(int amount) : base(amount)
+    public WoodPlanks(int amount) : base(ItemTypes.WoodPlanks, amount)
     {
-        MaxAmount = 10;
-        Description = "Sturdy wooden boards cut from trees.";
     }
 }

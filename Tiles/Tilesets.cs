@@ -1,2 +1,2 @@
-﻿namespace Quest.Tiles;
+namespace Quest.Tiles;
 public interface ICold { }

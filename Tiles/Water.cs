@@ -1,10 +1,8 @@
-﻿using Xna = Microsoft.Xna.Framework;
-
 namespace Quest.Tiles;
 
 public class Water : Tile
 {
-    public Water(Point location) : base(location, TileTypes.Water)
+    public Water(Point location) : base(location, TileTypeID.Water)
     {
     }
     public override void Draw(GameManager gameManager)

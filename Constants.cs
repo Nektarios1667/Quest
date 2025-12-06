@@ -62,7 +62,7 @@ public static class Constants
     // Enum string representations
     public static readonly string[] TileTypeNames = Enum.GetNames(typeof(TileTypeID));
     public static readonly string[] DecalTypeNames = Enum.GetNames(typeof(DecalType));
-    public static readonly string[] ItemTypeNames = Enum.GetNames(typeof(ItemType));
+    public static readonly string[] ItemTypeNames = Enum.GetNames(typeof(ItemTypeID));
     public static readonly string[] TextureIDNames = Enum.GetNames(typeof(TextureID));
 
     // Minimap pixel colors

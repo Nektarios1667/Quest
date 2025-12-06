@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Quest.Quill.Functions;
+﻿namespace Quest.Quill.Functions;
 
 public struct FunctionResponse
 {

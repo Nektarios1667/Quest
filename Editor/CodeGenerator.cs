@@ -1,7 +1,7 @@
-﻿using System.IO;
-using System.Linq;
-using ScottPlot;
+﻿using ScottPlot;
 using ScottPlot.TickGenerators;
+using System.IO;
+using System.Linq;
 
 namespace Quest.Editor;
 public static class CodeGenerator
@@ -55,7 +55,7 @@ public static class CodeGenerator
         float[] intensity = new float[seconds];
 
         int offset = DateTime.Now.Millisecond;
-        StateManager.SetWeatherPersistent(lastTimeValue:offset);
+        StateManager.SetWeatherPersistent(lastTimeValue: offset);
         for (int t = 0; t < seconds; t++)
         {
             values[t] = StateManager.WeatherNoiseValue(t + offset);
@@ -135,7 +135,7 @@ public static class CodeGenerator
         // TileTypeID enum in Tile.cs
         string newTileSource = tileSource.Replace("    // TILES ID", $"    {name},\r\n    // TILES ID");
         // TileType variable in TileTypes class in Tile.cs
-        newTileSource = newTileSource.Replace("    // TILES REGISTER", $"    public static readonly TileType {name} = new(TileTypeID.{name}, TextureID.{name}, {isWalkable.ToString().ToLower()}, {isWall.ToString().ToLower()});\r\n    // TILES REGISTER");
+        newTileSource = newTileSource.Replace("        // TILES REGISTER", $"        new(TileTypeID.{name}, TextureID.{name}, {isWalkable.ToString().ToLower()}, {isWall.ToString().ToLower()});\r\n        // TILES REGISTER");
         File.WriteAllText($"{sourceDirectory}/Tiles/Tile.cs", newTileSource);
 
         // TileFromID in LevelManager.cs
@@ -197,6 +197,7 @@ public static class CodeGenerator
 
         // ItemType enum in item.cs
         string newItemSource = itemSource.Replace("    // ITEMS", $"    {name},\r\n    // ITEMS");
+        newItemSource = newItemSource.Replace("    // ITEMS REGISTER", $"    public static readonly ItemType {name} = new(ItemTypeID.{name}, \"{description}\"{(maxAmount == "10" ? "" : $", {maxAmount}")});\r\n    // ITEMS REGISTER");
         File.WriteAllText($"{sourceDirectory}/Items/Item.cs", newItemSource);
     }
     public static void WriteLootTable()
@@ -257,7 +258,7 @@ public static class CodeGenerator
         // Try parse as int
         if (int.TryParse(input, out int intValue))
         {
-            if (Enum.IsDefined(typeof(ItemType), intValue - offset))
+            if (Enum.IsDefined(typeof(ItemTypeID), intValue - offset))
                 return intValue;
             else
             {
@@ -267,7 +268,7 @@ public static class CodeGenerator
         }
 
         // Try parse as enum name
-        if (Enum.TryParse(input, true, out ItemType enumValue))
+        if (Enum.TryParse(input, true, out ItemTypeID enumValue))
             return (int)enumValue + offset;
 
         Logger.Error($"'{input}' is not a valid name or value of enum ItemType.");

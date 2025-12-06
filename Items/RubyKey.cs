@@ -1,10 +1,7 @@
-﻿namespace Quest.Items;
+namespace Quest.Items;
 public class RubyKey : Item
 {
-    public RubyKey(int amount) : base(amount)
+    public RubyKey(int amount) : base(ItemTypes.RubyKey, amount)
     {
-        MaxAmount = 1;
-        Name = "RubyKey";
-        Description = "A fancy ruby key.";
     }
 }

@@ -1,9 +1,7 @@
-﻿namespace Quest.Items;
+namespace Quest.Items;
 public class GoldKey : Item
 {
-    public GoldKey(int amount) : base(amount)
+    public GoldKey(int amount) : base(ItemTypes.GoldKey, amount)
     {
-        MaxAmount = 1;
-        Description = "A fancy golden key.";
     }
 }

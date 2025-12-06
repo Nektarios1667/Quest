@@ -1,6 +1,4 @@
-﻿using System.Transactions;
-
-namespace Quest;
+﻿namespace Quest;
 
 
 public interface IContainer
@@ -17,7 +15,8 @@ public class Inventory
     public Item?[,] Items { get; }
     public bool Opened { get; set; } = false;
     private int _equippedSlot;
-    public int EquippedSlot {
+    public int EquippedSlot
+    {
         get => _equippedSlot;
         set { _equippedSlot = value; EquippedSlotChanged?.Invoke(value); }
     }
@@ -54,7 +53,7 @@ public class Inventory
 
         // Scroll slot
         if (InputManager.ScrollWheelChange > 0)
-            EquippedSlot = (EquippedSlot + 1) % Width;
+            EquippedSlot = (ushort)((EquippedSlot + 1) % Width);
         if (InputManager.ScrollWheelChange < 0)
             EquippedSlot -= 1;
         if (EquippedSlot < 0) EquippedSlot += Width;

@@ -2,7 +2,7 @@ namespace Quest.Tiles;
 
 public class PinkTiles : Tile
 {
-    public PinkTiles(Point location) : base(location, TileTypes.PinkTiles)
+    public PinkTiles(Point location) : base(location, TileTypeID.PinkTiles)
     {
     }
 }

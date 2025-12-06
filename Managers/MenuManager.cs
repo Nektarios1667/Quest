@@ -87,7 +87,7 @@ public class MenuManager
         PauseMenu.LoadContent(content, "Images/Gui");
         Label pauseLabel = new(PauseMenu, new(Constants.Middle.X - 110, 150), Color.White, "PAUSED", PixelOperatorTitle);
         Button resumeButton = new(PauseMenu, new(Constants.Middle.X - 150, 300), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => StateManager.OverlayState = OverlayState.None, [], text: "Resume", font: PixelOperatorSubtitle, border: 0);
-        Button quicksaveButton = new(PauseMenu, new(Constants.Middle.X - 150, 380), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.SaveGameState(gameManager, playerManager, StringTools.ParseLevelPath(StateManager.CurrentSave).level); }, [], text: "Quick Save", font: PixelOperatorSubtitle, border: 0);
+        Button quicksaveButton = new(PauseMenu, new(Constants.Middle.X - 150, 380), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.SaveGameState(gameManager, playerManager, new LevelPath(StateManager.CurrentSave).LevelName); }, [], text: "Quick Save", font: PixelOperatorSubtitle, border: 0);
         Button pauseSettingsButton = new(PauseMenu, new(Constants.Middle.X - 150, 460), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.State = GameState.Settings; }, [], text: "Settings", font: PixelOperatorSubtitle, border: 0);
         Button mainMenuButton = new(PauseMenu, new(Constants.Middle.X - 150, 540), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.State = GameState.MainMenu; }, [], text: "Main Menu", font: PixelOperatorSubtitle, border: 0);
         Button quitButton = new(PauseMenu, new(Constants.Middle.X - 150, 620), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => window.Exit(), [], text: "Quit", font: PixelOperatorSubtitle, border: 0);
@@ -109,10 +109,10 @@ public class MenuManager
     {
         if (StateManager.ContinueSave != "")
         {
-            var (world, save) = StringTools.ParseLevelPath(StateManager.ContinueSave);
+            LevelPath levelPath = new(StateManager.ContinueSave);
 
-            gameManager.LevelManager.ReadWorld(gameManager.UIManager, world, reload: true);
-            StateManager.ReadGameState(gameManager, playerManager, $"{world}/{save}");
+            gameManager.LevelManager.ReadWorld(gameManager.UIManager, levelPath.WorldName, reload: true);
+            StateManager.ReadGameState(gameManager, playerManager, levelPath.Path);
 
             StateManager.CurrentSave = StateManager.ContinueSave;
             StateManager.State = GameState.Game;
@@ -156,7 +156,11 @@ public class MenuManager
         if (saves.Selected != "(New Save)")
             _ = StateManager.ReadGameState(gameManager, playerManager, $"{worlds.Selected}/{saves.Selected}");
         else
+        {
             StateManager.CurrentSave = $"{worlds.Selected}/{DateTime.Now:Save MM-dd-yy HH-mm-ss}";
+            if (!gameManager.LevelManager.LoadLevel(gameManager, $"{worlds.Selected}/{worlds.Selected}"))
+                gameManager.LevelManager.LoadLevel(gameManager, 0);
+        }
 
         StateManager.State = GameState.Game;
     }
@@ -164,7 +168,7 @@ public class MenuManager
     {
         // Check
         if (saves.Selected == null || saves.Selected == "(New Save)") return;
-        
+
         // Rename
         var (success, values) = PopupFactory.ShowInputForm("Rename Save", [new("Name:", PopupFactory.IsAlphaNumeric)]);
         if (success && values.Length > 0 && !string.IsNullOrWhiteSpace(values[0]))

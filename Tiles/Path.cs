@@ -1,8 +1,8 @@
-﻿namespace Quest.Tiles;
+namespace Quest.Tiles;
 
 public class Path : Tile
 {
-    public Path(Point location) : base(location, TileTypes.Path)
+    public Path(Point location) : base(location, TileTypeID.Path)
     {
     }
 }

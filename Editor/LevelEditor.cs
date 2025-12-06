@@ -261,7 +261,7 @@ public class LevelEditor : Game
     {
         // Clear and start
         GraphicsDevice.Clear(Color.Magenta);
-        spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix:scale);
+        spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: scale);
 
         Point mouseCoordDraw = mouseCoord * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
 

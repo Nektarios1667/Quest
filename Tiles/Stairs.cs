@@ -1,5 +1,3 @@
-﻿using System.IO;
-
 namespace Quest.Tiles;
 
 public class Stairs : Tile
@@ -7,7 +5,7 @@ public class Stairs : Tile
     public string DestLevel { get; set; }
     public byte DestX { get; set; }
     public byte DestY { get; set; }
-    public Stairs(Point location, string destLevel, Point destPosition) : base(location, TileTypes.Stairs)
+    public Stairs(Point location, string destLevel, Point destPosition) : base(location, TileTypeID.Stairs)
     {
         DestX = (byte)destPosition.X;
         DestY = (byte)destPosition.Y;

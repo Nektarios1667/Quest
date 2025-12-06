@@ -11,7 +11,7 @@ public class Lamp : Tile
     }
     public ushort LightRadius { get; set; }
     private Color tintColor;
-    public Lamp(Point location, Color? lightColor = null, ushort lightRadius = 10) : base(location, TileTypes.Lamp)
+    public Lamp(Point location, Color? lightColor = null, ushort lightRadius = 10) : base(location, TileTypeID.Lamp)
     {
         LightColor = lightColor ?? new(10, 10, 0, 255);
         LightRadius = lightRadius;
@@ -30,6 +30,6 @@ public class Lamp : Tile
 
         gameManager.Batch.FillRectangle(new((Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle).ToVector2(), Constants.TileSize), tintColor);
 
-        LightingManager.SetLight($"LampTile_{X}_{Y}", Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle, LightRadius, Color.Transparent, singleFrame:true);
+        LightingManager.SetLight($"LampTile_{X}_{Y}", Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle, LightRadius, Color.Transparent, singleFrame: true);
     }
 }

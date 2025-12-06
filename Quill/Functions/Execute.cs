@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace Quest.Quill.Functions;
+﻿namespace Quest.Quill.Functions;
 public class Execute : IBuiltinFunction
 {
     public FunctionResponse Run(string[] args)

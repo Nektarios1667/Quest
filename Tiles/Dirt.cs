@@ -1,8 +1,8 @@
-﻿namespace Quest.Tiles;
+namespace Quest.Tiles;
 
 public class Dirt : Tile
 {
-    public Dirt(Point location) : base(location, TileTypes.Dirt)
+    public Dirt(Point location) : base(location, TileTypeID.Dirt)
     {
     }
 }

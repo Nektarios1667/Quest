@@ -1,9 +1,7 @@
-﻿namespace Quest.Items;
+namespace Quest.Items;
 public class IronKey : Item
 {
-    public IronKey(int amount) : base(amount)
+    public IronKey(int amount) : base(ItemTypes.IronKey, amount)
     {
-        MaxAmount = 1;
-        Description = "A simple iron key.";
     }
 }

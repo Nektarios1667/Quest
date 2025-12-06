@@ -1,9 +1,7 @@
-﻿namespace Quest.Items;
+namespace Quest.Items;
 public class MagicKey : Item
 {
-    public MagicKey(int amount) : base(amount)
+    public MagicKey(int amount) : base(ItemTypes.MagicKey, amount)
     {
-        MaxAmount = 1;
-        Description = "A magical key.";
     }
 }

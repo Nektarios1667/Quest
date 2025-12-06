@@ -1,8 +1,8 @@
-﻿namespace Quest.Tiles;
+namespace Quest.Tiles;
 
 public class Stone : Tile
 {
-    public Stone(Point location) : base(location, TileTypes.Stone)
+    public Stone(Point location) : base(location, TileTypeID.Stone)
     {
     }
 }

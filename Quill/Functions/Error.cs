@@ -1,6 +1,4 @@
 ﻿using NCalc;
-using System;
-using System.IO;
 
 namespace Quest.Quill.Functions;
 public class Error : IBuiltinFunction

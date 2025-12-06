@@ -1,9 +1,7 @@
 namespace Quest.Items;
 public class Chicken : Item
 {
-    public Chicken(int amount) : base(amount)
+    public Chicken(int amount) : base(ItemTypes.Chicken, amount)
     {
-        MaxAmount = 5;
-        Description = "Chicken meat.";
     }
 }

@@ -1,9 +1,7 @@
-﻿namespace Quest.Items;
+namespace Quest.Items;
 public class DiamondKey : Item
 {
-    public DiamondKey(int amount) : base(amount)
+    public DiamondKey(int amount) : base(ItemTypes.DiamondKey, amount)
     {
-        MaxAmount = 1;
-        Description = "A fancy diamond key.";
     }
 }

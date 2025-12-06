@@ -17,8 +17,6 @@ struct VertexShaderOutput
     float2 TextureCoordinates : TEXCOORD0;
 };
 
-// Ps stands for pixel shader this is were we can effect the change of colors to our images.
-// When we passed our effect to spritebatch.Begin( .., ...,, effect,..) this is what effects all the Draw calls we now make.
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
     float2 xy = input.TextureCoordinates * dim;

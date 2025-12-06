@@ -1,7 +1,7 @@
 ﻿namespace Quest;
 
 // Limited to 16 biome types b/c of save files
-public enum BiomeType
+public enum BiomeType : byte
 {
     Temperate,
     Indoors,
@@ -12,12 +12,12 @@ public enum BiomeType
 
 public static class Biome
 {
-    public static Color[] Colors =
-    {
+    public static readonly Color[] Colors =
+    [
         Color.Lime,
         Color.Gray,
         Color.White,
         Color.Yellow,
         Color.DarkBlue,
-    };
+    ];
 }

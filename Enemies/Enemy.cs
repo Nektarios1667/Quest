@@ -1,7 +1,7 @@
 ﻿namespace Quest.Enemies;
 public class Enemy
 {
-    public int UID { get; }
+    public ushort UID { get; }
     public bool IsAlive => Health >= 0;
     public string Name { get; protected set; }
     public int Health { get; protected set; }
@@ -19,9 +19,8 @@ public class Enemy
     public Enemy(Point location)
     {
         Name = GetType().Name;
-        //Texture = (TextureID)Enum.Parse(typeof(TextureID), GetType().Name);
         Texture = TextureID.PurpleWizard; // TODO remove this line when all enemies have textures
-        UID = UIDManager.NewUID("Enemies");
+        UID = UIDManager.Get(UIDCategory.Enemies);
         tileSize = TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap;
         Location = location.ToVector2();
 
@@ -38,6 +37,10 @@ public class Enemy
     public virtual void Update(GameManager gameManager)
     {
         if (StateManager.State != GameState.Game) return;
+
+        // Check death
+        if (!IsAlive)
+            UIDManager.Release(UIDCategory.Enemies, UID);
 
         // View range
         float playerDistSq = Vector2.DistanceSquared(Location, CameraManager.CameraDest);

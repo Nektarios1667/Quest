@@ -1,7 +1,5 @@
-﻿using MonoGUI;
-using NCalc;
+﻿using NCalc;
 using Quest.Quill.Functions;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -40,7 +38,7 @@ public static class Interpreter
         ExternalSymbols["<isinventoryopen>"] = player.Inventory.Opened.ToString();
         ExternalSymbols["<equippedslot>"] = player.Inventory.EquippedSlot.ToString();
         ExternalSymbols["<equippeditem>"] = (player.Inventory.Equipped?.Name ?? "null").WrapSingleQuotes();
-        ExternalSymbols["<equippeditemid>"] = (player.Inventory.Equipped?.UID.ToString() ?? "'-1'");
+        ExternalSymbols["<equippeditemuid>"] = (player.Inventory.Equipped?.UID.ToString() ?? "'-1'");
         ExternalSymbols["<equippeditemamount>"] = (player.Inventory.Equipped?.Amount.ToString() ?? "0");
         // Technical
         ExternalSymbols["<fps>"] = (1f / game.DeltaTime).ToString();
@@ -61,6 +59,7 @@ public static class Interpreter
         { "error", new Error() },
         { "teleport", new Teleport() },
         { "loadlevel", new LoadLevel() },
+        { "unloadlevel", new UnloadLevel() },
         { "readlevel", new ReadLevel() },
         { "give", new Give() },
     };
@@ -284,7 +283,7 @@ public static class Interpreter
             {
                 // Get parameters
                 string[] externalParams = parts.Length <= 1 ? [] : string.Join(' ', parts[1..]).Split(',', StringSplitOptions.TrimEntries);
-                
+
                 // Run
                 var resp = func.Run(externalParams);
                 if (!resp.Success)

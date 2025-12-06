@@ -1,4 +1,4 @@
-﻿namespace Quest.Tiles;
+namespace Quest.Tiles;
 
 public class Door : Tile
 {
@@ -6,7 +6,7 @@ public class Door : Tile
     public bool ConsumeKey { get; set; }
     public bool IsOpened { get; set; }
     public override bool IsWalkable => Type.IsWalkable || IsOpened;
-    public Door(Point location, string key = "", bool consumeKey = true) : base(location, TileTypes.Door)
+    public Door(Point location, string key = "", bool consumeKey = true) : base(location, TileTypeID.Door)
     {
         Key = key;
         ConsumeKey = consumeKey;

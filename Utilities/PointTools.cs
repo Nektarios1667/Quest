@@ -36,3 +36,4 @@ public static class PointTools
         return (float)Math.Sqrt(DistanceSquared(a, b));
     }
 }
+

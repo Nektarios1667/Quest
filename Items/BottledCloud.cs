@@ -1,9 +1,7 @@
 namespace Quest.Items;
 public class BottledCloud : Item
 {
-    public BottledCloud(int amount) : base(amount)
+    public BottledCloud(int amount) : base(ItemTypes.BottledCloud, amount)
     {
-        MaxAmount = 3;
-        Description = "A cloud somehow trapped in a glass bottle...";
     }
 }

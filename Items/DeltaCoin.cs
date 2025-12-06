@@ -2,8 +2,7 @@ namespace Quest.Items;
 
 public class DeltaCoin : Item
 {
-    public DeltaCoin(int amount) : base(amount)
+    public DeltaCoin(int amount) : base(ItemTypes.DeltaCoin, amount)
     {
-        Description = "A gold coin.";
     }
 }

@@ -1,7 +1,7 @@
 using System.Linq;
 
 namespace Quest.Decals;
-public enum DecalType
+public enum DecalType : byte
 {
     Footprint,
     Torch,
@@ -36,15 +36,16 @@ public class Decal
     );
     // Auto generated - no setter
     public TextureID Texture { get; }
-    public Point Location { get; }
+    public ByteCoord Location { get; }
+    public byte X => Location.X;
+    public byte Y => Location.Y;
     // Properties - protected setter
-    public Color Tint { get; protected set; } = Color.White;
     public DecalType Type { get; protected set; }
-    public int UID { get; } = UIDManager.NewUID("Decals");
+    public ushort UID  => (ushort)(Y * Constants.MapSize.X + X);
     public Decal(Point location)
     {
         // Initialize the tile
-        Location = location;
+        Location = new(location);
         Type = (DecalType)Enum.Parse(typeof(DecalType), GetType().Name);
         Texture = TileToTexture.TryGetValue(Type, out var tex) ? tex : TextureID.Null;
     }
@@ -52,8 +53,7 @@ public class Decal
     {
         // Draw
         Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
-        Point size = TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap;
         Rectangle source = GetAnimationSource(Texture, gameManager.GameTime, duration: .75f);
-        DrawTexture(gameManager.Batch, Texture, dest, source: source, scale: Constants.TileSizeScale, color: Tint);
+        DrawTexture(gameManager.Batch, Texture, dest, source: source, scale: Constants.TileSizeScale);
     }
 }

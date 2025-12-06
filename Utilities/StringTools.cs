@@ -85,16 +85,6 @@ public static class StringTools
             _ => throw new ArgumentException($"Unsupported type '{typeName}'")
         };
     }
-    public static (string world, string level) ParseLevelPath(string path)
-    {
-        string[] parts = path.Replace(" - ", "/").Split('\\', '/');
-        if (parts.Length < 2)
-        {
-            Logger.Error("Invalid level path format. Expected 'World/Level' or 'World\\Level'.");
-            return ("", "");
-        }
-        return (parts[0], parts[1]);
-    }
 }
 
 public static class StringExtensions

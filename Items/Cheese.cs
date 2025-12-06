@@ -1,9 +1,7 @@
 namespace Quest.Items;
 public class Cheese : Item
 {
-    public Cheese(int amount) : base(amount)
+    public Cheese(int amount) : base(ItemTypes.Cheese, amount)
     {
-        MaxAmount = 5;
-        Description = "A wedge of Swiss cheese.";
     }
 }

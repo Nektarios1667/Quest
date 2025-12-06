@@ -1,13 +1,12 @@
-﻿namespace Quest.Items;
+namespace Quest.Items;
 public class MeleeWeapon : Item
 {
     public float FireRate { get; } // Attacks per second
     public float Range { get; } // Pixels
     public int Damage { get; } // Damage dealt per hit
-    public MeleeWeapon(int amount, float firerate, float range, int damage) : base(amount)
+    public MeleeWeapon(ItemType itemType, int amount, float firerate, float range, int damage) : base(itemType, amount)
     {
         Amount = 1;
-        MaxAmount = 1;
         FireRate = firerate;
         Range = range;
         Damage = damage;

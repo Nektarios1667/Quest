@@ -16,9 +16,9 @@ public class LevelManager
     {
         // Empty
         Levels = [];
-        Tile[] skyTiles = new Tile[256 * 256];
-        for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) skyTiles[t] = new Sky(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
-        Level = new("", skyTiles, [], new(128, 128), [], [], [], [], []);
+        Tile[] grassTiles = new Tile[256 * 256];
+        for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) grassTiles[t] = new Sky(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
+        Level = new("", grassTiles, [], new(128, 128), [], [], [], [], []);
     }
     public void Update(GameManager gameManager)
     {
@@ -178,6 +178,7 @@ public class LevelManager
     }
     public bool LoadLevel(GameManager gameManager, string name)
     {
+        name = name.Replace('\\', '/');
         for (int l = 0; l < Levels.Count; l++)
         {
             if (Levels[l].Name == name)
@@ -227,7 +228,11 @@ public class LevelManager
         if (Level == Levels[levelIndex])
             Level = new("", [], [], new Point(128, 128), [], [], [], [], []);
 
-        Levels.RemoveAt(levelIndex);
+        // Unload
+        Level level = Levels[levelIndex];
+        for (int l = 0; l < level.Loot.Count; l++)
+            level.Loot[l].Dispose();
+        Levels.Remove(level);
         Logger.System($"Unloaded level '{name}'.");
         return true;
     }
@@ -284,6 +289,7 @@ public class LevelManager
     public bool ReadLevel(OverlayManager uiManager, string filename, bool reload = false)
     {
         // File checks
+        filename = filename.Replace('\\', '/');
         string[] splitPath = filename.Split('\\', '/');
         if (splitPath.Length != 2)
         {
@@ -434,10 +440,9 @@ public class LevelManager
 
             // Make and add the level
             Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, [], scriptBuffer, tint);
-            if (reload && Levels.Contains(Level))
-                Levels[Levels.IndexOf(Level)] = created;
-            else
-                Levels.Add(created);
+            if (reload)
+                Levels.RemoveAll(l => l.Name == filename);
+            Levels.Add(created);
             Logger.System($"Successfully read level '{filename}'.");
             return true;
         }
@@ -447,6 +452,7 @@ public class LevelManager
             return false;
         }
     }
+    public static Tile TileFromId(int id, ByteCoord location) => TileFromId(id, location);
     public static Tile TileFromId(int id, Point location)
     {
         // Create a tile from an id

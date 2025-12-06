@@ -1,9 +1,7 @@
 namespace Quest.Items;
 public class Orange : Item
 {
-    public Orange(int amount) : base(amount)
+    public Orange(int amount) : base(ItemTypes.Orange, amount)
     {
-        MaxAmount = 5;
-        Description = "A fresh juicy orange.";
     }
 }

@@ -1,8 +1,8 @@
-﻿namespace Quest.Tiles;
+namespace Quest.Tiles;
 
 public class Darkness : Tile
 {
-    public Darkness(Point location) : base(location, TileTypes.Darkness)
+    public Darkness(Point location) : base(location, TileTypeID.Darkness)
     {
     }
 }

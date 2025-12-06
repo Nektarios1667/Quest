@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 
 namespace Quest.Managers;
 public enum GameState
@@ -23,13 +24,6 @@ public enum Mood
     Calm,
     Dark,
     Epic,
-}
-
-public enum Weather
-{
-    Clear,
-    Light,
-    Heavy,
 }
 public static class StateManager
 {
@@ -123,7 +117,7 @@ public static class StateManager
     public static void SaveGameState(GameManager gameManager, PlayerManager playerManager, string saveName)
     {
         WriteKeyValueFile("continue", new() { { "lastSave", CurrentSave } });
-
+        string worldName = gameManager.LevelManager.Level.World;
         byte[] data;
 
         using (var ms = new MemoryStream())
@@ -143,14 +137,21 @@ public static class StateManager
             writer.Write((byte)gameManager.UIManager.HealthBar.MaxValue);
             // Write LevelManager data
             // Loot
-            writer.Write((byte)gameManager.LevelManager.Level.Loot.Count);
-            foreach (var loot in gameManager.LevelManager.Level.Loot)
+            Level[] levels = [.. gameManager.LevelManager.Levels.Where(l => l.World == worldName && l.Loot.Count > 0)];
+            writer.Write((ushort)levels.Length);
+            foreach (Level level in levels)
             {
-                writer.Write((byte)((byte)Enum.Parse(typeof(ItemType), loot.Item, true) + 1));
-                writer.Write((byte)loot.Amount);
-                writer.Write((ushort)loot.Location.X);
-                writer.Write((ushort)loot.Location.Y);
-            }
+                writer.Write(level.LevelName);
+                writer.Write((byte)level.Loot.Count);
+                foreach (var loot in level.Loot)
+                {
+                    writer.Write((byte)((byte)Enum.Parse(typeof(ItemTypeID), loot.Item, true) + 1));
+                    writer.Write(loot.Amount);
+                    writer.Write((ushort)loot.Location.X);
+                    writer.Write((ushort)loot.Location.Y);
+                }
+            };
+
             // Chests
             writer.Write((ushort)chests.Count);
             writer.Write((byte)Chest.ChestSize.X);
@@ -198,8 +199,8 @@ public static class StateManager
     }
     public static bool ReadGameState(GameManager gameManager, PlayerManager playerManager, string save)
     {
-        var path = StringTools.ParseLevelPath(save);
-        string file = $"GameData/Worlds/{path.world}/saves/{path.level}.qsv";
+        LevelPath levelPath = new(save);
+        string file = $"GameData/Worlds/{levelPath.WorldName}/saves/{levelPath.LevelName}.qsv";
         if (!File.Exists(file))
         {
             Logger.Error($"Save file '{file}' does not exist.");
@@ -220,7 +221,7 @@ public static class StateManager
             gameManager.GameTime = reader.ReadSingle();
             WeatherSeed = reader.ReadInt32();
             lastWeather = reader.ReadSingle();
-            SetWeatherPersistent(lastWeatherTime:lastWeather, lastTimeValue: gameManager.GameTime);
+            SetWeatherPersistent(lastWeatherTime: lastWeather, lastTimeValue: gameManager.GameTime);
             // Read CameraManager data
             CameraManager.CameraDest = new(reader.ReadSingle(), reader.ReadSingle());
             CameraManager.Camera = CameraManager.CameraDest;
@@ -229,14 +230,21 @@ public static class StateManager
             gameManager.UIManager.HealthBar.MaxValue = reader.ReadByte();
             // Read LevelManager data
             // Loot
-            byte lootCount = reader.ReadByte();
-            for (int l = 0; l < lootCount; l++)
+            ushort levelCount = reader.ReadUInt16();
+            for (int lc = 0; lc < levelCount; lc++)
             {
-                string name = ((ItemType)reader.ReadByte() - 1).ToString();
-                byte amount = reader.ReadByte();
-                Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
-                gameManager.LevelManager.Level.Loot.Add(new Loot(name, amount, location, 0f));
+                string lvl = $"{levelPath.WorldName}/{reader.ReadString()}";
+                Level current = gameManager.LevelManager.GetLevel(lvl);
+                byte lootCount = reader.ReadByte();
+                for (int l = 0; l < lootCount; l++)
+                {
+                    string name = ((ItemTypeID)reader.ReadByte() - 1).ToString();
+                    byte amount = reader.ReadByte();
+                    Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
+                    current.Loot.Add(new Loot(name, amount, location, 0f));
+                }
             }
+
             // Chests
             ushort chestCount = reader.ReadUInt16();
             byte chestWidth = reader.ReadByte();
@@ -246,7 +254,8 @@ public static class StateManager
                 string lvl = reader.ReadString(); // Chest level
                 int idx = reader.ReadUInt16(); // TileID
                 bool isGenerated = reader.ReadBoolean(); // IsGenerated
-                if (gameManager.LevelManager.GetLevel(lvl).Tiles[idx] is Chest chest)
+                Level current = gameManager.LevelManager.GetLevel(lvl);
+                if (idx >= 0 && idx <= Constants.MapSize.X * Constants.MapSize.Y && current.Tiles[idx] is Chest chest)
                     if (isGenerated)
                     {
                         chest.SetEmpty();
@@ -302,7 +311,7 @@ public static class StateManager
     }
     public static void WriteItemData(BinaryWriter writer, Item? item)
     {
-        writer.Write((byte)(item == null ? 0 : (byte)Enum.Parse(typeof(ItemType), item.Name, true) + 1));
+        writer.Write((byte)(item == null ? 0 : (byte)Enum.Parse(typeof(ItemTypeID), item.Name, true) + 1));
         if (item != null)
             writer.Write((byte)item.Amount);
     }
@@ -310,7 +319,7 @@ public static class StateManager
     {
         int id = reader.ReadByte();
         if (id == 0) return null;
-        ItemType itemType = (ItemType)(id - 1);
+        ItemTypeID itemType = (ItemTypeID)(id - 1);
         byte amount = reader.ReadByte();
         return Item.ItemFromItemType(itemType, amount);
     }

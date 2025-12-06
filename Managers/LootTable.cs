@@ -70,7 +70,7 @@ public class LootPreset : ILootGenerator
                         continue;
                     }
                     // Item
-                    ItemType item = (ItemType)id;
+                    ItemTypeID item = (ItemTypeID)id;
                     byte amount = reader.ReadByte();
                     items[x, y] = Item.ItemFromItemType(item!, 0);
                 }
@@ -149,7 +149,7 @@ public class LootTable : ILootGenerator
             // Ranges
             for (int i = 0; i < count; i++)
             {
-                ItemType item = (ItemType)(reader.ReadByte() - 1);
+                ItemTypeID item = (ItemTypeID)(reader.ReadByte() - 1);
                 float chance = reader.ReadByte() / 100f;
                 byte minAmount = reader.ReadByte();
                 byte maxAmount = reader.ReadByte();

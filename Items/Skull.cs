@@ -1,9 +1,7 @@
-﻿namespace Quest.Items;
+namespace Quest.Items;
 public class Skull : Item
 {
-    public Skull(int amount) : base(amount)
+    public Skull(int amount) : base(ItemTypes.Skull, amount)
     {
-        MaxAmount = 1;
-        Description = "Why are you holding this?";
     }
 }

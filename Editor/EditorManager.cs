@@ -1,10 +1,11 @@
 ﻿using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 using static Quest.Editor.PopupFactory;
 
 namespace Quest.Editor;
-public enum EditorTool
+public enum EditorTool : byte
 {
     Tile,
     Decal,
@@ -247,7 +248,7 @@ public class EditorManager
         if (tileBelow.Type.ID != tileSelection)
         {
             Queue<Tile> queue = new();
-            HashSet<Point> visited = []; // Track visited tiles
+            HashSet<ByteCoord> visited = []; // Track visited tiles
             queue.Enqueue(tileBelow);
             count++;
             while (queue.Count > 0)
@@ -464,6 +465,47 @@ public class EditorManager
             }
         }
     }
+    public void EditScripts()
+    {
+        if (InputManager.KeyDown(Keys.LeftShift)) // Delete
+            DeleteScript();
+        else // New
+            NewScript();
+    }
+    public void DeleteScript()
+    {
+        var (success, values) = ShowInputForm("Delete Script", [new("Script Name", dropdownOptions: levelManager.Level.Scripts.Select(s => s.ScriptName).ToArray())]);
+        if (!success || string.IsNullOrWhiteSpace(values[0]))
+        {
+            if (!PopupOpen) Logger.Error("Script deletion failed.");
+            return;
+        }
+
+        string name = values[0];
+        levelManager.Level.Scripts.RemoveAll(s => s.ScriptName == name);
+    }
+    public void NewScript()
+    {
+        var (success, values) = ShowInputForm("New Script", [new("Script Name", null), new("Source Filepath", null)]);
+        if (!success || string.IsNullOrWhiteSpace(values[0]) || string.IsNullOrWhiteSpace(values[1]))
+        {
+            if (!PopupOpen) Logger.Error("Script creation failed.");
+            return;
+        }
+        if (!File.Exists(values[1]))
+        {
+            Logger.Error($"Source file '{values[1]}' not found.");
+            return;
+        }
+        string name = values[0];
+        if (levelManager.Level.Scripts.Any(s => s.ScriptName == name))
+        {
+            Logger.Error($"A script with the name '{name}' already exists.");
+            return;
+        }
+        string sourceCode = File.ReadAllText(values[1]);
+        levelManager.Level.Scripts.Add(new QuillScript(name, sourceCode));
+    }
     public void SaveLevel()
     {
         // Winforms
@@ -576,8 +618,8 @@ public class EditorManager
             Decal decal = levelManager.Level.Decals[n];
             // Write decal data
             writer.Write((byte)decal.Type);
-            writer.Write(LevelEditor.IntToByte(decal.Location.X));
-            writer.Write(LevelEditor.IntToByte(decal.Location.Y));
+            writer.Write(LevelEditor.IntToByte(decal.X));
+            writer.Write(LevelEditor.IntToByte(decal.Y));
         }
 
         // Scripts
