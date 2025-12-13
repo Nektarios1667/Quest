@@ -93,8 +93,6 @@ public class Window : Game
         Logger.System("Initialized managers.");
 
         // Levels
-        levelManager.ReadWorld(gameManager.UIManager, "islands");
-        levelManager.ReadWorld(gameManager.UIManager, "house");
         menuManager.RefreshWorldList();
         Logger.System("Loaded levels.");
 

@@ -1,2 +1,8 @@
-﻿wait =<playercoord_y> <= 10
-give Skull, 1
+﻿while true
+	contains =<inventoryitems>, Apple
+	if =<gamestate> == 'Game' && =[return]
+		log Player has apple!
+	endif
+
+	sleep 1000
+endwhile

@@ -128,7 +128,11 @@ public class Tile
     public Tile(Point location, TileTypeID type)
     {
         Location = new(location);
-        Marked = false;
+        TypeID = (byte)type;
+    }
+    public Tile(ByteCoord location, TileTypeID type)
+    {
+        Location = location;
         TypeID = (byte)type;
     }
     public virtual void Draw(GameManager gameManager)

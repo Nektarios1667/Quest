@@ -11,7 +11,7 @@ public class ReadFile : IBuiltinFunction
         try
         {
             string content = File.ReadAllText(path);
-            return new(true, null, null, new() { { "[content]", $"'{content}'" } });
+            return new(true, null, null, new() { { "[return]", $"'{content}'" } });
         }
         catch (FileNotFoundException)
         {

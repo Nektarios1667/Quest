@@ -21,7 +21,7 @@ public static class Interpreter
         ExternalSymbols["<tilebelow>"] = player.TileBelow?.Type.ToString() ?? "null";
         ExternalSymbols["<camera_x>"] = CameraManager.Camera.X.ToString();
         ExternalSymbols["<camera_y>"] = CameraManager.Camera.Y.ToString();
-        ExternalSymbols["<camera>"] = $"({CameraManager.Camera.X}, {CameraManager.Camera.Y})";
+        ExternalSymbols["<camera>"] = $"{CameraManager.Camera.X},{CameraManager.Camera.Y}";
         // Level
         ExternalSymbols["<currentlevel>"] = game.LevelManager.Level.Name.WrapSingleQuotes();
         ExternalSymbols["<currentworld>"] = game.LevelManager.Level.World.WrapSingleQuotes();
@@ -32,13 +32,15 @@ public static class Interpreter
         ExternalSymbols["<totaltime>"] = game.TotalTime.ToString();
         ExternalSymbols["<gamestate>"] = StateManager.State.ToString().WrapSingleQuotes();
         // Inventory
+        ExternalSymbols["<inventoryitems>"] = player.Inventory.GetItemsString().WrapSingleQuotes();
+        ExternalSymbols["<inventoryamounts>"] = player.Inventory.GetItemsAmountString().WrapSingleQuotes();
         ExternalSymbols["<inventorysize_x>"] = player.Inventory.Width.ToString();
         ExternalSymbols["<inventorysize_y>"] = player.Inventory.Height.ToString();
         ExternalSymbols["<inventorysize>"] = $"{player.Inventory.Width},{player.Inventory.Height}";
         ExternalSymbols["<isinventoryopen>"] = player.Inventory.Opened.ToString();
         ExternalSymbols["<equippedslot>"] = player.Inventory.EquippedSlot.ToString();
         ExternalSymbols["<equippeditem>"] = (player.Inventory.Equipped?.Name ?? "null").WrapSingleQuotes();
-        ExternalSymbols["<equippeditemuid>"] = (player.Inventory.Equipped?.UID.ToString() ?? "'-1'");
+        ExternalSymbols["<equippeditemuid>"] = (player.Inventory.Equipped?.UID.ToString() ?? "-1");
         ExternalSymbols["<equippeditemamount>"] = (player.Inventory.Equipped?.Amount.ToString() ?? "0");
         // Technical
         ExternalSymbols["<fps>"] = (1f / game.DeltaTime).ToString();
@@ -62,6 +64,9 @@ public static class Interpreter
         { "unloadlevel", new UnloadLevel() },
         { "readlevel", new ReadLevel() },
         { "give", new Give() },
+        { "getitem", new GetItem() },
+        { "getitem2d", new GetItem2D() },
+        { "contains", new Contains() },
     };
     static void FillParameters(ref Expression expr, Dictionary<string, string> vars)
     {

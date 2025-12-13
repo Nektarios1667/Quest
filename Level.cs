@@ -40,4 +40,11 @@ public class Level
         Scripts = [.. scripts];
         Tint = tint ?? Color.Transparent;
     }
+    public void RunScripts()
+    {
+        foreach (var script in Scripts)
+        {
+            _ = Quill.Interpreter.RunScriptAsync(script.SourceCode);
+        }
+    }
 }

@@ -1,0 +1,23 @@
+﻿using NCalc;
+
+namespace Quest.Quill.Functions;
+public class GetItem : IBuiltinFunction
+{
+    public FunctionResponse Run(string[] args)
+    {
+        if (args.Length != 2)
+            return new(false, "ParameterMismatch", $"Expected 2 parameters, got {args.Length}");
+        if (!int.TryParse(args[1], out int idx))
+            return new(false, "TypeMismatch", $"Expected integer for second parameter, got '{args[1]}'");
+
+        string[] items = args[0].Split(";");
+        if (idx < 0 || idx >= items.Length)
+            return new(false, "IndexOutOfRange", $"Index {idx} is out of range");
+        string item = items[idx];
+        FunctionResponse response = new(true)
+        {
+            OutputVariables = new() { { "[return]", $"{item}" } }
+        };
+        return response;
+    }
+}

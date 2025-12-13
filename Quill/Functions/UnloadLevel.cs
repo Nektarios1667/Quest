@@ -7,6 +7,6 @@ public class UnloadLevel : IBuiltinFunction
             return new(false, "ParameterMismatch", $"Expected 1 parameter, got {args.Length}");
         if (CommandManager.Execute($"level unload {args[0]}").success)
             return new(true);
-        return new(false, "CommandError", $"Failed to uload level '{args[0]}'");
+        return new(false, "CommandError", $"Failed to unload level '{args[0]}'");
     }
 }

@@ -111,7 +111,6 @@ public class MenuManager
         {
             LevelPath levelPath = new(StateManager.ContinueSave);
 
-            gameManager.LevelManager.ReadWorld(gameManager.UIManager, levelPath.WorldName, reload: true);
             StateManager.ReadGameState(gameManager, playerManager, levelPath.Path);
 
             StateManager.CurrentSave = StateManager.ContinueSave;
@@ -150,8 +149,6 @@ public class MenuManager
     }
     private void OpenSave()
     {
-        gameManager.LevelManager.ReadWorld(gameManager.UIManager, worlds.Selected, reload: true);
-
         StateManager.State = GameState.Loading;
         if (saves.Selected != "(New Save)")
             _ = StateManager.ReadGameState(gameManager, playerManager, $"{worlds.Selected}/{saves.Selected}");

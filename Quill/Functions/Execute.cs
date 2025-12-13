@@ -8,6 +8,6 @@ public class Execute : IBuiltinFunction
         var (success, output) = CommandManager.Execute(args[0]);
         if (!success)
             return new(false, "CommandError", output);
-        return new(true, null, null, new() { { "[output]", $"'{output}'" } });
+        return new(true, null, null, new() { { "[return]", $"'{output}'" } });
     }
 }

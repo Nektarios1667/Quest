@@ -359,6 +359,34 @@ public class Inventory
         return new(-1, -1);
     }
     // Utilites
+    public string GetItemsString()
+    {
+        string result = "";
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                Item? item = Items[x, y];
+                result += $"{(item == null ? "NUL" : item.Name)};";
+            }
+            result += "/";
+        }
+        return result;
+    }
+    public string GetItemsAmountString()
+    {
+        string result = "";
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                Item? item = Items[x, y];
+                result += $"{(item == null ? "0" : item.Amount)};";
+            }
+            result += "/";
+        }
+        return result;
+    }
     // Flatten
     public int Flatten(int x, int y) { return y * Width + x; }
     public int Flatten(Point pos) { return Flatten(pos.X, pos.Y); }

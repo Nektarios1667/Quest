@@ -207,6 +207,7 @@ public static class StateManager
             return false;
         }
         CurrentSave = save;
+        gameManager.LevelManager.ReadWorld(gameManager.UIManager, levelPath.WorldName, true);
 
         using (var fs = new FileStream(file, FileMode.Open, FileAccess.Read))
         //using (var gzip = new GZipStream(fs, CompressionMode.Decompress))
