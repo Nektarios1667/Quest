@@ -14,6 +14,7 @@ public class Window : Game
     private LevelManager levelManager;
     private MenuManager menuManager;
     public static readonly Matrix Scale = Matrix.CreateScale(Constants.ScreenScale.X, Constants.ScreenScale.Y, 1f);
+    public RenderTarget2D Render;
 
     // Time
     private float delta;
@@ -21,6 +22,9 @@ public class Window : Game
 
     // Textures
     public Texture2D CursorArrow { get; private set; }
+    // Shaders
+    public Effect Grading;
+    public Effect Grayscale;
 
     // Movements
     public int moveX;
@@ -97,8 +101,21 @@ public class Window : Game
         Logger.System("Loaded levels.");
 
         // Shaders
+        Grading = Content.Load<Effect>("Shaders/Grading");
+        Grading.Parameters["Saturation"].SetValue(1f);
+        Grading.Parameters["Contrast"].SetValue(1f);
+        Grading.Parameters["Tint"].SetValue(new Vector3(1, 1, 1));
+
+        Grayscale = Content.Load<Effect>("Shaders/Grayscale");
 
         // Render Targets
+        Render = new RenderTarget2D(
+            GraphicsDevice,
+            Constants.ScreenResolution.X, Constants.ScreenResolution.Y,
+            false,
+            SurfaceFormat.Color,
+            DepthFormat.None
+        );
 
         // Run test script - DELETEME after testing
         Quill.Interpreter.UpdateSymbols(gameManager, playerManager);
@@ -150,6 +167,7 @@ public class Window : Game
 
     protected override void Draw(GameTime gameTime)
     {
+        GraphicsDevice.SetRenderTarget(Render);
         GraphicsDevice.Clear(Color.Magenta);
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: Scale);
 
@@ -182,6 +200,12 @@ public class Window : Game
 
         // Final
         spriteBatch.End();
+        GraphicsDevice.SetRenderTarget(null);
+        GraphicsDevice.Clear(Color.Transparent);
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, effect:Grading);
+        spriteBatch.Draw(Render, Vector2.Zero, Color.White);
+        spriteBatch.End();
+
         base.Draw(gameTime);
     }
     protected void OnExiting(object? sender, EventArgs args)

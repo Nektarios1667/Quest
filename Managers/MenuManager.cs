@@ -18,7 +18,7 @@ public class MenuManager
     // Widgets
     private readonly ScrollBox worlds;
     private readonly ScrollBox saves;
-    public MenuManager(Game window, SpriteBatch batch, ContentManager content, GameManager gameManager, PlayerManager playerManager)
+    public MenuManager(Window window, SpriteBatch batch, ContentManager content, GameManager gameManager, PlayerManager playerManager)
     {
         this.gameManager = gameManager;
         this.playerManager = playerManager;
@@ -53,7 +53,21 @@ public class MenuManager
         Label soundValue = new(SettingsMenu, new(520, 350), Color.White, $"{(int)(soundSlider.Value * 100)}%", PixelOperator);
         soundSlider.ValueChanged += (value) => soundValue.Text = $"{(int)(value * 100)}%";
 
-        SettingsMenu.Widgets = [settingsLabel, settingsBackButton, musicSlider, musicLabel, musicValue, soundSlider, soundLabel, soundValue];
+        HorizontalSlider saturationSlider = new(SettingsMenu, new(200, 430), 300, Color.Gray, Color.White, thickness: 5, size: 12);
+        saturationSlider.Value = 0.5f;
+        saturationSlider.ValueChanged += (value) => window.Grading.Parameters["Saturation"].SetValue(value * 2);
+        Label saturationLabel = new(SettingsMenu, new(200, 380), Color.White, "Saturation", PixelOperator);
+        Label saturationValue = new(SettingsMenu, new(520, 415), Color.White, $"{(int)(saturationSlider.Value * 2)}", PixelOperator);
+        saturationSlider.ValueChanged += (value) => saturationValue.Text = $"{value * 2:F1}x";
+
+        HorizontalSlider contrastSlider = new(SettingsMenu, new(200, 495), 300, Color.Gray, Color.White, thickness: 5, size: 12);
+        contrastSlider.Value = 0.5f;
+        contrastSlider.ValueChanged += (value) => window.Grading.Parameters["Contrast"].SetValue(value + 0.5f);
+        Label contrastLabel = new(SettingsMenu, new(200, 445), Color.White, "Contrast", PixelOperator);
+        Label contrastValue = new(SettingsMenu, new(520, 480), Color.White, $"{(int)(contrastSlider.Value + 0.5f)}", PixelOperator);
+        contrastSlider.ValueChanged += (value) => contrastValue.Text = $"{value + 0.5f:F1}x";
+
+        SettingsMenu.Widgets = [settingsLabel, settingsBackButton, musicSlider, musicLabel, musicValue, soundSlider, soundLabel, soundValue, saturationSlider, saturationLabel, saturationValue, contrastSlider, contrastLabel, contrastValue];
 
         // Credits Menu
         CreditsMenu = new(window, batch, PixelOperator);

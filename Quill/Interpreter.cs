@@ -10,6 +10,10 @@ public static class Interpreter
     public static void UpdateSymbols(GameManager game, PlayerManager player)
     {
         DebugManager.StartBenchmark("QuillSymbolsUpdate");
+
+        // Check
+        if (StateManager.State != GameState.Game) return;
+
         // Player
         ExternalSymbols["<playercoord_x>"] = CameraManager.TileCoord.X.ToString();
         ExternalSymbols["<playercoord_y>"] = CameraManager.TileCoord.Y.ToString();

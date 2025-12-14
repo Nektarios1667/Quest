@@ -1,8 +1,6 @@
 ﻿#define VS_SHADERMODEL vs_4_0_level_9_1
 #define PS_SHADERMODEL ps_4_0_level_9_1
 
-float2 dim;
-
 Texture2D SpriteTexture;
 
 sampler2D SpriteTextureSampler = sampler_state
@@ -19,7 +17,6 @@ struct VertexShaderOutput
 
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
-    float2 xy = input.TextureCoordinates * dim;
     float4 color = tex2D(SpriteTextureSampler, input.TextureCoordinates);
     float gray = dot(color.rgb, float3(0.299, 0.587, 0.114));
     return float4(gray, gray, gray, color.a);
