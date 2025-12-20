@@ -36,7 +36,7 @@ public class GameManager
         TotalTime += deltaTime;
 
         // Pause
-        if (InputManager.KeyPressed(Keys.Escape))
+        if (InputManager.KeyPressed(Keys.Escape) && StateManager.State == GameState.Game)
         {
             if (StateManager.OverlayState == OverlayState.None)
                 StateManager.OverlayState = OverlayState.Pause;

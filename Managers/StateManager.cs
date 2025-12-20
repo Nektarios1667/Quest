@@ -226,6 +226,7 @@ public static class StateManager
             // Read CameraManager data
             CameraManager.CameraDest = new(reader.ReadSingle(), reader.ReadSingle());
             CameraManager.Camera = CameraManager.CameraDest;
+            CameraManager.Update(0); // In bounds check
             // Read PlayerManager data
             gameManager.UIManager.HealthBar.CurrentValue = reader.ReadByte();
             gameManager.UIManager.HealthBar.MaxValue = reader.ReadByte();
@@ -354,15 +355,13 @@ public static class StateManager
     {
         // Write key-value pairs to file
         string prefix = Constants.DEVMODE ? "../../../" : "";
-        using (var fs = new FileStream($"{prefix}GameData/Persistent/{name}.qkv", FileMode.Create, FileAccess.Write))
-        using (var writer = new BinaryWriter(fs))
+        using var fs = new FileStream($"{prefix}GameData/Persistent/{name}.qkv", FileMode.Create, FileAccess.Write);
+        using var writer = new BinaryWriter(fs);
+        writer.Write((uint)data.Count);
+        foreach (var pair in data)
         {
-            writer.Write((uint)data.Count);
-            foreach (var pair in data)
-            {
-                writer.Write(pair.Key);
-                writer.Write(pair.Value);
-            }
+            writer.Write(pair.Key);
+            writer.Write(pair.Value);
         }
     }
 }
