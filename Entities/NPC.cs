@@ -2,26 +2,31 @@
 
 namespace Quest.Entities;
 
+public struct ShopOption
+{
+    public Item Item;
+    public Item Cost;
+}
 public class NPC
 {
+    public static Dialog? DialogBox { get; set; }
+    public static List<(NPC npc, float dist)> NPCsNearby { get; set; } = [];
     public bool HasSpoken { get; set; }
-    public bool IsTalking => DialogBox.IsVisible && DialogBox.IsSpeaking;
-    public Dialog DialogBox { get; private set; }
+    public bool IsTalking => DialogBox != null && DialogBox.IsVisible && DialogBox.IsSpeaking;
+    public ShopOption[] ShopOptions { get; private set; }
     public Point Location { get; set; }
     public string Name { get; set; }
     public string Dialog { get; set; }
     public TextureID Texture { get; set; }
     public Color TextureColor { get; set; }
     public float Scale { get; set; }
-    public bool Important { get; set; }
     // Private
     private Point tilemap;
     private Point tilesize;
 
-    public NPC(OverlayManager uiManager, TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1, bool important = true)
+    public NPC(OverlayManager uiManager, TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1)
     {
         HasSpoken = false;
-        Important = important;
         Texture = texture;
 
         // Private
@@ -33,8 +38,6 @@ public class NPC
         Dialog = dialog;
         TextureColor = textureColor == default ? Color.White : textureColor;
         Scale = scale;
-        DialogBox = new Dialog(uiManager.Gui, new(Constants.Middle.X - 600, Constants.NativeResolution.Y - 190), new(1200, 100), new(100, 100, 100), Color.Black, $"[{name}] {dialog}", PixelOperator, borderColor: new(40, 40, 40)) { IsVisible = false };
-        uiManager.Gui.Widgets.Add(DialogBox);
     }
     public void Draw(GameManager gameManager)
     {
@@ -49,17 +52,9 @@ public class NPC
     }
     public void Update(GameManager gameManager)
     {
-        if (DialogBox.HasSpoken) HasSpoken = true;
-        // Speaking
-        if (Vector2.DistanceSquared(CameraManager.PlayerFoot.ToVector2() / Constants.TileSize.ToVector2(), Location.ToVector2() + Constants.HalfVec) <= 4)
-        {
-            DialogBox.IsVisible = true;
-        }
-        // Hiding if away
-        else
-        {
-            DialogBox.IsVisible = false;
-            DialogBox.Displayed = "";
-        }
+        // Mark as dialogue possibility
+        float dist = Vector2.DistanceSquared(CameraManager.PlayerFoot.ToVector2() / Constants.TileSize.ToVector2(), Location.ToVector2() + Constants.HalfVec);
+        if (dist <= 4)
+            NPCsNearby.Add((this, dist));
     }
 }

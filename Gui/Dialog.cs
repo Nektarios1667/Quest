@@ -7,20 +7,20 @@ public class Dialog : Widget
     public bool HasSpoken => Displayed == Text;
     public bool IsSpeaking => Displayed != "" && Displayed != Text;
     public Gui Gui { get; private set; }
-    public Xna.Vector2 Dimensions { get; private set; }
+    public Vector2 Dimensions { get; private set; }
     public Rectangle Rect { get; private set; }
-    public Xna.Color Color { get; private set; }
+    public Color Color { get; private set; }
     public int Border { get; private set; }
     public Color BorderColor { get; private set; }
-    public string Text { get; set; }
+    public string Text { get; private set; }
     public string Displayed { get; set; } = "";
     public SpriteFont Font { get; set; }
     public Color Foreground { get; set; }
-    public Xna.Vector2 Inside { get; set; }
-    public float CharDelay { get; set; } = .05f;
+    public Vector2 Inside { get; set; }
+    public const float CharDelay = .05f;
     public float charWait { get; set; } = 0;
     // Private
-    public Dialog(Gui gui, Xna.Point location, Xna.Vector2 dimensions, Color color, Color foreground, string text, SpriteFont font, int border = 6, Color? borderColor = null) : base(location)
+    public Dialog(Gui gui, Point location, Vector2 dimensions, Color color, Color foreground, string text, SpriteFont font, int border = 6, Color? borderColor = null) : base(location)
     {
         Gui = gui;
         Dimensions = dimensions;
@@ -62,6 +62,14 @@ public class Dialog : Widget
         batch.DrawString(Font, LimitLines(Displayed, Font, Inside.Y), new(Location.X + Border + 2, Location.Y + Border + 2), Foreground);
         // Outline
         batch.DrawRectangle(Rect, BorderColor, Border);
+    }
+    public void SetText(string text, bool respeak = false)
+    {
+        if (Text != text || respeak)
+        {
+            Text = text;
+            Displayed = "";
+        }
     }
     public static string SoftwrapWords(string text, SpriteFont font, Xna.Vector2 dimensions)
     {

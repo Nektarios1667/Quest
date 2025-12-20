@@ -160,13 +160,10 @@ public class LevelManager
         }
 
         // Close dialogs
-        if (Level != null)
+        if (Level != null && NPC.DialogBox != null)
         {
-            foreach (NPC npc in Level.NPCs)
-            {
-                npc.DialogBox.IsVisible = false;
-                npc.DialogBox.Displayed = "";
-            }
+            NPC.DialogBox.IsVisible = false;
+            NPC.DialogBox.Displayed = "";
         }
 
         // Load the level data
@@ -205,13 +202,10 @@ public class LevelManager
     public bool LoadLevelObject(GameManager gameManager, Level level)
     {
         // Close dialogs
-        if (Level != null)
+        if (Level != null && NPC.DialogBox != null)
         {
-            foreach (NPC npc in Level.NPCs)
-            {
-                npc.DialogBox.IsVisible = false;
-                npc.DialogBox.Displayed = "";
-            }
+            NPC.DialogBox.IsVisible = false;
+            NPC.DialogBox.Displayed = "";
         }
 
         // Load the level data

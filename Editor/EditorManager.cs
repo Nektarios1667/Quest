@@ -517,7 +517,15 @@ public class EditorManager
         }
 
         // Parse
-        if ((values[0].Contains('\\') || values[0].Contains('/')) && world != "")
+        if (world == "" || world == "NUL_WORLD")
+        {
+            if ((values[0].Contains('\\') || values[0].Contains('/')))
+                world = values[0].Split('\\', '/')[1];
+            else
+                world = "new_world";
+            values[0] = values[0].Split('\\', '/')[0]; // Remove world
+        }
+        else if (values[0].Contains('\\') || values[0].Contains('/'))
         {
             Logger.Error($"Invalid level format. File has to be in the same world.");
             return;
