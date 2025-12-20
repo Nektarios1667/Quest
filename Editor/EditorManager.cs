@@ -215,9 +215,9 @@ public class EditorManager
                 return;
             }
             if (values[1] == "Loot Table")
-                chest.RegenerateLoot(LootTable.ReadLootTable($"GameData/Worlds/{world}/loot/{values[0]}.qlt"));
+                chest.RegenerateLoot(LootTable.ReadLootTable(world, $"{values[0]}.qlt"));
             else if (values[1] == "Loot Preset")
-                chest.RegenerateLoot(LootPreset.ReadLootPreset($"GameData/Worlds/{world}/loot/{values[0]}.qlp"));
+                chest.RegenerateLoot(LootPreset.ReadLootPreset(world, $"{values[0]}.qlp"));
             else
                 Logger.Error("Chest edit failed.");
         }
@@ -339,7 +339,7 @@ public class EditorManager
         }
 
         // Winforms
-        var (success, values) = ShowInputForm("NPC Editor", [new("Name", null), new("Dialog", null), new("Size [1-25.5]", IsScaleValue), new("Texture", null, CharacterTextures.Select(t => t.ToString()).ToArray())]);
+        var (success, values) = ShowInputForm("NPC Editor", [new("Name", null), new("Dialog", null), new("Size [1-25.5]", IsScaleValue), new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())])]);
         if (!success)
         {
             if (!PopupOpen) Logger.Error("NPC creation failed.");
@@ -474,7 +474,7 @@ public class EditorManager
     }
     public void DeleteScript()
     {
-        var (success, values) = ShowInputForm("Delete Script", [new("Script Name", dropdownOptions: levelManager.Level.Scripts.Select(s => s.ScriptName).ToArray())]);
+        var (success, values) = ShowInputForm("Delete Script", [new("Script Name", dropdownOptions: [.. levelManager.Level.Scripts.Select(s => s.ScriptName)])]);
         if (!success || string.IsNullOrWhiteSpace(values[0]))
         {
             if (!PopupOpen) Logger.Error("Script deletion failed.");
@@ -578,7 +578,7 @@ public class EditorManager
             else if (tile is Chest chest)
             {
                 // Write chest loot
-                writer.Write(chest.LootGenerator.FileName);
+                writer.Write(chest.LootGenerator.FileName.Split('/', '\\')[^1]);
             }
             else if (tile is Lamp lamp)
             {

@@ -71,7 +71,7 @@ public class LevelManager
                 case BiomeType.Temperate: weatherColor = Color.MediumBlue; break;
                 case BiomeType.Snowy: weatherColor = Color.White; break;
                 case BiomeType.Desert: weatherColor = Color.OrangeRed; break;
-                case BiomeType.Ocean: weatherColor = Color.Blue; break;
+                case BiomeType.Ocean: weatherColor = Color.SlateGray; break;
             }
         }
         weatherColor *= blend.Value;
@@ -142,7 +142,7 @@ public class LevelManager
         foreach (Enemy enemy in Level.Enemies) enemy.Draw(gameManager);
         DebugManager.EndBenchmark("CharacterDraws");
     }
-    public Level GetLevel(string name, bool read = true)
+    public Level GetLevel(string name)
     {
         foreach (Level level in Levels)
             if (level.Name == name)
@@ -282,12 +282,12 @@ public class LevelManager
         // Read loot tables and presets
         string[] qlp = Directory.GetFiles($"GameData/Worlds/{folder}/loot", "*.qlp");
         string[] qlt = Directory.GetFiles($"GameData/Worlds/{folder}/loot", "*.qlt");
-        foreach (string file in qlp.Concat(qlt).ToArray())
+        foreach (string file in qlp.Concat(qlt).Select(f => f.Split('/', '\\')[^1]).ToArray())
         {
             if (file.EndsWith(".qlt"))
-                LootGenerators.Add(LootTable.ReadLootTable(file));
+                LootGenerators.Add(LootTable.ReadLootTable(folder, file));
             else if (file.EndsWith(".qlp"))
-                LootGenerators.Add(LootPreset.ReadLootPreset(file));
+                LootGenerators.Add(LootPreset.ReadLootPreset(folder, file));
             Logger.System($"Loaded Loot file {file}.");
         }
 
@@ -309,7 +309,7 @@ public class LevelManager
         var startTime = DateTime.Now;
         // File checks
         filename = filename.Replace('\\', '/');
-        string[] splitPath = filename.Split('/');
+        string[] splitPath = filename.Split('\\', '/');
         if (splitPath.Length != 2)
         {
             Logger.Error($"Invalid file format '{filename}.'");
@@ -395,17 +395,17 @@ public class LevelManager
                         string lootGenFile = reader.ReadString();
                         ILootGenerator? lootGen = null;
                         if (lootGenFile.EndsWith(".qlt"))
-                            lootGen = LootTable.ReadLootTable(lootGenFile);
+                            lootGen = LootTable.ReadLootTable(splitPath[0], lootGenFile);
                         else if (lootGenFile.EndsWith(".qlp"))
-                            lootGen = LootPreset.ReadLootPreset(lootGenFile);
+                            lootGen = LootPreset.ReadLootPreset(splitPath[0], lootGenFile);
                         if (lootGen == null)
                         {
                             if (lootGenFile != "_")
                                 Logger.Warning($"Invalid loot generator file '{lootGenFile}' for chest at {loc}.");
-                            tile = new Chest(loc, LootPreset.EmptyPreset, filename);
+                            tile = new Chest(loc, LootPreset.EmptyPreset, splitPath[1]);
                         }
                         else
-                            tile = new Chest(loc, lootGen, filename);
+                            tile = new Chest(loc, lootGen, splitPath[1]);
                     }
                     // Lamps
                     else if (type == (int)TileTypeID.Lamp)
@@ -431,8 +431,9 @@ public class LevelManager
                     Logger.Error($"Failed to read biome data for level '{filename}' - expected {totalTiles}B got {read}B.");
                     return false;
                 }
-            } else
-                Array.Fill(biomeBuffer, BiomeType.Temperate);
+            }
+            else
+                biomeBuffer = [];
 
             // NPCs
             int npcCount = reader.ReadByte();

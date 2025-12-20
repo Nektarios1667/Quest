@@ -120,9 +120,9 @@ public static class StateManager
     {
         openedDoors.Add(idx);
     }
-    public static void SaveChestGenerator(Chest chest, string levelPath)
+    public static void SaveChestGenerator(Chest chest, string level)
     {
-        chests.Add((chest, levelPath));
+        chests.Add((chest, level));
     }
     public static void SaveGameState(GameManager gameManager, PlayerManager playerManager, string saveName)
     {
@@ -178,7 +178,7 @@ public static class StateManager
                 else
                 {
                     writer.Write(chest.Chest.Seed);
-                    writer.Write(chest.Chest.LootGenerator.FileName);
+                    writer.Write(chest.Chest.LootGenerator.FileName.Split('\\', '/')[^1]);
                 }
             }
             // Doors
@@ -266,8 +266,9 @@ public static class StateManager
                 string lvl = reader.ReadString(); // Chest level
                 int idx = reader.ReadUInt16(); // TileID
                 bool isGenerated = reader.ReadBoolean(); // IsGenerated
-                Level current = gameManager.LevelManager.GetLevel(lvl);
+                Level current = gameManager.LevelManager.GetLevel($"{levelPath.WorldName}/{lvl}");
                 if (idx >= 0 && idx <= Constants.MapSize.X * Constants.MapSize.Y && current.Tiles[idx] is Chest chest)
+                {
                     if (isGenerated)
                     {
                         chest.SetEmpty();
@@ -277,8 +278,9 @@ public static class StateManager
                     else
                     {
                         chest.SetSeed(reader.ReadInt32());
-                        chest.RegenerateLoot(LootGeneratorHelper.Read(reader.ReadString()));
+                        chest.RegenerateLoot(LootGeneratorHelper.Read(levelPath.WorldName, reader.ReadString()));
                     }
+                }
                 else
                 {
                     Logger.Error($"Tile at index {idx} is not a chest.");

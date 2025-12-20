@@ -34,9 +34,10 @@ public class LootPreset : ILootGenerator
         FileName = filename;
     }
     public Inventory Generate(int width, int height, int seed = -1) => new(width, height, ArrayTools.Resize2DArray(Preset, width, height));
-    public static LootPreset ReadLootPreset(string file)
+    public static LootPreset ReadLootPreset(string world, string file)
     {
         // Check
+        //file = $"GameData/Worlds/{world}/loot/{file}";
         if (!file.EndsWith(".qlp"))
         {
             Logger.Error($"Failed to read preset '{file}'. Expected .qlp file.");
@@ -125,9 +126,10 @@ public class LootTable : ILootGenerator
         Entries.Remove(entry);
     }
 
-    public static LootTable ReadLootTable(string file)
+    public static LootTable ReadLootTable(string world, string file)
     {
         // Check
+        file = $"GameData/Worlds/{world}/loot/{file}";
         if (!file.EndsWith(".qlt"))
         {
             Logger.Error($"Failed to read preset '{file}'. Expected .qlt file.");
@@ -162,12 +164,12 @@ public class LootTable : ILootGenerator
 
 public static class LootGeneratorHelper
 {
-    public static ILootGenerator Read(string file)
+    public static ILootGenerator Read(string world, string file)
     {
         if (file.EndsWith(".qlt"))
-            return LootTable.ReadLootTable(file);
+            return LootTable.ReadLootTable(world, file);
         else if (file.EndsWith(".qlp"))
-            return LootPreset.ReadLootPreset(file);
+            return LootPreset.ReadLootPreset(world, file);
         else
             Logger.Warning($"Failed to read loot generator '{file}'. Expected .qlt or .qlp file.");
         return LootPreset.EmptyPreset;

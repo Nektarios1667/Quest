@@ -65,7 +65,7 @@ public class OverlayManager
         // Process NPC dialogs
         if (NPC.DialogBox == null)
         {
-            NPC.DialogBox = new Gui.Dialog(gameManager.UIManager.Gui, new(Constants.Middle.X - 600, Constants.NativeResolution.Y - 300), new(1200, 200), new(100, 100, 100), Color.Black, "", PixelOperator, borderColor: new(40, 40, 40)) { IsVisible = false };
+            NPC.DialogBox = new Gui.Dialog(gameManager.UIManager.Gui, new(Constants.Middle.X - 600, Constants.NativeResolution.Y - 300), new(1200, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false };
             gameManager.UIManager.Gui.Widgets.Add(NPC.DialogBox);
         }
         if (NPC.NPCsNearby.Count > 0)
