@@ -339,7 +339,7 @@ public class EditorManager
         }
 
         // Winforms
-        var (success, values) = ShowInputForm("NPC Editor", [new("Name", null), new("Dialog", null), new("Size [1-25.5]", IsScaleValue), new("Texture", null, Enum.GetNames(typeof(TextureID)))]);
+        var (success, values) = ShowInputForm("NPC Editor", [new("Name", null), new("Dialog", null), new("Size [1-25.5]", IsScaleValue), new("Texture", null, CharacterTextures.Select(t => t.ToString()).ToArray())]);
         if (!success)
         {
             if (!PopupOpen) Logger.Error("NPC creation failed.");

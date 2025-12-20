@@ -42,7 +42,7 @@ public class NPC
         Vector2 origin = new(tilesize.X / 2, tilesize.Y);
         Point pos = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle + tilesize / Constants.TwoPoint;
         Rectangle source = GetAnimationSource(Texture, gameManager.GameTime);
-        DrawTexture(gameManager.Batch, Texture, pos, color: TextureColor, scale: Scale, source: source, origin: origin);
+        DrawTexture(gameManager.Batch, Texture, pos, color: TextureColor, scale: Scale * Constants.NPCScale, source: source, origin: origin);
         // Debug
         if (DebugManager.DrawHitboxes)
             FillRectangle(gameManager.Batch, new(pos - tilesize, (source.Size.ToVector2() * Scale).ToPoint()), Constants.DebugPinkTint);

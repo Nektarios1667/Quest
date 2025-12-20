@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework.Content;
+using System.Linq;
 
 namespace Quest.Managers;
 
@@ -22,6 +23,10 @@ public static class TextureManager
         PurpleWizard,
         WhiteWizard,
         Ghost,
+        Miner,
+        CyanVillager,
+        GreenVillager,
+        RedVillager,
         // CHARACTERS ENUM INSERT
         CursorArrow,
         DialogBox,
@@ -132,6 +137,7 @@ public static class TextureManager
     private static List<string> errors = [];
     public static Dictionary<TextureID, Texture2D> Textures { get; private set; } = [];
     public static Dictionary<TextureID, Metadata> Metadata { get; private set; } = [];
+    public static TextureID[] CharacterTextures = [];
     private static Texture2D Pixel { get; set; } = null!;
     // Fonts
     public static SpriteFont PixelOperator { get; private set; } = null!;
@@ -156,6 +162,10 @@ public static class TextureManager
         Textures[TextureID.PurpleWizard] = content.Load<Texture2D>("Images/Characters/PurpleWizard");
         Textures[TextureID.WhiteWizard] = content.Load<Texture2D>("Images/Characters/WhiteWizard");
         Textures[TextureID.Ghost] = content.Load<Texture2D>("Images/Characters/Ghost");
+        Textures[TextureID.Miner] = content.Load<Texture2D>("Images/Characters/Miner");
+        Textures[TextureID.CyanVillager] = content.Load<Texture2D>("Images/Characters/CyanVillager");
+        Textures[TextureID.GreenVillager] = content.Load<Texture2D>("Images/Characters/GreenVillager");
+        Textures[TextureID.RedVillager] = content.Load<Texture2D>("Images/Characters/RedVillager");
         // CHARACTERS INSERT
         Textures[TextureID.CursorArrow] = content.Load<Texture2D>("Images/Gui/CursorArrow");
         Textures[TextureID.DialogBox] = content.Load<Texture2D>("Images/Gui/DialogBox");
@@ -262,7 +272,6 @@ public static class TextureManager
         Textures[TextureID.Glow] = content.Load<Texture2D>("Images/Effects/Glow");
         Textures[TextureID.Slash] = content.Load<Texture2D>("Images/Effects/Slash");
         // EFFECTS INSERT
-
         Pixel = Textures[TextureID.Pixel];
 
         foreach (var kv in Textures)
@@ -276,12 +285,16 @@ public static class TextureManager
         Metadata[TextureID.Null] = new(Textures[TextureID.Null].Bounds.Size, new(1, 1), "null");
         Metadata[TextureID.Pixel] = new(Textures[TextureID.Pixel].Bounds.Size, new(1, 1), "pixel");
         // OTHERS METADATA INSERT
-        Metadata[TextureID.BlueMage] = new(Textures[TextureID.BlueMage].Bounds.Size, new(4, 5), "character");
-        Metadata[TextureID.GrayMage] = new(Textures[TextureID.GrayMage].Bounds.Size, new(4, 5), "character");
-        Metadata[TextureID.WhiteMage] = new(Textures[TextureID.WhiteMage].Bounds.Size, new(4, 5), "character");
+        Metadata[TextureID.BlueMage] = new(Textures[TextureID.BlueMage].Bounds.Size, new(4, 5), "player");
+        Metadata[TextureID.GrayMage] = new(Textures[TextureID.GrayMage].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.WhiteMage] = new(Textures[TextureID.WhiteMage].Bounds.Size, new(2, 1), "character");
         Metadata[TextureID.PurpleWizard] = new(Textures[TextureID.PurpleWizard].Bounds.Size, new(2, 1), "character");
         Metadata[TextureID.WhiteWizard] = new(Textures[TextureID.WhiteWizard].Bounds.Size, new(2, 1), "character");
         Metadata[TextureID.Ghost] = new(Textures[TextureID.Ghost].Bounds.Size, new(4, 1), "character");
+        Metadata[TextureID.Miner] = new(Textures[TextureID.Miner].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.CyanVillager] = new(Textures[TextureID.CyanVillager].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.GreenVillager] = new(Textures[TextureID.GreenVillager].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.RedVillager] = new(Textures[TextureID.RedVillager].Bounds.Size, new(2, 1), "character");
         // CHARACTERS METADATA INSERT
         Metadata[TextureID.CursorArrow] = new(Textures[TextureID.CursorArrow].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.DialogBox] = new(Textures[TextureID.DialogBox].Bounds.Size, new(1, 1), "gui");
@@ -395,6 +408,9 @@ public static class TextureManager
             else
                 Logger.System($"Metadata for texture '{kv.Key}' successfully loaded.");
         Logger.System($"Successfully loaded {Metadata.Count}/{Textures.Count} texture Metadata.");
+
+        // Generate characters
+        CharacterTextures = Textures.Where(kv => Metadata[kv.Key].Type == "character").Select(kv => kv.Key).ToArray();
 
         // Fonts
         PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");
