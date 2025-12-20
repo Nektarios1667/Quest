@@ -245,6 +245,7 @@ public class LevelManager
             level.Loot[l].Dispose();
         for (int e = 0; e < level.Enemies.Count; e++)
             level.Enemies[e].Dispose();
+        UIDManager.ReleaseAll(UIDCategory.Items);
 
         // Remove
         Levels.Remove(level);
@@ -266,7 +267,7 @@ public class LevelManager
         Logger.Error($"Level '{levelName}' not found in stored levels.");
         return false;
     }
-    public bool ReadWorld(OverlayManager uIManager, string folder, bool reload = false)
+    public bool ReadWorld(OverlayManager uiManager, string folder, bool reload = false)
     {
         if (!Directory.Exists($"GameData/Worlds/{folder}"))
         {
@@ -299,7 +300,14 @@ public class LevelManager
         // Read levels
         string[] qlv = Directory.GetFiles($"GameData/Worlds/{folder}/levels", "*.qlv");
         foreach (string file in qlv)
-            ReadLevel(uIManager, $"{folder}/{System.IO.Path.GetFileNameWithoutExtension(file)}", reload);
+            ReadLevel(uiManager, $"{folder}/{System.IO.Path.GetFileNameWithoutExtension(file)}", reload);
+        return true;
+    }
+    public bool UnloadWorld(string folder)
+    {
+        for (int l = Levels.Count - 1; l >= 0; l--)
+            if (Levels[l].World == folder)
+                UnloadLevel(l);
         return true;
     }
     public bool ReadLevel(OverlayManager uiManager, string filename, bool reload = false)

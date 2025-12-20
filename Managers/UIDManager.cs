@@ -49,4 +49,10 @@ public static class UIDManager
     {
         uids[(int)category].Enqueue(uid);
     }
+    public static void ReleaseAll(UIDCategory category)
+    {
+        int c = (int)category;
+        uids[c].Clear();
+        uidCounters[c] = 0;
+    }
 }

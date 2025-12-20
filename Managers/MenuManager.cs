@@ -103,7 +103,7 @@ public class MenuManager
         Button resumeButton = new(PauseMenu, new(Constants.Middle.X - 150, 300), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => StateManager.OverlayState = OverlayState.None, [], text: "Resume", font: PixelOperatorSubtitle, border: 0);
         Button quicksaveButton = new(PauseMenu, new(Constants.Middle.X - 150, 380), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.SaveGameState(gameManager, playerManager, new LevelPath(StateManager.CurrentSave).LevelName); }, [], text: "Quick Save", font: PixelOperatorSubtitle, border: 0);
         Button pauseSettingsButton = new(PauseMenu, new(Constants.Middle.X - 150, 460), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.State = GameState.Settings; }, [], text: "Settings", font: PixelOperatorSubtitle, border: 0);
-        Button mainMenuButton = new(PauseMenu, new(Constants.Middle.X - 150, 540), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.State = GameState.MainMenu; }, [], text: "Main Menu", font: PixelOperatorSubtitle, border: 0);
+        Button mainMenuButton = new(PauseMenu, new(Constants.Middle.X - 150, 540), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, ExitToMainMenu, [], text: "Main Menu", font: PixelOperatorSubtitle, border: 0);
         Button quitButton = new(PauseMenu, new(Constants.Middle.X - 150, 620), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => window.Exit(), [], text: "Quit", font: PixelOperatorSubtitle, border: 0);
 
         PauseMenu.Widgets = [resumeButton, quicksaveButton, pauseSettingsButton, mainMenuButton, quitButton, pauseLabel];
@@ -118,6 +118,12 @@ public class MenuManager
         //weatherSlider.ValueChanged += (value) => StateManager.currentWeatherNoise = value;
         Label weatherLabel = new(DebugMenu, new(Constants.Middle.X - 100, 20), Color.Black, "Weather");
         DebugMenu.Widgets = [timeSlider, timeLabel, weatherLabel, weatherSlider];
+    }
+    private void ExitToMainMenu()
+    {
+        StateManager.OverlayState = OverlayState.None;
+        StateManager.State = GameState.MainMenu;
+        gameManager.LevelManager.UnloadWorld(gameManager.LevelManager.Level.World);
     }
     private void ContinueSave()
     {
