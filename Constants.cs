@@ -48,7 +48,9 @@ public static class Constants
     public static readonly Point PlayerBox = new(PlayerCorners[1].X - PlayerCorners[0].X, PlayerCorners[2].Y - PlayerCorners[1].Y);
     public static readonly Point MageSize = new(96, 96); // Size of player on screen
     public static readonly Point MageHalfSize = new(MageSize.X / 2, MageSize.Y / 2); // Half size of the mage sprite in pixels
-    public static readonly Point MageDrawShift = new(MageHalfSize.X, 0); // Used for center aligning mages
+    public static readonly Point MageHalfSizeX = new(MageSize.X / 2, 0); // Half size of the mage sprite in x pixels
+    public static readonly Point MageHalfSizeY = new(0, MageSize.Y / 2); // Half size of the mage sprite in y pixels
+    public static readonly Point MageItemShift = new(MageSize.X / 8, 0); // Used for center aligning mages
     public const float PlayerScale = 3;
     public const int NPCScale = 3;
 

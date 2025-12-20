@@ -109,6 +109,7 @@ public class PlayerManager : IContainer
         for (int l = 0; l < gameManager.LevelManager.Level.Loot.Count; l++)
         {
             Loot loot = gameManager.LevelManager.Level.Loot[l];
+            if (gameManager.GameTime - loot.Birth < 3) continue; // Prevent picking up things just dropped
             // Pick up loot
             if (PointTools.DistanceSquared(CameraManager.PlayerFoot, loot.Location + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
             {
@@ -120,11 +121,12 @@ public class PlayerManager : IContainer
                     gameManager.LevelManager.Level.Loot.Remove(loot);
                 }
                 else if (leftover.Amount < loot.Amount)
-                {
                     loot.Amount = leftover.Amount;
-                    LightingManager.RemoveLight($"Loot_{loot.UID}");
-                    SoundManager.PlaySound("Pickup", pitch: RandomManager.RandomFloat() / 2 - .25f);
-                }
+                else
+                    continue;
+                // 
+                LightingManager.RemoveLight($"Loot_{loot.UID}");
+                SoundManager.PlaySound("Pickup", pitch: RandomManager.RandomFloat() / 2 - .25f);
             }
         }
     }
@@ -161,7 +163,9 @@ public class PlayerManager : IContainer
         // Draw equipped item
         if (Inventory.Equipped != null)
         {
-            Point itemPos = Constants.Middle + CameraManager.CameraOffset.ToPoint() - (PlayerDirection == Direction.Left ? Constants.MageDrawShift : Point.Zero);
+            bool left = PlayerDirection == Direction.Left;
+            var leftShift = left ? new(TextureManager.Metadata[Inventory.Equipped.Texture].Size.X * 2, 0) : Point.Zero;
+            Point itemPos = Constants.Middle + CameraManager.CameraOffset.ToPoint() - leftShift + Constants.MageItemShift.Scaled(left ? -1 : 1);
             DrawTexture(gameManager.Batch, Inventory.Equipped.Texture, itemPos, scale: 2, effects: PlayerDirection == Direction.Left ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
         }
     }

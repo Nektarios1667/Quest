@@ -18,9 +18,14 @@ public static class PointExtensions
     {
         return $"{point.X},{point.Y}";
     }
+    public static Point Negative(this Point point)
+    {
+        return point * PointTools.Negative;
+    }
 }
 public static class PointTools
 {
+    public static readonly Point Negative = new(-1, -1);
     public static readonly Point Up = new(0, -1);
     public static readonly Point Down = new(0, 1);
     public static readonly Point Left = new(-1, 0);

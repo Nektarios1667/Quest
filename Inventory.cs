@@ -177,7 +177,7 @@ public class Inventory
             Item? item = GetItem(HoverSlot);
             if (item != null)
             {
-                gameManager.LevelManager.DropLoot(gameManager, new Loot(item.Name, item.Amount, CameraManager.PlayerFoot + Constants.MageDrawShift, gameManager.GameTime));
+                gameManager.LevelManager.DropLoot(gameManager, new Loot(item.Name, item.Amount, CameraManager.PlayerFoot, gameManager.GameTime));
                 item.Dispose();
                 ItemDropped?.Invoke(item);
             }
