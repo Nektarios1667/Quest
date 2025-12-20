@@ -183,6 +183,8 @@ public class LevelManager
         // Spawn
         CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
         CameraManager.Camera = CameraManager.CameraDest;
+        CameraManager.Update(0); // Ensure in bounds
+
         return true;
     }
     public bool LoadLevel(GameManager gameManager, string name)

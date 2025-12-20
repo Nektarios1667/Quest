@@ -44,12 +44,13 @@ public static class Constants
 
     // Rendering and positioning
     public static readonly Rectangle ZeroSource = new(0, 0, TilePixelSize.X, TilePixelSize.Y); // Default tile source rect
-    public static readonly Point[] PlayerCorners = [new(-20, -20), new(20, -20), new(-20, 0), new(20, 0)]; // Player bounding box corners, tl, tr, bl, br
+    public static readonly Point[] PlayerCorners = [new(-24, -24), new(24, -24), new(-24, 0), new(24, 0)]; // Player bounding box corners, tl, tr, bl, br
     public static readonly Point PlayerBox = new(PlayerCorners[1].X - PlayerCorners[0].X, PlayerCorners[2].Y - PlayerCorners[1].Y);
-    public static readonly Point MageSize = new(80, 80); // Size of the mage sprite in pixels
+    public static readonly Point MageSize = new(96, 96); // Size of player on screen
     public static readonly Point MageHalfSize = new(MageSize.X / 2, MageSize.Y / 2); // Half size of the mage sprite in pixels
     public static readonly Point MageDrawShift = new(MageHalfSize.X, 0); // Used for center aligning mages
-    public const float NPCScale = 3;
+    public const float PlayerScale = 3;
+    public const int NPCScale = 3;
 
     // Colors
     public static readonly Color NearBlack = new(85, 85, 85);
