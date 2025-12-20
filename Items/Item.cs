@@ -125,4 +125,8 @@ public class Item
     {
         return (Item)MemberwiseClone();
     }
+    public void Dispose()
+    {
+        UIDManager.Release(UIDCategory.Items, UID);
+    }
 }

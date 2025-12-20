@@ -16,7 +16,7 @@ public struct Loot
         Texture = ParseTextureString(item);
         Birth = time;
     }
-    public void Dispose()
+    public readonly void Dispose()
     {
         UIDManager.Release(UIDCategory.Loot, UID);
     }

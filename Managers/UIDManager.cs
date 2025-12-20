@@ -30,7 +30,20 @@ public static class UIDManager
         if (uids[c].Count > 0)
             return uids[c].Dequeue();
         else
-            return ++uidCounters[c];
+            return uidCounters[c]++;
+    }
+    public static ushort Peek(UIDCategory category)
+    {
+        int c = (int)category;
+        if (uids[c].Count > 0)
+            return uids[c].Peek();
+        else
+            return uidCounters[c];
+    }
+    public static int Available(UIDCategory category)
+    {
+        int c = (int)category;
+        return uidCounters[c] - uids[c].Count;
     }
     public static void Release(UIDCategory category, ushort uid)
     {

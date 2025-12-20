@@ -234,15 +234,19 @@ public class LevelManager
             Logger.Error($"Invalid level index {levelIndex}.");
             return false;
         }
-        // Unload the level
+
         string name = Levels[levelIndex].Name;
         if (Level == Levels[levelIndex])
             Level = EmptyLevel;
 
-        // Unload
+        // Dispose
         Level level = Levels[levelIndex];
         for (int l = 0; l < level.Loot.Count; l++)
             level.Loot[l].Dispose();
+        for (int e = 0; e < level.Enemies.Count; e++)
+            level.Enemies[e].Dispose();
+
+        // Remove
         Levels.Remove(level);
         Logger.System($"Unloaded level '{name}'.");
         return true;

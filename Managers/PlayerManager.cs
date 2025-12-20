@@ -115,7 +115,10 @@ public class PlayerManager : IContainer
                 gameManager.UIManager.LootNotifications.AddNotification($"+{loot.DisplayName}");
                 (bool success, Item leftover) = Inventory.AddItem(Item.ItemFromName(loot.Item, loot.Amount));
                 if (success)
+                {
+                    loot.Dispose();
                     gameManager.LevelManager.Level.Loot.Remove(loot);
+                }
                 else if (leftover.Amount < loot.Amount)
                 {
                     loot.Amount = leftover.Amount;

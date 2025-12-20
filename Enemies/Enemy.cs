@@ -86,4 +86,8 @@ public class Enemy
     {
 
     }
+    public virtual void Dispose()
+    {
+        UIDManager.Release(UIDCategory.Enemies, UID);
+    }
 }
