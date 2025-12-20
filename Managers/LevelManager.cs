@@ -353,7 +353,7 @@ public class LevelManager
                 Logger.Error($"Invalid file format for file '{filename}'.");
                 return false;
             }
-            byte version = reader.ReadByte();
+            LevelFeatures flags = (LevelFeatures)reader.ReadUInt16();
 
             // Tint
             Color tint = new(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
@@ -382,7 +382,13 @@ public class LevelManager
                         tile = new Stairs(loc, reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
                     // Doors
                     else if (type == (int)TileTypeID.Door)
-                        tile = new Door(loc, reader.ReadString());
+                    {
+                        string keyName = reader.ReadString();
+                        if (keyName == "NUL" || keyName == "")
+                            tile = new Door(loc, null);
+                        else
+                            tile = new Door(loc, new(ItemTypes.All[(int)Enum.Parse(typeof(ItemTypeID), keyName)], flags.HasFlag(LevelFeatures.DoorKeyAmounts) ? reader.ReadByte() : 1));
+                    }
                     // Chests
                     else if (type == (int)TileTypeID.Chest)
                     {
@@ -416,13 +422,17 @@ public class LevelManager
             }
 
             // Biomes
-            Span<byte> rawBiome = MemoryMarshal.AsBytes(biomeBuffer.AsSpan());
-            int read = reader.Read(rawBiome);
-            if (read != totalTiles)
+            if (flags.HasFlag(LevelFeatures.Biomes))
             {
-                Logger.Error($"Failed to read biome data for level '{filename}' - expected {totalTiles}B got {read}B.");
-                return false;
-            }
+                Span<byte> rawBiome = MemoryMarshal.AsBytes(biomeBuffer.AsSpan());
+                int read = reader.Read(rawBiome);
+                if (read != totalTiles)
+                {
+                    Logger.Error($"Failed to read biome data for level '{filename}' - expected {totalTiles}B got {read}B.");
+                    return false;
+                }
+            } else
+                Array.Fill(biomeBuffer, BiomeType.Temperate);
 
             // NPCs
             int npcCount = reader.ReadByte();
@@ -457,7 +467,7 @@ public class LevelManager
             }
 
             // Scripts
-            if (version >= 2)
+            if (flags.HasFlag(LevelFeatures.QuillScripts))
             {
                 byte scriptCount = reader.ReadByte();
                 for (int s = 0; s < scriptCount; s++)
@@ -500,8 +510,8 @@ public class LevelManager
             TileTypeID.Darkness => new Darkness(location),
             TileTypeID.WoodFlooring => new WoodFlooring(location),
             TileTypeID.Stone => new Stone(location),
-            TileTypeID.Door => new Door(location, ""),
-            TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, ""),
+            TileTypeID.Door => new Door(location, null),
+            TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, "_"),
             TileTypeID.ConcreteWall => new ConcreteWall(location),
             TileTypeID.WoodWall => new WoodWall(location),
             TileTypeID.Path => new Tiles.Path(location),

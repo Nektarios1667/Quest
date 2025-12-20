@@ -236,21 +236,6 @@ public class Inventory
         if (item1 == null || item2 == null) return false;
         return item1.Name == item2.Name && item1.Description == item2.Description;
     }
-    // Contains
-    public bool Contains(string item)
-    {
-        for (int x = 0; x < Width; x++)
-        {
-            for (int y = 0; y < Height; y++)
-            {
-                // Item
-                Item? currentItem = Items[x, y];
-                if (currentItem == null) continue; // Skip empty slots
-                if (currentItem.Name == item) return true;
-            }
-        }
-        return false;
-    }
     // GetItem
     public Item? GetItem(Point pos)
     {
@@ -336,8 +321,13 @@ public class Inventory
         if (slot.X < 0 || slot.X >= Width || slot.Y < 0 || slot.Y >= Height) return; // Out of bounds
         Items[slot.X, slot.Y] = null; // Remove item from inventory
     }
-    public void Consume(string item)
+    public bool Consume(Item item)
     {
+        // Not enough
+        if (Count(item.Type) < item.Amount) return false;
+
+        // Consume
+        int consumeLeft = item.Amount;
         for (int x = 0; x < Width; x++)
         {
             for (int y = 0; y < Height; y++)
@@ -345,9 +335,41 @@ public class Inventory
                 // Item
                 Item? currentItem = Items[x, y];
                 if (currentItem == null) continue; // Skip empty slots
-                if (currentItem.Name == item) Items[x, y] = null;
+
+                // Consume
+                if (currentItem.Type == item.Type)
+                {
+                    // Consume in this slot
+                    int toConsume = Math.Min(currentItem.Amount, consumeLeft);
+                    currentItem.Amount -= (byte)toConsume;
+                    consumeLeft -= toConsume;
+                    if (currentItem.Amount <= 0)
+                        Items[x, y] = null;
+
+                    // Check if enough
+                    if (consumeLeft <= 0) return true;
+                }
             }
         }
+
+        Logger.Error($"Item consume failed despite previous checks.", exit: true);
+        return false;
+    }
+    public int Count(ItemType itemType)
+    {
+        int count = 0;
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                // Item
+                Item? currentItem = Items[x, y];
+                if (currentItem == null) continue; // Skip empty slots
+                if (currentItem.Type == itemType) count += currentItem.Amount;
+            }
+        }
+
+        return count;
     }
     // MouseSlot
     public Point GetMouseSlot()

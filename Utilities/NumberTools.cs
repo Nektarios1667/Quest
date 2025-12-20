@@ -30,4 +30,17 @@ public static class NumberTools
         if (newIdx < 0) newIdx = values.Length - 1;
         value = values[newIdx];
     }
+    public static bool[] ExtractFlags(byte flags)
+    {
+        return [
+            (flags & (1 << 0)) != 0,
+            (flags & (1 << 1)) != 0,
+            (flags & (1 << 2)) != 0,
+            (flags & (1 << 3)) != 0,
+            (flags & (1 << 4)) != 0,
+            (flags & (1 << 5)) != 0,
+            (flags & (1 << 6)) != 0,
+            (flags & (1 << 7)) != 0,
+        ];
+    }
 }

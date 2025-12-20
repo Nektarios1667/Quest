@@ -2,18 +2,17 @@
 
 namespace Quest.Entities;
 
-public struct ShopOption
+public struct ShopOption(Item item, Item? cost)
 {
-    public Item Item;
-    public Item Cost;
+    public Item Item = item;
+    public Item? Cost = cost;
 }
+
 public class NPC
 {
     public static Dialog? DialogBox { get; set; }
     public static List<(NPC npc, float dist)> NPCsNearby { get; set; } = [];
-    public bool HasSpoken { get; set; }
-    public bool IsTalking => DialogBox != null && DialogBox.IsVisible && DialogBox.IsSpeaking;
-    public ShopOption[] ShopOptions { get; private set; }
+    public List<ShopOption> ShopOptions { get; private set; } = [];
     public Point Location { get; set; }
     public string Name { get; set; }
     public string Dialog { get; set; }
@@ -26,7 +25,6 @@ public class NPC
 
     public NPC(OverlayManager uiManager, TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1)
     {
-        HasSpoken = false;
         Texture = texture;
 
         // Private
@@ -38,6 +36,9 @@ public class NPC
         Dialog = dialog;
         TextureColor = textureColor == default ? Color.White : textureColor;
         Scale = scale;
+        AddShopOption(new(ItemTypes.SteelSword, 1), new(ItemTypes.DeltaCoin, 3));
+        AddShopOption(new(ItemTypes.SteelSword, 1), new(ItemTypes.PhiCoin, 7));
+        AddShopOption(new(ItemTypes.Lantern, 1), new(ItemTypes.PhiCoin, 4));
     }
     public void Draw(GameManager gameManager)
     {
@@ -56,5 +57,34 @@ public class NPC
         float dist = Vector2.DistanceSquared(CameraManager.PlayerFoot.ToVector2() / Constants.TileSize.ToVector2(), Location.ToVector2() + Constants.HalfVec);
         if (dist <= 4)
             NPCsNearby.Add((this, dist));
+    }
+    public void AddShopOption(ShopOption option)
+    {
+        ShopOptions.Add(option);
+    }
+    public void AddShopOption(Item bought, Item? cost)
+    {
+        ShopOptions.Add(new(bought, cost));
+    }
+    public string GetFullDialog()
+    {
+        // Name and dialog
+        string dialog = $"[{Name}] {Dialog}";
+        
+        // Shop
+        if (ShopOptions.Count > 0)
+            dialog += "\nSHOP:";
+        int o = 1;
+        foreach (var option in ShopOptions)
+        {
+            dialog += $"\n{o}] {option.Item.Name} ({option.Item.Amount}) : ";
+            if (option.Cost == null)
+                dialog += "FREE";
+            else
+                dialog += $"{option.Cost.Name} ({option.Cost.Amount})";
+            o++;
+        }
+
+        return dialog;
     }
 }

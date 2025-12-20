@@ -65,7 +65,7 @@ public class OverlayManager
         // Process NPC dialogs
         if (NPC.DialogBox == null)
         {
-            NPC.DialogBox = new Gui.Dialog(gameManager.UIManager.Gui, new(Constants.Middle.X - 600, Constants.NativeResolution.Y - 190), new(1200, 100), new(100, 100, 100), Color.Black, "", PixelOperator, borderColor: new(40, 40, 40)) { IsVisible = false };
+            NPC.DialogBox = new Gui.Dialog(gameManager.UIManager.Gui, new(Constants.Middle.X - 600, Constants.NativeResolution.Y - 300), new(1200, 200), new(100, 100, 100), Color.Black, "", PixelOperator, borderColor: new(40, 40, 40)) { IsVisible = false };
             gameManager.UIManager.Gui.Widgets.Add(NPC.DialogBox);
         }
         if (NPC.NPCsNearby.Count > 0)
@@ -76,8 +76,8 @@ public class OverlayManager
                 if (NPC.NPCsNearby[n].dist < current.dist)
                     current = NPC.NPCsNearby[n];
             }
-            string fullDialog = $"[{current.npc.Name}] {current.npc.Dialog}";
-            NPC.DialogBox.SetText(fullDialog, respeak:false);
+
+            NPC.DialogBox.SetText(current.npc.GetFullDialog(), respeak:false);
             NPC.DialogBox.IsVisible = true;
         } else
             NPC.DialogBox.IsVisible = false;

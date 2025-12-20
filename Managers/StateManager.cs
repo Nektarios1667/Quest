@@ -2,6 +2,16 @@
 using System.Linq;
 
 namespace Quest.Managers;
+[Flags]
+public enum LevelFeatures : ushort
+{
+    None = 0,
+    Biomes = 1,
+    QuillScripts = 2,
+    DoorKeyAmounts = 4,
+}
+
+
 public enum GameState
 {
     MainMenu,

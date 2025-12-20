@@ -2,11 +2,11 @@ namespace Quest.Tiles;
 
 public class Door : Tile
 {
-    public string Key { get; set; }
+    public Item? Key { get; set; }
     public bool ConsumeKey { get; set; }
     public bool IsOpened { get; set; }
     public override bool IsWalkable => Type.IsWalkable || IsOpened;
-    public Door(Point location, string key = "", bool consumeKey = true) : base(location, TileTypeID.Door)
+    public Door(Point location, Item? key = null, bool consumeKey = true) : base(location, TileTypeID.Door)
     {
         Key = key;
         ConsumeKey = consumeKey;
@@ -24,12 +24,12 @@ public class Door : Tile
     }
     public override void OnPlayerCollide(GameManager game, PlayerManager player)
     {
-        if (Key == "" || player.Inventory.Contains(Key))
+        if (Key == null || player.Inventory.Count(Key.Type) >= Key.Amount)
         {
-            if (Key != "" && ConsumeKey)
+            if (Key != null && ConsumeKey)
             {
                 player.Inventory.Consume(Key);
-                game.UIManager.Notification($"-1 {StringTools.FillCamelSpaces(Key)}", Color.Red, 3);
+                game.UIManager.Notification($"-1 {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
                 SoundManager.PlaySoundInstance("DoorUnlock");
             }
             IsOpened = true;
@@ -38,7 +38,7 @@ public class Door : Tile
         else
         {
             // Notif
-            game.UIManager.Notification($"{StringTools.FillCamelSpaces(Key)} needed to unlock.", Color.Red, 5);
+            game.UIManager.Notification($"{StringTools.FillCamelSpaces(Key.Name)} needed to unlock.", Color.Red, 5);
 
             // Sound fx
             string timerName = $"DoorLocked_{X + Y * Constants.MapSize.X}";

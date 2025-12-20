@@ -197,13 +197,13 @@ public class EditorManager
         // Door
         else if (tile is Door door)
         {
-            var (success, values) = ShowInputForm("Door Editor", [new("Key", null)]);
+            var (success, values) = ShowInputForm("Door Editor", [new("Key", null, Enum.GetNames(typeof(ItemTypeID))), new("Amount", IsByte)]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Stair edit failed.");
                 return;
             }
-            door.Key = values[0];
+            door.Key = new(ItemTypes.All[(int)Enum.Parse(typeof(ItemTypeID), values[0])], int.Parse(values[1]));
         }
         // Chest
         else if (tile is Chest chest)
@@ -541,8 +541,9 @@ public class EditorManager
         using BinaryWriter writer = new(gzipStream);
 
         // Metadata
+        var flags = LevelFeatures.Biomes | LevelFeatures.QuillScripts | LevelFeatures.DoorKeyAmounts;
         writer.Write(Encoding.UTF8.GetBytes("QLVL")); // Magic number
-        writer.Write((byte)1); // Version
+        writer.Write((ushort)flags); // Flags
 
         // Write tint
         writer.Write(levelManager.Level.Tint.R);
@@ -571,7 +572,8 @@ public class EditorManager
             else if (tile is Door door)
             {
                 // Write door key
-                writer.Write(door.Key);
+                writer.Write(door.Key == null ? "NUL" : door.Key.Name);
+                if (flags.HasFlag(LevelFeatures.DoorKeyAmounts) && door.Key != null) writer.Write(door.Key.Amount);
             }
             else if (tile is Chest chest)
             {
@@ -585,13 +587,14 @@ public class EditorManager
                 writer.Write(lamp.LightColor.G);
                 writer.Write(lamp.LightColor.B);
                 writer.Write(lamp.LightColor.A);
-                writer.Write((ushort)lamp.LightRadius);
+                writer.Write(lamp.LightRadius);
             }
         }
 
         // Biome
-        for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
-            writer.Write((byte)(int)levelManager.Level.Biome[i]);
+        if (flags.HasFlag(LevelFeatures.Biomes)) 
+            for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
+                writer.Write((byte)(int)levelManager.Level.Biome[i]);
 
         // NPCs
         writer.Write((byte)Math.Min(levelManager.Level.NPCs.Count, 255));
@@ -631,12 +634,15 @@ public class EditorManager
         }
 
         // Scripts
-        writer.Write((byte)levelManager.Level.Scripts.Count);
-        for (int s = 0; s < levelManager.Level.Scripts.Count; s++)
+        if (flags.HasFlag(LevelFeatures.QuillScripts))
         {
-            QuillScript script = levelManager.Level.Scripts[s];
-            writer.Write(script.ScriptName);
-            writer.Write(script.SourceCode);
+            writer.Write((byte)levelManager.Level.Scripts.Count);
+            for (int s = 0; s < levelManager.Level.Scripts.Count; s++)
+            {
+                QuillScript script = levelManager.Level.Scripts[s];
+                writer.Write(script.ScriptName);
+                writer.Write(script.SourceCode);
+            }
         }
 
         // Log
