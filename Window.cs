@@ -93,7 +93,6 @@ public class Window : Game
         levelManager.LevelLoaded += _ => playerManager.CloseContainer();
         CommandManager.Init(this, gameManager, levelManager, playerManager);
         Pathfinder.Init(gameManager);
-        StateManager.Init(gameManager);
         Logger.System("Initialized managers.");
 
         // Levels
@@ -206,15 +205,6 @@ public class Window : Game
 
         base.Draw(gameTime);
     }
-    protected void OnExiting(object? sender, EventArgs args)
-    {
-        Logger.System("Exiting game.");
-
-        if (StateManager.CurrentSave != "")
-            StateManager.WriteKeyValueFile("continue", new() { { "lastSave", StateManager.CurrentSave } });
-
-        Logger.System("Game exited successfully.");
-    }
     // For cleaner code
     public void DrawFrameInfo()
     {
@@ -269,6 +259,8 @@ public class Window : Game
         debugSb.AppendFormat(" [{0:0.00}]", StateManager.WeatherNoiseValue(gameManager.GameTime));
         debugSb.Append("\nUIDs: ");
         debugSb.AppendFormat("L:{0} E:{1} I:{2}", UIDManager.Available(UIDCategory.Loot), UIDManager.Available(UIDCategory.Enemies), UIDManager.Available(UIDCategory.Items));
+        debugSb.Append("\nCurrent Save: ");
+        debugSb.Append(StateManager.CurrentSave);
 
         FillRectangle(spriteBatch, new(0, 0, 220, debugSb.ToString().Split('\n').Length * 20), Color.Black * 0.8f);
         spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);

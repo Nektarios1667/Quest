@@ -59,9 +59,7 @@ public static class StateManager
     public static GameState PreviousState { get; private set; } = GameState.MainMenu;
     public static OverlayState OverlayState { get; set; } = OverlayState.None;
     public static Mood Mood { get; set; } = Mood.Calm;
-    public static string CurrentSave { get; set; } = "";
-    public static string ContinueSave { get; set; } = "";
-    private static GameManager GameManager;
+    public static LevelPath CurrentSave { get; set; } = new();
     // Save State changes
     private static readonly HashSet<int> openedDoors = [];
     private static readonly HashSet<(Chest Chest, string Level)> chests = [];
@@ -72,14 +70,6 @@ public static class StateManager
         WeatherNoise.SetFrequency(0.005f);
         WeatherNoise.SetFractalType(FastNoiseLite.FractalType.FBm);
         WeatherNoise.SetFractalOctaves(3);
-
-        var continuePersist = ReadKeyValueFile("continue");
-        if (continuePersist.TryGetValue("lastSave", out string? value))
-            ContinueSave = value;
-    }
-    public static void Init(GameManager gameManager)
-    {
-        GameManager = gameManager;
     }
     public static void SetWeatherPersistent(int seed = -1, float lastWeatherTime = 0f, float lastTimeValue = -1f)
     {
@@ -124,9 +114,9 @@ public static class StateManager
     {
         chests.Add((chest, level));
     }
-    public static void SaveGameState(GameManager gameManager, PlayerManager playerManager, string saveName)
+    public static void SaveGameState(GameManager gameManager, PlayerManager playerManager)
     {
-        WriteKeyValueFile("continue", new() { { "lastSave", CurrentSave } });
+        WriteKeyValueFile("continue", new() { { "save", CurrentSave.ToString() } });
         string worldName = gameManager.LevelManager.Level.World;
         byte[] data;
 
@@ -198,14 +188,13 @@ public static class StateManager
         Logger.System("Saved game state.");
 
         // Write
-        string world = gameManager.LevelManager.Level.World;
-        using (var fs = new FileStream($"GameData/Worlds/{world}/saves/{saveName}.qsv", FileMode.Create, FileAccess.Write))
+        using (var fs = new FileStream($"GameData/Worlds/{CurrentSave.WorldName}/saves/{CurrentSave.LevelName}.qsv", FileMode.Create, FileAccess.Write))
             fs.Write(data, 0, data.Length);
         if (Constants.DEVMODE)
-            File.Copy($"GameData/Worlds/{world}/saves/{saveName}.qsv", $"../../../GameData/Worlds/{world}/saves/{saveName}.qsv", true);
+            File.Copy($"GameData/Worlds/{CurrentSave.WorldName}/saves/{CurrentSave.LevelName}.qsv", $"../../../GameData/Worlds/{CurrentSave.WorldName}/saves/{CurrentSave.LevelName}.qsv", true);
 
         gameManager.UIManager.LootNotifications.AddNotification($"Game Saved", Color.Cyan);
-        Logger.System($"Saved game state to '{saveName}.qsv'.");
+        Logger.System($"Saved game state to '{CurrentSave.LevelName}.qsv'.");
     }
     public static bool ReadGameState(GameManager gameManager, PlayerManager playerManager, string save)
     {
@@ -216,7 +205,8 @@ public static class StateManager
             Logger.Error($"Save file '{file}' does not exist.");
             return false;
         }
-        CurrentSave = save;
+        CurrentSave = levelPath;
+        WriteKeyValueFile("continue", new() { { "save", save } });
         gameManager.LevelManager.ReadWorld(gameManager.UIManager, levelPath.WorldName, true);
 
         using (var fs = new FileStream(file, FileMode.Open, FileAccess.Read))
@@ -348,32 +338,43 @@ public static class StateManager
         }
 
         // Read key-value pairs from file
-        Dictionary<string, string> data = [];
-        using (var fs = new FileStream($"GameData/Persistent/{name}.qkv", FileMode.Open, FileAccess.Read))
-        using (var reader = new BinaryReader(fs))
+        try
         {
-
-            uint pairs = reader.ReadUInt32();
-            for (int p = 0; p < pairs; p++)
+            Dictionary<string, string> data = [];
+            using (var fs = new FileStream($"GameData/Persistent/{name}.qkv", FileMode.Open, FileAccess.Read))
+            using (var reader = new BinaryReader(fs))
             {
-                string key = reader.ReadString();
-                string value = reader.ReadString();
-                data[key] = value;
+
+                uint pairs = reader.ReadUInt32();
+                for (int p = 0; p < pairs; p++)
+                {
+                    string key = reader.ReadString();
+                    string value = reader.ReadString();
+                    data[key] = value;
+                }
             }
+            return data;
         }
-        return data;
+        catch
+        {
+            return [];
+        }
     }
     public static void WriteKeyValueFile(string name, Dictionary<string, string> data)
     {
         // Write key-value pairs to file
-        string prefix = Constants.DEVMODE ? "../../../" : "";
-        using var fs = new FileStream($"{prefix}GameData/Persistent/{name}.qkv", FileMode.Create, FileAccess.Write);
-        using var writer = new BinaryWriter(fs);
-        writer.Write((uint)data.Count);
-        foreach (var pair in data)
+        using (var fs = new FileStream($"GameData/Persistent/{name}.qkv", FileMode.Create, FileAccess.Write))
+        using (var writer = new BinaryWriter(fs))
         {
-            writer.Write(pair.Key);
-            writer.Write(pair.Value);
+            writer.Write((uint)data.Count);
+            foreach (var pair in data)
+            {
+                writer.Write(pair.Key);
+                writer.Write(pair.Value);
+            }
         }
+        // Copy back to source code
+        if (Constants.DEVMODE)
+            File.Copy($"GameData/Persistent/{name}.qkv", $"../../../GameData/Persistent/{name}.qkv", true);
     }
 }

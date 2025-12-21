@@ -18,6 +18,7 @@ public class MenuManager
     // Widgets
     private readonly ScrollBox worlds;
     private readonly ScrollBox saves;
+    private readonly Label saveListLabel;
     public MenuManager(Window window, SpriteBatch batch, ContentManager content, GameManager gameManager, PlayerManager playerManager)
     {
         this.gameManager = gameManager;
@@ -26,7 +27,7 @@ public class MenuManager
         // Main Menu
         MainMenu = new(window, batch, PixelOperator);
         MainMenu.LoadContent(content, "Images/Gui");
-        Button startButton = new(MainMenu, new(Constants.Middle.X - 150, 220), new(300, 70), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => StateManager.State = GameState.LevelSelect, [], text: "Start", font: PixelOperatorSubtitle, border: 0);
+        Button startButton = new(MainMenu, new(Constants.Middle.X - 150, 220), new(300, 70), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, LevelSelect, [], text: "Start", font: PixelOperatorSubtitle, border: 0);
         Button continueButton = new(MainMenu, new(Constants.Middle.X - 150, 310), new(300, 70), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, ContinueSave, [], text: "Continue", font: PixelOperatorSubtitle, border: 0);
         Button settingsButton = new(MainMenu, new(Constants.Middle.X - 150, 400), new(300, 70), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => StateManager.State = GameState.Settings, [], text: "Settings", font: PixelOperatorSubtitle, border: 0);
         Button creditsButton = new(MainMenu, new(Constants.Middle.X - 150, 490), new(300, 70), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => StateManager.State = GameState.Credits, [], text: "Credits", font: PixelOperatorSubtitle, border: 0);
@@ -83,16 +84,16 @@ public class MenuManager
         LevelSelectMenu.LoadContent(content, "Images/Gui");
 
         worlds = new(LevelSelectMenu, new(220, 50), new(520, 600), Color.White, Color.Black * .6f, Color.LightBlue * .5f, border: 2, borderColor: Color.Cyan * .2f, troughColor: Color.Black * .6f, seperation: 0);
-        saves = new(LevelSelectMenu, new(800, 50), new(300, 600), Color.White, Color.Black * .6f, Color.LightBlue * .5f, border: 2, borderColor: Color.Cyan * .2f, troughColor: Color.Black * .6f, seperation: 0);
-        worlds.ItemSelected += (item) => { LoadSaves(item); };
+        saves = new(LevelSelectMenu, new(800, 50), new(300, 600), Color.White, Color.Black * .6f, Color.LightBlue * .5f, border: 2, borderColor: Color.Cyan * .2f, troughColor: Color.Black * .6f, seperation: 0) { Visible = false };
 
         Label worldListLabel = new(LevelSelectMenu, new(435, 5), Color.White, "Worlds", PixelOperatorLarge);
-        Label saveListLabel = new(LevelSelectMenu, new(900, 5), Color.White, "Saves", PixelOperatorLarge);
+        saveListLabel = new(LevelSelectMenu, new(900, 5), Color.White, "Saves", PixelOperatorLarge);
         Button levelSelectBackButton = new(LevelSelectMenu, new(20, 20), new(100, 40), Color.White, Color.Black * 0.5f, ColorTools.NearBlack * 0.5f, StateManager.RevertGameState, [], text: "Back", font: PixelOperator, border: 0);
         Button openButton = new(LevelSelectMenu, new(200, 660), new(180, 40), Color.White, Color.DarkGreen * 0.6f, Color.Green * 0.6f, OpenSave, [], text: "Open", border: 0);
         Button renameButton = new(LevelSelectMenu, new(400, 660), new(180, 40), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, Rename, [], text: "Rename", border: 0);
         Button refreshButton = new(LevelSelectMenu, new(600, 660), new(180, 40), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => LoadSaves(worlds.Selected), [], text: "Refresh", border: 0);
         Button deleteButton = new(LevelSelectMenu, new(800, 660), new(180, 40), Color.White, Color.DarkRed * 0.6f, Color.Red * 0.6f, DeleteSelectedSave, [], text: "Delete", border: 0);
+        worlds.ItemSelected += (item) => { LoadSaves(item); saves.Visible = true; saveListLabel.Visible = true; };
 
         LevelSelectMenu.Widgets = [levelSelectBackButton, worlds, saves, openButton, deleteButton, renameButton, refreshButton, worldListLabel, saveListLabel];
 
@@ -101,7 +102,7 @@ public class MenuManager
         PauseMenu.LoadContent(content, "Images/Gui");
         Label pauseLabel = new(PauseMenu, new(Constants.Middle.X - 110, 150), Color.White, "PAUSED", PixelOperatorTitle);
         Button resumeButton = new(PauseMenu, new(Constants.Middle.X - 150, 300), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => StateManager.OverlayState = OverlayState.None, [], text: "Resume", font: PixelOperatorSubtitle, border: 0);
-        Button quicksaveButton = new(PauseMenu, new(Constants.Middle.X - 150, 380), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.SaveGameState(gameManager, playerManager, new LevelPath(StateManager.CurrentSave).LevelName); }, [], text: "Quick Save", font: PixelOperatorSubtitle, border: 0);
+        Button quicksaveButton = new(PauseMenu, new(Constants.Middle.X - 150, 380), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.SaveGameState(gameManager, playerManager); }, [], text: "Quick Save", font: PixelOperatorSubtitle, border: 0);
         Button pauseSettingsButton = new(PauseMenu, new(Constants.Middle.X - 150, 460), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.State = GameState.Settings; }, [], text: "Settings", font: PixelOperatorSubtitle, border: 0);
         Button mainMenuButton = new(PauseMenu, new(Constants.Middle.X - 150, 540), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, ExitToMainMenu, [], text: "Main Menu", font: PixelOperatorSubtitle, border: 0);
         Button quitButton = new(PauseMenu, new(Constants.Middle.X - 150, 620), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => window.Exit(), [], text: "Quit", font: PixelOperatorSubtitle, border: 0);
@@ -125,21 +126,26 @@ public class MenuManager
         StateManager.State = GameState.MainMenu;
         gameManager.LevelManager.UnloadWorld(gameManager.LevelManager.Level.World);
     }
-    private void ContinueSave()
+    public void ContinueSave()
     {
-        if (StateManager.ContinueSave != "")
+
+        if (StateManager.ReadKeyValueFile("continue").TryGetValue("save", out var loadSave))
         {
-            LevelPath levelPath = new(StateManager.ContinueSave);
-
-            StateManager.ReadGameState(gameManager, playerManager, levelPath.Path);
-
-            StateManager.CurrentSave = StateManager.ContinueSave;
+            StateManager.ReadGameState(gameManager, playerManager, loadSave);
             StateManager.State = GameState.Game;
         }
         else
         {
             StateManager.State = GameState.LevelSelect;
         }
+    }
+    public void LevelSelect()
+    {
+        worlds?.SelectItem("");
+        if (saves != null)
+            saves.Visible = false;
+        saveListLabel.Visible = false;
+        StateManager.State = GameState.LevelSelect;
     }
     public void RefreshWorldList()
     {
@@ -153,6 +159,14 @@ public class MenuManager
             if (Constants.DEVMODE)
                 File.Delete($"../../../GameData/Worlds/{worlds.Selected}/saves/{saves.Selected}.qsv");
             File.Delete($"GameData/Worlds/{worlds.Selected}/saves/{saves.Selected}.qsv");
+
+            // Check continue save
+            var continueData = StateManager.ReadKeyValueFile("continue");
+            if (continueData.TryGetValue("save", out string? value) && value.Replace('\\', '/') == $"{worlds.Selected}/{saves.Selected}")
+                continueData.Remove("save");
+            StateManager.WriteKeyValueFile("continue", continueData);
+
+            // Refresh
             LoadSaves(worlds.Selected);
         }
     }
@@ -174,7 +188,7 @@ public class MenuManager
             _ = StateManager.ReadGameState(gameManager, playerManager, $"{worlds.Selected}/{saves.Selected}");
         else
         {
-            StateManager.CurrentSave = $"{worlds.Selected}/{DateTime.Now:Save MM-dd-yy HH-mm-ss}";
+            StateManager.CurrentSave = new($"{worlds.Selected}/{DateTime.Now:Save MM-dd-yy HH-mm-ss}");
             gameManager.LevelManager.ReadWorld(gameManager.UIManager, worlds.Selected, reload: true);
             if (!gameManager.LevelManager.LoadLevel(gameManager, $"{worlds.Selected}/{worlds.Selected}"))
                 gameManager.LevelManager.LoadLevel(gameManager, 0);
