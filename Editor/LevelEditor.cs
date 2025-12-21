@@ -86,27 +86,27 @@ public class LevelEditor : Game
 
         // Gui
         gui = new(this, spriteBatch, Arial);
-        mouseMenu = new(gui, Point.Zero, new(100, 300), Color.White, GUI.NearBlack, Color.Gray, border: 1, seperation: 3, borderColor: Color.White);
+        mouseMenu = new(gui, Point.Zero, new(100, 300), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         mouseMenu.AddItem("Pick", () => { TileSelection = mouseTile.Type.ID; Logger.Log($"Picked tile '{TileSelection}' @ {mouseCoord.X}, {mouseCoord.Y}."); }, []);
-        mouseMenu.AddItem("Open", editorManager.OpenFile, []);
+        mouseMenu.AddItem("Open", editorManager.OpenFileDialog, []);
         mouseMenu.AddItem("Fill", editorManager.FloodFill, []);
         mouseMenu.AddItem("Edit", editorManager.EditTile, []);
 
-        MouseMenu newMenu = new(gui, Point.Zero, new(100, 80), Color.White, GUI.NearBlack, Color.Gray, border: 1, seperation: 3, borderColor: Color.White);
+        MouseMenu newMenu = new(gui, Point.Zero, new(100, 80), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         newMenu.AddItem("New NPC", editorManager.NewNPC, []);
         newMenu.AddItem("New Loot", editorManager.NewLoot, []);
         newMenu.AddItem("New Decal", editorManager.NewDecal, []);
         mouseMenu.AddItem("New...", null, []);
         mouseMenu.AddSubMenu("New...", newMenu);
 
-        MouseMenu deleteMenu = new(gui, Point.Zero, new(150, 80), Color.White, GUI.NearBlack, Color.Gray, border: 1, seperation: 3, borderColor: Color.White);
+        MouseMenu deleteMenu = new(gui, Point.Zero, new(150, 80), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         deleteMenu.AddItem("Delete NPC", editorManager.DeleteNPC, []);
         deleteMenu.AddItem("Delete Loot", editorManager.DeleteLoot, []);
         deleteMenu.AddItem("Delete Decal", editorManager.DeleteDecal, []);
         mouseMenu.AddItem("Delete...", null, []);
         mouseMenu.AddSubMenu("Delete...", deleteMenu);
 
-        mouseMenu.AddItem("Save", editorManager.SaveLevel, []);
+        mouseMenu.AddItem("Save", editorManager.SaveLevelDialog, []);
         mouseMenu.AddItem("Spawn", editorManager.SetSpawn, []);
         mouseMenu.AddItem("Tint", editorManager.SetTint, []);
         mouseMenu.AddItem("Generate", editorManager.GenerateLevel, []);
@@ -221,7 +221,7 @@ public class LevelEditor : Game
         // Pick
         if (InputManager.MMouseClicked) PickTile();
         // Open file
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.O)) editorManager.OpenFile();
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.O)) editorManager.OpenFileDialog();
         // Fill
         if (InputManager.KeyPressed(Keys.F)) editorManager.FloodFill();
         // NPCs
@@ -231,7 +231,7 @@ public class LevelEditor : Game
         // Decals
         if (InputManager.Hotkey(Keys.LeftControl, Keys.D)) { MouseSelect(); editorManager.EditDecals(); }
         // Save
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.E)) editorManager.SaveLevel();
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.E)) editorManager.SaveLevelDialog();
         // Level info
         if (InputManager.Hotkey(Keys.LeftControl, Keys.S)) editorManager.SetSpawn();
         if (InputManager.Hotkey(Keys.LeftControl, Keys.T)) editorManager.SetTint();

@@ -527,20 +527,19 @@ public class EditorManager
             ResaveLevel(formattedLevel);
         }
     }
-    public void SaveLevel(string? name = null)
+    public void SaveLevelDialog()
     {
         // Winforms
-        if (name == null)
+        var (success, values) = ShowInputForm("Save Level", [new("Name", null)]);
+        if (!success)
         {
-            var (success, values) = ShowInputForm("Save Level", [new("Name", null)]);
-            if (!success)
-            {
-                if (!PopupOpen) Logger.Error("Failed to save level.");
-                return;
-            }
-            name = values[0];
+            if (!PopupOpen) Logger.Error("Failed to save level.");
+            return;
         }
+        SaveLevel(values[0]);
+    }
 
+    public void SaveLevel(string name) {
         // Parse
         if (world == "" || world == "NUL_WORLD")
         {
@@ -695,20 +694,18 @@ public class EditorManager
         levelManager.LoadLevelObject(gameManager, level);
         FlagRebuildMinimap();
     }
-    public void OpenFile(string? filename = null)
+    public void OpenFileDialog()
     {
         // Winforms
-        if (filename == null)
+        var (success, values) = ShowInputForm("Open File", [new("File Name", null)]);
+        if (!success)
         {
-            var (success, values) = ShowInputForm("Open File", [new("File Name", null)]);
-            if (!success)
-            {
-                if (!PopupOpen) Logger.Error("Failed to open file.");
-                return;
-            }
-            filename = values[0];
+            if (!PopupOpen) Logger.Error("Failed to open file.");
+            return;
         }
-
+        OpenFile(values[0]);
+    }
+    public void OpenFile(string filename) {
         // Open
         if (!filename.Contains('/') && !filename.Contains('\\'))
         {
