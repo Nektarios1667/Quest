@@ -237,6 +237,10 @@ public class LevelEditor : Game
         if (InputManager.Hotkey(Keys.LeftControl, Keys.T)) editorManager.SetTint();
         // Generate level
         if (InputManager.Hotkey(Keys.LeftControl, Keys.G)) editorManager.GenerateLevel();
+        // Resave level
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.R)) editorManager.ResaveLevel(levelManager.Level.Name);
+        // Resave world
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.R)) editorManager.ResaveWorld(levelManager.Level.World);
         // Script
         //if (InputManager.Hotkey(Keys.LeftControl, Keys.P)) editorManager.EditScript();
 

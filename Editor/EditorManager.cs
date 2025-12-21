@@ -512,6 +512,7 @@ public class EditorManager
     {
         OpenFile(name);
         SaveLevel(name);
+        Logger.Log($"Resaved level '{name}'");
     }
     public void ResaveWorld(string world)
     {
