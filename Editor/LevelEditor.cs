@@ -113,9 +113,9 @@ public class LevelEditor : Game
         mouseMenu.AddItem("Exit", Exit, []);
         gui.AddWidget(mouseMenu);
 
-        Button tileDrawSelect = new(gui, new(Constants.Middle.X - 100, 10), new(90, 25), Color.White, ColorTools.NearBlack, Color.Gray, () => currentTool = EditorTool.Tile, [], "Tiles");
-        Button decalDrawSelect = new(gui, new(Constants.Middle.X, 10), new(90, 25), Color.White, ColorTools.NearBlack, Color.Gray, () => currentTool = EditorTool.Decal, [], "Decals");
-        Button biomeDrawSelect = new(gui, new(Constants.Middle.X + 100, 10), new(90, 25), Color.White, ColorTools.NearBlack, Color.Gray, () => currentTool = EditorTool.Biome, [], "Biomes");
+        Button tileDrawSelect = new(gui, new(Constants.Middle.X - 100, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Tile, [], "Tiles", border: 0);
+        Button decalDrawSelect = new(gui, new(Constants.Middle.X, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.5f, () => currentTool = EditorTool.Decal, [], "Decals", border: 0);
+        Button biomeDrawSelect = new(gui, new(Constants.Middle.X + 100, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Biome, [], "Biomes", border: 0);
         gui.AddWidgets(tileDrawSelect, decalDrawSelect, biomeDrawSelect);
 
         gui.LoadContent(Content, "Images/Gui");
