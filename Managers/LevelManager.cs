@@ -379,7 +379,7 @@ public class LevelManager
                     Point loc = new(x, y);
                     // Stairs
                     if (type == (int)TileTypeID.Stairs)
-                        tile = new Stairs(loc, reader.ReadString(), new(reader.ReadByte(), reader.ReadByte()));
+                        tile = new Stairs(loc, $"{splitPath[0]}/{reader.ReadString()}", new(reader.ReadByte(), reader.ReadByte()));
                     // Doors
                     else if (type == (int)TileTypeID.Door)
                     {

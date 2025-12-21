@@ -1,7 +1,9 @@
 ﻿using System.IO;
+using IO = System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms.Design;
 using static Quest.Editor.PopupFactory;
 
 namespace Quest.Editor;
@@ -506,26 +508,48 @@ public class EditorManager
         string sourceCode = File.ReadAllText(values[1]);
         levelManager.Level.Scripts.Add(new QuillScript(name, sourceCode));
     }
-    public void SaveLevel()
+    public void ResaveLevel(string name)
+    {
+        OpenFile(name);
+        SaveLevel(name);
+    }
+    public void ResaveWorld(string world)
+    {
+        // Get files
+        string prefix = Constants.DEVMODE ? "../../../" : "";
+        string[] levels = [.. Directory.GetFiles($"{prefix}GameData/Worlds/{world}/levels").Where(f => f.EndsWith(".qlv"))];
+
+        // Resave all
+        foreach (var level in levels)
+        {
+            string formattedLevel = IO.Path.Combine(IO.Path.GetFileName(IO.Path.GetDirectoryName(level))!, IO.Path.GetFileName(level));
+            ResaveLevel(formattedLevel);
+        }
+    }
+    public void SaveLevel(string? name = null)
     {
         // Winforms
-        var (success, values) = ShowInputForm("Save Level", [new("Name", null)]);
-        if (!success)
+        if (name == null)
         {
-            if (!PopupOpen) Logger.Error("Failed to save level.");
-            return;
+            var (success, values) = ShowInputForm("Save Level", [new("Name", null)]);
+            if (!success)
+            {
+                if (!PopupOpen) Logger.Error("Failed to save level.");
+                return;
+            }
+            name = values[0];
         }
 
         // Parse
         if (world == "" || world == "NUL_WORLD")
         {
-            if ((values[0].Contains('\\') || values[0].Contains('/')))
-                world = values[0].Split('\\', '/')[1];
+            if ((name.Contains('\\') || name.Contains('/')))
+                world = name.Split('\\', '/')[1];
             else
                 world = "new_world";
-            values[0] = values[0].Split('\\', '/')[0]; // Remove world
+            name = name.Split('\\', '/')[0]; // Remove world
         }
-        else if (values[0].Contains('\\') || values[0].Contains('/'))
+        else if (name.Contains('\\') || name.Contains('/'))
         {
             Logger.Error($"Invalid level format. File has to be in the same world.");
             return;
@@ -536,7 +560,7 @@ public class EditorManager
         Directory.CreateDirectory($"{prefix}GameData/Worlds/{world}/levels");
         Directory.CreateDirectory($"{prefix}GameData/Worlds/{world}/loot");
         Directory.CreateDirectory($"{prefix}GameData/Worlds/{world}/saves");
-        using FileStream fileStream = File.Create($"{prefix}GameData/Worlds/{world}/levels/{values[0]}.qlv");
+        using FileStream fileStream = File.Create($"{prefix}GameData/Worlds/{world}/levels/{name}.qlv");
         using GZipStream gzipStream = new(fileStream, CompressionLevel.Optimal);
         using BinaryWriter writer = new(gzipStream);
 
@@ -565,14 +589,15 @@ public class EditorManager
             if (tile is Stairs stairs)
             {
                 // Write destination
-                writer.Write(stairs.DestLevel);
-                writer.Write(LevelEditor.IntToByte(stairs.DestX));
-                writer.Write(LevelEditor.IntToByte(stairs.DestY));
+                writer.Write(stairs.DestLevel.Split('/', '\\')[^1]);
+
+                writer.Write(stairs.DestX);
+                writer.Write(stairs.DestY);
             }
             else if (tile is Door door)
             {
                 // Write door key
-                writer.Write(door.Key == null ? "NUL" : door.Key.Name);
+                writer.Write(door.Key == null ? "" : door.Key.Name);
                 if (flags.HasFlag(LevelFeatures.DoorKeyAmounts) && door.Key != null) writer.Write(door.Key.Amount);
             }
             else if (tile is Chest chest)
@@ -646,7 +671,7 @@ public class EditorManager
         }
 
         // Log
-        Logger.Log($"Exported level to '{values[0]}.qlv'.");
+        Logger.Log($"Exported level to '{name}.qlv'.");
     }
     public void GenerateLevel()
     {
@@ -669,18 +694,21 @@ public class EditorManager
         levelManager.LoadLevelObject(gameManager, level);
         FlagRebuildMinimap();
     }
-    public void OpenFile()
+    public void OpenFile(string? filename = null)
     {
         // Winforms
-        var (success, values) = ShowInputForm("Open File", [new("File Name", null)]);
-        if (!success)
+        if (filename == null)
         {
-            if (!PopupOpen) Logger.Error("Failed to open file.");
-            return;
+            var (success, values) = ShowInputForm("Open File", [new("File Name", null)]);
+            if (!success)
+            {
+                if (!PopupOpen) Logger.Error("Failed to open file.");
+                return;
+            }
+            filename = values[0];
         }
 
         // Open
-        string filename = values[0];
         if (!filename.Contains('/') && !filename.Contains('\\'))
         {
             Logger.Error("Invalid level name. Use format 'WorldName/LevelName'.");

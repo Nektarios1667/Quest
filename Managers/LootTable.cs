@@ -37,7 +37,7 @@ public class LootPreset : ILootGenerator
     public static LootPreset ReadLootPreset(string world, string file)
     {
         // Check
-        //file = $"GameData/Worlds/{world}/loot/{file}";
+        file = $"GameData/Worlds/{world}/loot/{file}";
         if (!file.EndsWith(".qlp"))
         {
             Logger.Error($"Failed to read preset '{file}'. Expected .qlp file.");

@@ -1,4 +1,5 @@
-﻿using ScottPlot;
+﻿using MonoGame.Extended.ECS;
+using ScottPlot;
 using ScottPlot.TickGenerators;
 using System.IO;
 using System.Linq;
@@ -208,6 +209,7 @@ public static class CodeGenerator
         string? tableName = Ask("Table name: ");
         if (tableName == null || tableName == "") return;
 
+        string? world;
         using (var ms = new MemoryStream())
         using (var writer = new BinaryWriter(ms))
         {
@@ -244,6 +246,9 @@ public static class CodeGenerator
                 entries++;
 
             } while (itemResp != "" && entries < 255);
+            do
+                world = Ask("World to output to: ");
+            while (world == null || world == "" || !Directory.Exists($"{sourceDirectory}/GameData/Worlds/{world}"));
 
             // Write to data
             data = ms.ToArray();
@@ -251,7 +256,8 @@ public static class CodeGenerator
         }
 
         // Write
-        File.WriteAllBytes($"{sourceDirectory}/World/Loot/{tableName}.qlt", data);
+       Directory.CreateDirectory($"{sourceDirectory}/GameData/Worlds/{world}/loot");
+        File.WriteAllBytes($"{sourceDirectory}/GameData/Worlds/{world}/loot/{tableName}.qlt", data);
     }
     public static int ParseItemEnumOrInt(string input, int offset = 0)
     {
