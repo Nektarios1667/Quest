@@ -2,6 +2,13 @@
 
 namespace Quest.Gui;
 
+public enum DialogRespeak
+{
+    Never,
+    Auto,
+    Instant,
+    Always,
+}
 public class Dialog : Widget
 {
     public bool HasSpoken => Displayed == Text;
@@ -17,7 +24,7 @@ public class Dialog : Widget
     public SpriteFont Font { get; set; }
     public Color Foreground { get; set; }
     public Vector2 Inside { get; set; }
-    public const float CharDelay = .05f;
+    public const float CharDelay = .03f;
     public float charWait { get; set; } = 0;
     // Private
     public Dialog(Gui gui, Point location, Vector2 dimensions, Color color, Color foreground, string text, SpriteFont font, int border = 6, Color? borderColor = null) : base(location)
@@ -63,12 +70,17 @@ public class Dialog : Widget
         // Outline
         batch.DrawRectangle(Rect, BorderColor, Border);
     }
-    public void SetText(string text, bool respeak = false)
+    public void SetText(string text, DialogRespeak respeak = DialogRespeak.Auto)
     {
-        if (Text != text || respeak)
+        if (respeak == DialogRespeak.Always || (Text != text && respeak == DialogRespeak.Auto))
         {
             Text = text;
             Displayed = "";
+        }
+        if (respeak == DialogRespeak.Instant)
+        {
+            Text = text;
+            Displayed = text;
         }
     }
     public static string SoftwrapWords(string text, SpriteFont font, Xna.Vector2 dimensions)
@@ -108,7 +120,7 @@ public class Dialog : Widget
     public static string LimitLines(string text, SpriteFont font, float height)
     {
         // Height
-        float lineHeight = font.MeasureString("|").Y;
+        float lineHeight = font.LineSpacing;
 
         int maxLines = (int)(height / lineHeight);
         if (text.Split('\n').Length <= maxLines) return text;

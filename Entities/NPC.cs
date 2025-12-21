@@ -1,15 +1,34 @@
 ﻿using Quest.Gui;
+using System.Linq;
 
 namespace Quest.Entities;
 
-public struct ShopOption(Item item, Item? cost)
+public class ShopOption
 {
-    public Item Item = item;
-    public Item? Cost = cost;
+    public Item Item;
+    public Item? Cost;
+    public int Stock;
+
+    public ShopOption(Item item, Item? cost, int stock)
+    {
+        Item = item;
+        Cost = cost;
+        Stock = stock;
+    }
+
+    public bool Buy(Inventory inventory)
+    {
+        if (Cost == null || inventory.Consume(Cost))
+            inventory.AddItem(Item);
+        else
+            return false;
+        return true;
+    }
 }
 
 public class NPC
 {
+    public static readonly NPC Null = new(null!, TextureID.Null, Point.Zero, "NUL_NAME", "NUL_DIALOG");
     public static Dialog? DialogBox { get; set; }
     public static List<(NPC npc, float dist)> NPCsNearby { get; set; } = [];
     public List<ShopOption> ShopOptions { get; private set; } = [];
@@ -36,9 +55,10 @@ public class NPC
         Dialog = dialog;
         TextureColor = textureColor == default ? Color.White : textureColor;
         Scale = scale;
-        AddShopOption(new(ItemTypes.SteelSword, 1), new(ItemTypes.DeltaCoin, 3));
-        AddShopOption(new(ItemTypes.SteelSword, 1), new(ItemTypes.PhiCoin, 7));
-        AddShopOption(new(ItemTypes.Lantern, 1), new(ItemTypes.PhiCoin, 4));
+        AddShopOption(new(ItemTypes.SteelSword, 1), new(ItemTypes.DeltaCoin, 3), 1);
+        AddShopOption(new(ItemTypes.SteelSword, 1), new(ItemTypes.PhiCoin, 7), 1);
+        AddShopOption(new(ItemTypes.Lantern, 1), new(ItemTypes.PhiCoin, 4), 2);
+        AddShopOption(new(ItemTypes.Lantern, 1), null, 4);
     }
     public void Draw(GameManager gameManager)
     {
@@ -60,31 +80,60 @@ public class NPC
     }
     public void AddShopOption(ShopOption option)
     {
+        if (ShopOptions.Count >= 5)
+        {
+            Logger.Warning($"NPC '{Name}' reached max shop options of 5");
+            return;
+        }
         ShopOptions.Add(option);
     }
-    public void AddShopOption(Item bought, Item? cost)
+    public void AddShopOption(Item bought, Item? cost, int stock)
     {
-        ShopOptions.Add(new(bought, cost));
+        AddShopOption(new(bought, cost, stock));
     }
     public string GetFullDialog()
     {
         // Name and dialog
-        string dialog = $"[{Name}] {Dialog}";
+        string dialog = $"[{Name}] {Dialog}-------------------------------------------------------";
         
         // Shop
-        if (ShopOptions.Count > 0)
-            dialog += "\nSHOP:";
         int o = 1;
         foreach (var option in ShopOptions)
         {
             dialog += $"\n{o}] {option.Item.Name} ({option.Item.Amount}) : ";
             if (option.Cost == null)
-                dialog += "FREE";
+                dialog += $"FREE | Stock: {option.Stock}";
             else
-                dialog += $"{option.Cost.Name} ({option.Cost.Amount})";
+                dialog += $"{option.Cost.Name} ({option.Cost.Amount}) | Stock: {option.Stock}";
             o++;
         }
 
         return dialog;
+    }
+    public bool Buy(ShopOption option, Inventory inv, GameManager gameManager)
+    {
+        // Check
+        if (!ShopOptions.Contains(option)) return false;
+
+        // Buy
+        if ((option.Cost == null || inv.Consume(option.Cost)) && option.Stock > 0)
+        {
+            (bool success, Item leftover) = inv.AddItem(option.Item);
+            if (!success)
+                gameManager.LevelManager.Level.Loot.Add(new(leftover.Name, leftover.Amount, Location, gameManager.GameTime));
+            if (leftover.Amount < option.Item.Amount)
+                SoundManager.PlaySound("Trinkets");
+            option.Stock -= 1;
+        }
+
+        // Quickly rewrite dialog
+        DialogBox!.SetText(GetFullDialog(), respeak: DialogRespeak.Instant);
+
+        return true;
+    }
+    public bool Buy(int option, Inventory inv, GameManager gameManager)
+    {
+        if (option >= ShopOptions.Count) return false;
+        return Buy(ShopOptions[option], inv, gameManager);
     }
 }

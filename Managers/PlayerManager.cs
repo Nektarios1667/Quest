@@ -1,4 +1,7 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.VisualBasic.Logging;
+using Quest.Gui;
+using SharpDX.Direct3D11;
+using System.ComponentModel;
 
 namespace Quest.Managers;
 
@@ -96,11 +99,54 @@ public class PlayerManager : IContainer
             OpenedContainer?.Inventory?.Update(gameManager, this);
         DebugManager.EndBenchmark("InventoryUpdate");
 
+        // NPC
+        UpdateNPCInteractions(gameManager);
+
         // Player lighting
         if (Inventory.Equipped is Light light)
             LightingManager.SetLight("PlayerLightItem", CameraManager.PlayerFoot - CameraManager.Camera.ToPoint() + Constants.Middle, light.LightStrength, light.LightColor);
         else
             LightingManager.RemoveLight("PlayerLightItem");
+    }
+    public void UpdateNPCInteractions(GameManager gameManager)
+    {
+        // Process NPC dialogs
+        if (NPC.DialogBox == null)
+        {
+            NPC.DialogBox = new Dialog(gameManager.UIManager.Gui, new(Constants.Middle.X - 600, Constants.NativeResolution.Y - 300), new(1200, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false };
+            gameManager.UIManager.Gui.Widgets.Add(NPC.DialogBox);
+        }
+        (NPC npc, float dist) interacting = new(NPC.Null, float.MaxValue);
+        if (NPC.NPCsNearby.Count > 0)
+        {
+            interacting = NPC.NPCsNearby[0];
+            for (int n = 1; n < NPC.NPCsNearby.Count; n++)
+            {
+                if (NPC.NPCsNearby[n].dist < interacting.dist)
+                    interacting = NPC.NPCsNearby[n];
+            }
+            // Same NPC
+            string text = NPC.DialogBox.Text;
+            if (text.Contains(']') && text[1..text.IndexOf(']')] == interacting.npc.Name)
+                NPC.DialogBox.SetText(interacting.npc.GetFullDialog(), respeak: DialogRespeak.Auto);
+            else
+                NPC.DialogBox.SetText(interacting.npc.GetFullDialog(), respeak: DialogRespeak.Always);
+            NPC.DialogBox.IsVisible = true;
+        }
+        else
+            NPC.DialogBox.IsVisible = false;
+
+        // Shop
+        if (NPC.NPCsNearby.Count > 0)
+        {
+            if (InputManager.KeyPressed(Keys.D1)) interacting.npc.Buy(0, Inventory, gameManager);
+            if (InputManager.KeyPressed(Keys.D2)) interacting.npc.Buy(1, Inventory, gameManager);
+            if (InputManager.KeyPressed(Keys.D3)) interacting.npc.Buy(2, Inventory, gameManager);
+            if (InputManager.KeyPressed(Keys.D4)) interacting.npc.Buy(3, Inventory, gameManager);
+            if (InputManager.KeyPressed(Keys.D5)) interacting.npc.Buy(4, Inventory, gameManager);
+        }
+
+        NPC.NPCsNearby.Clear();
     }
     public void CheckForLoot(GameManager gameManager)
     {

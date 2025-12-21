@@ -414,6 +414,8 @@ public static class TextureManager
 
         // Fonts
         PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");
+        PixelOperator.LineSpacing -= 8;
+        PixelOperator.Spacing = -2;
         PixelOperatorLarge = Content.Load<SpriteFont>("Fonts/PixelOperatorLarge");
         PixelOperatorBold = Content.Load<SpriteFont>("Fonts/PixelOperatorBold");
         PixelOperatorTitle = Content.Load<SpriteFont>("Fonts/PixelOperatorTitle");

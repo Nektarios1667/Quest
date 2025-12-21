@@ -62,27 +62,6 @@ public class OverlayManager
         if (StateManager.State == GameState.Game)
             DrawLighting(gameManager);
 
-        // Process NPC dialogs
-        if (NPC.DialogBox == null)
-        {
-            NPC.DialogBox = new Gui.Dialog(gameManager.UIManager.Gui, new(Constants.Middle.X - 600, Constants.NativeResolution.Y - 300), new(1200, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false };
-            gameManager.UIManager.Gui.Widgets.Add(NPC.DialogBox);
-        }
-        if (NPC.NPCsNearby.Count > 0)
-        {
-            var current = NPC.NPCsNearby[0];
-            for (int n = 1; n < NPC.NPCsNearby.Count; n++)
-            {
-                if (NPC.NPCsNearby[n].dist < current.dist)
-                    current = NPC.NPCsNearby[n];
-            }
-
-            NPC.DialogBox.SetText(current.npc.GetFullDialog(), respeak:false);
-            NPC.DialogBox.IsVisible = true;
-        } else
-            NPC.DialogBox.IsVisible = false;
-        NPC.NPCsNearby.Clear();
-
         // Widgets
         LootNotifications.Offset = (CameraManager.CameraDest - CameraManager.Camera).ToPoint();
         Gui.Draw(gameManager.Batch);
