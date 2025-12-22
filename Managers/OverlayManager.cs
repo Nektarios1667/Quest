@@ -73,7 +73,7 @@ public class OverlayManager
         DebugManager.StartBenchmark("InventoryGuiDraw");
         if (playerManager != null)
         {
-            playerManager.OpenedContainer?.Inventory?.Draw(gameManager, playerManager);
+            playerManager.ContainerInventory.Draw(gameManager, playerManager);
             playerManager.Inventory.Draw(gameManager, playerManager);
         }
         DebugManager.EndBenchmark("InventoryGuiDraw");

@@ -1,5 +1,4 @@
 ﻿using Quest.Gui;
-using System.Reflection.Metadata.Ecma335;
 namespace Quest.Managers;
 
 public class Attack(int damage, RectangleF hitbox)
@@ -7,12 +6,13 @@ public class Attack(int damage, RectangleF hitbox)
     public int Damage { get; } = damage;
     public RectangleF Hitbox { get; } = hitbox;
 }
-public class PlayerManager : IContainer
+public class PlayerManager
 {
-    public int SelectedSlot { get; set; }
-    public Inventory? SelectedInventory { get; set; }
     public Inventory Inventory { get; }
-    public IContainer? OpenedContainer { get; private set; }
+    public Inventory ContainerInventory { get; }
+    public IContainer? OpenedContainer { get; set; } = null;
+    public int SelectedSlot { get; set; }
+    public Inventory SelectedInventory { get; set; }
     public Tile? TileBelow { get; private set; }
     public List<Tile> TileBumps { get; private set; } = [];
     public Direction PlayerDirection { get; private set; }
@@ -21,6 +21,9 @@ public class PlayerManager : IContainer
     public PlayerManager()
     {
         Inventory = new(6, 4, isPlayer: true);
+        ContainerInventory = new(Chest.Size.X, Chest.Size.Y, isPlayer: false);
+        SelectedInventory = Inventory;
+
         Inventory.SetSlot(0, new DiamondSword(1));
         Inventory.SetSlot(1, new Lantern(1));
         Inventory.SetSlot(2, new Pickaxe(1));
@@ -49,13 +52,11 @@ public class PlayerManager : IContainer
         // Toggle inventory
         if (InputManager.KeyPressed(Keys.I))
         {
-            if (OpenedContainer != null) CloseContainer();
-            else OpenContainer(this);
+            if (Inventory.Opened) CloseContainer();
+            else OpenInventory();
         }
         if (InputManager.KeyPressed(Keys.Escape))
-        {
-            if (OpenedContainer != null) CloseContainer();
-        }
+            CloseContainer();
 
         // Loot
         DebugManager.StartBenchmark("UpdateLoot");
@@ -63,7 +64,7 @@ public class PlayerManager : IContainer
         DebugManager.EndBenchmark("UpdateLoot");
 
         // Movement
-        if (OpenedContainer == null)
+        if (!Inventory.Opened)
         {
             // Movement
             DebugManager.StartBenchmark("UpdateMovement");
@@ -92,8 +93,7 @@ public class PlayerManager : IContainer
         // Inventory
         DebugManager.StartBenchmark("InventoryUpdate");
         Inventory.Update(gameManager, this);
-        if (OpenedContainer != this)
-            OpenedContainer?.Inventory?.Update(gameManager, this);
+        ContainerInventory.Update(gameManager, this);
         DebugManager.EndBenchmark("InventoryUpdate");
 
         // NPC
@@ -157,14 +157,14 @@ public class PlayerManager : IContainer
             if (PointTools.DistanceSquared(CameraManager.PlayerFoot, loot.Location + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
             {
                 gameManager.UIManager.LootNotifications.AddNotification($"+{loot.DisplayName}");
-                (bool success, Item leftover) = Inventory.AddItem(Item.ItemFromName(loot.Item, loot.Amount));
+                (bool success, Item leftover) = Inventory.AddItem(new(loot.Item.Type, loot.Item.Amount));
                 if (success)
                 {
                     loot.Dispose();
                     gameManager.LevelManager.Level.Loot.Remove(loot);
                 }
-                else if (leftover.Amount < loot.Amount)
-                    loot.Amount = leftover.Amount;
+                else if (leftover.Amount < loot.Item.Amount)
+                    loot.Item.Amount = leftover.Amount;
                 else
                     continue;
                 // 
@@ -289,25 +289,44 @@ public class PlayerManager : IContainer
             }
         }
     }
+    public void CommitContainerChanges(IContainer container)
+    {
+        if (container.Items == null) return;
+        for (int x = 0; x < ContainerInventory.Width; x++)
+            for (int y = 0; y < ContainerInventory.Height; y++)
+                container.Items[x, y] = ContainerInventory.Items[x, y];
+    }
+    public void OpenInventory()
+    {
+        Inventory.Opened = true;
+        StateManager.OverlayState = OverlayState.Container;
+        SoundManager.PlaySound("Click");
+    }
 
     public void OpenContainer(IContainer container)
     {
+        if (container.Items == null) return;
+
         Inventory.Opened = true;
+
         OpenedContainer = container;
-        if (container.Inventory != null)
-            container.Inventory.Opened = true;
+        ContainerInventory.SetItems(container.Items);
+        ContainerInventory.Opened = true;
+
         StateManager.OverlayState = OverlayState.Container;
         SoundManager.PlaySound("Click");
     }
     public void CloseContainer()
     {
-        if (OpenedContainer != null || Inventory.Opened)
+        if (Inventory.Opened)
             SoundManager.PlaySound("Click");
 
-        if (OpenedContainer != null && OpenedContainer.Inventory != null)
-            OpenedContainer.Inventory.Opened = false;
-        Inventory.Opened = false;
+        if (OpenedContainer != null)
+            CommitContainerChanges(OpenedContainer);
         OpenedContainer = null;
+        ContainerInventory.SetItems(null);
+        ContainerInventory.Opened = false;
+        Inventory.Opened = false;
         StateManager.OverlayState = OverlayState.None;
     }
     public void UpdatePositions(GameManager gameManager)

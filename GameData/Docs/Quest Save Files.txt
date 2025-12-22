@@ -10,31 +10,30 @@ float - cameraY
 byte - health
 byte - maxHealth
 
-byte - lootCount
-[for each loot (<256)]
-	byte - lootItemID
-	byte - lootAmount
-	uint16 - lootX
-	uint16 - lootY
+byte - levels count
+[foreach level]
+	string - level
 
-uint16 - chestsCount
-[for each chest (<65536)]
-	uint16 - tileID
-	bool/byte - isGenerated
-	[if isGenerated]
-		[for each slot (18) l->r u->d]
-			byte - itemId - nothing = 0
-			[if not nothing]
-				byte - itemAmount
-	[else]
-		int32 - seed
-		string - lootGeneratorFileName
+	byte - lootCount
+	[foreach loot]
+		byte - ID
+		byte - amount
+		ushort - X
+		ushort - Y
+	
+	ushort - doorCount
+	[foreach door]
+		ushort - ID
+	
+	ushort - chestCount
+	[foreach chest]
+		ushort - ID
+		bool - generated
+		[if generated]
+			WriteItemData...
+		[else]
+			int - seed
+			string - generator
 
-uint16 - openedDoorsCount
-[for each opened door (<65536)]
-	uint16 - doorTileIndex
-
-[for each inventory slot (24)]
-	byte - itemId - nothing = 0
-	[if not nothing]
-		byte - itemAmount
+[repeat 24]
+	WriteItemData...

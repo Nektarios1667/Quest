@@ -1,5 +1,9 @@
-﻿using System.IO;
+﻿using Quest.Tiles;
+using Quest.Utilities;
+using ScottPlot.Colormaps;
+using System.IO;
 using System.Linq;
+using System.Net.Http.Json;
 
 namespace Quest.Managers;
 [Flags]
@@ -61,8 +65,8 @@ public static class StateManager
     public static Mood Mood { get; set; } = Mood.Calm;
     public static LevelPath CurrentSave { get; set; } = new();
     // Save State changes
-    private static readonly HashSet<int> openedDoors = [];
-    private static readonly HashSet<(Chest Chest, string Level)> chests = [];
+    private static readonly Dictionary<string, HashSet<ushort>> openedDoors = [];
+    private static readonly Dictionary<string, HashSet<Chest>> chests = [];
     static StateManager()
     {
         WeatherNoise.SetSeed(WeatherSeed);
@@ -106,13 +110,19 @@ public static class StateManager
     }
     public static float NoiseToIntensity(float noise) => Math.Min((float)Math.Sqrt(Math.Max(noise - weatherThreshold, 0) / (1 - weatherThreshold)), 0.8f);
     public static float WeatherIntensity(float time) => NoiseToIntensity(WeatherNoiseValue(time));
-    public static void SaveDoorOpened(int idx)
+    public static void SaveDoorOpened(ushort idx, string level)
     {
-        openedDoors.Add(idx);
+        if (openedDoors.TryGetValue(level, out var levelDoors))
+            levelDoors.Add(idx);
+        else
+            openedDoors[level] = [idx];
     }
     public static void SaveChestGenerator(Chest chest, string level)
     {
-        chests.Add((chest, level));
+        if (chests.TryGetValue(level, out var levelChests))
+            levelChests.Add(chest);
+        else
+            chests[level] = [chest];
     }
     public static void SaveGameState(GameManager gameManager, PlayerManager playerManager)
     {
@@ -135,49 +145,48 @@ public static class StateManager
             // Write PlayerManager data
             writer.Write((byte)gameManager.UIManager.HealthBar.CurrentValue);
             writer.Write((byte)gameManager.UIManager.HealthBar.MaxValue);
-            // Write LevelManager data
-            // Loot
-            Level[] levels = [.. gameManager.LevelManager.Levels.Where(l => l.World == worldName && l.Loot.Count > 0)];
-            writer.Write((ushort)levels.Length);
-            foreach (Level level in levels)
+            // Level specific data
+            // All of the levels with extra data
+            string[] levels = new[] {
+                chests.Keys,
+                openedDoors.Keys,
+                gameManager.LevelManager.Levels.Where(l => l.World == worldName && l.Loot.Count > 0).Select(l => l.LevelName)
+            }.SelectMany(x => x).Distinct().Take(255).ToArray();
+
+            writer.Write((byte)levels.Length);
+            foreach (string level in levels)
             {
-                writer.Write(level.LevelName);
-                writer.Write((byte)level.Loot.Count);
-                foreach (var loot in level.Loot)
+                writer.Write(level);
+                Level levelObj = gameManager.LevelManager.GetLevel($"{worldName}/{level}");
+                // Loot
+                writer.Write((byte)levelObj.Loot.Count);
+                foreach (var loot in levelObj.Loot)
                 {
-                    writer.Write((byte)((byte)Enum.Parse(typeof(ItemTypeID), loot.Item, true) + 1));
-                    writer.Write(loot.Amount);
+                    writer.Write((byte)((byte)loot.Item.Type.TypeID + 1));
+                    writer.Write(loot.Item.Amount);
                     writer.Write((ushort)loot.Location.X);
                     writer.Write((ushort)loot.Location.Y);
                 }
-            }
-            ;
-
-            // Chests
-            writer.Write((ushort)chests.Count);
-            writer.Write((byte)Chest.ChestSize.X);
-            writer.Write((byte)Chest.ChestSize.Y);
-            foreach (var chest in chests)
-            {
-                writer.Write(chest.Level); // Chest level
-                writer.Write(chest.Chest.TileID); // TileID
-                writer.Write(chest.Chest.Generated); // IsGenerated
-                if (chest.Chest.Generated)
-                    for (int y = 0; y < chest.Chest.Inventory!.Items.GetLength(1); y++)
-                        for (int x = 0; x < chest.Chest.Inventory!.Items.GetLength(0); x++)
-                            WriteItemData(writer, chest.Chest.Inventory.Items[x, y]);
-                else
+                // Doors
+                if (openedDoors.TryGetValue(level, out var levelDoors))
                 {
-                    writer.Write(chest.Chest.Seed);
-                    writer.Write(chest.Chest.LootGenerator.FileName.Split('\\', '/')[^1]);
+                    writer.Write((ushort)levelDoors.Count);
+                    foreach (ushort door in levelDoors)
+                        writer.Write(door);
                 }
+                else
+                    writer.Write((ushort)0);
+                if (chests.TryGetValue(level, out var levelChests))
+                {
+                    // Chests
+                    writer.Write((ushort)levelChests.Count);
+                    foreach (Chest chest in levelChests)
+                        WriteChestData(writer, chest);
+                }
+                else
+                    writer.Write((ushort)0);
             }
-            // Doors
-            writer.Write((ushort)openedDoors.Count);
-            foreach (var idx in openedDoors)
-            {
-                writer.Write((ushort)idx);
-            }
+
             // Write Inventory data
             var inventory = playerManager.Inventory;
             for (int y = 0; y < inventory.Items.GetLength(1); y++)
@@ -216,7 +225,6 @@ public static class StateManager
         {
             // Read GameManager data
             string level = reader.ReadString();
-            gameManager.LevelManager.ReadLevel(gameManager.UIManager, level, reload: true);
             gameManager.LevelManager.LoadLevel(gameManager, level);
 
             gameManager.DayTime = reader.ReadSingle();
@@ -232,76 +240,41 @@ public static class StateManager
             gameManager.UIManager.HealthBar.CurrentValue = reader.ReadByte();
             gameManager.UIManager.HealthBar.MaxValue = reader.ReadByte();
             // Read LevelManager data
-            // Loot
-            ushort levelCount = reader.ReadUInt16();
+            // Levels
+            byte levelCount = reader.ReadByte();
             for (int lc = 0; lc < levelCount; lc++)
             {
                 string lvl = $"{levelPath.WorldName}/{reader.ReadString()}";
                 Level current = gameManager.LevelManager.GetLevel(lvl);
+                // Loot
                 byte lootCount = reader.ReadByte();
                 for (int l = 0; l < lootCount; l++)
                 {
-                    string name = ((ItemTypeID)reader.ReadByte() - 1).ToString();
+                    byte typeID = (byte)(reader.ReadByte() - 1);
                     byte amount = reader.ReadByte();
                     Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
-                    current.Loot.Add(new Loot(name, amount, location, 0f));
+                    current.Loot.Add(new Loot(new(ItemTypes.All[typeID], amount), location, 0f));
                 }
+                // Doors
+                ushort doorsCount = reader.ReadUInt16();
+                for (int d = 0; d < doorsCount; d++)
+                    if (current.Tiles[reader.ReadUInt16()] is Door door)
+                        door.Open(gameManager);
+                // Chests
+                ushort chestCount = reader.ReadUInt16();
+                for (int c = 0; c < chestCount; c++)
+                    ReadChestData(reader, current, levelPath);
             }
 
-            // Chests
-            ushort chestCount = reader.ReadUInt16();
-            byte chestWidth = reader.ReadByte();
-            byte chestHeight = reader.ReadByte();
-            for (int c = 0; c < chestCount; c++)
-            {
-                string lvl = reader.ReadString(); // Chest level
-                int idx = reader.ReadUInt16(); // TileID
-                bool isGenerated = reader.ReadBoolean(); // IsGenerated
-                Level current = gameManager.LevelManager.GetLevel($"{levelPath.WorldName}/{lvl}");
-                if (idx >= 0 && idx <= Constants.MapSize.X * Constants.MapSize.Y && current.Tiles[idx] is Chest chest)
-                {
-                    if (isGenerated)
-                    {
-                        chest.SetEmpty();
-                        for (int s = 0; s < chestWidth * chestHeight; s++)
-                            chest.Inventory!.SetSlot(s, ReadItemData(reader));
-                    }
-                    else
-                    {
-                        chest.SetSeed(reader.ReadInt32());
-                        chest.RegenerateLoot(LootGeneratorHelper.Read(levelPath.WorldName, reader.ReadString()));
-                    }
-                }
-                else
-                {
-                    Logger.Error($"Tile at index {idx} is not a chest.");
 
-                    // Chew up next bytes
-                    if (isGenerated)
-                        for (int s = 0; s < chestWidth * chestHeight; s++)
-                            ReadItemData(reader);
-                    else
-                    {
-                        reader.ReadInt32();
-                        reader.ReadString();
-                    }
-                }
-            }
-            // Doors
-            ushort doorCount = reader.ReadUInt16();
-            for (int d = 0; d < doorCount; d++)
-            {
-                int idx = reader.ReadUInt16();
-                if (gameManager.LevelManager.Level.Tiles[idx] is Door door)
-                    door.Open();
-                else
-                    Logger.Error($"Tile at index {idx} is not a door.");
-            }
             // Read Inventory data
-            for (int s = 0; s < 24; s++)
+            for (int y = 0; y < playerManager.Inventory.Items.GetLength(1); y++)
             {
-                var item = ReadItemData(reader);
-                playerManager.Inventory.SetSlot(s, item);
+                for (int x = 0; x < playerManager.Inventory.Items.GetLength(0); x++)
+                {
+                    var item = ReadItemData(reader);
+                    playerManager.Inventory.SetSlot(x, y, item);
+                }
             }
         }
 
@@ -313,6 +286,53 @@ public static class StateManager
     {
         openedDoors.Clear();
         chests.Clear();
+    }
+    public static void WriteChestData(BinaryWriter writer, Chest chest)
+    {
+        writer.Write(chest.TileID); // TileID - ushort
+        writer.Write(chest.Generated); // IsGenerated - bool
+        if (chest.Generated)
+            for (int y = 0; y < chest.Items!.GetLength(1); y++)
+                for (int x = 0; x < chest.Items!.GetLength(0); x++)
+                    WriteItemData(writer, chest.Items![x, y]);
+        else
+        {
+            writer.Write(chest.Seed); // int (4 bytes)
+            writer.Write(chest.LootGenerator.FileName.Split('\\', '/')[^1]);
+        }
+    }
+    public static void ReadChestData(BinaryReader reader, Level current, LevelPath levelPath)
+    {
+        int idx = reader.ReadUInt16(); // TileID
+        bool isGenerated = reader.ReadBoolean(); // IsGenerated
+        if (idx >= 0 && idx <= Constants.MapSize.X * Constants.MapSize.Y && current.Tiles[idx] is Chest chest)
+        {
+            if (isGenerated)
+            {
+                chest.SetEmpty();
+                for (int s = 0; s < Chest.Size.X * Chest.Size.Y; s++)
+                    chest.Items![s % Chest.Size.X, s / Chest.Size.X] = ReadItemData(reader);
+            }
+            else
+            {
+                chest.SetSeed(reader.ReadInt32());
+                chest.RegenerateLoot(LootGeneratorHelper.Read(levelPath.WorldName, reader.ReadString()));
+            }
+        }
+        else
+        {
+            Logger.Error($"Tile at index {idx} is not a chest.");
+
+            // Chew up next bytes
+            if (isGenerated)
+                for (int s = 0; s < Chest.Size.X * Chest.Size.Y; s++)
+                    ReadItemData(reader);
+            else
+            {
+                reader.ReadInt32();
+                reader.ReadString();
+            }
+        }
     }
     public static void WriteItemData(BinaryWriter writer, Item? item)
     {

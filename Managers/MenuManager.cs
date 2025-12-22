@@ -173,8 +173,8 @@ public class MenuManager
     private void LoadSaves(string level)
     {
         saves.Items.Clear();
-        string[] dir = level.Replace(" - ", "/").Split('\\', '/');
-        string path = $"GameData/Worlds/{dir[0]}/saves";
+        string path = $"GameData/Worlds/{level}/saves";
+        if (level == "") return;
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
         var savesList = Directory.GetFiles(path, "*.qsv").Select(f => System.IO.Path.GetFileNameWithoutExtension(f)).ToArray();
@@ -184,15 +184,14 @@ public class MenuManager
     private void OpenSave()
     {
         StateManager.State = GameState.Loading;
-        if (saves.Selected != "(New Save)")
-            _ = StateManager.ReadGameState(gameManager, playerManager, $"{worlds.Selected}/{saves.Selected}");
-        else
+        if (saves.Selected == "(New Save)")
         {
             StateManager.CurrentSave = new($"{worlds.Selected}/{DateTime.Now:Save MM-dd-yy HH-mm-ss}");
             gameManager.LevelManager.ReadWorld(gameManager.UIManager, worlds.Selected, reload: true);
             if (!gameManager.LevelManager.LoadLevel(gameManager, $"{worlds.Selected}/{worlds.Selected}"))
                 gameManager.LevelManager.LoadLevel(gameManager, 0);
-        }
+        } else 
+            StateManager.ReadGameState(gameManager, playerManager, $"{worlds.Selected}/{saves.Selected}");
 
         StateManager.State = GameState.Game;
     }

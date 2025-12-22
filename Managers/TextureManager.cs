@@ -136,14 +136,14 @@ public static class TextureManager
         Slash,
         // EFFECTS ENUM INSERT
     }
-    private static readonly float autoDepth = 0.0f;
     private static readonly List<string> errors = [];
     public static Dictionary<TextureID, Texture2D> Textures { get; private set; } = [];
     public static Dictionary<TextureID, Metadata> Metadata { get; private set; } = [];
-    public static TextureID[] CharacterTextures = [];
+    public static TextureID[] CharacterTextures { get; private set; } = [];
     private static Texture2D Pixel { get; set; } = null!;
     // Fonts
     public static SpriteFont PixelOperator { get; private set; } = null!;
+    public static Point PixelOperatorCharSize { get; private set; }
     public static SpriteFont PixelOperatorLarge { get; private set; } = null!;
     public static SpriteFont PixelOperatorBold { get; private set; } = null!;
     public static SpriteFont PixelOperatorTitle { get; private set; } = null!;
@@ -425,6 +425,7 @@ public static class TextureManager
         PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");
         PixelOperator.LineSpacing -= 8;
         PixelOperator.Spacing = -2;
+        PixelOperatorCharSize = PixelOperator.MeasureString("#").ToPoint();
         PixelOperatorLarge = Content.Load<SpriteFont>("Fonts/PixelOperatorLarge");
         PixelOperatorBold = Content.Load<SpriteFont>("Fonts/PixelOperatorBold");
         PixelOperatorTitle = Content.Load<SpriteFont>("Fonts/PixelOperatorTitle");

@@ -1,3 +1,6 @@
+using System;
+using System.ComponentModel.Design;
+
 namespace Quest.Items;
 public enum ItemTypeID : byte
 {
@@ -117,16 +120,34 @@ public class ItemTypes
     // ITEMS
     ];
 }
-
-public class Item
+public class ItemRef
 {
+    public byte Amount { get; set; }
+    public ItemType Type { get; }
     public string Name => Type.Name;
     public string Description => Type.Description;
-    public byte Amount { get; set; }
     public byte MaxAmount => Type.MaxAmount;
     public TextureID Texture => Type.Texture;
+    public ItemRef(ItemType type, byte amount)
+    {
+        Type = type;
+        Amount = amount;
+    }
+    public ItemRef(ItemType type, int amount)
+    {
+        Type = type;
+        Amount = (byte)amount;
+    }
+}
+public class Item
+{
+    public byte Amount { get; set; }
     public ItemType Type { get; protected set; }
     public ushort UID { get; protected set; }
+    public string Name => Type.Name;
+    public string Description => Type.Description;
+    public byte MaxAmount => Type.MaxAmount;
+    public TextureID Texture => Type.Texture;
     public Item(ItemType itemType, int amount)
     {
         Type = itemType;
@@ -138,21 +159,16 @@ public class Item
 
     public static Item ItemFromName(string name, int amount)
     {
-        string fullTypeName = $"Quest.Items.{name}";
-        var type = System.Type.GetType(fullTypeName);
+        if (!Enum.TryParse<ItemTypeID>(name, out var typeID))
+            throw new ArgumentException($"Item {name} does not exist");
 
-        if (type == null || !typeof(Item).IsAssignableFrom(type))
-        {
-            Logger.Error($"Invalid ItemFromName name '{name}'");
-            return new Item(ItemTypes.Skull, 0);
-        }
-
-        var created = (Item?)Activator.CreateInstance(type, amount);
-        return created ?? throw new InvalidOperationException($"Failed to create item '{name}'");
+        ItemType type = ItemTypes.All[(byte)typeID];
+        return new(type, amount);
     }
     public static Item ItemFromItemType(ItemTypeID itemType, int amount)
     {
-        return ItemFromName(itemType.ToString(), amount);
+        ItemType type = ItemTypes.All[(byte)itemType];
+        return new(type, amount);
     }
     public Item ShallowCopy()
     {

@@ -2,18 +2,16 @@
 public struct Loot
 {
     public ushort UID { get; } = UIDManager.Get(UIDCategory.Loot);
-    public readonly string DisplayName => $"{Amount} {StringTools.FillCamelSpaces(Item)}";
-    public string Item { get; private set; }
-    public byte Amount { get; set; }
+    public ItemRef Item { get; }
     public Point Location { get; set; }
-    public TextureID Texture { get; private set; }
     public float Birth { get; private set; }
-    public Loot(string item, byte amount, Point location, float time)
+    // Generated
+    public readonly TextureID Texture => Item.Texture;
+    public readonly string DisplayName => $"{Item.Amount} {StringTools.FillCamelSpaces(Item.Name)}";
+    public Loot(ItemRef item, Point location, float time)
     {
         Item = item;
-        Amount = amount;
         Location = location;
-        Texture = ParseTextureString(item);
         Birth = time;
     }
     public readonly void Dispose()

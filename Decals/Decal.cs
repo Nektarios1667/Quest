@@ -38,12 +38,12 @@ public class Decal
         tileType => Enum.TryParse<TextureID>(tileType.ToString(), out var texture) ? texture : TextureID.Null
     );
     // Auto generated - no setter
-    public TextureID Texture { get; }
     public ByteCoord Location { get; }
+    public TextureID Texture { get; }
+    public DecalType Type { get; protected set; }
+    // Generated properties
     public byte X => Location.X;
     public byte Y => Location.Y;
-    // Properties - protected setter
-    public DecalType Type { get; protected set; }
     public ushort UID => (ushort)(Y * Constants.MapSize.X + X);
     public Decal(Point location)
     {

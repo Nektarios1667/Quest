@@ -316,7 +316,7 @@ public static class CommandManager
         if (item == null) return false;
         (bool success, Item leftover) = playerManager!.Inventory.AddItem(item);
         if (!success)
-            levelManager!.Level.Loot.Add(new(itemName, leftover.Amount, CameraManager.PlayerFoot, gameManager!.GameTime));
+            levelManager!.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), CameraManager.PlayerFoot, gameManager!.GameTime));
         return true;
     }
 }

@@ -3,7 +3,7 @@
 
 public interface IContainer
 {
-    Inventory? Inventory { get; }
+    Item?[,]? Items { get; }
 }
 
 public class Inventory
@@ -12,7 +12,7 @@ public class Inventory
     public event Action<int>? EquippedSlotChanged;
     public event Action<Item>? ItemDropped;
     // Properties
-    public Item?[,] Items { get; }
+    public Item?[,] Items { get; private set; }
     public bool Opened { get; set; } = false;
     private int _equippedSlot;
     public int EquippedSlot
@@ -20,12 +20,13 @@ public class Inventory
         get => _equippedSlot;
         set { _equippedSlot = value; EquippedSlotChanged?.Invoke(value); }
     }
-    public Item? Equipped => Items.Length > 0 ? Items[EquippedSlot, 0] : null;
     private int HoverSlot;
     public byte Width { get; }
     public byte Height { get; }
     public readonly bool IsPlayer;
     private readonly Rectangle[,] slotHitboxes;
+    // Generated properties
+    public Item? Equipped => Items.Length > 0 ? Items[EquippedSlot, 0] : null;
     // Consts/statics
     private static readonly Point itemOffset = new(14, 14);
     private const float itemScale = 3;
@@ -85,7 +86,7 @@ public class Inventory
 
                 // Amount text
                 if (item.Amount <= 1) continue; // Don't draw amount text for single items
-                Vector2 textDest = itemDest + slotSize.ToVector2() - new Vector2(PixelOperator.MeasureString($"{item.Amount}").X + 6, 36);
+                Vector2 textDest = itemDest + slotSize.ToVector2() - new Vector2(PixelOperatorCharSize.X * item.Amount.ToString().Length + 6, 36);
                 gameManager.Batch.DrawString(PixelOperatorBold, $"{item.Amount}", textDest, Color.White);
             }
         }
@@ -177,7 +178,7 @@ public class Inventory
             Item? item = GetItem(HoverSlot);
             if (item != null)
             {
-                gameManager.LevelManager.DropLoot(gameManager, new Loot(item.Name, item.Amount, CameraManager.PlayerFoot, gameManager.GameTime));
+                gameManager.LevelManager.DropLoot(gameManager, new Loot(new(item.Type, item.Amount), CameraManager.PlayerFoot, gameManager.GameTime));
                 item.Dispose();
                 ItemDropped?.Invoke(item);
             }
@@ -303,11 +304,21 @@ public class Inventory
     }
     public void SetSlot(int idx, Item? item)
     {
-        if (idx >= 0 && idx < Width * Height)
+        Point pos = Expand(idx);
+        SetSlot(pos.X, pos.Y, item);
+    }
+    public void SetItems(Item?[,]? items)
+    {
+        if (items == null)
         {
-            Point pos = Expand(idx);
-            SetSlot(pos.X, pos.Y, item);
+            Array.Clear(Items);
+            return;
         }
+
+        if (items.GetLength(0) != Width || items.GetLength(1) != Height)
+            throw new ArgumentException($"Expected {Width}x{Height} array got {items.GetLength(0)}x{items.GetLength(1)}");
+
+        Items = (Item?[,])items.Clone();
     }
     // Consume
     public void Consume(int idx)
@@ -320,6 +331,10 @@ public class Inventory
     {
         if (slot.X < 0 || slot.X >= Width || slot.Y < 0 || slot.Y >= Height) return; // Out of bounds
         Items[slot.X, slot.Y] = null; // Remove item from inventory
+    }
+    public bool Consume(ItemRef item)
+    {
+        return Consume(new Item(item.Type, item.Amount));
     }
     public bool Consume(Item item)
     {

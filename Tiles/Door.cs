@@ -1,12 +1,14 @@
+using Microsoft.Xna.Framework;
+
 namespace Quest.Tiles;
 
 public class Door : Tile
 {
-    public Item? Key { get; set; }
+    public ItemRef? Key { get; set; }
     public bool ConsumeKey { get; set; }
-    public bool IsOpened { get; set; }
+    public bool IsOpened { get; private set; }
     public override bool IsWalkable => Type.IsWalkable || IsOpened;
-    public Door(Point location, Item? key = null, bool consumeKey = true) : base(location, TileTypeID.Door)
+    public Door(Point location, ItemRef? key = null, bool consumeKey = true) : base(location, TileTypeID.Door)
     {
         Key = key;
         ConsumeKey = consumeKey;
@@ -25,11 +27,10 @@ public class Door : Tile
             if (Key != null && ConsumeKey)
             {
                 player.Inventory.Consume(Key);
-                game.UIManager.Notification($"-1 {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
+                game.UIManager.Notification($"-{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
                 SoundManager.PlaySoundInstance("DoorUnlock");
             }
-            IsOpened = true;
-            StateManager.SaveDoorOpened(TileID);
+            Open(game);
         }
         else
         {
@@ -45,12 +46,9 @@ public class Door : Tile
             }
         }
     }
-    public void Open()
+    public void Open(GameManager game)
     {
         IsOpened = true;
-    }
-    public void Close()
-    {
-        IsOpened = false;
+        StateManager.SaveDoorOpened(TileID, game.LevelManager.Level.LevelName);
     }
 }

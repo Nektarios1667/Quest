@@ -204,7 +204,7 @@ public class EditorManager
                 if (!PopupOpen) Logger.Error("Stair edit failed.");
                 return;
             }
-            door.Key = new(ItemTypes.All[(int)Enum.Parse(typeof(ItemTypeID), values[0])], int.Parse(values[1]));
+            door.Key = new(ItemTypes.All[(int)Enum.Parse(typeof(ItemTypeID), values[0])], byte.Parse(values[1]));
         }
         // Chest
         else if (tile is Chest chest)
@@ -450,9 +450,9 @@ public class EditorManager
             return;
         }
 
-        string name = values[0];
+        ItemType name = ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[0])];
         byte amount = byte.Parse(values[1]);
-        LevelManager.Level.Loot.Add(new Loot(name, amount, MouseSelection, GameManager.GameTime));
+        LevelManager.Level.Loot.Add(new Loot(new ItemRef(name, amount), MouseSelection, GameManager.GameTime));
     }
     public void DeleteLoot()
     {
@@ -541,12 +541,11 @@ public class EditorManager
     public void SaveLevel(string name)
     {
         // Parse
+        if (world.Contains('/') || world.Contains('\\'))
+            throw new Exception("world var has / or \\ which might be doing that dumb bug");
         if (world == "" || world == "NUL_WORLD")
         {
-            if (name.Contains('\\') || name.Contains('/'))
-                world = name.Split('\\', '/')[1];
-            else
-                world = "new_world";
+            world = "new_world";
             name = name.Split('\\', '/')[0]; // Remove world
         }
         else if (name.Contains('\\') || name.Contains('/'))
@@ -641,8 +640,8 @@ public class EditorManager
         {
             Loot loot = LevelManager.Level.Loot[n];
             // Write loot data
-            writer.Write(loot.Item);
-            writer.Write(LevelEditor.IntToByte(loot.Amount));
+            writer.Write(loot.Item.Name);
+            writer.Write(LevelEditor.IntToByte(loot.Item.Amount));
             writer.Write((ushort)loot.Location.X);
             writer.Write((ushort)loot.Location.Y);
         }

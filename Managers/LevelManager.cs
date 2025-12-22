@@ -33,6 +33,8 @@ public class LevelManager
         // Entities
         foreach (NPC npc in Level.NPCs) npc.Update(gameManager);
         foreach (Enemy enemy in Level.Enemies) enemy.Update(gameManager);
+        if (Level.Loot.Count > 255)
+            Level.Loot.RemoveRange(0, Level.Loot.Count - 255);
 
         // SkyTint
         UpdateSky(gameManager);
@@ -40,7 +42,7 @@ public class LevelManager
 
         // Dynamic lighting
         foreach (Loot loot in Level.Loot)
-            if (loot.Item == "Lantern")
+            if (loot.Item.Type == ItemTypes.Lantern)
             {
                 Point loc = loot.Location - CameraManager.Camera.ToPoint() + Constants.Middle + TextureManager.Metadata[loot.Texture].Size;
                 LightingManager.SetLight($"Loot_{loot.UID}", loc, 2, Color.Transparent);
@@ -125,9 +127,9 @@ public class LevelManager
             pos.Y += (int)(Math.Sin((gameManager.GameTime - loot.Birth) * 2 % (Math.PI * 2)) * 6); // Bob up and down
             DrawTexture(gameManager.Batch, loot.Texture, pos, scale: 2);
             // Draw stacks if multiple
-            if (loot.Amount > 1)
+            if (loot.Item.Amount > 1)
                 DrawTexture(gameManager.Batch, loot.Texture, pos + lootStackOffset, scale: 2);
-            if (loot.Amount > 2)
+            if (loot.Item.Amount > 2)
                 DrawTexture(gameManager.Batch, loot.Texture, pos + lootStackOffset + lootStackOffset, scale: 2);
             // Draw hitbox if enabled
             if (DebugManager.DrawHitboxes)
@@ -343,7 +345,7 @@ public class LevelManager
         using BufferedStream buffer = new(fileStream, 8192);
         using GZipStream gzipStream = new(buffer, CompressionMode.Decompress);
         using BinaryReader reader = new(gzipStream);
-        try
+        //try
         {
 
             // Metadata
@@ -387,7 +389,7 @@ public class LevelManager
                         if (keyName == "NUL" || keyName == "")
                             tile = new Door(loc, null);
                         else
-                            tile = new Door(loc, new(ItemTypes.All[(int)Enum.Parse(typeof(ItemTypeID), keyName)], flags.HasFlag(LevelFeatures.DoorKeyAmounts) ? reader.ReadByte() : 1));
+                            tile = new Door(loc, new(ItemTypes.All[(int)Enum.Parse(typeof(ItemTypeID), keyName)], flags.HasFlag(LevelFeatures.DoorKeyAmounts) ? reader.ReadByte() : (byte)1));
                     }
                     // Chests
                     else if (type == (int)TileTypeID.Chest)
@@ -455,7 +457,7 @@ public class LevelManager
                 string name = reader.ReadString();
                 byte amount = reader.ReadByte();
                 Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
-                lootBuffer.Add(new Loot(name, amount, location, 0f));
+                lootBuffer.Add(new Loot(new(Item.ItemFromName(name, amount).Type, amount), location, 0f));
             }
 
             // Decals
@@ -487,11 +489,11 @@ public class LevelManager
             Logger.System($"Successfully read level '{filename}' in {(DateTime.Now - startTime).TotalSeconds:F2}s.");
             return true;
         }
-        catch (Exception ex)
-        {
-            Logger.Error($"Failed to read level file '{filename}': {ex.Message}");
-            return false;
-        }
+        //catch (Exception ex)
+        //{
+        //    Logger.Error($"Failed to read level file '{filename}': {ex.Message}");
+        //    return false;
+        //}
     }
     public static Tile TileFromId(int id, ByteCoord location) => TileFromId(id, location);
     public static Tile TileFromId(int id, Point location)

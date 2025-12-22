@@ -20,7 +20,7 @@ public class LootTableEntry
 public interface ILootGenerator
 {
     public string FileName { get; }
-    public Inventory Generate(int width, int height, int seed = -1);
+    public Item?[,] Generate(int width, int height, int seed = -1);
 }
 
 public class LootPreset : ILootGenerator
@@ -33,7 +33,7 @@ public class LootPreset : ILootGenerator
         Preset = items;
         FileName = filename;
     }
-    public Inventory Generate(int width, int height, int seed = -1) => new(width, height, ArrayTools.Resize2DArray(Preset, width, height));
+    public Item?[,] Generate(int width, int height, int seed = -1) => ArrayTools.Resize2DArray(Preset, width, height);
     public static LootPreset ReadLootPreset(string world, string file)
     {
         // Check
@@ -92,32 +92,32 @@ public class LootTable : ILootGenerator
         Entries = entries;
         FileName = fileName;
     }
-    public Inventory Generate(int width, int height, int seed = -1)
+    public Item?[,] Generate(int width, int height, int seed = -1)
     {
         if (seed != -1)
             RandomManager.SetSeed(seed);
 
-        Inventory inv = new(width, height);
+        Item?[,] items = new Item?[width,height];
+        Point size = new(width, height);
         foreach (var table in Entries)
         {
             // Check full
-            if (inv.IsFull()) break;
+            if (!ArrayTools.Contains(items, null)) break;
             // Chances
             if (RandomManager.RandomFloat() >= table.Chance) continue;
 
             // Get random empty slot
             Point dest;
-            Point invSize = new(inv.Width, inv.Height);
             do
-                dest = RandomManager.RandomPoint(Point.Zero, invSize);
-            while (inv.GetItem(dest) != null);
+                dest = RandomManager.RandomPoint(Point.Zero, size);
+            while (items[dest.X,dest.Y] != null);
 
             // Set item
             Item item = table.Item.ShallowCopy();
             item.Amount = (byte)Math.Clamp(RandomManager.RandomIntRange(table.MinAmount, table.MaxAmount + 1), 0, table.Item.MaxAmount);
-            inv.SetSlot(dest, item);
+            items[dest.X, dest.Y] = item;
         }
-        return inv;
+        return items;
     }
     public void AddEntry(LootTableEntry entry)
     {

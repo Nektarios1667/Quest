@@ -119,7 +119,7 @@ public class NPC
         {
             (bool success, Item leftover) = inv.AddItem(option.Item);
             if (!success)
-                gameManager.LevelManager.Level.Loot.Add(new(leftover.Name, leftover.Amount, Location, gameManager.GameTime));
+                gameManager.LevelManager.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), Location, gameManager.GameTime));
             if (leftover.Amount < option.Item.Amount)
                 SoundManager.PlaySound("Trinkets");
             option.Stock -= 1;

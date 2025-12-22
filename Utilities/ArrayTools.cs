@@ -44,4 +44,11 @@ public static class ArrayTools
             Console.WriteLine();
         }
     }
+    public static bool Contains<T>(T?[,] array, T? target) where T : class
+    {
+        for (int x = 0; x < array.GetLength(0); x++)
+            for (int y = 0; y < array.GetLength(1); y++)
+                if (array[x, y] == target) return true;
+        return false;
+    }
 }

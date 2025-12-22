@@ -1,10 +1,12 @@
+using System.Windows.Forms;
+
 namespace Quest.Tiles;
 
 public class Chest : Tile, IContainer
 {
-    public readonly static Point ChestSize = new(6, 3);
+    public readonly static Point Size = new(6, 3);
     public ILootGenerator LootGenerator { get; private set; }
-    public Inventory? Inventory { get; private set; } = null;
+    public Item?[,]? Items { get; private set; }
     public bool Generated { get; private set; } = false;
     public int Seed { get; private set; } = Random.Shared.Next();
     public Chest(Point location, ILootGenerator lootGenerator, string levelPath) : base(location, TileTypeID.Chest)
@@ -20,19 +22,19 @@ public class Chest : Tile, IContainer
     public void RegenerateLoot(ILootGenerator lootGenerator)
     {
         LootGenerator = lootGenerator;
-        Inventory = lootGenerator.Generate(6, 3, Seed);
+        Items = lootGenerator.Generate(6, 3, Seed);
         Generated = true;
     }
     public void TryGenerateLoot()
     {
         if (Generated) return;
-        Inventory = LootGenerator.Generate(6, 3, Seed);
+        Items = LootGenerator.Generate(6, 3, Seed);
         Generated = true;
     }
     public void SetEmpty()
     {
         Generated = true;
-        Inventory = new(6, 3);
+        Items = new Item?[Size.X,Size.Y];
     }
     public void SetSeed(int seed) => Seed = seed;
 }
