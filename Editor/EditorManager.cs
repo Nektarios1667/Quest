@@ -21,160 +21,160 @@ public class EditorManager
         new(64, 192, 128), new(192, 64, 128), new(160, 80, 0), new(80, 160, 0), new(0, 160, 80),
         new(160, 0, 80), new(96, 96, 192), new(192, 96, 96), new(96, 192, 96), new(192, 192, 96)
     };
-    private GameManager gameManager { get; }
-    private LevelManager levelManager { get; }
-    private LevelGenerator levelGenerator { get; }
-    private StringBuilder debugSb { get; }
-    private GraphicsDevice graphics { get; }
-    private SpriteBatch spriteBatch { get; }
-    private float delta { get; set; }
-    private float cacheDelta { get; set; }
-    private Dictionary<string, double> frameTimes { get; set; } = new();
-    private Tile? mouseTile { get; set; }
-    private Point mouseCoord { get; set; }
-    private Point mouseSelection { get; set; }
-    private Point mouseSelectionCoord { get; set; }
-    private TileTypeID tileSelection { get; set; }
-    private EditorTool currentTool { get; set; }
-    private BiomeType biomeSelection { get; set; }
-    private RenderTarget2D minimap { get; set; }
-    private bool rebuildMinimap { get; set; } = true;
-    private DecalType? previousDecal { get; set; } = null;
+    private GameManager GameManager { get; }
+    private LevelManager LevelManager { get; }
+    private LevelGenerator LevelGenerator { get; }
+    private StringBuilder DebugSb { get; }
+    private GraphicsDevice Graphics { get; }
+    private SpriteBatch SpriteBatch { get; }
+    private float Delta;
+    private float CacheDelta;
+    private Dictionary<string, double> FrameTimes = [];
+    private Tile? MouseTile;
+    private Point MouseCoord;
+    private Point MouseSelection;
+    private Point MouseSelectionCoord;
+    private TileTypeID TileSelection;
+    private EditorTool CurrentTool;
+    private BiomeType BiomeSelection;
+    private RenderTarget2D Minimap;
+    private bool RebuildMinimap = true;
+    private DecalType? PreviousDecal = null;
     private string world = "";
     public EditorManager(GraphicsDevice graphics, GameManager gameManager, LevelManager levelManager, LevelGenerator levelGenerator, SpriteBatch batch, StringBuilder debugSb)
     {
-        this.graphics = graphics;
-        this.gameManager = gameManager;
-        this.levelManager = levelManager;
-        this.levelGenerator = levelGenerator;
-        this.debugSb = debugSb;
-        this.spriteBatch = batch;
-        cacheDelta = delta;
+        Graphics = graphics;
+        GameManager = gameManager;
+        LevelManager = levelManager;
+        LevelGenerator = levelGenerator;
+        DebugSb = debugSb;
+        SpriteBatch = batch;
+        CacheDelta = Delta;
     }
     public void Update(TileTypeID material, BiomeType biome, EditorTool tool, float deltaTime, Tile? mouseTile, Point mouseCoord, Point mouseSelection, Point mouseSelectionCoord)
     {
-        delta = deltaTime;
-        this.mouseTile = mouseTile;
-        this.mouseCoord = mouseCoord;
-        this.mouseSelection = mouseSelection;
-        this.mouseSelectionCoord = mouseSelectionCoord;
-        currentTool = tool;
-        tileSelection = material;
-        biomeSelection = biome;
+        Delta = deltaTime;
+        MouseTile = mouseTile;
+        MouseCoord = mouseCoord;
+        MouseSelection = mouseSelection;
+        MouseSelectionCoord = mouseSelectionCoord;
+        CurrentTool = tool;
+        TileSelection = material;
+        BiomeSelection = biome;
 
-        if (rebuildMinimap) RebuildMiniMap();
+        if (RebuildMinimap) RebuildMiniMap();
     }
     public void DrawMiniMap()
     {
         DebugManager.StartBenchmark("DrawMinimap");
 
         // Frame
-        gameManager.Batch.DrawRectangle(new(7, Constants.NativeResolution.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
+        GameManager.Batch.DrawRectangle(new(7, Constants.NativeResolution.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
 
         // Draw minimap texture
-        if (minimap != null)
-            spriteBatch.Draw(minimap, new Rectangle(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
+        if (Minimap != null)
+            SpriteBatch.Draw(Minimap, new Rectangle(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
 
         // Player
         Point dest = CameraManager.TileCoord + new Point(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10);
-        spriteBatch.DrawPoint(dest.ToVector2(), Color.Red, size: 2);
+        SpriteBatch.DrawPoint(dest.ToVector2(), Color.Red, size: 2);
 
         DebugManager.EndBenchmark("DrawMinimap");
     }
 
     public void RebuildMiniMap()
     {
-        minimap = new RenderTarget2D(graphics, Constants.MapSize.X, Constants.MapSize.Y);
-        graphics.SetRenderTarget(minimap);
-        graphics.Clear(Color.Transparent);
-        spriteBatch.Begin();
+        Minimap = new RenderTarget2D(Graphics, Constants.MapSize.X, Constants.MapSize.Y);
+        Graphics.SetRenderTarget(Minimap);
+        Graphics.Clear(Color.Transparent);
+        SpriteBatch.Begin();
 
         for (int y = 0; y < Constants.MapSize.Y; y++)
         {
             for (int x = 0; x < Constants.MapSize.X; x++)
             {
-                Tile tile = gameManager.LevelManager.GetTile(new Point(x, y))!;
-                spriteBatch.DrawPoint(new(x, y), Constants.MiniMapColors[(byte)tile.Type.ID]);
+                Tile tile = GameManager.LevelManager.GetTile(new Point(x, y))!;
+                SpriteBatch.DrawPoint(new(x, y), Constants.MiniMapColors[(byte)tile.Type.ID]);
             }
         }
 
-        spriteBatch.End();
-        graphics.SetRenderTarget(null);
-        rebuildMinimap = false;
+        SpriteBatch.End();
+        Graphics.SetRenderTarget(null);
+        RebuildMinimap = false;
     }
     public void DrawFrameInfo()
     {
         float boxHeight = DebugManager.FrameTimes.Count * 20;
-        FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 190, 0, 190, (int)boxHeight), Color.Black * 0.8f);
+        FillRectangle(SpriteBatch, new(Constants.NativeResolution.X - 190, 0, 190, (int)boxHeight), Color.Black * 0.8f);
 
-        debugSb.Clear();
-        foreach (var kv in frameTimes)
+        DebugSb.Clear();
+        foreach (var kv in FrameTimes)
         {
-            debugSb.Append(kv.Key);
-            debugSb.Append(": ");
-            debugSb.AppendFormat("{0:0.0}ms", kv.Value);
-            debugSb.Append('\n');
+            DebugSb.Append(kv.Key);
+            DebugSb.Append(": ");
+            DebugSb.AppendFormat("{0:0.0}ms", kv.Value);
+            DebugSb.Append('\n');
         }
 
-        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.NativeResolution.X - 180, 10), Color.White);
+        SpriteBatch.DrawString(Arial, DebugSb.ToString(), new Vector2(Constants.NativeResolution.X - 180, 10), Color.White);
     }
     public void DrawTextInfo()
     {
-        FillRectangle(spriteBatch, new(0, 0, 200, 200), Color.Black * 0.8f);
+        FillRectangle(SpriteBatch, new(0, 0, 200, 200), Color.Black * 0.8f);
 
-        debugSb.Clear();
-        debugSb.Append("FPS: ");
-        debugSb.AppendFormat("{0:0.0}", cacheDelta != 0 ? 1f / cacheDelta : 0);
-        debugSb.Append("\nGameTime: ");
-        debugSb.AppendFormat("{0:0.00}", gameManager.GameTime);
-        debugSb.Append("\nDayTime: ");
-        debugSb.AppendFormat("{0:0.00}", gameManager.DayTime);
-        debugSb.Append("\nTotalTime: ");
-        debugSb.AppendFormat("{0:0.00}", gameManager.TotalTime);
-        debugSb.Append("\nCamera: ");
-        debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.Camera.X, CameraManager.Camera.Y);
-        debugSb.Append("\nTile Below: ");
-        debugSb.Append(mouseTile == null ? "none" : mouseTile.Type.Texture);
-        if (mouseTile != null)
+        DebugSb.Clear();
+        DebugSb.Append("FPS: ");
+        DebugSb.AppendFormat("{0:0.0}", CacheDelta != 0 ? 1f / CacheDelta : 0);
+        DebugSb.Append("\nGameTime: ");
+        DebugSb.AppendFormat("{0:0.00}", GameManager.GameTime);
+        DebugSb.Append("\nDayTime: ");
+        DebugSb.AppendFormat("{0:0.00}", GameManager.DayTime);
+        DebugSb.Append("\nTotalTime: ");
+        DebugSb.AppendFormat("{0:0.00}", GameManager.TotalTime);
+        DebugSb.Append("\nCamera: ");
+        DebugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.Camera.X, CameraManager.Camera.Y);
+        DebugSb.Append("\nTile Below: ");
+        DebugSb.Append(MouseTile == null ? "none" : MouseTile.Type.Texture);
+        if (MouseTile != null)
         {
-            debugSb.Append("\nMouse Tile: ");
-            debugSb.AppendFormat("{0:0},{1:0}", mouseTile.X, mouseTile.Y);
+            DebugSb.Append("\nMouse Tile: ");
+            DebugSb.AppendFormat("{0:0},{1:0}", MouseTile.X, MouseTile.Y);
         }
-        debugSb.Append("\nCoord: ");
-        debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.TileCoord.X, CameraManager.TileCoord.Y);
-        debugSb.Append("\nLevel: ");
-        debugSb.Append(levelManager.Level?.Name);
-        debugSb.Append("\nGUI: ");
-        debugSb.Append(gameManager.UIManager.Gui.Widgets.Count);
+        DebugSb.Append("\nCoord: ");
+        DebugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.TileCoord.X, CameraManager.TileCoord.Y);
+        DebugSb.Append("\nLevel: ");
+        DebugSb.Append(LevelManager.Level?.Name);
+        DebugSb.Append("\nGUI: ");
+        DebugSb.Append(GameManager.UIManager.Gui.Widgets.Count);
 
-        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);
+        SpriteBatch.DrawString(Arial, DebugSb.ToString(), new Vector2(10, 10), Color.White);
     }
     public void DrawFrameBar()
     {
         // Background
-        FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 320, Constants.NativeResolution.Y - frameTimes.Count * 20 - 50, 320, 1000), Color.Black * .8f);
+        FillRectangle(SpriteBatch, new(Constants.NativeResolution.X - 320, Constants.NativeResolution.Y - FrameTimes.Count * 20 - 50, 320, 1000), Color.Black * .8f);
 
         // Labels and bars
         int start = 0;
         int c = 0;
-        FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 310, Constants.NativeResolution.Y - 40, 300, 25), Color.White);
-        foreach (KeyValuePair<string, double> process in frameTimes)
+        FillRectangle(SpriteBatch, new(Constants.NativeResolution.X - 310, Constants.NativeResolution.Y - 40, 300, 25), Color.White);
+        foreach (KeyValuePair<string, double> process in FrameTimes)
         {
-            spriteBatch.DrawString(Arial, process.Key, new Vector2(Constants.NativeResolution.X - Arial.MeasureString(process.Key).X - 5, Constants.NativeResolution.Y - 20 * c - 60), colors[c]);
-            FillRectangle(spriteBatch, new Rectangle(Constants.NativeResolution.X - 310 + start, Constants.NativeResolution.Y - 40, (int)(process.Value / (cacheDelta * 1000) * 300), 25), colors[c]);
-            start += (int)(process.Value / (cacheDelta * 1000)) * 300;
+            SpriteBatch.DrawString(Arial, process.Key, new Vector2(Constants.NativeResolution.X - Arial.MeasureString(process.Key).X - 5, Constants.NativeResolution.Y - 20 * c - 60), colors[c]);
+            FillRectangle(SpriteBatch, new Rectangle(Constants.NativeResolution.X - 310 + start, Constants.NativeResolution.Y - 40, (int)(process.Value / (CacheDelta * 1000) * 300), 25), colors[c]);
+            start += (int)(process.Value / (CacheDelta * 1000)) * 300;
             c++;
         }
     }
     public void UpdateFrameTimes()
     {
-        frameTimes.Clear();
-        frameTimes = new(DebugManager.FrameTimes);
-        cacheDelta = gameManager.DeltaTime;
+        FrameTimes.Clear();
+        FrameTimes = new(DebugManager.FrameTimes);
+        CacheDelta = GameManager.DeltaTime;
     }
     public void EditTile()
     {
-        Tile? tile = levelManager.GetTile(mouseSelectionCoord);
+        Tile? tile = LevelManager.GetTile(MouseSelectionCoord);
         // Stair
         if (tile is Stairs stairs)
         {
@@ -237,16 +237,16 @@ public class EditorManager
     }
     public void FloodFill()
     {
-        if (currentTool == EditorTool.Tile) FloodFillTiles();
-        else if (currentTool == EditorTool.Decal) { } // TODO
-        else if (currentTool == EditorTool.Biome) FloodFillBiome();
+        if (CurrentTool == EditorTool.Tile) FloodFillTiles();
+        else if (CurrentTool == EditorTool.Decal) { } // TODO
+        else if (CurrentTool == EditorTool.Biome) FloodFillBiome();
     }
     public void FloodFillTiles()
     {
         // Fill with current material
         int count = 0;
-        Tile tileBelow = GetTile(mouseCoord);
-        if (tileBelow.Type.ID != tileSelection)
+        Tile tileBelow = GetTile(MouseCoord);
+        if (tileBelow.Type.ID != TileSelection)
         {
             Queue<Tile> queue = new();
             HashSet<ByteCoord> visited = []; // Track visited tiles
@@ -255,9 +255,9 @@ public class EditorManager
             while (queue.Count > 0)
             {
                 Tile current = queue.Dequeue();
-                if (current.Type.ID == tileSelection || visited.Contains(current.Location)) continue; // Skip if already filled
+                if (current.Type.ID == TileSelection || visited.Contains(current.Location)) continue; // Skip if already filled
                 count++;
-                SetTile(LevelManager.TileFromId((int)tileSelection, current.Location));
+                SetTile(LevelManager.TileFromId((int)TileSelection, current.Location));
                 visited.Add(current.Location); // Mark as visited
                 // Check neighbors
                 foreach (Point neighbor in Constants.NeighborTiles)
@@ -265,52 +265,52 @@ public class EditorManager
                     Point neighborCoord = current.Location + neighbor;
                     if (neighborCoord.X < 0 || neighborCoord.X >= Constants.MapSize.X || neighborCoord.Y < 0 || neighborCoord.Y >= Constants.MapSize.Y) continue;
                     Tile neighborTile = GetTile(neighborCoord);
-                    if (neighborTile.Type == tileBelow.Type && neighborTile.Type.ID != tileSelection)
+                    if (neighborTile.Type == tileBelow.Type && neighborTile.Type.ID != TileSelection)
                     {
                         queue.Enqueue(neighborTile);
                     }
                 }
             }
-            Logger.Log($"Filled {count} tiles with '{tileSelection}' starting from {mouseCoord.X}, {mouseCoord.Y}.");
+            Logger.Log($"Filled {count} tiles with '{TileSelection}' starting from {MouseCoord.X}, {MouseCoord.Y}.");
         }
     }
     public void FloodFillBiome()
     {
         // Fill with current material
         int count = 0;
-        BiomeType? startBiome = levelManager.GetBiome(mouseCoord);
-        if (startBiome != biomeSelection)
+        BiomeType? startBiome = LevelManager.GetBiome(MouseCoord);
+        if (startBiome != BiomeSelection)
         {
             Queue<Point> queue = new();
             HashSet<Point> visited = []; // Track visited tiles
-            queue.Enqueue(mouseCoord);
+            queue.Enqueue(MouseCoord);
             count++;
             while (queue.Count > 0)
             {
                 Point current = queue.Dequeue();
-                if (levelManager.GetBiome(current) == biomeSelection || visited.Contains(current)) continue; // Skip if already filled
+                if (LevelManager.GetBiome(current) == BiomeSelection || visited.Contains(current)) continue; // Skip if already filled
                 visited.Add(current); // Mark as visited
                 count++;
-                levelManager.Level.Biome[LevelManager.Flatten(current)] = biomeSelection;
+                LevelManager.Level.Biome[LevelManager.Flatten(current)] = BiomeSelection;
                 // Check neighbors
                 foreach (Point neighbor in Constants.NeighborTiles)
                 {
                     Point neighborCoord = current + neighbor;
                     if (neighborCoord.X < 0 || neighborCoord.X >= Constants.MapSize.X || neighborCoord.Y < 0 || neighborCoord.Y >= Constants.MapSize.Y) continue;
-                    BiomeType? biome = levelManager.GetBiome(neighborCoord);
-                    if (biome == startBiome && biome != biomeSelection)
+                    BiomeType? biome = LevelManager.GetBiome(neighborCoord);
+                    if (biome == startBiome && biome != BiomeSelection)
                     {
                         queue.Enqueue(neighborCoord);
                     }
                 }
             }
-            Logger.Log($"Set {count} tiles to biome '{biomeSelection}' starting from {mouseCoord.X}, {mouseCoord.Y}.");
+            Logger.Log($"Set {count} tiles to biome '{BiomeSelection}' starting from {MouseCoord.X}, {MouseCoord.Y}.");
         }
     }
     public void SetSpawn()
     {
-        levelManager.Level.Spawn = mouseSelectionCoord;
-        Logger.Log($"Set level spawn to {mouseSelectionCoord.X}, {mouseSelectionCoord.Y}");
+        LevelManager.Level.Spawn = MouseSelectionCoord;
+        Logger.Log($"Set level spawn to {MouseSelectionCoord.X}, {MouseSelectionCoord.Y}");
     }
     public void SetTint()
     {
@@ -321,7 +321,7 @@ public class EditorManager
             if (!PopupOpen) Logger.Error("Failed to set tint.");
             return;
         }
-        levelManager.Level.Tint = new Color(byte.Parse(values[0]), byte.Parse(values[1]), byte.Parse(values[2])) * (byte.Parse(values[3]) / 255f);
+        LevelManager.Level.Tint = new Color(byte.Parse(values[0]), byte.Parse(values[1]), byte.Parse(values[2])) * (byte.Parse(values[3]) / 255f);
     }
     public void EditNPCs()
     {
@@ -333,7 +333,7 @@ public class EditorManager
     public void NewNPC()
     {
         // Check
-        if (levelManager.Level.NPCs.Count >= 255)
+        if (LevelManager.Level.NPCs.Count >= 255)
         {
             Logger.Error("Maximum number of NPCs reached (255).");
             return;
@@ -357,16 +357,16 @@ public class EditorManager
             scale = 1;
         }
         TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), values[3]);
-        levelManager.Level.NPCs.Add(new NPC(gameManager.UIManager, texture, mouseSelectionCoord, name, dialog, Color.White, scale));
+        LevelManager.Level.NPCs.Add(new NPC(GameManager.UIManager, texture, MouseSelectionCoord, name, dialog, Color.White, scale));
     }
     public void DeleteNPC()
     {
-        foreach (NPC npc in levelManager.Level.NPCs)
+        foreach (NPC npc in LevelManager.Level.NPCs)
         {
-            if (npc.Location == mouseSelectionCoord)
+            if (npc.Location == MouseSelectionCoord)
             {
-                levelManager.Level.NPCs.Remove(npc);
-                Logger.Log($"Deleted NPC '{npc.Name}' @ {mouseSelectionCoord.X}, {mouseSelectionCoord.Y}.");
+                LevelManager.Level.NPCs.Remove(npc);
+                Logger.Log($"Deleted NPC '{npc.Name}' @ {MouseSelectionCoord.X}, {MouseSelectionCoord.Y}.");
                 break;
             }
         }
@@ -383,7 +383,7 @@ public class EditorManager
     public void NewDecal()
     {
         // Check
-        if (levelManager.Level.Decals.Count >= 255)
+        if (LevelManager.Level.Decals.Count >= 255)
         {
             Logger.Error("Maximum number of Decals reached (255).");
             return;
@@ -399,29 +399,29 @@ public class EditorManager
 
         string name = values[0];
         DecalType decal = Enum.TryParse<DecalType>(name, true, out var dec) ? dec : DecalType.Torch;
-        previousDecal = decal;
-        levelManager.Level.Decals.Add(LevelManager.DecalFromId(decal, mouseSelectionCoord));
+        PreviousDecal = decal;
+        LevelManager.Level.Decals.Add(LevelManager.DecalFromId(decal, MouseSelectionCoord));
     }
     public void PasteDecal()
     {
         // Check
-        if (previousDecal == null) return;
-        if (levelManager.Level.Decals.Count >= 255)
+        if (PreviousDecal == null) return;
+        if (LevelManager.Level.Decals.Count >= 255)
         {
             Logger.Error("Maximum number of Decals reached (255).");
             return;
         }
 
-        levelManager.Level.Decals.Add(LevelManager.DecalFromId(previousDecal.Value, mouseCoord));
+        LevelManager.Level.Decals.Add(LevelManager.DecalFromId(PreviousDecal.Value, MouseCoord));
     }
     public void DeleteDecal()
     {
-        foreach (Decal decal in levelManager.Level.Decals)
+        foreach (Decal decal in LevelManager.Level.Decals)
         {
-            if (decal.Location == mouseSelectionCoord)
+            if (decal.Location == MouseSelectionCoord)
             {
-                levelManager.Level.Decals.Remove(decal);
-                Logger.Log($"Deleted decal '{decal.Type}' @ {mouseSelectionCoord.X}, {mouseSelectionCoord.Y}.");
+                LevelManager.Level.Decals.Remove(decal);
+                Logger.Log($"Deleted decal '{decal.Type}' @ {MouseSelectionCoord.X}, {MouseSelectionCoord.Y}.");
                 break;
             }
         }
@@ -436,7 +436,7 @@ public class EditorManager
     public void NewLoot()
     {
         // Check
-        if (levelManager.Level.Loot.Count >= 255)
+        if (LevelManager.Level.Loot.Count >= 255)
         {
             Logger.Error("Maximum number of Loot reached (255).");
             return;
@@ -452,16 +452,16 @@ public class EditorManager
 
         string name = values[0];
         byte amount = byte.Parse(values[1]);
-        levelManager.Level.Loot.Add(new Loot(name, amount, mouseSelection, gameManager.GameTime));
+        LevelManager.Level.Loot.Add(new Loot(name, amount, MouseSelection, GameManager.GameTime));
     }
     public void DeleteLoot()
     {
-        foreach (Loot loot in levelManager.Level.Loot)
+        foreach (Loot loot in LevelManager.Level.Loot)
         {
-            if (Vector2.DistanceSquared(loot.Location.ToVector2(), mouseSelection.ToVector2()) < 900)
+            if (Vector2.DistanceSquared(loot.Location.ToVector2(), MouseSelection.ToVector2()) < 900)
             {
-                levelManager.Level.Loot.Remove(loot);
-                Logger.Log($"Deleted loot '{loot.Item}' @ {mouseCoord.X}, {mouseCoord.Y}.");
+                LevelManager.Level.Loot.Remove(loot);
+                Logger.Log($"Deleted loot '{loot.Item}' @ {MouseCoord.X}, {MouseCoord.Y}.");
                 break;
             }
         }
@@ -475,7 +475,7 @@ public class EditorManager
     }
     public void DeleteScript()
     {
-        var (success, values) = ShowInputForm("Delete Script", [new("Script Name", dropdownOptions: [.. levelManager.Level.Scripts.Select(s => s.ScriptName)])]);
+        var (success, values) = ShowInputForm("Delete Script", [new("Script Name", dropdownOptions: [.. LevelManager.Level.Scripts.Select(s => s.ScriptName)])]);
         if (!success || string.IsNullOrWhiteSpace(values[0]))
         {
             if (!PopupOpen) Logger.Error("Script deletion failed.");
@@ -483,7 +483,7 @@ public class EditorManager
         }
 
         string name = values[0];
-        levelManager.Level.Scripts.RemoveAll(s => s.ScriptName == name);
+        LevelManager.Level.Scripts.RemoveAll(s => s.ScriptName == name);
     }
     public void NewScript()
     {
@@ -499,13 +499,13 @@ public class EditorManager
             return;
         }
         string name = values[0];
-        if (levelManager.Level.Scripts.Any(s => s.ScriptName == name))
+        if (LevelManager.Level.Scripts.Any(s => s.ScriptName == name))
         {
             Logger.Error($"A script with the name '{name}' already exists.");
             return;
         }
         string sourceCode = File.ReadAllText(values[1]);
-        levelManager.Level.Scripts.Add(new QuillScript(name, sourceCode));
+        LevelManager.Level.Scripts.Add(new QuillScript(name, sourceCode));
     }
     public void ResaveLevel(string name)
     {
@@ -570,19 +570,19 @@ public class EditorManager
         writer.Write((ushort)flags); // Flags
 
         // Write tint
-        writer.Write(levelManager.Level.Tint.R);
-        writer.Write(levelManager.Level.Tint.G);
-        writer.Write(levelManager.Level.Tint.B);
-        writer.Write(levelManager.Level.Tint.A);
+        writer.Write(LevelManager.Level.Tint.R);
+        writer.Write(LevelManager.Level.Tint.G);
+        writer.Write(LevelManager.Level.Tint.B);
+        writer.Write(LevelManager.Level.Tint.A);
 
         // Write spawn
-        writer.Write(LevelEditor.IntToByte(levelManager.Level.Spawn.X));
-        writer.Write(LevelEditor.IntToByte(levelManager.Level.Spawn.Y));
+        writer.Write(LevelEditor.IntToByte(LevelManager.Level.Spawn.X));
+        writer.Write(LevelEditor.IntToByte(LevelManager.Level.Spawn.Y));
 
         // Tiles
         for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
         {
-            Tile tile = levelManager.Level.Tiles[i];
+            Tile tile = LevelManager.Level.Tiles[i];
             // Write tile data
             writer.Write((byte)tile.Type.ID);
             // Extra properties
@@ -619,13 +619,13 @@ public class EditorManager
         // Biome
         if (flags.HasFlag(LevelFeatures.Biomes))
             for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
-                writer.Write((byte)(int)levelManager.Level.Biome[i]);
+                writer.Write((byte)(int)LevelManager.Level.Biome[i]);
 
         // NPCs
-        writer.Write((byte)Math.Min(levelManager.Level.NPCs.Count, 255));
-        for (int n = 0; n < Math.Min(levelManager.Level.NPCs.Count, 255); n++)
+        writer.Write((byte)Math.Min(LevelManager.Level.NPCs.Count, 255));
+        for (int n = 0; n < Math.Min(LevelManager.Level.NPCs.Count, 255); n++)
         {
-            NPC npc = levelManager.Level.NPCs[n];
+            NPC npc = LevelManager.Level.NPCs[n];
             // Write NPC data
             writer.Write(npc.Name);
             writer.Write(npc.Dialog);
@@ -636,10 +636,10 @@ public class EditorManager
         }
 
         // Floor loot
-        writer.Write((byte)Math.Min(levelManager.Level.Loot.Count, 255));
-        for (int n = 0; n < Math.Min(levelManager.Level.Loot.Count, 255); n++)
+        writer.Write((byte)Math.Min(LevelManager.Level.Loot.Count, 255));
+        for (int n = 0; n < Math.Min(LevelManager.Level.Loot.Count, 255); n++)
         {
-            Loot loot = levelManager.Level.Loot[n];
+            Loot loot = LevelManager.Level.Loot[n];
             // Write loot data
             writer.Write(loot.Item);
             writer.Write(LevelEditor.IntToByte(loot.Amount));
@@ -648,10 +648,10 @@ public class EditorManager
         }
 
         // Decals
-        writer.Write((byte)Math.Min(levelManager.Level.Decals.Count, 255));
-        for (int n = 0; n < Math.Min(levelManager.Level.Decals.Count, 255); n++)
+        writer.Write((byte)Math.Min(LevelManager.Level.Decals.Count, 255));
+        for (int n = 0; n < Math.Min(LevelManager.Level.Decals.Count, 255); n++)
         {
-            Decal decal = levelManager.Level.Decals[n];
+            Decal decal = LevelManager.Level.Decals[n];
             // Write decal data
             writer.Write((byte)decal.Type);
             writer.Write(LevelEditor.IntToByte(decal.X));
@@ -661,10 +661,10 @@ public class EditorManager
         // Scripts
         if (flags.HasFlag(LevelFeatures.QuillScripts))
         {
-            writer.Write((byte)levelManager.Level.Scripts.Count);
-            for (int s = 0; s < levelManager.Level.Scripts.Count; s++)
+            writer.Write((byte)LevelManager.Level.Scripts.Count);
+            for (int s = 0; s < LevelManager.Level.Scripts.Count; s++)
             {
-                QuillScript script = levelManager.Level.Scripts[s];
+                QuillScript script = LevelManager.Level.Scripts[s];
                 writer.Write(script.ScriptName);
                 writer.Write(script.SourceCode);
             }
@@ -676,7 +676,7 @@ public class EditorManager
     public void GenerateLevel()
     {
         // Winforms
-        var (success, values) = ShowInputForm("Generate Level", [new("Seed", IsInteger), new("Terrain", null, [.. levelGenerator.Terrains.Keys]), new("Structure Attempts", IsPositiveIntegerOrZero)]);
+        var (success, values) = ShowInputForm("Generate Level", [new("Seed", IsInteger), new("Terrain", null, [.. LevelGenerator.Terrains.Keys]), new("Structure Attempts", IsPositiveIntegerOrZero)]);
         if (!success)
         {
             if (!PopupOpen) Logger.Error("Level generation failed.");
@@ -684,14 +684,14 @@ public class EditorManager
         }
 
         // Generate
-        levelGenerator.Seed = int.Parse(values[0]);
-        levelGenerator.Terrain = levelGenerator.Terrains.GetValueOrDefault(values[1], levelGenerator.Terrain);
-        Tile[] tiles = levelGenerator.GenerateLevel(Constants.MapSize, int.Parse(values[2]));
+        LevelGenerator.Seed = int.Parse(values[0]);
+        LevelGenerator.Terrain = LevelGenerator.Terrains.GetValueOrDefault(values[1], LevelGenerator.Terrain);
+        Tile[] tiles = LevelGenerator.GenerateLevel(Constants.MapSize, int.Parse(values[2]));
 
-        Level current = levelManager.Level;
+        Level current = LevelManager.Level;
         Level level = new(current.Name, tiles, [], current.Spawn, current.NPCs, current.Loot, current.Decals, current.Enemies, [], current.Tint);
 
-        levelManager.LoadLevelObject(gameManager, level);
+        LevelManager.LoadLevelObject(GameManager, level);
         FlagRebuildMinimap();
     }
     public void OpenFileDialog()
@@ -716,8 +716,8 @@ public class EditorManager
         world = filename.Split('\\', '/')[0];
         try
         {
-            levelManager.ReadLevel(gameManager.UIManager, filename, reload: true);
-            levelManager.LoadLevel(gameManager, filename);
+            LevelManager.ReadLevel(GameManager.UIManager, filename, reload: true);
+            LevelManager.LoadLevel(GameManager, filename);
             Logger.Log($"Opened level '{filename}'.");
         }
         catch (Exception ex)
@@ -731,12 +731,12 @@ public class EditorManager
     {
         if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
             throw new ArgumentOutOfRangeException(nameof(coord), "Coordinates are out of bounds of the level.");
-        return levelManager.Level.Tiles[coord.X + coord.Y * Constants.MapSize.X];
+        return LevelManager.Level.Tiles[coord.X + coord.Y * Constants.MapSize.X];
     }
     public void SetTile(Tile tile)
     {
-        levelManager.Level.Tiles[tile.X + tile.Y * Constants.MapSize.X] = tile;
+        LevelManager.Level.Tiles[tile.X + tile.Y * Constants.MapSize.X] = tile;
         FlagRebuildMinimap();
     }
-    public void FlagRebuildMinimap() { rebuildMinimap = true; }
+    public void FlagRebuildMinimap() { RebuildMinimap = true; }
 }

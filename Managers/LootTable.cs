@@ -40,12 +40,14 @@ public class LootPreset : ILootGenerator
         file = $"GameData/Worlds/{world}/loot/{file}";
         if (!file.EndsWith(".qlp"))
         {
-            Logger.Error($"Failed to read preset '{file}'. Expected .qlp file.");
+            if (file != "" && file != "_") // Check discard
+                Logger.Error($"Failed to read preset '{file}'. Expected .qlp file.");
             return EmptyPreset;
         }
         if (!File.Exists(file))
         {
-            Logger.Error($"File {file} not found.");
+            if (file != "" && file != "_") // Check discard
+                Logger.Error($"File {file} not found.");
             return EmptyPreset;
         }
 
@@ -132,12 +134,14 @@ public class LootTable : ILootGenerator
         file = $"GameData/Worlds/{world}/loot/{file}";
         if (!file.EndsWith(".qlt"))
         {
-            Logger.Error($"Failed to read preset '{file}'. Expected .qlt file.");
+            if (file != "" && file != "_") // Check discard
+                Logger.Error($"Failed to read preset '{file}'. Expected .qlt file.");
             return new([], "");
         }
         if (!File.Exists(file))
         {
-            Logger.Error($"File {file} not found.");
+            if (file != "" && file != "_") // Check discard
+                Logger.Error($"File {file} not found.");
             return new([], "");
         }
 
@@ -170,7 +174,7 @@ public static class LootGeneratorHelper
             return LootTable.ReadLootTable(world, file);
         else if (file.EndsWith(".qlp"))
             return LootPreset.ReadLootPreset(world, file);
-        else
+        else if (file != "" && file != "_") // Check discard
             Logger.Warning($"Failed to read loot generator '{file}'. Expected .qlt or .qlp file.");
         return LootPreset.EmptyPreset;
     }
