@@ -25,6 +25,9 @@ public enum DecalType : byte
     Splotch2,
     Splotch3,
     Splotch4,
+    LightTint,
+    MediumTint,
+    DarkTint,
     // DECALS
 }
 public class Decal

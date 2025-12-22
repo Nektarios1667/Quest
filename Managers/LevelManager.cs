@@ -568,6 +568,9 @@ public class LevelManager
             DecalType.Splotch2 => new Splotch2(location),
             DecalType.Splotch3 => new Splotch3(location),
             DecalType.Splotch4 => new Splotch4(location),
+            DecalType.LightTint => new LightTint(location),
+            DecalType.MediumTint => new MediumTint(location),
+            DecalType.DarkTint => new DarkTint(location),
             // DECALFROMID INSERT
             _ => null,
         };

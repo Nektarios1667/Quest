@@ -128,6 +128,9 @@ public static class TextureManager
         Splotch2,
         Splotch3,
         Splotch4,
+        LightTint,
+        MediumTint,
+        DarkTint,
         // DECALS ENUM INSERT
         Glow,
         Slash,
@@ -268,6 +271,9 @@ public static class TextureManager
         Textures[TextureID.Splotch2] = content.Load<Texture2D>("Images/Decals/Splotch2");
         Textures[TextureID.Splotch3] = content.Load<Texture2D>("Images/Decals/Splotch3");
         Textures[TextureID.Splotch4] = content.Load<Texture2D>("Images/Decals/Splotch4");
+        Textures[TextureID.LightTint] = content.Load<Texture2D>("Images/Decals/LightTint");
+        Textures[TextureID.MediumTint] = content.Load<Texture2D>("Images/Decals/MediumTint");
+        Textures[TextureID.DarkTint] = content.Load<Texture2D>("Images/Decals/DarkTint");
         // DECALS INSERT
         Textures[TextureID.Glow] = content.Load<Texture2D>("Images/Effects/Glow");
         Textures[TextureID.Slash] = content.Load<Texture2D>("Images/Effects/Slash");
@@ -397,6 +403,9 @@ public static class TextureManager
         Metadata[TextureID.Splotch2] = new(Textures[TextureID.Splotch2].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.Splotch3] = new(Textures[TextureID.Splotch3].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.Splotch4] = new(Textures[TextureID.Splotch4].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.LightTint] = new(Textures[TextureID.LightTint].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.MediumTint] = new(Textures[TextureID.MediumTint].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.DarkTint] = new(Textures[TextureID.DarkTint].Bounds.Size, new(1, 1), "decal");
         // DECALS METADATA INSERT
         Metadata[TextureID.Glow] = new(Textures[TextureID.Glow].Bounds.Size, new(1, 1), "effect");
         Metadata[TextureID.Slash] = new(Textures[TextureID.Slash].Bounds.Size, new(1, 1), "effect");
