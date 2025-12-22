@@ -65,8 +65,6 @@ public class Window : Game
         debugUpdateTime = 0;
         cacheDelta = 0f;
 
-        Exiting += OnExiting;
-
         base.Initialize();
     }
 

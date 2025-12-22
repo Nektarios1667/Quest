@@ -8,13 +8,10 @@ public class Water : Tile
     public override void Draw(GameManager gameManager)
     {
         // Draw each tile using the sprite batch
-        Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint();
+        Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
 
-        dest += Constants.Middle;
         // Draw tile
-        Color color = Marked ? Color.Red : Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(gameManager.GameTime + X + Y));
+        Color color = Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(gameManager.GameTime + X + Y));
         DrawTexture(gameManager.Batch, TextureID.Water, dest, source: gameManager.LevelManager.TileTextureSource(this), color: color, scale: Constants.TileSizeScale);
-
-        Marked = false; // Reset marked state for next frame
     }
 }

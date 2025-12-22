@@ -1,8 +1,6 @@
 ﻿using Quest.Gui;
-
+using System.Reflection.Metadata.Ecma335;
 namespace Quest.Managers;
-
-
 
 public class Attack(int damage, RectangleF hitbox)
 {
@@ -16,6 +14,7 @@ public class PlayerManager : IContainer
     public Inventory Inventory { get; }
     public IContainer? OpenedContainer { get; private set; }
     public Tile? TileBelow { get; private set; }
+    public List<Tile> TileBumps { get; private set; } = [];
     public Direction PlayerDirection { get; private set; }
     public List<Attack> Attacks { get; private set; } = [];
     private float moveX, moveY;
@@ -44,6 +43,7 @@ public class PlayerManager : IContainer
         if (StateManager.OverlayState == OverlayState.Pause) return;
 
         // Update player position
+        TileBumps.Clear();
         UpdatePositions(gameManager);
 
         // Toggle inventory
@@ -175,20 +175,30 @@ public class PlayerManager : IContainer
     }
     public void Draw(GameManager gameManager)
     {
-        switch (StateManager.State)
-        {
-            case GameState.Game or GameState.Editor:
-                DrawPlayer(gameManager);
-                if (DebugManager.DrawHitboxes)
-                {
-                    DrawPlayerHitbox(gameManager);
-                    foreach (Attack attack in Attacks)
-                        FillRectangle(gameManager.Batch, new(attack.Hitbox.Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, new Point((int)attack.Hitbox.Width, (int)attack.Hitbox.Height)), Constants.DebugPinkTint);
-                }
+        if (StateManager.State != GameState.Game) return;
 
-                break;
+        // Draw player
+        DrawPlayer(gameManager);
+        if (DebugManager.DrawHitboxes)
+        {
+            DrawPlayerHitbox(gameManager);
+            foreach (Attack attack in Attacks)
+                FillRectangle(gameManager.Batch, new(attack.Hitbox.Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, new Point((int)attack.Hitbox.Width, (int)attack.Hitbox.Height)), Constants.DebugPinkTint);
         }
 
+        // Draw marked tile
+        if (TileBelow != null && DebugManager.CollisionDebug)
+        {
+            Point belowDest = TileBelow.Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
+            gameManager.Batch.FillRectangle(new(belowDest.ToVector2(), Constants.TileSize), Color.Red * 0.5f);
+        }
+        if (TileBumps != null && DebugManager.CollisionDebug) {
+            foreach (Tile tile in TileBumps)
+            {
+                Point bumpDest = tile.Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
+                gameManager.Batch.FillRectangle(new(bumpDest.ToVector2(), Constants.TileSize), Color.Blue * 0.5f);
+            }
+        }
     }
     public void DrawPlayer(GameManager gameManager)
     {
@@ -243,9 +253,6 @@ public class PlayerManager : IContainer
         UpdatePositions(gameManager);
         if (TileBelow == null) return;
         TileBelow.OnPlayerEnter(gameManager, this);
-
-        // Debug
-        if (DebugManager.CollisionDebug) TileBelow.Marked = true;
     }
     public bool IsColliding(GameManager gameManager)
     {
@@ -272,12 +279,13 @@ public class PlayerManager : IContainer
         {
             for (int x = topLeftTile.X; x <= bottomRightTile.X; x++)
             {
+                // Check
                 Tile? tile = gameManager.LevelManager.GetTile(new Point(x, y));
-                if (tile != null && !tile.IsWalkable)
-                {
-                    tile.OnPlayerCollide(gameManager, this);
-                    return;
-                }
+                if (tile == null || tile.IsWalkable) continue;
+                
+                // Bump
+                tile.OnPlayerCollide(gameManager, this);
+                TileBumps.Add(tile);
             }
         }
     }

@@ -15,12 +15,8 @@ public class Door : Tile
     {
         // Draw tile
         Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
-        Color color = Marked ? Color.Red : Color.White;
         Rectangle source = new(IsWalkable ? 16 : 0, 0, 16, 16);
-        DrawTexture(gameManager.Batch, TextureID.Door, dest, source: source, scale: Constants.TileSizeScale, color: color);
-
-        // Handling
-        Marked = false;
+        DrawTexture(gameManager.Batch, TextureID.Door, dest, source: source, scale: Constants.TileSizeScale);
     }
     public override void OnPlayerCollide(GameManager game, PlayerManager player)
     {

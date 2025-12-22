@@ -107,7 +107,6 @@ public static class TileTypes
 public class Tile
 {
     // Properties
-    public bool Marked { get; set; }
     public byte TypeID { get; }
     public ByteCoord Location { get; }
     // Computed properties
@@ -132,11 +131,7 @@ public class Tile
     {
         // Draw tile
         Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
-        Color color = Marked ? Color.Red : Color.White;
-        DrawTexture(gameManager.Batch, Type.Texture, dest, source: gameManager.LevelManager.TileTextureSource(this), scale: Constants.TileSizeScale, color: color);
-
-        // Final
-        Marked = false;
+        DrawTexture(gameManager.Batch, Type.Texture, dest, source: gameManager.LevelManager.TileTextureSource(this), scale: Constants.TileSizeScale);
     }
 
     public virtual void OnPlayerEnter(GameManager game, PlayerManager player) { }
