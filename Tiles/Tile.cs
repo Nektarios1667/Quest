@@ -61,8 +61,9 @@ public class TileType
 
 public static class TileTypes
 {
-    public static readonly TileType[] All = new TileType[]
-    {
+    // Must be in same order as TileTypeID enum
+    public static readonly TileType[] All =
+    [
         new(TileTypeID.Sky, TextureID.Sky, false, false),
         new(TileTypeID.Grass, TextureID.Grass, true, false),
         new(TileTypeID.Water, TextureID.Water, false, false),
@@ -100,31 +101,23 @@ public static class TileTypes
         new(TileTypeID.Sandstone, TextureID.Sandstone, true, false),
         new(TileTypeID.SandstoneWall, TextureID.SandstoneWall, false, true),
         // TILES REGISTER
-    };
+    ];
 }
 
 public class Tile
 {
-    protected static readonly Dictionary<TileTypeID, TextureID> TileToTexture = Enum.GetValues<TileTypeID>()
-    .ToDictionary(
-        tileType => tileType,
-        tileType => Enum.TryParse<TextureID>(tileType.ToString(), out var texture) ? texture : TextureID.Null
-    );
-
-    // Debug
+    // Properties
     public bool Marked { get; set; }
-    // Auto generated - no setter
+    public byte TypeID { get; }
+    public ByteCoord Location { get; }
+    // Computed properties
     public byte X => Location.X;
     public byte Y => Location.Y;
-    public ByteCoord Location { get; }
-    public ushort TileID => (ushort)(X + Y * Constants.MapSize.X);
-    // Type
-    public byte TypeID { get; }
-    public TileType Type => TileTypes.All[TypeID];
-    public TextureID Texture => Type.Texture;
     public virtual bool IsWalkable => Type.IsWalkable;
     public bool IsWall => Type.IsWall;
-    // Private 
+    public ushort TileID => (ushort)(X + Y * Constants.MapSize.X);
+    public TileType Type => TileTypes.All[TypeID];
+
     public Tile(Point location, TileTypeID type)
     {
         Location = new(location);
@@ -140,7 +133,7 @@ public class Tile
         // Draw tile
         Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
         Color color = Marked ? Color.Red : Color.White;
-        DrawTexture(gameManager.Batch, Texture, dest, source: gameManager.LevelManager.TileTextureSource(this), scale: Constants.TileSizeScale, color: color);
+        DrawTexture(gameManager.Batch, Type.Texture, dest, source: gameManager.LevelManager.TileTextureSource(this), scale: Constants.TileSizeScale, color: color);
 
         // Final
         Marked = false;
