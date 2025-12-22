@@ -136,7 +136,7 @@ public static class CodeGenerator
         // TileTypeID enum in Tile.cs
         string newTileSource = tileSource.Replace("    // TILES ID", $"    {name},\r\n    // TILES ID");
         // TileType variable in TileTypes class in Tile.cs
-        newTileSource = newTileSource.Replace("        // TILES REGISTER", $"        new(TileTypeID.{name}, TextureID.{name}, {isWalkable.ToString().ToLower()}, {isWall.ToString().ToLower()});\r\n        // TILES REGISTER");
+        newTileSource = newTileSource.Replace("        // TILES REGISTER", $"        new(TileTypeID.{name}, TextureID.{name}, {isWalkable.ToString().ToLower()}, {isWall.ToString().ToLower()}),\r\n        // TILES REGISTER");
         File.WriteAllText($"{sourceDirectory}/Tiles/Tile.cs", newTileSource);
 
         // TileFromID in LevelManager.cs
