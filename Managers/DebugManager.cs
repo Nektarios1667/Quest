@@ -5,7 +5,7 @@ public static class DebugManager
 {
     public static Stopwatch Watch { get; private set; } = new();
     public static Dictionary<string, double> FrameTimes { get; private set; } = [];
-    private static Dictionary<string, float> benchmarkTimes = [];
+    private static readonly Dictionary<string, float> benchmarkTimes = [];
     public static bool CollisionDebug { get; set; } = false;
     public static bool TextInfo { get; set; } = true;
     public static bool FrameInfo { get; set; } = true;

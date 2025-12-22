@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Quest.Utilities;
+﻿namespace Quest.Utilities;
 public struct ByteCoord
 {
     public byte X;

@@ -33,7 +33,7 @@ public class NotificationArea(Point location, int height, SpriteFont font, Color
 
             // Fade away
             if (notif.Timer / notif.Duration >= .25f)
-                notif.Color = notif.BaseColor * (1 - ((notif.Timer * 4 / 3) / notif.Duration - .25f));
+                notif.Color = notif.BaseColor * (1 - (notif.Timer * 4 / 3 / notif.Duration - .25f));
             else
                 notif.Color = notif.BaseColor;
         }

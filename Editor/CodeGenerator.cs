@@ -1,5 +1,4 @@
-﻿using MonoGame.Extended.ECS;
-using ScottPlot;
+﻿using ScottPlot;
 using ScottPlot.TickGenerators;
 using System.IO;
 using System.Linq;
@@ -256,7 +255,7 @@ public static class CodeGenerator
         }
 
         // Write
-       Directory.CreateDirectory($"{sourceDirectory}/GameData/Worlds/{world}/loot");
+        Directory.CreateDirectory($"{sourceDirectory}/GameData/Worlds/{world}/loot");
         File.WriteAllBytes($"{sourceDirectory}/GameData/Worlds/{world}/loot/{tableName}.qlt", data);
     }
     public static int ParseItemEnumOrInt(string input, int offset = 0)

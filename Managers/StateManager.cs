@@ -150,7 +150,8 @@ public static class StateManager
                     writer.Write((ushort)loot.Location.X);
                     writer.Write((ushort)loot.Location.Y);
                 }
-            };
+            }
+            ;
 
             // Chests
             writer.Write((ushort)chests.Count);
@@ -317,7 +318,7 @@ public static class StateManager
     {
         writer.Write((byte)(item == null ? 0 : (byte)Enum.Parse(typeof(ItemTypeID), item.Name, true) + 1));
         if (item != null)
-            writer.Write((byte)item.Amount);
+            writer.Write(item.Amount);
     }
     public static Item? ReadItemData(BinaryReader reader)
     {

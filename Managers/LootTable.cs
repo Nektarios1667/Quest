@@ -63,7 +63,7 @@ public class LootPreset : ILootGenerator
             {
                 for (int x = 0; x < width; x++)
                 {
-                    int id = (reader.ReadByte() - 1);
+                    int id = reader.ReadByte() - 1;
                     // Empty
                     if (id < 0)
                     {

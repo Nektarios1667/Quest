@@ -1,6 +1,4 @@
-﻿using SharpDX.MediaFoundation.DirectX;
-
-namespace Quest.Managers;
+﻿namespace Quest.Managers;
 
 public enum UIDCategory
 {

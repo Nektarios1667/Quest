@@ -1,5 +1,4 @@
 ﻿using Quest.Gui;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace Quest.Managers;
 
@@ -177,7 +176,7 @@ public class OverlayManager
             {
                 for (int dy = 0; dy < lightDivisions; dy++)
                     for (int dx = 0; dx < lightDivisions; dx++)
-                        lightGrid.SetLight(lightTile.Scaled(lightDivisions) + new Point(dx, dy), (light.Size * lightDivisions) / Constants.TileSize.X);
+                        lightGrid.SetLight(lightTile.Scaled(lightDivisions) + new Point(dx, dy), light.Size * lightDivisions / Constants.TileSize.X);
             }
         }
         lightGrid.Run();
@@ -191,7 +190,7 @@ public class OverlayManager
             for (int x = 0; x < tileWidth; x++)
             {
                 // Biome
-                Point worldLoc = ((new Point(x, y) + start) * Constants.TileSize) / Constants.TileSize;
+                Point worldLoc = (new Point(x, y) + start) * Constants.TileSize / Constants.TileSize;
                 biomeColors[x, y] = gameManager.LevelManager.GetWeatherColor(gameManager, worldLoc, blend);
             }
         }

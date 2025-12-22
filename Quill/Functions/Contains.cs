@@ -1,5 +1,4 @@
-﻿using NCalc;
-using System.Linq;
+﻿using System.Linq;
 
 namespace Quest.Quill.Functions;
 public class Contains : IBuiltinFunction

@@ -1,12 +1,11 @@
-﻿using System.IO;
-using System.Text;
+﻿using System.Text;
 
 namespace Quest;
 public class Window : Game
 {
     static readonly StringBuilder debugSb = new();
     // Devices and managers
-    private GraphicsDeviceManager graphics;
+    private readonly GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
     private GameManager gameManager;
     private PlayerManager playerManager;
@@ -199,7 +198,7 @@ public class Window : Game
         spriteBatch.End();
         GraphicsDevice.SetRenderTarget(null);
         GraphicsDevice.Clear(Color.Transparent);
-        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, effect:Grading);
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, effect: Grading);
         spriteBatch.Draw(Render, Vector2.Zero, Color.White);
         spriteBatch.End();
 

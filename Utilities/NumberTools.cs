@@ -26,7 +26,7 @@ public static class NumberTools
     public static void CycleDown<T>(ref T value) where T : Enum
     {
         var values = (T[])Enum.GetValues(typeof(T));
-        int newIdx = (Array.IndexOf(values, value) - 1);
+        int newIdx = Array.IndexOf(values, value) - 1;
         if (newIdx < 0) newIdx = values.Length - 1;
         value = values[newIdx];
     }

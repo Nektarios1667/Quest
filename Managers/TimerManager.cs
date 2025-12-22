@@ -24,8 +24,8 @@ public static class TimerManager
             }
         }
     }
-    private static Dictionary<string, Timer> timers = [];
-    private static List<string> removals = [];
+    private static readonly Dictionary<string, Timer> timers = [];
+    private static readonly List<string> removals = [];
     public static void Update(GameManager gameManager)
     {
         DebugManager.StartBenchmark("TimerUpdates");

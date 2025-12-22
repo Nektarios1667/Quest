@@ -1,6 +1,4 @@
-﻿using NCalc;
-
-namespace Quest.Quill.Functions;
+﻿namespace Quest.Quill.Functions;
 public class GetItem2D : IBuiltinFunction
 {
     public FunctionResponse Run(string[] args)

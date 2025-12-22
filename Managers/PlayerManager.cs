@@ -1,7 +1,4 @@
-﻿using Microsoft.VisualBasic.Logging;
-using Quest.Gui;
-using SharpDX.Direct3D11;
-using System.ComponentModel;
+﻿using Quest.Gui;
 
 namespace Quest.Managers;
 

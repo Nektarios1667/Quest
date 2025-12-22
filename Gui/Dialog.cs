@@ -33,7 +33,7 @@ public class Dialog : Widget
         Dimensions = dimensions;
         Color = color;
         Border = border;
-        BorderColor = (borderColor == null ? Color.Black : (Color)borderColor);
+        BorderColor = borderColor == null ? Color.Black : (Color)borderColor;
         Text = text;
         Font = font;
         Foreground = foreground;

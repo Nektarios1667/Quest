@@ -1,2 +1,2 @@
 namespace Quest.Decals;
-public class DarkTint(Point location) : Decal(location) {}
+public class DarkTint(Point location) : Decal(location) { }

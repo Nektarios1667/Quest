@@ -7,7 +7,7 @@ public class LevelEditor : Game
 {
     static readonly StringBuilder debugSb = new();
     // Devices and managers
-    private GraphicsDeviceManager graphics;
+    private readonly GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch = null!;
     private GameManager gameManager = null!;
     private OverlayManager uiManager = null!;

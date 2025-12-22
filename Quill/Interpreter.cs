@@ -44,8 +44,8 @@ public static class Interpreter
         ExternalSymbols["<isinventoryopen>"] = player.Inventory.Opened.ToString();
         ExternalSymbols["<equippedslot>"] = player.Inventory.EquippedSlot.ToString();
         ExternalSymbols["<equippeditem>"] = (player.Inventory.Equipped?.Name ?? "null").WrapSingleQuotes();
-        ExternalSymbols["<equippeditemuid>"] = (player.Inventory.Equipped?.UID.ToString() ?? "-1");
-        ExternalSymbols["<equippeditemamount>"] = (player.Inventory.Equipped?.Amount.ToString() ?? "0");
+        ExternalSymbols["<equippeditemuid>"] = player.Inventory.Equipped?.UID.ToString() ?? "-1";
+        ExternalSymbols["<equippeditemamount>"] = player.Inventory.Equipped?.Amount.ToString() ?? "0";
         // Technical
         ExternalSymbols["<fps>"] = (1f / game.DeltaTime).ToString();
         ExternalSymbols["<deltatime>"] = game.DeltaTime.ToString();

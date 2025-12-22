@@ -624,8 +624,8 @@ public class LevelManager
 
         int mask = TileConnectionsMask(tile);
 
-        int srcX = (mask % Constants.TileMapDim.X) * Constants.TilePixelSize.X;
-        int srcY = (mask / Constants.TileMapDim.X) * Constants.TilePixelSize.Y;
+        int srcX = mask % Constants.TileMapDim.X * Constants.TilePixelSize.X;
+        int srcY = mask / Constants.TileMapDim.X * Constants.TilePixelSize.Y;
 
         return new(srcX, srcY, Constants.TilePixelSize.X, Constants.TilePixelSize.Y);
     }
@@ -634,8 +634,8 @@ public class LevelManager
 
         int mask = BiomeConnectionsMask(loc);
 
-        int srcX = (mask % Constants.TileMapDim.X) * Constants.TilePixelSize.X;
-        int srcY = (mask / Constants.TileMapDim.X) * Constants.TilePixelSize.Y;
+        int srcX = mask % Constants.TileMapDim.X * Constants.TilePixelSize.X;
+        int srcY = mask / Constants.TileMapDim.X * Constants.TilePixelSize.Y;
 
         return new(srcX, srcY, Constants.TilePixelSize.X, Constants.TilePixelSize.Y);
     }

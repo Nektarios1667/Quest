@@ -136,8 +136,8 @@ public static class TextureManager
         Slash,
         // EFFECTS ENUM INSERT
     }
-    private static float autoDepth = 0.0f;
-    private static List<string> errors = [];
+    private static readonly float autoDepth = 0.0f;
+    private static readonly List<string> errors = [];
     public static Dictionary<TextureID, Texture2D> Textures { get; private set; } = [];
     public static Dictionary<TextureID, Metadata> Metadata { get; private set; } = [];
     public static TextureID[] CharacterTextures = [];

@@ -1,5 +1,4 @@
 ﻿using Quest.Gui;
-using System.Linq;
 
 namespace Quest.Entities;
 
@@ -95,7 +94,7 @@ public class NPC
     {
         // Name and dialog
         string dialog = $"[{Name}] {Dialog}-------------------------------------------------------";
-        
+
         // Shop
         int o = 1;
         foreach (var option in ShopOptions)

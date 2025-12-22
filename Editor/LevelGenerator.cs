@@ -16,8 +16,8 @@ public class LevelGenerator
 {
     private FastNoiseLite Noise { get; set; } = new();
     private int _seed;
-    private Dictionary<string, Structure> Structures = new();
-    private List<Rectangle> GeneratedStructures = [];
+    private readonly Dictionary<string, Structure> Structures = new();
+    private readonly List<Rectangle> GeneratedStructures = [];
     public Terrain Terrain { get; set; }
     public Dictionary<string, Terrain> Terrains { get; set; } = new();
     public int Seed
@@ -121,7 +121,7 @@ public class LevelGenerator
                 {
                     TileTypeID? tileType = structure.Tiles[y * structure.Size.X + x];
                     if (!tileType.HasValue) continue;
-                    level[(spawnPoint.Y + y) * width + (spawnPoint.X + x)] = LevelManager.TileFromId(tileType.Value, new(spawnPoint.X + x, spawnPoint.Y + y));
+                    level[(spawnPoint.Y + y) * width + spawnPoint.X + x] = LevelManager.TileFromId(tileType.Value, new(spawnPoint.X + x, spawnPoint.Y + y));
                 }
             }
             // Add to generated structures

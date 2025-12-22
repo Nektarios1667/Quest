@@ -1,10 +1,9 @@
 ﻿using System.IO;
-using IO = System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms.Design;
 using static Quest.Editor.PopupFactory;
+using IO = System.IO;
 
 namespace Quest.Editor;
 public enum EditorTool : byte
@@ -539,11 +538,12 @@ public class EditorManager
         SaveLevel(values[0]);
     }
 
-    public void SaveLevel(string name) {
+    public void SaveLevel(string name)
+    {
         // Parse
         if (world == "" || world == "NUL_WORLD")
         {
-            if ((name.Contains('\\') || name.Contains('/')))
+            if (name.Contains('\\') || name.Contains('/'))
                 world = name.Split('\\', '/')[1];
             else
                 world = "new_world";
@@ -617,7 +617,7 @@ public class EditorManager
         }
 
         // Biome
-        if (flags.HasFlag(LevelFeatures.Biomes)) 
+        if (flags.HasFlag(LevelFeatures.Biomes))
             for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
                 writer.Write((byte)(int)levelManager.Level.Biome[i]);
 
@@ -705,7 +705,8 @@ public class EditorManager
         }
         OpenFile(values[0]);
     }
-    public void OpenFile(string filename) {
+    public void OpenFile(string filename)
+    {
         // Open
         if (!filename.Contains('/') && !filename.Contains('\\'))
         {
