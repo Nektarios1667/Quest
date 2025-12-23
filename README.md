@@ -2,7 +2,7 @@
 
 **Quest** is a pixel art tile-based adventure game built with a custom engine. It comes with the game, a level editor, and a code generator.
 
-![Quest Game](GameData/Docs/QuestGame.png)
+![Quest Game](GameData/Docs/QuestGame.PNG)
 
 ## Game Features
 
@@ -44,7 +44,7 @@ Clone the repository:
 
 ## Level Editor
 The level editor allows you to create and modify game levels with ease.
-![Quest Editor](GameData/Docs/QuestEditor.png)
+![Quest Editor](GameData/Docs/QuestEditor.PNG)
 
 ### Running the Level Editor
 The level editor is included in the same project as the game. To run it, run the game with the argument `--level-editor`.
