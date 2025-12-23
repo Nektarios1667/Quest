@@ -198,13 +198,14 @@ public class EditorManager
         // Door
         else if (tile is Door door)
         {
-            var (success, values) = ShowInputForm("Door Editor", [new("Key", null, Enum.GetNames(typeof(ItemTypeID))), new("Amount", IsByte)]);
+            var (success, values) = ShowInputForm("Door Editor", [new("Key", null, Enum.GetNames(typeof(ItemTypeID))), new("Amount", IsByte), new("Consume Key", null, ["true", "false"])]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Stair edit failed.");
                 return;
             }
-            door.Key = new(ItemTypes.All[(int)Enum.Parse(typeof(ItemTypeID), values[0])], byte.Parse(values[1]));
+            door.Key = new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[0])], byte.Parse(values[1]));
+            door.ConsumeKey = bool.Parse(values[2]);
         }
         // Chest
         else if (tile is Chest chest)
@@ -243,37 +244,52 @@ public class EditorManager
     }
     public void FloodFillTiles()
     {
-        // Fill with current material
+        return;
+        // TODO FIX IT FROM FREEZING
+
+        Tile start = GetTile(MouseCoord);
+        if (start.Type.ID == TileSelection)
+            return;
+
+        Queue<Tile> queue = new();
+        HashSet<Point> visited = [];
+
+        queue.Enqueue(start);
+        visited.Add(start.Location.ToPoint());
+
         int count = 0;
-        Tile tileBelow = GetTile(MouseCoord);
-        if (tileBelow.Type.ID != TileSelection)
+
+        while (queue.Count > 0)
         {
-            Queue<Tile> queue = new();
-            HashSet<ByteCoord> visited = []; // Track visited tiles
-            queue.Enqueue(tileBelow);
+            Tile current = queue.Dequeue();
+
+            SetTile(LevelManager.TileFromId((int)TileSelection, current.Location));
             count++;
-            while (queue.Count > 0)
+
+            foreach (Point offset in Constants.NeighborTiles)
             {
-                Tile current = queue.Dequeue();
-                if (current.Type.ID == TileSelection || visited.Contains(current.Location)) continue; // Skip if already filled
-                count++;
-                SetTile(LevelManager.TileFromId((int)TileSelection, current.Location));
-                visited.Add(current.Location); // Mark as visited
-                // Check neighbors
-                foreach (Point neighbor in Constants.NeighborTiles)
+                Point coord = current.Location + offset;
+
+                if (coord.X < 0 || coord.X >= Constants.MapSize.X ||
+                    coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
+                    continue;
+
+                if (visited.Contains(coord))
+                    continue;
+
+                Tile neighbor = GetTile(coord);
+
+                if (neighbor.Type.ID == start.Type.ID)
                 {
-                    Point neighborCoord = current.Location + neighbor;
-                    if (neighborCoord.X < 0 || neighborCoord.X >= Constants.MapSize.X || neighborCoord.Y < 0 || neighborCoord.Y >= Constants.MapSize.Y) continue;
-                    Tile neighborTile = GetTile(neighborCoord);
-                    if (neighborTile.Type == tileBelow.Type && neighborTile.Type.ID != TileSelection)
-                    {
-                        queue.Enqueue(neighborTile);
-                    }
+                    visited.Add(coord);      // ← KEY LINE
+                    queue.Enqueue(neighbor);
                 }
             }
-            Logger.Log($"Filled {count} tiles with '{TileSelection}' starting from {MouseCoord.X}, {MouseCoord.Y}.");
         }
+
+        Logger.Log($"Filled {count} tiles with '{TileSelection}' starting from {MouseCoord.X}, {MouseCoord.Y}.");
     }
+
     public void FloodFillBiome()
     {
         // Fill with current material

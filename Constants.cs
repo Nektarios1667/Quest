@@ -52,7 +52,7 @@ public static class Constants
     public static readonly Point MageHalfSizeY = new(0, MageSize.Y / 2); // Half size of the mage sprite in y pixels
     public static readonly Point MageItemShift = new(MageSize.X / 8, 0); // Used for center aligning mages
     public const float PlayerScale = 3;
-    public const int NPCScale = 3;
+    public const int NPCScale = 4;
 
     // Colors
     public static readonly Color NearBlack = new(85, 85, 85);

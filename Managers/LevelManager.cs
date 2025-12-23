@@ -389,7 +389,7 @@ public class LevelManager
                         if (keyName == "NUL" || keyName == "")
                             tile = new Door(loc, null);
                         else
-                            tile = new Door(loc, new(ItemTypes.All[(int)Enum.Parse(typeof(ItemTypeID), keyName)], flags.HasFlag(LevelFeatures.DoorKeyAmounts) ? reader.ReadByte() : (byte)1));
+                            tile = new Door(loc, new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), keyName)], flags.HasFlag(LevelFeatures.DoorKeyAmounts) ? reader.ReadByte() : (byte)1));
                     }
                     // Chests
                     else if (type == (int)TileTypeID.Chest)
