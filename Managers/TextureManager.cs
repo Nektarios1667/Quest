@@ -27,6 +27,10 @@ public static class TextureManager
         CyanVillager,
         GreenVillager,
         RedVillager,
+        OrangeVillager,
+        PinkVillager,
+        PurpleVillager,
+        YellowVillager,
         Guard,
         DarkGuard,
         GuardLeader,
@@ -172,6 +176,10 @@ public static class TextureManager
         Textures[TextureID.CyanVillager] = content.Load<Texture2D>("Images/Characters/CyanVillager");
         Textures[TextureID.GreenVillager] = content.Load<Texture2D>("Images/Characters/GreenVillager");
         Textures[TextureID.RedVillager] = content.Load<Texture2D>("Images/Characters/RedVillager");
+        Textures[TextureID.OrangeVillager] = content.Load<Texture2D>("Images/Characters/OrangeVillager");
+        Textures[TextureID.PinkVillager] = content.Load<Texture2D>("Images/Characters/PinkVillager");
+        Textures[TextureID.PurpleVillager] = content.Load<Texture2D>("Images/Characters/PurpleVillager");
+        Textures[TextureID.YellowVillager] = content.Load<Texture2D>("Images/Characters/YellowVillager");
         Textures[TextureID.Guard] = content.Load<Texture2D>("Images/Characters/Guard");
         Textures[TextureID.DarkGuard] = content.Load<Texture2D>("Images/Characters/DarkGuard");
         Textures[TextureID.GuardLeader] = content.Load<Texture2D>("Images/Characters/GuardLeader");
@@ -307,6 +315,10 @@ public static class TextureManager
         Metadata[TextureID.CyanVillager] = new(Textures[TextureID.CyanVillager].Bounds.Size, new(2, 1), "character");
         Metadata[TextureID.GreenVillager] = new(Textures[TextureID.GreenVillager].Bounds.Size, new(2, 1), "character");
         Metadata[TextureID.RedVillager] = new(Textures[TextureID.RedVillager].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.OrangeVillager] = new(Textures[TextureID.OrangeVillager].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.PinkVillager] = new(Textures[TextureID.PinkVillager].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.PurpleVillager] = new(Textures[TextureID.PurpleVillager].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.YellowVillager] = new(Textures[TextureID.YellowVillager].Bounds.Size, new(2, 1), "character");
         Metadata[TextureID.Guard] = new(Textures[TextureID.Guard].Bounds.Size, new(2, 1), "character");
         Metadata[TextureID.DarkGuard] = new(Textures[TextureID.DarkGuard].Bounds.Size, new(2, 1), "character");
         Metadata[TextureID.GuardLeader] = new(Textures[TextureID.GuardLeader].Bounds.Size, new(2, 1), "character");
