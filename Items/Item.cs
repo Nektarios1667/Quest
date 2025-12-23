@@ -55,6 +55,12 @@ public class ItemType
 
 public class ItemTypes
 {
+    public static ItemType Get(ItemTypeID typeID) => All[(byte)typeID];
+    public static ItemType Get(string typeID) {
+        if (!Enum.TryParse<ItemTypeID>(typeID, out var parsedTypeID))
+            throw new ArgumentException($"ItemType {typeID} does not exist");
+        return All[(byte)Enum.Parse(typeof(ItemTypeID), typeID)];
+    }
     public static readonly ItemType ActivePalantir = new(ItemTypeID.ActivePalantir, "A seeing stone used to communicate with sauron.", 1);
     public static readonly ItemType SteelSword = new(ItemTypeID.SteelSword, "A sturdy steel sword.", 1);
     public static readonly ItemType DeltaCoin = new(ItemTypeID.DeltaCoin, "A gold coin.");
@@ -152,6 +158,12 @@ public class Item
     {
         Type = itemType;
         Amount = (byte)amount;
+        UID = UIDManager.Get(UIDCategory.Items);
+    }
+    public Item(ItemRef itemRef)
+    {
+        Type = itemRef.Type;
+        Amount = itemRef.Amount;
         UID = UIDManager.Get(UIDCategory.Items);
     }
     public virtual void PrimaryUse(PlayerManager player) { }

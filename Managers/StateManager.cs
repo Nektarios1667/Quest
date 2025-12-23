@@ -12,7 +12,6 @@ public enum LevelFeatures : ushort
     None = 0,
     Biomes = 1,
     QuillScripts = 2,
-    DoorKeyAmounts = 4,
 }
 public enum GameState
 {
@@ -215,7 +214,7 @@ public static class StateManager
         }
         CurrentSave = levelPath;
         WriteKeyValueFile("continue", new() { { "save", save } });
-        gameManager.LevelManager.ReadWorld(gameManager.UIManager, levelPath.WorldName, true);
+        gameManager.LevelManager.ReadWorld(gameManager, levelPath.WorldName, true);
 
         using (var fs = new FileStream(file, FileMode.Open, FileAccess.Read))
         //using (var gzip = new GZipStream(fs, CompressionMode.Decompress))

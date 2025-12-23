@@ -28,8 +28,10 @@ public class Door : Tile
             {
                 player.Inventory.Consume(Key);
                 game.UIManager.Notification($"-{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
-                SoundManager.PlaySoundInstance("DoorUnlock");
-            }
+            } else if (Key != null)
+                game.UIManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Gray, 2);
+
+            SoundManager.PlaySoundInstance("DoorUnlock");
             Open(game);
         }
         else

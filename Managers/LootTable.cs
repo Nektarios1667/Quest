@@ -26,7 +26,7 @@ public interface ILootGenerator
 public class LootPreset : ILootGenerator
 {
     public string FileName { get; }
-    public static readonly LootPreset EmptyPreset = new(new Item?[0, 0], "_");
+    public static readonly LootPreset EmptyPreset = new(new Item?[0, 0], "NUL");
     public Item?[,] Preset { get; }
     public LootPreset(Item?[,] items, string filename)
     {
@@ -170,7 +170,9 @@ public static class LootGeneratorHelper
 {
     public static ILootGenerator Read(string world, string file)
     {
-        if (file.EndsWith(".qlt"))
+        if (file.IsNUL() || file == "_")
+            return LootPreset.EmptyPreset;
+        else if (file.EndsWith(".qlt"))
             return LootTable.ReadLootTable(world, file);
         else if (file.EndsWith(".qlp"))
             return LootPreset.ReadLootPreset(world, file);

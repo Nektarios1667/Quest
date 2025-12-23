@@ -4,11 +4,11 @@ namespace Quest.Entities;
 
 public class ShopOption
 {
-    public Item Item;
-    public Item? Cost;
+    public ItemRef Item;
+    public ItemRef? Cost;
     public int Stock;
 
-    public ShopOption(Item item, Item? cost, int stock)
+    public ShopOption(ItemRef item, ItemRef? cost, int stock)
     {
         Item = item;
         Cost = cost;
@@ -18,7 +18,7 @@ public class ShopOption
     public bool Buy(Inventory inventory)
     {
         if (Cost == null || inventory.Consume(Cost))
-            inventory.AddItem(Item);
+            inventory.AddItem(new(Item));
         else
             return false;
         return true;
@@ -54,10 +54,6 @@ public class NPC
         Dialog = dialog;
         TextureColor = textureColor == default ? Color.White : textureColor;
         Scale = scale;
-        AddShopOption(new(ItemTypes.SteelSword, 1), new(ItemTypes.DeltaCoin, 3), 1);
-        AddShopOption(new(ItemTypes.SteelSword, 1), new(ItemTypes.PhiCoin, 7), 1);
-        AddShopOption(new(ItemTypes.Lantern, 1), new(ItemTypes.PhiCoin, 4), 2);
-        AddShopOption(new(ItemTypes.Lantern, 1), null, 4);
     }
     public void Draw(GameManager gameManager)
     {
@@ -86,7 +82,7 @@ public class NPC
         }
         ShopOptions.Add(option);
     }
-    public void AddShopOption(Item bought, Item? cost, int stock)
+    public void AddShopOption(ItemRef bought, ItemRef? cost, int stock)
     {
         AddShopOption(new(bought, cost, stock));
     }
@@ -117,7 +113,7 @@ public class NPC
         // Buy
         if ((option.Cost == null || inv.Consume(option.Cost)) && option.Stock > 0)
         {
-            (bool success, Item leftover) = inv.AddItem(option.Item);
+            (bool success, Item leftover) = inv.AddItem(new(option.Item));
             if (!success)
                 gameManager.LevelManager.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), Location, gameManager.GameTime));
             if (leftover.Amount < option.Item.Amount)

@@ -45,11 +45,11 @@ public class Decal
     public byte X => Location.X;
     public byte Y => Location.Y;
     public ushort UID => (ushort)(Y * Constants.MapSize.X + X);
-    public Decal(Point location)
+    public Decal(Point location, DecalType? type = null)
     {
         // Initialize the tile
         Location = new(location);
-        Type = (DecalType)Enum.Parse(typeof(DecalType), GetType().Name);
+        Type = type ?? (DecalType)Enum.Parse(typeof(DecalType), GetType().Name);
         Texture = TileToTexture.TryGetValue(Type, out var tex) ? tex : TextureID.Null;
     }
     public virtual void Draw(GameManager gameManager)

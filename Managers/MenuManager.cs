@@ -187,7 +187,7 @@ public class MenuManager
         if (saves.Selected == "(New Save)")
         {
             StateManager.CurrentSave = new($"{worlds.Selected}/{DateTime.Now:Save MM-dd-yy HH-mm-ss}");
-            gameManager.LevelManager.ReadWorld(gameManager.UIManager, worlds.Selected, reload: true);
+            gameManager.LevelManager.ReadWorld(gameManager, worlds.Selected, reload: true);
             if (!gameManager.LevelManager.LoadLevel(gameManager, $"{worlds.Selected}/{worlds.Selected}"))
                 gameManager.LevelManager.LoadLevel(gameManager, 0);
         } else 

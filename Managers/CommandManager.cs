@@ -224,12 +224,12 @@ public static class CommandManager
             }
             else if (parts[1] == "read")
             {
-                levelManager!.ReadLevel(gameManager!.UIManager, parts[2], reload: true);
+                levelManager!.ReadLevel(gameManager!, parts[2], reload: true);
                 return true;
             }
             else if (parts[1] == "open")
             {
-                levelManager!.ReadLevel(gameManager!.UIManager, parts[2]);
+                levelManager!.ReadLevel(gameManager!, parts[2]);
                 levelManager!.LoadLevel(gameManager!, parts[2]);
                 return true;
             }

@@ -52,19 +52,18 @@ public class LevelGenerator
         }
         Terrain = Terrains["Islands"];
     }
+
     public float GetNormNoise(int x, int y)
     {
         // Generate noise value in range [0, 1]
         float noiseValue = Noise.GetNoise(x, y);
         return (noiseValue + 1) / 2; // Normalize to [0, 1]
     }
-    public float GetNormNoise(Point point) => GetNormNoise(point.X, point.Y);
     public float GetNoise(int x, int y)
     {
         // Generate noise value in range [-1, 1]
         return Noise.GetNoise(x, y);
     }
-    public float GetNoise(Point point) => GetNoise(point.X, point.Y);
     public TileTypeID GetGeneratedTile(int x, int y, float value)
     {
         foreach (var (min, max, tile) in Terrain.Ranges)
@@ -75,8 +74,6 @@ public class LevelGenerator
         }
         return TileTypeID.Sky;
     }
-    public TileTypeID GetGeneratedTile(Point point, float value) => GetGeneratedTile(point.X, point.Y, value);
-
     public Tile[] GenerateTerrain(int width, int height)
     {
         Tile[] level = new Tile[width * height];

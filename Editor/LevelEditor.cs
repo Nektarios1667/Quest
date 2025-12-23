@@ -87,7 +87,7 @@ public class LevelEditor : Game
         gui = new(this, spriteBatch, Arial);
         mouseMenu = new(gui, Point.Zero, new(100, 300), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         mouseMenu.AddItem("Pick", () => { TileSelection = mouseTile.Type.ID; Logger.Log($"Picked tile '{TileSelection}' @ {mouseCoord.X}, {mouseCoord.Y}."); }, []);
-        mouseMenu.AddItem("Open", editorManager.OpenFileDialog, []);
+        mouseMenu.AddItem("Open", editorManager.OpenLevelDialog, []);
         mouseMenu.AddItem("Fill", editorManager.FloodFill, []);
         mouseMenu.AddItem("Edit", editorManager.EditTile, []);
 
@@ -220,15 +220,18 @@ public class LevelEditor : Game
         // Pick
         if (InputManager.MMouseClicked) PickTile();
         // Open file
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.O)) editorManager.OpenFileDialog();
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.O)) editorManager.OpenLevelDialog();
         // Fill
         if (InputManager.KeyPressed(Keys.F)) editorManager.FloodFill();
         // NPCs
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.N)) { MouseSelect(); editorManager.EditNPCs(); }
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.N)) { MouseSelect(); editorManager.NewNPC(); }
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.N)) { MouseSelect(); editorManager.DeleteNPC(); }
         // Loot
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.L)) { MouseSelect(); editorManager.EditLoot(); }
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.L)) { MouseSelect(); editorManager.NewLoot(); }
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.L)) { MouseSelect(); editorManager.DeleteLoot(); }
         // Decals
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.D)) { MouseSelect(); editorManager.EditDecals(); }
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.D)) { MouseSelect(); editorManager.NewDecal(); }
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.D)) { MouseSelect(); editorManager.DeleteDecal(); }
         // Save
         if (InputManager.Hotkey(Keys.LeftControl, Keys.E)) editorManager.SaveLevelDialog();
         // Level info
@@ -240,6 +243,10 @@ public class LevelEditor : Game
         if (InputManager.Hotkey(Keys.LeftControl, Keys.R)) editorManager.ResaveLevel(levelManager.Level.LevelPath);
         // Resave world
         if (InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.R)) editorManager.ResaveWorld(levelManager.Level.World);
+        // Tool select
+        if (InputManager.KeyPressed(Keys.D1)) currentTool = EditorTool.Tile;
+        if (InputManager.KeyPressed(Keys.D2)) currentTool = EditorTool.Decal;
+        if (InputManager.KeyPressed(Keys.D3)) currentTool = EditorTool.Biome;
         // Script
         //if (InputManager.Hotkey(Keys.LeftControl, Keys.P)) editorManager.EditScript();
 
@@ -327,7 +334,7 @@ public class LevelEditor : Game
 
         // Tile info
         if (mouseTile is Stairs stair)
-            DrawBottomInfo($"[Stairs] dest: '{stair.DestLevel}' @ {stair.DestX},{stair.DestY}");
+            DrawBottomInfo($"[Stairs] dest: '{stair.DestLevel}' @ {stair.Dest}");
         else if (mouseTile is Door door)
             DrawBottomInfo($"[Door] key: {(door.Key == null ? "None" : $"'{door.Key.Name}' x{door.Key.Amount}")} consume: {door.ConsumeKey}");
         else if (mouseTile is Chest chest)

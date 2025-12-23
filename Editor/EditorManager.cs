@@ -1,4 +1,5 @@
-﻿using SharpDX.Direct3D9;
+﻿using Quest.Utilities;
+using SharpDX.Direct3D9;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -39,7 +40,7 @@ public class EditorManager
     private TileTypeID TileSelection;
     private EditorTool CurrentTool;
     private BiomeType BiomeSelection;
-    private RenderTarget2D Minimap;
+    private RenderTarget2D Minimap = null!;
     private bool RebuildMinimap = true;
     private DecalType? PreviousDecal = null;
     private string world = "";
@@ -194,8 +195,7 @@ public class EditorManager
 
             // Level
             stairs.DestLevel = $"{world}/{values[0]}";
-            stairs.DestX = byte.Parse(values[1]);
-            stairs.DestY = byte.Parse(values[2]);
+            stairs.Dest = new(byte.Parse(values[1]), byte.Parse(values[2]));
         }
         // Door
         else if (tile is Door door)
@@ -330,13 +330,6 @@ public class EditorManager
         }
         LevelManager.Level.Tint = new Color(byte.Parse(values[0]), byte.Parse(values[1]), byte.Parse(values[2])) * (byte.Parse(values[3]) / 255f);
     }
-    public void EditNPCs()
-    {
-        if (InputManager.KeyDown(Keys.LeftShift)) // Delete
-            DeleteNPC();
-        else // New
-            NewNPC();
-    }
     public void NewNPC()
     {
         // Check
@@ -377,15 +370,6 @@ public class EditorManager
                 break;
             }
         }
-    }
-    public void EditDecals()
-    {
-        if (InputManager.KeyDown(Keys.LeftShift)) // Delete
-            DeleteDecal();
-        else if (InputManager.KeyDown(Keys.LeftAlt)) // Paste
-            PasteDecal();
-        else // New
-            NewDecal();
     }
     public void NewDecal()
     {
@@ -432,13 +416,6 @@ public class EditorManager
                 break;
             }
         }
-    }
-    public void EditLoot()
-    {
-        if (InputManager.KeyDown(Keys.LeftShift)) // Delete
-            DeleteLoot();
-        else // New
-            NewLoot();
     }
     public void NewLoot()
     {
@@ -516,7 +493,7 @@ public class EditorManager
     }
     public void ResaveLevel(LevelPath levelPath)
     {
-        OpenFile(levelPath.Path);
+        OpenLevel(levelPath.Path);
         SaveLevel(levelPath.LevelName, levelPath.WorldName);
         Logger.Log($"Resaved level '{levelPath.Path}'");
     }
@@ -571,19 +548,15 @@ public class EditorManager
         using BinaryWriter writer = new(gzipStream);
 
         // Metadata
-        var flags = LevelFeatures.Biomes | LevelFeatures.QuillScripts | LevelFeatures.DoorKeyAmounts;
+        var flags = LevelFeatures.Biomes | LevelFeatures.QuillScripts;
         writer.Write(Encoding.UTF8.GetBytes("QLVL")); // Magic number
         writer.Write((ushort)flags); // Flags
 
         // Write tint
-        writer.Write(LevelManager.Level.Tint.R);
-        writer.Write(LevelManager.Level.Tint.G);
-        writer.Write(LevelManager.Level.Tint.B);
-        writer.Write(LevelManager.Level.Tint.A);
+        writer.Write(LevelManager.Level.Tint);
 
         // Write spawn
-        writer.Write(LevelEditor.IntToByte(LevelManager.Level.Spawn.X));
-        writer.Write(LevelEditor.IntToByte(LevelManager.Level.Spawn.Y));
+        writer.Write(new ByteCoord(LevelManager.Level.Spawn));
 
         // Tiles
         for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
@@ -596,18 +569,16 @@ public class EditorManager
             {
                 // Write destination
                 writer.Write(stairs.DestLevel.Split('/', '\\')[^1]);
-
-                writer.Write(stairs.DestX);
-                writer.Write(stairs.DestY);
+                writer.Write(stairs.Dest);
             }
             else if (tile is Door door)
             {
                 // Write door key
                 writer.Write(door.Key == null ? "" : door.Key.Name);
-                if (flags.HasFlag(LevelFeatures.DoorKeyAmounts) && door.Key != null) writer.Write(door.Key.Amount);
+                if (door.Key != null) writer.Write(door.Key.Amount);
             }
             else if (tile is Chest chest)
-                writer.Write(chest.LootGenerator.FileName.Split('/', '\\')[^1]);
+                writer.Write(chest.LootGenerator);
             else if (tile is Lamp lamp)
                 writer.Write(lamp.LightRadius);
         }
@@ -620,39 +591,17 @@ public class EditorManager
         // NPCs
         writer.Write((byte)Math.Min(LevelManager.Level.NPCs.Count, 255));
         for (int n = 0; n < Math.Min(LevelManager.Level.NPCs.Count, 255); n++)
-        {
-            NPC npc = LevelManager.Level.NPCs[n];
-            // Write NPC data
-            writer.Write(npc.Name);
-            writer.Write(npc.Dialog);
-            writer.Write(LevelEditor.IntToByte(npc.Location.X));
-            writer.Write(LevelEditor.IntToByte(npc.Location.Y));
-            writer.Write(LevelEditor.IntToByte((int)(npc.Scale * 10)));
-            writer.Write(LevelEditor.IntToByte((int)npc.Texture));
-        }
+            writer.Write(LevelManager.Level.NPCs[n]);
 
         // Floor loot
         writer.Write((byte)Math.Min(LevelManager.Level.Loot.Count, 255));
         for (int n = 0; n < Math.Min(LevelManager.Level.Loot.Count, 255); n++)
-        {
-            Loot loot = LevelManager.Level.Loot[n];
-            // Write loot data
-            writer.Write(loot.Item.Name);
-            writer.Write(LevelEditor.IntToByte(loot.Item.Amount));
-            writer.Write((ushort)loot.Location.X);
-            writer.Write((ushort)loot.Location.Y);
-        }
+            writer.Write(LevelManager.Level.Loot[n]);
 
         // Decals
         writer.Write((byte)Math.Min(LevelManager.Level.Decals.Count, 255));
         for (int n = 0; n < Math.Min(LevelManager.Level.Decals.Count, 255); n++)
-        {
-            Decal decal = LevelManager.Level.Decals[n];
-            // Write decal data
-            writer.Write((byte)decal.Type);
-            writer.Write(LevelEditor.IntToByte(decal.X));
-            writer.Write(LevelEditor.IntToByte(decal.Y));
-        }
+            writer.Write(LevelManager.Level.Decals[n]);
 
         // Scripts
         if (flags.HasFlag(LevelFeatures.QuillScripts))
@@ -690,18 +639,18 @@ public class EditorManager
         LevelManager.LoadLevelObject(GameManager, level);
         FlagRebuildMinimap();
     }
-    public void OpenFileDialog()
+    public void OpenLevelDialog()
     {
         // Winforms
-        var (success, values) = ShowInputForm("Open File", [new("File Name", null)]);
+        var (success, values) = ShowInputForm("Open Level", [new("Level", null)]);
         if (!success)
         {
             if (!PopupOpen) Logger.Error("Failed to open file.");
             return;
         }
-        OpenFile(values[0]);
+        OpenLevel(values[0]);
     }
-    public void OpenFile(string filename)
+    public void OpenLevel(string filename)
     {
         // Open
         if (!filename.Contains('/') && !filename.Contains('\\'))
@@ -710,16 +659,9 @@ public class EditorManager
             return;
         }
         world = filename.Split('\\', '/')[0];
-        try
-        {
-            LevelManager.ReadLevel(GameManager.UIManager, filename, reload: true);
-            LevelManager.LoadLevel(GameManager, filename);
-            Logger.Log($"Opened level '{filename}'.");
-        }
-        catch (Exception ex)
-        {
-            Logger.Error($"Failed to open level '{filename}': {ex.Message}");
-        }
+        LevelManager.ReadLevel(GameManager, filename, reload: true);
+        LevelManager.LoadLevel(GameManager, filename);
+        Logger.Log($"Opened level '{filename}'.");
 
         FlagRebuildMinimap();
     }
