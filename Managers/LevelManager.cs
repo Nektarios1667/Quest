@@ -28,7 +28,7 @@ public class LevelManager
     }
     public void Update(GameManager gameManager)
     {
-        if (!StateManager.IsGameState) return;
+        if (!StateManager.IsPlayingState) return;
 
         // Entities
         foreach (NPC npc in Level.NPCs) npc.Update(gameManager);
@@ -81,7 +81,7 @@ public class LevelManager
     }
     public void Draw(GameManager gameManager)
     {
-        if (!StateManager.IsGameState) return;
+        if (!StateManager.IsPlayingState) return;
 
         DrawTiles(gameManager);
         DrawDecals(gameManager);
@@ -411,11 +411,7 @@ public class LevelManager
                     }
                     // Lamps
                     else if (type == (int)TileTypeID.Lamp)
-                    {
-                        Color lampTint = new(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
-                        ushort lampRadius = reader.ReadUInt16();
-                        tile = new Lamp(loc, lampTint, lampRadius);
-                    }
+                        tile = new Lamp(loc, reader.ReadByte());
                     else // Regular tile
                         tile = TileFromId(type, loc);
                     int idx = tile.X + tile.Y * Constants.MapSize.X;

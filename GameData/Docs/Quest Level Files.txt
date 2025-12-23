@@ -15,13 +15,18 @@ spawnY - byte
 	(special)
 	door:
 		keyName - string
+		{KeyAmounts}
+		keyAmount - byte
 	stairs:
 		destLevel - string
 		destX - byte
 		destY - byte
 	chest:
 		lootGeneratorFile - string
+	lamp:
+		radius - byte
 
+{Biomes}
 [for each tile (65536)]
 	biomeID - byte
 
@@ -50,3 +55,9 @@ decalNumber - byte
 	decalType - byte
 	decalX - uint16
 	decalY - uint16
+
+{QuillScripts}
+scriptNumber - byte
+[for each script (<256)]
+	string - name
+	string - content

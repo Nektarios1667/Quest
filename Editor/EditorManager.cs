@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using SharpDX.Direct3D9;
+using System.Diagnostics;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
@@ -226,14 +228,13 @@ public class EditorManager
         // Lamp
         else if (tile is Lamp lamp)
         {
-            var (success, values) = ShowInputForm("Lamp Editor", [new("Color R", IsByte), new("Color G", IsByte), new("Color B", IsByte), new("Light Strength", IsByte), new("Light Radius", IsUInt16)]);
+            var (success, values) = ShowInputForm("Lamp Editor", [new("Light Radius", IsByte)]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Lamp edit failed.");
                 return;
             }
-            lamp.LightColor = new(byte.Parse(values[0]), byte.Parse(values[1]), byte.Parse(values[2]), byte.Parse(values[3]));
-            lamp.LightRadius = ushort.Parse(values[4]);
+            lamp.LightRadius = byte.Parse(values[4]);
         }
     }
     public void FloodFill()
@@ -244,50 +245,40 @@ public class EditorManager
     }
     public void FloodFillTiles()
     {
-        return;
-        // TODO FIX IT FROM FREEZING
-
-        Tile start = GetTile(MouseCoord);
-        if (start.Type.ID == TileSelection)
-            return;
-
-        Queue<Tile> queue = new();
-        HashSet<Point> visited = [];
-
-        queue.Enqueue(start);
-        visited.Add(start.Location.ToPoint());
-
+        // Fill with current material
+        var sw = Stopwatch.StartNew();
         int count = 0;
-
-        while (queue.Count > 0)
+        Tile tileBelow = GetTile(MouseCoord);
+        if (tileBelow.Type.ID != TileSelection)
         {
-            Tile current = queue.Dequeue();
-
-            SetTile(LevelManager.TileFromId((int)TileSelection, current.Location));
+            Queue<Tile> queue = new();
+            HashSet<ByteCoord> visited = []; // Track visited tiles
+            queue.Enqueue(tileBelow);
             count++;
-
-            foreach (Point offset in Constants.NeighborTiles)
+            
+            while (queue.Count > 0)
             {
-                Point coord = current.Location + offset;
+                Tile current = queue.Dequeue();
+                if (current.Type.ID == TileSelection || visited.Contains(current.Location)) continue; // Skip if already filled
+                count++;
+                SetTile(new Tile(current.Location, TileSelection));
+                visited.Add(current.Location); // Mark as visited
 
-                if (coord.X < 0 || coord.X >= Constants.MapSize.X ||
-                    coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
-                    continue;
-
-                if (visited.Contains(coord))
-                    continue;
-
-                Tile neighbor = GetTile(coord);
-
-                if (neighbor.Type.ID == start.Type.ID)
+                // Check neighbors
+                foreach (Point neighbor in Constants.NeighborTiles)
                 {
-                    visited.Add(coord);      // ← KEY LINE
-                    queue.Enqueue(neighbor);
+                    Point neighborCoord = current.Location + neighbor;
+                    if (neighborCoord.X < 0 || neighborCoord.X >= Constants.MapSize.X || neighborCoord.Y < 0 || neighborCoord.Y >= Constants.MapSize.Y) continue;
+                    Tile neighborTile = GetTile(neighborCoord);
+                    if (neighborTile.Type == tileBelow.Type && neighborTile.Type.ID != TileSelection)
+                    {
+                        queue.Enqueue(neighborTile);
+                    }
                 }
             }
+            sw.Stop();
+            Logger.Log($"Filled {count} tiles with '{TileSelection}' starting from {MouseCoord.X}, {MouseCoord.Y} in {sw.ElapsedMilliseconds:F1}ms.");
         }
-
-        Logger.Log($"Filled {count} tiles with '{TileSelection}' starting from {MouseCoord.X}, {MouseCoord.Y}.");
     }
 
     public void FloodFillBiome()
@@ -523,11 +514,11 @@ public class EditorManager
         string sourceCode = File.ReadAllText(values[1]);
         LevelManager.Level.Scripts.Add(new QuillScript(name, sourceCode));
     }
-    public void ResaveLevel(string name)
+    public void ResaveLevel(LevelPath levelPath)
     {
-        OpenFile(name);
-        SaveLevel(name);
-        Logger.Log($"Resaved level '{name}'");
+        OpenFile(levelPath.Path);
+        SaveLevel(levelPath.LevelName, levelPath.WorldName);
+        Logger.Log($"Resaved level '{levelPath.Path}'");
     }
     public void ResaveWorld(string world)
     {
@@ -538,8 +529,8 @@ public class EditorManager
         // Resave all
         foreach (var level in levels)
         {
-            string formattedLevel = IO.Path.Combine(IO.Path.GetFileName(IO.Path.GetDirectoryName(level))!, IO.Path.GetFileName(level));
-            ResaveLevel(formattedLevel);
+            string formattedLevel = $"{world}/{IO.Path.GetFileNameWithoutExtension(level)}";
+            ResaveLevel(new(formattedLevel));
         }
     }
     public void SaveLevelDialog()
@@ -554,11 +545,9 @@ public class EditorManager
         SaveLevel(values[0]);
     }
 
-    public void SaveLevel(string name)
+    public void SaveLevel(string name, string? currentWorld = null)
     {
         // Parse
-        if (world.Contains('/') || world.Contains('\\'))
-            throw new Exception("world var has / or \\ which might be doing that dumb bug");
         if (world == "" || world == "NUL_WORLD")
         {
             world = "new_world";
@@ -569,6 +558,8 @@ public class EditorManager
             Logger.Error($"Invalid level format. File has to be in the same world.");
             return;
         }
+        if (currentWorld != null)
+            world = currentWorld;
         string prefix = Constants.DEVMODE ? "../../../" : "";
 
         Directory.CreateDirectory($"{prefix}GameData/Worlds/{world}");
@@ -616,19 +607,9 @@ public class EditorManager
                 if (flags.HasFlag(LevelFeatures.DoorKeyAmounts) && door.Key != null) writer.Write(door.Key.Amount);
             }
             else if (tile is Chest chest)
-            {
-                // Write chest loot
                 writer.Write(chest.LootGenerator.FileName.Split('/', '\\')[^1]);
-            }
             else if (tile is Lamp lamp)
-            {
-                // Write lamp data
-                writer.Write(lamp.LightColor.R);
-                writer.Write(lamp.LightColor.G);
-                writer.Write(lamp.LightColor.B);
-                writer.Write(lamp.LightColor.A);
                 writer.Write(lamp.LightRadius);
-            }
         }
 
         // Biome

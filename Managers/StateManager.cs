@@ -14,8 +14,6 @@ public enum LevelFeatures : ushort
     QuillScripts = 2,
     DoorKeyAmounts = 4,
 }
-
-
 public enum GameState
 {
     MainMenu,
@@ -49,7 +47,7 @@ public static class StateManager
     private static float lastWeather = 0f;
     private static float lastTime = -1f;
     // States
-    public static bool IsGameState => State == GameState.Game || State == GameState.Editor;
+    public static bool IsPlayingState => State == GameState.Game || State == GameState.Editor;
     private static GameState _state = GameState.MainMenu;
     public static GameState State
     {

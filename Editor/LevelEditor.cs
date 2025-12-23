@@ -237,7 +237,7 @@ public class LevelEditor : Game
         // Generate level
         if (InputManager.Hotkey(Keys.LeftControl, Keys.G)) editorManager.GenerateLevel();
         // Resave level
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.R)) editorManager.ResaveLevel(levelManager.Level.Name);
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.R)) editorManager.ResaveLevel(levelManager.Level.LevelPath);
         // Resave world
         if (InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.R)) editorManager.ResaveWorld(levelManager.Level.World);
         // Script
@@ -333,7 +333,7 @@ public class LevelEditor : Game
         else if (mouseTile is Chest chest)
             DrawBottomInfo($"[Chest] gen: '{chest.LootGenerator.FileName}'");
         else if (mouseTile is Lamp lamp)
-            DrawBottomInfo($"[Lamp] color: {lamp.LightColor} | radius: {lamp.LightRadius}");
+            DrawBottomInfo($"[Lamp] radius: {lamp.LightRadius}");
         else
             DrawBottomInfo($"[{mouseTile?.Type.Texture}]");
 
