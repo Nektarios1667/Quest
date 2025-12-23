@@ -168,7 +168,11 @@ public class Item
     public static Item ItemFromItemType(ItemTypeID itemType, int amount)
     {
         ItemType type = ItemTypes.All[(byte)itemType];
-        return new(type, amount);
+        return itemType switch
+        {
+            ItemTypeID.Lantern => new Lantern(amount),
+            _ => new Item(type, amount),
+        };
     }
     public Item ShallowCopy()
     {
