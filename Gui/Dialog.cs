@@ -80,7 +80,7 @@ public class Dialog : Widget
         if (respeak == DialogRespeak.Instant)
         {
             Text = text;
-            Displayed = text;
+            Displayed = SoftwrapWords(text, Font, Inside);
         }
     }
     public static string SoftwrapWords(string text, SpriteFont font, Xna.Vector2 dimensions)
