@@ -393,7 +393,7 @@ public class LevelManager
         Door ReadDoor(Point loc)
         {
             string keyName = reader.ReadString();
-            return new Door(loc, keyName.IsNUL() ? null : new(ItemTypes.Get(keyName), reader.ReadByte()), !flags.HasFlag(LevelFeatures.KeyConsumeOption) || keyName.IsNUL() || reader.ReadBoolean());
+            return new Door(loc, keyName.IsNUL() ? null : new(ItemTypes.Get(keyName), reader.ReadByte()), keyName.IsNUL() || reader.ReadBoolean());
         }
         Chest ReadChest(Point loc)
         {
