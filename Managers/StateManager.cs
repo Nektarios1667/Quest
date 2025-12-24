@@ -12,6 +12,7 @@ public enum LevelFeatures : ushort
     None = 0,
     Biomes = 1,
     QuillScripts = 2,
+    KeyConsumeOption = 4,
 }
 public enum GameState
 {

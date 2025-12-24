@@ -89,7 +89,7 @@ public class NPC
     public string GetFullDialog()
     {
         // Name and dialog
-        string dialog = $"[{Name}] {Dialog}-------------------------------------------------------";
+        string dialog = $"[{Name}] {Dialog}";
 
         // Shop
         int o = 1;

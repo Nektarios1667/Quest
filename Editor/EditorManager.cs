@@ -548,7 +548,7 @@ public class EditorManager
         using BinaryWriter writer = new(gzipStream);
 
         // Metadata
-        var flags = LevelFeatures.Biomes | LevelFeatures.QuillScripts;
+        var flags = LevelFeatures.Biomes | LevelFeatures.QuillScripts | LevelFeatures.KeyConsumeOption;
         writer.Write(Encoding.UTF8.GetBytes("QLVL")); // Magic number
         writer.Write((ushort)flags); // Flags
 
@@ -575,7 +575,10 @@ public class EditorManager
             {
                 // Write door key
                 writer.Write(door.Key == null ? "" : door.Key.Name);
-                if (door.Key != null) writer.Write(door.Key.Amount);
+                if (door.Key == null) continue;
+                writer.Write(door.Key.Amount);
+                if (flags.HasFlag(LevelFeatures.KeyConsumeOption))
+                    writer.Write(door.ConsumeKey);
             }
             else if (tile is Chest chest)
                 writer.Write(chest.LootGenerator);

@@ -326,7 +326,7 @@ public class LevelManager
         using BufferedStream buffer = new(fileStream, 8192);
         using GZipStream gzipStream = new(buffer, CompressionMode.Decompress);
         using BinaryReader reader = new(gzipStream);
-        //try
+        try
         {
 
             // Metadata
@@ -381,11 +381,11 @@ public class LevelManager
             Logger.System($"Successfully read level '{filename}' in {sw.ElapsedMilliseconds:F2}s.");
             return true;
         }
-        //catch (Exception ex)
-        //{
-        //    Logger.Error($"Failed to read level file '{filename}': {ex.Message}");
-        //    return false;
-        //}
+        catch (Exception ex)
+        {
+            Logger.Error($"Failed to read level file '{filename}': {ex.Message}");
+            return false;
+        }
     }
     private static Tile ReadTile(BinaryReader reader, LevelFeatures flags, string[] splitPath, int x, int y)
     {
@@ -393,7 +393,7 @@ public class LevelManager
         Door ReadDoor(Point loc)
         {
             string keyName = reader.ReadString();
-            return new Door(loc, keyName.IsNUL() ? null : new(ItemTypes.Get(keyName), reader.ReadByte()));
+            return new Door(loc, keyName.IsNUL() ? null : new(ItemTypes.Get(keyName), reader.ReadByte()), !flags.HasFlag(LevelFeatures.KeyConsumeOption) || keyName.IsNUL() || reader.ReadBoolean());
         }
         Chest ReadChest(Point loc)
         {
