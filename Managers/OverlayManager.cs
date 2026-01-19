@@ -2,8 +2,6 @@
 
 namespace Quest.Managers;
 
-
-
 public class OverlayManager
 {
     public Gui.Gui Gui { get; private set; } // GUI handler
@@ -18,10 +16,12 @@ public class OverlayManager
     private FloodLightingGrid lightGrid = null!;
     private bool[,] blocked = new bool[0, 0];
     private Color[,] biomeColors = new Color[0, 0];
+    private Point luxelSize = Point.Zero;
     private Point start;
+    private Point lastCamera = Point.Zero;
     private const int lightDivisions = 2;
     private const float invLightDivisions = 1f / lightDivisions;
-    private bool updateLighting = true;
+    public bool UpdateLighting { private set; get; } = true;
     public OverlayManager(LevelManager levelManager, PlayerManager? playerManager)
     {
         Gui = new()
@@ -32,14 +32,31 @@ public class OverlayManager
             ]
         };
 
+
         // Trigger lighting updates
+        void CheckUpdateLighting(params Item?[] items)
+        {
+            foreach (var item in items)
+                if (item != null && (item is Light || item.IsLight))
+                {
+                    MarkUpdateLighting();
+                    return;
+                }
+        }
         if (playerManager != null)
         {
-            playerManager.Inventory.EquippedSlotChanged += (_) => updateLighting = true;
-            playerManager.Inventory.ItemDropped += (_) => updateLighting = true;
+            playerManager.Inventory.EquippedItemChanged += (oldItem, newItem) => CheckUpdateLighting(oldItem, newItem);
+            playerManager.Inventory.ItemDropped += (item) => CheckUpdateLighting(item);
+            playerManager.Inventory.ItemAdded += (item) => MarkUpdateLighting();
+
         }
-        TimerManager.SetTimer("LightingUpdate", 1f, () => updateLighting = true, int.MaxValue);
-        CameraManager.CameraMove += (_, _) => updateLighting = true;
+        TimerManager.SetTimer("LightingUpdate", 1f, MarkUpdateLighting, int.MaxValue);
+        CameraManager.TileChange += (_, _) => MarkUpdateLighting();
+        CameraManager.CameraMove += (_, newCam) =>
+        {
+            if (newCam.ToPoint() / Constants.TileSize != lastCamera / Constants.TileSize)
+                MarkUpdateLighting();
+        };
     }
     public void Update(GameManager gameManager)
     {
@@ -104,11 +121,14 @@ public class OverlayManager
 
         DebugManager.EndBenchmark("PostProcessing");
     }
+    public void MarkUpdateLighting() {
+        UpdateLighting = true;
+    }
     public void DrawLighting(GameManager gameManager)
     {
 
         DebugManager.StartBenchmark("Lighting");
-        if (updateLighting)
+        if (UpdateLighting)
             RecalculateLighting(gameManager);
         DebugManager.EndBenchmark("Lighting");
 
@@ -124,11 +144,11 @@ public class OverlayManager
                 float intensity = LightingManager.LightToIntensityCache[intensityLookup];
 
                 // Skip full light
-                if (intensity >= 1f)
+                if (intensity >= 0.99f)
                     continue;
 
                 // Draw
-                Rectangle rect = new((new Point(x, y) + start.Scaled(lightDivisions)) * Constants.TileSize.Scaled(invLightDivisions) + Constants.Middle - CameraManager.Camera.ToPoint(), Constants.TileSize.Scaled(invLightDivisions));
+                Rectangle rect = new((new Point(x, y) + start.Scaled(lightDivisions)) * luxelSize + Constants.Middle - CameraManager.Camera.ToPoint(), luxelSize);
                 gameManager.Batch.FillRectangle(rect, gameManager.LevelManager.SkyColor * (1 - intensity));
 
                 // Biome
@@ -140,13 +160,18 @@ public class OverlayManager
     }
     public void RecalculateLighting(GameManager gameManager)
     {
-        updateLighting = false;
+        UpdateLighting = false;
 
-        // Flood fill lighting
-        start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
+        // Precomputations
+        if (luxelSize.X == 0)
+            luxelSize = Constants.TileSize.Scaled(invLightDivisions);
+
+        // Flood fill lighting                                                          one tile buffer at top
+        start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize + PointTools.Up;
+        lastCamera = CameraManager.Camera.ToPoint();
         Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
         int tileWidth = end.X - start.X + 1;
-        int tileHeight = end.Y - start.Y + 1;
+        int tileHeight = end.Y - start.Y + 3; // Extra row ontop and below for smoothness
 
         int lightWidth = tileWidth * lightDivisions;
         int lightHeight = tileHeight * lightDivisions;
@@ -154,6 +179,8 @@ public class OverlayManager
         // Blocked
         if (blocked.GetLength(0) != lightWidth || blocked.GetLength(1) != lightHeight)
             blocked = new bool[lightWidth, lightHeight];
+
+        // Set blocked luxels
         for (int y = 0; y < tileHeight; y++)
             for (int x = 0; x < tileWidth; x++)
             {
@@ -164,16 +191,18 @@ public class OverlayManager
                         blocked[x * lightDivisions + dx, y * lightDivisions + dy] = isBlocked;
             }
 
-        // Lighting
+        // Reset or make new grid
         if (lightGrid == null || lightGrid.Width != lightWidth || lightGrid.Height != lightHeight)
             lightGrid = new(lightWidth, lightHeight, blocked);
         else
             lightGrid.Reset(blocked: blocked);
+        // Set lights
         foreach (var light in LightingManager.Lights.Values)
         {
             Point lightTile = ((light.Position + CameraManager.Camera.ToPoint() - Constants.Middle).ToVector2() / Constants.TileSize.ToVector2()).ToPoint() - start;
             if (lightTile.X >= 0 && lightTile.Y >= 0 && lightTile.X < lightGrid.Width && lightTile.Y < lightGrid.Height)
             {
+                // Set all luxels in the light tile area
                 for (int dy = 0; dy < lightDivisions; dy++)
                     for (int dx = 0; dx < lightDivisions; dx++)
                         lightGrid.SetLight(lightTile.Scaled(lightDivisions) + new Point(dx, dy), light.Size * lightDivisions / Constants.TileSize.X);

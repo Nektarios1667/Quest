@@ -8,9 +8,15 @@ public static class CameraManager
         get => _cameraDest;
         set
         {
-            if (value == _cameraDest) return;
+            if (Vector2.DistanceSquared(value, _cameraDest) < 0.001f) return;
+            // CameraDestMove
             CameraDestMove?.Invoke(_cameraDest, value);
-            _cameraDest = value;
+            // TileChange
+            Point beforeTile = TileCoord;
+            // Set and clamp
+            _cameraDest = Vector2.Clamp(value, Vector2.Zero, (Constants.MapSize * Constants.TileSize).ToVector2());
+            // TileChange event
+            if (beforeTile != TileCoord) TileChange?.Invoke(beforeTile, TileCoord);
         }
     }
     public static Vector2 CameraOffset => CameraDest - Camera;
@@ -27,24 +33,23 @@ public static class CameraManager
         DebugManager.StartBenchmark("CameraUpdate");
 
         // Clamp
-        CameraDest = Vector2.Clamp(CameraDest, Vector2.Zero, (Constants.MapSize * Constants.TileSize).ToVector2());
 
         // Lerp camera
-        if (Vector2.DistanceSquared(Camera, CameraDest) < 4 * deltaTime * 60) Camera = CameraDest; // If close enough snap to destination
-        if (deltaTime > 0 && CameraDest != Camera)
+        if (Vector2.DistanceSquared(Camera, CameraDest) < 4f) Camera = CameraDest; // If close enough snap to destination
+        else if (deltaTime > 0)
         {
             Vector2 beforeCamera = Camera;
             Camera = Vector2.Lerp(Camera, CameraDest, 1f - MathF.Pow(1f - Constants.CameraRigidity, deltaTime * 60f));
+            Camera = Vector2.Clamp(Camera, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
 
             // Events
-            CameraMove?.Invoke(beforeCamera, Camera);
-            Point beforeTile = (beforeCamera.ToPoint() + new Point(0, Constants.MageHalfSize.Y)) / Constants.TileSize;
-            Point afterTile = (Camera.ToPoint() + new Point(0, Constants.MageHalfSize.Y)) / Constants.TileSize;
-            if (beforeTile != afterTile) TileChange?.Invoke(beforeTile, afterTile);
-        }
-        // Clamp
+            if (beforeCamera != Camera)
+                CameraMove?.Invoke(beforeCamera, Camera);
+        } 
         Camera = Vector2.Clamp(Camera, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
 
         DebugManager.EndBenchmark("CameraUpdate");
     }
+    public static Point PositionToWorldCoord(Vector2 position) => position.ToPoint() / Constants.TileSize;
+    public static Point PositionToWorldCoord(Point position) => position / Constants.TileSize;
 }

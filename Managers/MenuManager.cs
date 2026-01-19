@@ -120,24 +120,23 @@ public class MenuManager
         Label weatherLabel = new(DebugMenu, new(Constants.Middle.X - 100, 20), Color.Black, "Weather");
         DebugMenu.Widgets = [timeSlider, timeLabel, weatherLabel, weatherSlider];
     }
-    private void ExitToMainMenu()
+    public void ExitToMainMenu()
     {
         StateManager.OverlayState = OverlayState.None;
         StateManager.State = GameState.MainMenu;
         gameManager.LevelManager.UnloadWorld(gameManager.LevelManager.Level.World);
     }
-    public void ContinueSave()
+    public bool ContinueSave()
     {
 
         if (StateManager.ReadKeyValueFile("continue").TryGetValue("save", out var loadSave))
         {
-            StateManager.ReadGameState(gameManager, playerManager, loadSave);
             StateManager.State = GameState.Game;
+            return StateManager.ReadGameState(gameManager, playerManager, loadSave);
         }
-        else
-        {
-            StateManager.State = GameState.LevelSelect;
-        }
+        // else
+        StateManager.State = GameState.LevelSelect;
+        return true;
     }
     public void LevelSelect()
     {
@@ -152,7 +151,7 @@ public class MenuManager
         worlds.Items.Clear();
         worlds.AddItems([.. Directory.GetDirectories("GameData\\Worlds").Select(d => d.Split('\\')[^1])]);
     }
-    private void DeleteSelectedSave()
+    public void DeleteSelectedSave()
     {
         if (saves.Selected != null && saves.Selected != "(New Save)")
         {
@@ -170,7 +169,7 @@ public class MenuManager
             LoadSaves(worlds.Selected);
         }
     }
-    private void LoadSaves(string level)
+    public void LoadSaves(string level)
     {
         saves.Items.Clear();
         string path = $"GameData/Worlds/{level}/saves";
@@ -181,7 +180,7 @@ public class MenuManager
         saves.AddItems(savesList);
         saves.AddItems("(New Save)");
     }
-    private void OpenSave()
+    public void OpenSave()
     {
         StateManager.State = GameState.Loading;
         if (saves.Selected == "(New Save)")
@@ -195,7 +194,7 @@ public class MenuManager
 
         StateManager.State = GameState.Game;
     }
-    private void Rename()
+    public void Rename()
     {
         // Check
         if (saves.Selected == null || saves.Selected == "(New Save)") return;

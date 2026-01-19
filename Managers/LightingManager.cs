@@ -95,6 +95,7 @@ public readonly struct RadialLight
 public static class LightingManager
 {
     public const int LightScale = 10;
+    public const float LightBoost = 0.7f;
     public static Dictionary<string, RadialLight> Lights { get; private set; } = [];
     public static float[] LightToIntensityCache { get; private set; } = [];
     static LightingManager()
@@ -103,7 +104,7 @@ public static class LightingManager
         LightToIntensityCache = new float[LightScale * 2 + 1];
         for (float i = 0; i <= LightScale; i += 0.5f)
         {
-            float intensity = 1f - MathF.Exp(-i / LightScale);
+            float intensity = MathF.Exp((i * LightBoost) / LightScale) - 1;
             intensity = Math.Clamp(intensity, 0f, 1f);
             LightToIntensityCache[(int)(i * 2)] = intensity;
         }

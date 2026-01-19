@@ -44,12 +44,15 @@ public class ItemType
     public string Description { get; protected set; } = "NUL_DESCR";
     public TextureID Texture { get; protected set; }
     public byte MaxAmount { get; protected set; }
-    public ItemType(ItemTypeID typeID, string descr, int maxAmount = Constants.MaxStack, string? name = null)
+    public bool IsLight { get; protected set; }
+    public ItemType(ItemTypeID typeID, string descr, int maxAmount = Constants.MaxStack, bool isLight = false, string? name = null)
     {
         TypeID = typeID;
         Name = name ?? typeID.ToString();
         Texture = (TextureID)Enum.Parse(typeof(TextureID), Name);
+        Description = descr;
         MaxAmount = (byte)maxAmount;
+        IsLight = isLight;
     }
 }
 
@@ -84,7 +87,7 @@ public class ItemTypes
     public static readonly ItemType Chicken = new(ItemTypeID.Chicken, "Chicken meat.");
     public static readonly ItemType Potato = new(ItemTypeID.Potato, "An earthy potato.");
     public static readonly ItemType Orange = new(ItemTypeID.Orange, "A fresh juicy orange.");
-    public static readonly ItemType Lantern = new(ItemTypeID.Lantern, "A burning lantern used for light.", 1);
+    public static readonly ItemType Lantern = new(ItemTypeID.Lantern, "A burning lantern used for light.", 1, isLight: true);
     public static readonly ItemType WoodPlanks = new(ItemTypeID.WoodPlanks, "Sturdy wooden boards cut from trees.");
     public static readonly ItemType Rock = new(ItemTypeID.Rock, "Hard rock mined from the ground.");
     public static readonly ItemType GlassBottle = new(ItemTypeID.GlassBottle, "An empty bottle made of glass.", 3);
@@ -134,6 +137,7 @@ public class ItemRef
     public string Description => Type.Description;
     public byte MaxAmount => Type.MaxAmount;
     public TextureID Texture => Type.Texture;
+    public bool IsLight => Type.IsLight;
     public ItemRef(ItemType type, byte amount)
     {
         Type = type;
@@ -154,6 +158,7 @@ public class Item
     public string Description => Type.Description;
     public byte MaxAmount => Type.MaxAmount;
     public TextureID Texture => Type.Texture;
+    public bool IsLight => Type.IsLight;
     public Item(ItemType itemType, int amount)
     {
         Type = itemType;

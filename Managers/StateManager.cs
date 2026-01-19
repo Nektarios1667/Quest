@@ -46,6 +46,7 @@ public static class StateManager
     private static float lastWeather = 0f;
     private static float lastTime = -1f;
     // States
+    public static Action<GameState>? OnStateChanged;
     public static bool IsPlayingState => State == GameState.Game || State == GameState.Editor;
     private static GameState _state = GameState.MainMenu;
     public static GameState State
@@ -54,6 +55,7 @@ public static class StateManager
         set
         {
             PreviousState = _state;
+            OnStateChanged?.Invoke(value);
             _state = value;
         }
     }

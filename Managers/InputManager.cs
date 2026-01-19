@@ -8,10 +8,8 @@ public static class InputManager
     public static MouseState LastMouseState { get; private set; }
     public static void Update(Game game)
     {
-        //if (!game.IsActive)
-        //{
-        //    return;
-        //}
+        if (!game.IsActive) return;
+
         // Update input states
         LastKeyboardState = KeyboardState;
         LastMouseState = MouseState;

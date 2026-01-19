@@ -9,8 +9,10 @@ public interface IContainer
 public class Inventory
 {
     // Events
-    public event Action<int>? EquippedSlotChanged;
+    public event Action<int, int>? EquippedSlotChanged;
+    public event Action<Item, Item>? EquippedItemChanged;
     public event Action<Item>? ItemDropped;
+    public event Action<Item>? ItemAdded;
     // Properties
     public Item?[,] Items { get; private set; }
     public bool Opened { get; set; } = false;
@@ -18,7 +20,18 @@ public class Inventory
     public int EquippedSlot
     {
         get => _equippedSlot;
-        set { _equippedSlot = value; EquippedSlotChanged?.Invoke(value); }
+        set {
+            if (value < 0) value += Width;
+            if (value >= Width) value %= Width;
+
+            EquippedSlotChanged?.Invoke(_equippedSlot, value);
+            _equippedSlot = value;
+            if (Equipped != lastEquipped)
+            {
+                EquippedItemChanged?.Invoke(lastEquipped!, Equipped!);
+                lastEquipped = Equipped;
+            }
+        }
     }
     private int HoverSlot;
     public byte Width { get; }
@@ -27,6 +40,7 @@ public class Inventory
     private readonly Rectangle[,] slotHitboxes;
     // Generated properties
     public Item? Equipped => Items.Length > 0 ? Items[EquippedSlot, 0] : null;
+    private Item? lastEquipped = null;
     // Consts/statics
     private static readonly Point itemOffset = new(14, 14);
     private const float itemScale = 3;
@@ -52,12 +66,11 @@ public class Inventory
     {
         if (Width < 1 || Height < 1) return; // No slots to update
 
-        // Scroll slot
+        // Scroll slot - setter manages wrapping
         if (InputManager.ScrollWheelChange > 0)
-            EquippedSlot = (ushort)((EquippedSlot + 1) % Width);
+            EquippedSlot += 1;
         if (InputManager.ScrollWheelChange < 0)
             EquippedSlot -= 1;
-        if (EquippedSlot < 0) EquippedSlot += Width;
 
         // Handle slot interactions
         SlotInteractions(gameManager, playerManager);
@@ -209,6 +222,14 @@ public class Inventory
     // AddItem
     public (bool success, Item leftover) AddItem(Item item)
     {
+        bool calledEvent = false;
+        void CallEvent(Item item)
+        {
+            if (calledEvent) return;
+            ItemAdded?.Invoke(item);
+            calledEvent = true;
+        }
+
         for (byte y = 0; y < Height; y++)
         {
             for (byte x = 0; x < Width; x++)
@@ -216,6 +237,7 @@ public class Inventory
                 Item? current = Items[x, y];
                 if (current == null)
                 {
+                    CallEvent(item);
                     SetSlot(Flatten(x, y), item);
                     return (true, item);
                 }
@@ -224,6 +246,7 @@ public class Inventory
                     byte moved = (byte)Math.Min(item.Amount, current.MaxAmount - current.Amount);
                     current!.Amount += moved; // Add to existing item
                     item.Amount -= moved; // Reduce amount of new item
+                    CallEvent(item);
                     if (item.Amount < 1) return (true, item); // If item is fully added exit
                 }
             }

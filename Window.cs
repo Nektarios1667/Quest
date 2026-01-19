@@ -1,29 +1,31 @@
-﻿using System.Text;
+﻿using Quest.Editor;
+using System.Linq;
+using System.Text;
 
 namespace Quest;
 public class Window : Game
 {
     static readonly StringBuilder debugSb = new();
     // Devices and managers
-    private readonly GraphicsDeviceManager graphics;
-    private SpriteBatch spriteBatch;
-    private GameManager gameManager;
-    private PlayerManager playerManager;
-    private OverlayManager overlayManager;
-    private LevelManager levelManager;
-    private MenuManager menuManager;
+    private readonly GraphicsDeviceManager graphics = null!;
+    private SpriteBatch spriteBatch = null!;
+    private GameManager gameManager = null!;
+    private PlayerManager playerManager = null!;
+    private OverlayManager overlayManager = null!;
+    private LevelManager levelManager = null!;
+    private MenuManager menuManager = null!;
     public static readonly Matrix Scale = Matrix.CreateScale(Constants.ScreenScale.X, Constants.ScreenScale.Y, 1f);
-    public RenderTarget2D Render;
+    public RenderTarget2D Render = null!;
 
     // Time
     private float delta;
-    private Dictionary<string, double> frameTimes;
+    private Dictionary<string, double> frameTimes = [];
 
     // Textures
-    public Texture2D CursorArrow { get; private set; }
+    public Texture2D CursorArrow { get; private set; } = null!;
     // Shaders
-    public Effect Grading;
-    public Effect Grayscale;
+    public Effect Grading = null!;
+    public Effect Grayscale = null!;
 
     // Movements
     public int moveX;
