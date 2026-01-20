@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 namespace Quest.Quill;
 public static class Interpreter
 {
-    private static readonly Dictionary<string, string> ExternalSymbols = [];
+    private static readonly Dictionary<string, string> ExternalSymbols = new() {
+        { "<ready>", "false" },
+    };
     public static void UpdateSymbols(GameManager game, PlayerManager player)
     {
         DebugManager.StartBenchmark("QuillSymbolsUpdate");
 
         // Check
-        if (StateManager.State != GameState.Game) return;
+        //if (StateManager.State != GameState.Game) return;
 
         // Player
         ExternalSymbols["<playercoord_x>"] = CameraManager.TileCoord.X.ToString();
@@ -25,7 +27,7 @@ public static class Interpreter
         ExternalSymbols["<tilebelow>"] = player.TileBelow?.Type.ToString() ?? "null";
         ExternalSymbols["<camera_x>"] = CameraManager.Camera.X.ToString();
         ExternalSymbols["<camera_y>"] = CameraManager.Camera.Y.ToString();
-        ExternalSymbols["<camera>"] = $"{CameraManager.Camera.X},{CameraManager.Camera.Y}";
+        ExternalSymbols["<camera>"] = $"{CameraManager.Camera.X};{CameraManager.Camera.Y};/";
         // Level
         ExternalSymbols["<currentlevel>"] = game.LevelManager.Level.Name.WrapSingleQuotes();
         ExternalSymbols["<currentworld>"] = game.LevelManager.Level.World.WrapSingleQuotes();
@@ -40,20 +42,21 @@ public static class Interpreter
         ExternalSymbols["<inventoryamounts>"] = player.Inventory.GetItemsAmountString().WrapSingleQuotes();
         ExternalSymbols["<inventorysize_x>"] = player.Inventory.Width.ToString();
         ExternalSymbols["<inventorysize_y>"] = player.Inventory.Height.ToString();
-        ExternalSymbols["<inventorysize>"] = $"{player.Inventory.Width},{player.Inventory.Height}";
+        ExternalSymbols["<inventorysize>"] = $"{player.Inventory.Width};{player.Inventory.Height};/";
         ExternalSymbols["<isinventoryopen>"] = player.Inventory.Opened.ToString();
         ExternalSymbols["<equippedslot>"] = player.Inventory.EquippedSlot.ToString();
         ExternalSymbols["<equippeditem>"] = (player.Inventory.Equipped?.Name ?? "null").WrapSingleQuotes();
         ExternalSymbols["<equippeditemuid>"] = player.Inventory.Equipped?.UID.ToString() ?? "-1";
         ExternalSymbols["<equippeditemamount>"] = player.Inventory.Equipped?.Amount.ToString() ?? "0";
         // Technical
+        ExternalSymbols["<ready>"] = "true";
         ExternalSymbols["<fps>"] = (1f / game.DeltaTime).ToString();
         ExternalSymbols["<deltatime>"] = game.DeltaTime.ToString();
         ExternalSymbols["<ispaused>"] = (StateManager.OverlayState == OverlayState.Pause).ToString();
         ExternalSymbols["<vsync>"] = Constants.VSYNC.ToString();
         ExternalSymbols["<resolution_x>"] = Constants.ScreenResolution.X.ToString();
         ExternalSymbols["<resolution_y>"] = Constants.ScreenResolution.X.ToString();
-        ExternalSymbols["<resolution>"] = $"{Constants.ScreenResolution.X}, {Constants.ScreenResolution.Y})";
+        ExternalSymbols["<resolution>"] = $"{Constants.ScreenResolution.X};{Constants.ScreenResolution.Y};/";
         ExternalSymbols["<fpslimit>"] = Constants.FPS.ToString();
         DebugManager.EndBenchmark("QuillSymbolsUpdate");
     }
@@ -176,6 +179,14 @@ public static class Interpreter
                 variables[varName] = varValue;
                 continue;
             }
+            else if (parts[0] == "breakwhile")
+            {
+                l = FindLine(lines, "endwhile", l);
+            }
+            else if (parts[0] == "continuewhile")
+            {
+                l = FindLineBackwards(lines, "while", l) - 1; // -1 because of the l++ at the end of the loop
+            }
             else if (parts[0] == "if")
             {
                 Expression expr = new(line[3..].Trim());
@@ -194,8 +205,7 @@ public static class Interpreter
             }
             else if (parts[0] == "endwhile")
             {
-                int whileLine = FindLineBackwards(lines, "while", l);
-                l = whileLine - 1; // -1 because of the l++ at the end of the loop
+                l = FindLineBackwards(lines, "while", l) - 1; // -1 because of the l++ at the end of the loop
             }
             else if (parts[0] == "func")
             {

@@ -1,7 +1,9 @@
 ﻿while true
+	// Check for apple in inventory
 	contains =<inventoryitems>, Apple
 	if =<gamestate> == 'Game' && =[return]
-		log Player has apple!
+		log 'Playerhasapple!'
+		breakwhile
 	endif
 
 	sleep 1000

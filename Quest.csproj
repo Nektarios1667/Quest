@@ -45,7 +45,7 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
-	  <None Update="Test.quill">
+	  <None Update="GameData\Worlds\islands\scripts\Test.quill">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>

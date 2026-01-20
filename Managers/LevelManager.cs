@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using Quest.Quill;
 
 namespace Quest.Managers;
 public class LevelManager
@@ -196,7 +197,7 @@ public class LevelManager
             if (Levels[l].Name == name)
             {
                 LoadLevel(gameManager, l);
-                return true; ;
+                return true;
             }
         }
         // If not found throw an error
@@ -303,10 +304,10 @@ public class LevelManager
         var sw = new Stopwatch();
         // File checks
         filename = filename.Replace('\\', '/');
-        string[] splitPath = filename.Split('\\', '/');
-        string path = $"GameData/Worlds/{splitPath[0]}/levels/{splitPath[1]}.qlv";
+        LevelPath levelPath = new(filename);
+        string path = $"GameData/Worlds/{levelPath.WorldName}/levels/{levelPath.LevelName}.qlv";
 
-        if (splitPath.Length != 2) return Error($"Invalid file format '{filename}.'");
+        if (levelPath.IsNull()) return Error($"Invalid file format '{filename}.'");
         if (!File.Exists(path)) return Error($"Level file '{filename}' does not exist.");
 
         // Check if already read
@@ -342,7 +343,7 @@ public class LevelManager
             // Tiles
             for (int y = 0; y < Constants.MapSize.Y; y++)
                 for (int x = 0; x < Constants.MapSize.X; x++)
-                    tilesBuffer[x + y * Constants.MapSize.X] = ReadTile(reader, flags, splitPath, x, y);
+                    tilesBuffer[x + y * Constants.MapSize.X] = ReadTile(reader, flags, levelPath, x, y);
 
             // Biomes
             if (flags.HasFlag(LevelFeatures.Biomes))
@@ -370,8 +371,17 @@ public class LevelManager
 
             // Scripts
             if (flags.HasFlag(LevelFeatures.QuillScripts))
-                for (int s = 0; s < reader.ReadByte(); s++)
-                    scriptBuffer.Add(new QuillScript(reader.ReadString(), reader.ReadString()));
+            {
+                Directory.CreateDirectory("GameData/Worlds/{levelPath.WorldName}/scripts");
+                byte scriptCount = reader.ReadByte();
+                for (int s = 0; s < scriptCount; s++)
+                {
+                    string name = reader.ReadString();
+                    string scriptPath = $"GameData/Worlds/{levelPath.WorldName}/scripts/{name}";
+                    string code = File.Exists(scriptPath) ? File.ReadAllText(scriptPath) : "// NUL";
+                    scriptBuffer.Add(new QuillScript(name, code));
+                }
+            }
 
             // Make and add the level
             Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, [], scriptBuffer, tint);
@@ -387,7 +397,7 @@ public class LevelManager
             return false;
         }
     }
-    private static Tile ReadTile(BinaryReader reader, LevelFeatures flags, string[] splitPath, int x, int y)
+    private static Tile ReadTile(BinaryReader reader, LevelFeatures flags, LevelPath levelPath, int x, int y)
     {
         // Helper
         Door ReadDoor(Point loc)
@@ -398,11 +408,11 @@ public class LevelManager
         Chest ReadChest(Point loc)
         {
             string lootGenFile = reader.ReadString();
-            ILootGenerator lootGen = LootGeneratorHelper.Read(splitPath[0], lootGenFile);
+            ILootGenerator lootGen = LootGeneratorHelper.Read(levelPath.WorldName, lootGenFile);
             if (lootGen.FileName.IsNUL() || lootGen.FileName == "_")
-                return new Chest(loc, LootPreset.EmptyPreset, splitPath[1]);
+                return new Chest(loc, LootPreset.EmptyPreset, levelPath.LevelName);
             else
-                return new Chest(loc, lootGen, splitPath[1]);
+                return new Chest(loc, lootGen, levelPath.LevelName);
         }
 
         // Read tile data
@@ -411,7 +421,7 @@ public class LevelManager
 
         return type switch
         {
-            TileTypeID.Stairs => new Stairs(loc, $"{splitPath[0]}/{reader.ReadString()}", new(reader.ReadByte(), reader.ReadByte())),
+            TileTypeID.Stairs => new Stairs(loc, $"{levelPath.WorldName}/{reader.ReadString()}", new(reader.ReadByte(), reader.ReadByte())),
             TileTypeID.Door => ReadDoor(loc),
             TileTypeID.Chest => ReadChest(loc),
             TileTypeID.Lamp => new Lamp(loc, reader.ReadByte()),

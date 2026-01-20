@@ -95,13 +95,15 @@ public class LevelEditor : Game
         newMenu.AddItem("New NPC", editorManager.NewNPC, []);
         newMenu.AddItem("New Loot", editorManager.NewLoot, []);
         newMenu.AddItem("New Decal", editorManager.NewDecal, []);
+        newMenu.AddItem("New Script", editorManager.NewScript, []);
         mouseMenu.AddItem("New...", null, []);
         mouseMenu.AddSubMenu("New...", newMenu);
 
-        MouseMenu deleteMenu = new(gui, Point.Zero, new(150, 80), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
+        MouseMenu deleteMenu = new(gui, Point.Zero, new(150, 100), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         deleteMenu.AddItem("Delete NPC", editorManager.DeleteNPC, []);
         deleteMenu.AddItem("Delete Loot", editorManager.DeleteLoot, []);
         deleteMenu.AddItem("Delete Decal", editorManager.DeleteDecal, []);
+        deleteMenu.AddItem("Delete Script", editorManager.DeleteScript, []);
         mouseMenu.AddItem("Delete...", null, []);
         mouseMenu.AddSubMenu("Delete...", deleteMenu);
 
@@ -248,7 +250,7 @@ public class LevelEditor : Game
         if (InputManager.KeyPressed(Keys.D2)) currentTool = EditorTool.Decal;
         if (InputManager.KeyPressed(Keys.D3)) currentTool = EditorTool.Biome;
         // Script
-        //if (InputManager.Hotkey(Keys.LeftControl, Keys.P)) editorManager.EditScript();
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.P)) editorManager.EditScripts();
 
         // Managers
         if (!PopupFactory.PopupOpen) InputManager.Update(this);

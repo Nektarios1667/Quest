@@ -115,7 +115,6 @@ public class Window : Game
             DepthFormat.None
         );
 
-        // Run test script - DELETEME after testing
         Quill.Interpreter.UpdateSymbols(gameManager, playerManager);
 
         // Other

@@ -471,25 +471,25 @@ public class EditorManager
     }
     public void NewScript()
     {
-        var (success, values) = ShowInputForm("New Script", [new("Script Name", null), new("Source Filepath", null)]);
-        if (!success || string.IsNullOrWhiteSpace(values[0]) || string.IsNullOrWhiteSpace(values[1]))
+        var (success, values) = ShowInputForm("New Script", [new("Script File", null)]);
+        if (!success || string.IsNullOrWhiteSpace(values[0]))
         {
             if (!PopupOpen) Logger.Error("Script creation failed.");
             return;
         }
-        if (!File.Exists(values[1]))
+        string path = $"GameData/Worlds/{world}/scripts/{values[0]}";
+        if (!File.Exists(path))
         {
-            Logger.Error($"Source file '{values[1]}' not found.");
+            Logger.Error($"Source file '{path}' not found.");
             return;
         }
-        string name = values[0];
-        if (LevelManager.Level.Scripts.Any(s => s.ScriptName == name))
+        if (LevelManager.Level.Scripts.Any(s => s.ScriptName == values[0]))
         {
-            Logger.Error($"A script with the name '{name}' already exists.");
+            Logger.Error($"A script with the name '{values[0]}' already exists.");
             return;
         }
-        string sourceCode = File.ReadAllText(values[1]);
-        LevelManager.Level.Scripts.Add(new QuillScript(name, sourceCode));
+        string sourceCode = File.ReadAllText(path);
+        LevelManager.Level.Scripts.Add(new QuillScript(values[0], sourceCode));
     }
     public void ResaveLevel(LevelPath levelPath)
     {
@@ -613,7 +613,6 @@ public class EditorManager
             {
                 QuillScript script = LevelManager.Level.Scripts[s];
                 writer.Write(script.ScriptName);
-                writer.Write(script.SourceCode);
             }
         }
 

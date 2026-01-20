@@ -219,7 +219,6 @@ public static class StateManager
         gameManager.LevelManager.ReadWorld(gameManager, levelPath.WorldName, true);
 
         using (var fs = new FileStream(file, FileMode.Open, FileAccess.Read))
-        //using (var gzip = new GZipStream(fs, CompressionMode.Decompress))
         using (var reader = new BinaryReader(fs))
         {
             // Read GameManager data

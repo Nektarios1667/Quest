@@ -47,7 +47,8 @@ public static class PopupFactory
                     DropDownStyle = ComboBoxStyle.DropDownList
                 };
                 combo.Items.AddRange(field.DropdownOptions!);
-                combo.SelectedIndex = 0;
+                if (combo.Items.Count > 0)
+                    combo.SelectedIndex = 0;
                 inputControl = combo;
             }
             // Input textbox
