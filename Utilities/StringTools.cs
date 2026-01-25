@@ -1,4 +1,7 @@
-﻿namespace Quest.Utilities;
+﻿using System.Diagnostics;
+using System.Linq;
+
+namespace Quest.Utilities;
 
 public static class StringTools
 {

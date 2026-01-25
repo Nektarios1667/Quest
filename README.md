@@ -221,3 +221,116 @@ Answer prompts and the generator will write the necessary files.
 ### Weather Test
 By entering `w` the weather test generator can be used to test the current weather system.  
 Results will be printed out and a graph will be outputted to the bin folder.  
+
+## Quill Language
+
+### Overview
+Quill is a interpreted scripting language for use in Quest levels.  
+It is very simple and is still in early development.  
+
+### Commands
+Each line of code (other than comments) represents a command.  
+Commands can have parameters separated by commas.  
+Comments start with `//` and make the entire line ignored.  
+
+`(value)` denotes a parameter that must be provided.  
+`[value]` denotes an optional paramter.  
+`.label` denotes an optional label for control flow commands. The labels are used when nesting flow commands to ensure the correct block is ended.  
+The following commands are currently supported:  
+- `if [.label] (condition)` - runs the following block if the condition is true
+- `endif [.label]` - ends an if block
+- `while [.label] (condition)` - runs the following block while the condition is true
+- `endwhile [.label]` - ends a while block
+- `breakwhile [.label]` - breaks out of the current while loop
+- `str (name) (value)` - creates a string variable
+- `num (name) (value)` - creates a number variable
+- `func (name)` - creates a function
+- `endfunc` - ends a function definition
+- `call (name)` - calls a function
+- `sleep (milliseconds)` - pauses execution for the specified time
+- `wait (recheck milliseconds) (condition)` - pauses execution until the condition is true; rechecks every specified milliseconds
+
+### Builtin Functions
+The following are builtin functions that can be called just like commands:  
+- `contains (array / 2d-array) (target)` - checks if the array contains a specific value
+- `error (message) (exit)` - prints an error message and optionally exits the script
+- `execute (command)` - executes a console command
+- `getitem (array) (index)` - gets an item from an array at the specified index
+- `getitem2d (2d-array) (x) (y)` - gets an item from a 2d array at the specified coordinates
+- `give (item) (amount)` - gives the player a specific item and amount
+- `loadlevel (levelName)` - loads a specific level
+- `log (message)` - prints a message to the console
+- `readfile (filePath)` - reads the contents of a file
+- `readlevel (levelName)` - reads the data of a specific level
+- `teleport (x) (y)` - teleports the player to the specified coordinates
+- `unloadlevel (levelName)` - unloads a specific level
+- `warn (message)` - prints a warning message to the console
+
+### Quest Engine Integration
+Quest Engine provides additional variables that can be accessed in Quill scripts.  
+It is recommended to check in the beginning of the script if the symbol system is ready using `<ready>`.  
+These include:
+- `<playercoord_x>` – player tile X coordinate
+- `<playercoord_y>` – player tile Y coordinate
+- `<playercoord>` – player tile coordinates as a formatted string
+- `<playerhealth>` – current player health
+- `<playermaxhealth>` – maximum player health
+- `<playerspeed>` – player movement speed constant
+- `<isstuck>` – whether the tile below the player is not walkable (`true` / `false`)
+- `<tilebelow>` – type of the tile directly below the player, or `NUL` if none
+- `<camera_x>` – camera X position
+- `<camera_y>` – camera Y position
+- `<camera>` – camera position formatted as `x;y`
+- `<currentlevel>` – name of the current level
+- `<currentworld>` – name of the current world
+- `<spawn>` – spawn point coordinates of the current level
+- `<gametime>` – current game time
+- `<daytime>` – current in-game daytime value
+- `<totaltime>` – total elapsed game time
+- `<gamestate>` – current game state
+- `<inventoryitems>` – list of inventory item names as a `2d-array`
+- `<inventoryamounts>` – list of inventory item amounts as a `2d-array`
+- `<inventorysize_x>` – inventory width
+- `<inventorysize_y>` – inventory height
+- `<inventorysize>` – inventory size formatted as `width;height`
+- `<isinventoryopen>` – whether the inventory UI is open
+- `<equippedslot>` – index of the currently equipped slot
+- `<equippeditem>` – name of the equipped item, or `NUL`
+- `<equippeditemuid>` – unique ID of the equipped item, or `-1` if none
+- `<equippeditemamount>` – amount of the equipped item, or `0` if none
+- `<ready>` – indicates the symbol system is initialized
+- `<fps>` – current frames per second
+- `<deltatime>` – delta time for the current frame
+- `<ispaused>` – whether the game is currently paused
+- `<vsync>` – whether VSync is enabled
+- `<resolution_x>` – screen resolution width
+- `<resolution_y>` – screen resolution height
+- `<resolution>` – screen resolution formatted as `width;height`
+- `<fpslimit>` – FPS limit setting
+
+
+### Language
+Variables can be accessed with `=variableName`.  
+Arrays are stored as strings with values separated by `;`.  
+2D-arrays are stored as strings with rows separated by `/` and values in each row separated by `;`.  
+Booleans are represented as `true` and `false`.  
+Numbers can be integers or decimals.  
+Strings must be enclosed in single quotes `'myString'`.  
+Null values are represented as `'NUL'`.  
+Values are returned from functions in the variable `[return]`.  
+Expressions can be enclosed in curly braces `{5 * 5}` to be evaluated.  
+Some functions automatically evaluate expressions passed as parameters.  
+
+### Examples
+```Quill
+// Wait for symbol system to be ready - not necessary but recommended
+wait 1000 =<ready>
+
+// Check if player has item
+while .main true
+    if .hasApple contains =<inventoryitems>, 'Apple'
+        log 'Achievement Unlocked: An apple a day...!'
+        breakwhile
+    endif .hasApple
+endwhile .main
+```

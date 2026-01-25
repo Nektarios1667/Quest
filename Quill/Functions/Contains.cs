@@ -7,7 +7,7 @@ public class Contains : IBuiltinFunction
     {
         if (args.Length != 2)
             return new(false, "ParameterMismatch", $"Expected 2 parameters, got {args.Length}");
-        string[] lines = args[0].Trim('\'').Split("//");
+        string[] lines = args[0].Trim('\'').Split("/");
 
         for (int l = 0; l < lines.Length; l++)
         {

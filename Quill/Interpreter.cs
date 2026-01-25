@@ -19,15 +19,15 @@ public static class Interpreter
         // Player
         ExternalSymbols["<playercoord_x>"] = CameraManager.TileCoord.X.ToString();
         ExternalSymbols["<playercoord_y>"] = CameraManager.TileCoord.Y.ToString();
-        ExternalSymbols["<playercoord>"] = CameraManager.TileCoord.CoordString();
+        ExternalSymbols["<playercoord>"] = $"{CameraManager.TileCoord.X};{CameraManager.TileCoord.Y}";
         ExternalSymbols["<playerhealth>"] = game.UIManager.HealthBar.CurrentValue.ToString();
         ExternalSymbols["<playermaxhealth>"] = game.UIManager.HealthBar.MaxValue.ToString();
         ExternalSymbols["<playerspeed>"] = Constants.PlayerSpeed.ToString();
         ExternalSymbols["<isstuck>"] = (!(player.TileBelow?.Type.IsWalkable ?? true)).ToString().ToLower();
-        ExternalSymbols["<tilebelow>"] = player.TileBelow?.Type.ToString() ?? "null";
+        ExternalSymbols["<tilebelow>"] = player.TileBelow?.Type.ToString() ?? "NUL";
         ExternalSymbols["<camera_x>"] = CameraManager.Camera.X.ToString();
         ExternalSymbols["<camera_y>"] = CameraManager.Camera.Y.ToString();
-        ExternalSymbols["<camera>"] = $"{CameraManager.Camera.X};{CameraManager.Camera.Y};/";
+        ExternalSymbols["<camera>"] = $"{CameraManager.Camera.X};{CameraManager.Camera.Y}";
         // Level
         ExternalSymbols["<currentlevel>"] = game.LevelManager.Level.Name.WrapSingleQuotes();
         ExternalSymbols["<currentworld>"] = game.LevelManager.Level.World.WrapSingleQuotes();
@@ -42,10 +42,10 @@ public static class Interpreter
         ExternalSymbols["<inventoryamounts>"] = player.Inventory.GetItemsAmountString().WrapSingleQuotes();
         ExternalSymbols["<inventorysize_x>"] = player.Inventory.Width.ToString();
         ExternalSymbols["<inventorysize_y>"] = player.Inventory.Height.ToString();
-        ExternalSymbols["<inventorysize>"] = $"{player.Inventory.Width};{player.Inventory.Height};/";
+        ExternalSymbols["<inventorysize>"] = $"{player.Inventory.Width};{player.Inventory.Height}";
         ExternalSymbols["<isinventoryopen>"] = player.Inventory.Opened.ToString();
         ExternalSymbols["<equippedslot>"] = player.Inventory.EquippedSlot.ToString();
-        ExternalSymbols["<equippeditem>"] = (player.Inventory.Equipped?.Name ?? "null").WrapSingleQuotes();
+        ExternalSymbols["<equippeditem>"] = (player.Inventory.Equipped?.Name ?? "NUL").WrapSingleQuotes();
         ExternalSymbols["<equippeditemuid>"] = player.Inventory.Equipped?.UID.ToString() ?? "-1";
         ExternalSymbols["<equippeditemamount>"] = player.Inventory.Equipped?.Amount.ToString() ?? "0";
         // Technical
@@ -56,7 +56,7 @@ public static class Interpreter
         ExternalSymbols["<vsync>"] = Constants.VSYNC.ToString();
         ExternalSymbols["<resolution_x>"] = Constants.ScreenResolution.X.ToString();
         ExternalSymbols["<resolution_y>"] = Constants.ScreenResolution.X.ToString();
-        ExternalSymbols["<resolution>"] = $"{Constants.ScreenResolution.X};{Constants.ScreenResolution.Y};/";
+        ExternalSymbols["<resolution>"] = $"{Constants.ScreenResolution.X};{Constants.ScreenResolution.Y}";
         ExternalSymbols["<fpslimit>"] = Constants.FPS.ToString();
         DebugManager.EndBenchmark("QuillSymbolsUpdate");
     }
@@ -160,7 +160,7 @@ public static class Interpreter
                     Console.WriteLine($"Invalid variable name: {varName}");
                     continue;
                 }
-                string varValue = line[(line.IndexOf('=', 0) + 1)..].Trim();
+                string varValue = parts[2];
                 Expression expr = new(varValue);
                 FillParameters(ref expr, variables);
                 var result = expr.Evaluate();
@@ -175,47 +175,64 @@ public static class Interpreter
                     Console.WriteLine($"Invalid variable name: {varName}");
                     continue;
                 }
-                string varValue = line[(line.IndexOf('=', 0) + 1)..].Trim().Trim('"');
+                string varValue = parts[2];
                 variables[varName] = varValue;
                 continue;
             }
             else if (parts[0] == "breakwhile")
             {
-                l = FindLine(lines, "endwhile", l);
+                if (parts.Length < 2)
+                    l = FindLine(lines, $"endwhile", l);
+                else
+                    l = FindLine(lines, $"endwhile {parts[1]}", l);
             }
             else if (parts[0] == "continuewhile")
             {
-                l = FindLineBackwards(lines, "while", l) - 1; // -1 because of the l++ at the end of the loop
+                if (parts.Length < 2)
+                    l = FindLineBackwards(lines, $"while", l) - 1; // -1 because of the l++ at the end of the loop
+                else
+                    l = FindLineBackwards(lines, $"while {parts[1]}", l) - 1; // -1 because of the l++ at the end of the loop
             }
             else if (parts[0] == "if")
             {
-                Expression expr = new(line[3..].Trim());
+                string name = parts[1];
+                int conditionStart = 1;
+                if (name.StartsWith('.')) conditionStart = 2;
+                Expression expr = new(string.Join(' ', parts[conditionStart..]));
                 var result = expr.Evaluate();
                 if (result is bool b && !b)
-                    l = FindLine(lines, "endif", l);
+                    l = FindLine(lines, $"endif {(name.StartsWith('.') ? name : "")}", l);
             }
             else if (parts[0] == "endif") { } // Marker
             else if (parts[0] == "while")
             {
-                Expression expr = new(line[6..].Trim());
+                string name = parts[1];
+                int conditionStart = 1;
+                if (name.StartsWith('.')) conditionStart = 2;
+                Expression expr = new(string.Join(' ', parts[conditionStart..]));
                 FillParameters(ref expr, variables);
                 var result = expr.Evaluate();
                 if (result is bool b && !b)
-                    l = FindLine(lines, "endwhile", l);
+                    l = FindLine(lines, $"endwhile {(name.StartsWith('.') ? name : "")}", l);
             }
             else if (parts[0] == "endwhile")
             {
-                l = FindLineBackwards(lines, "while", l) - 1; // -1 because of the l++ at the end of the loop
+                if (parts.Length < 2)
+                    l = FindLineBackwards(lines, $"while", l) - 1; // -1 because of the l++ at the end of the loop
+                else
+                    l = FindLineBackwards(lines, $"while {parts[1]}", l) - 1; // -1 because of the l++ at the end of the loop
             }
             else if (parts[0] == "func")
             {
                 string funcName = parts[1];
                 string[] funcParams = parts.Length <= 2 ? [] : parts[2..];
                 functions[funcName] = (l, funcParams);
-                l = FindLine(lines, "endfunc", l);
+                l = FindLine(lines, $"endfunc {funcName}", l);
                 if (l == -1)
                 {
-                    Logger.Error($"Function '{funcName}' missing endfunc");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Function '{funcName}' missing endfunc");
+                    Console.ResetColor();
                     break;
                 }
             } // Skip function definition
@@ -287,14 +304,20 @@ public static class Interpreter
             // Wait until
             else if (parts[0] == "wait")
             {
-                string conditionStr = line[5..].Trim();
+                string waitTimeStr = parts[1];
+                string conditionStr = parts[2].Trim();
                 Expression expr = new(conditionStr);
                 FillParameters(ref expr, variables);
                 var result = expr.Evaluate();
-                if (result is bool b && !b)
+                if (result is not bool b || !int.TryParse(waitTimeStr, out int waitTime))
+                {
+                    Console.WriteLine($"Invalid wait command: {line}");
+                    continue;
+                }
+                if (!b)
                 {
                     l--;
-                    await Task.Delay(15); // about a frame at 60fps
+                    await Task.Delay(waitTime);
                 }
             }
             // Builtin functions

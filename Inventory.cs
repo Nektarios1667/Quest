@@ -428,9 +428,11 @@ public class Inventory
             for (int y = 0; y < Height; y++)
             {
                 Item? item = Items[x, y];
-                result += $"{(item == null ? "NUL" : item.Name)};";
+                result += $"{(item == null ? "NUL" : item.Name)}";
+                if (y < Height - 1) result += ";";
             }
-            result += "/";
+            if (x < Width - 1)
+                result += "/";
         }
         return result;
     }
@@ -442,9 +444,11 @@ public class Inventory
             for (int y = 0; y < Height; y++)
             {
                 Item? item = Items[x, y];
-                result += $"{(item == null ? "0" : item.Amount)};";
+                result += $"{(item == null ? "0" : item.Amount)}";
+                if (y < Height - 1) result += ";";
             }
-            result += "/";
+            if (x < Width - 1)
+                result += "/";
         }
         return result;
     }
