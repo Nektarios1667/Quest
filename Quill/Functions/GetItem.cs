@@ -12,10 +12,6 @@ public class GetItem : IBuiltinFunction
         if (idx < 0 || idx >= items.Length)
             return new(false, "IndexOutOfRange", $"Index {idx} is out of range");
         string item = items[idx];
-        FunctionResponse response = new(true)
-        {
-            OutputVariables = new() { { "[return]", $"{item}" } }
-        };
-        return response;
+        return new(true, null, null, new() { { "[return]", $"{item}"} });
     }
 }

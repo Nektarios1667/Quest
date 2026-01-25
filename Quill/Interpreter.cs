@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Quest.Quill;
-public static class Interpreter
+public static partial class Interpreter
 {
     private static int l = 0;
     private static Dictionary<string, string> Variables = [];
@@ -152,7 +152,7 @@ public static class Interpreter
             ReplaceVariables(ref line, ExternalSymbols);
 
             // Evaluations
-            line = Regex.Replace(line, @"\{([^}]*)\}", match =>
+            line = CurlyExpressions().Replace(line, match =>
             {
                 string exprStr = match.Groups[1].Value.Trim();
                 Expression expr = new(exprStr);
@@ -161,31 +161,35 @@ public static class Interpreter
                 return result?.ToString() ?? "";
             });
 
-            string[] parts = line.Split(' ');
-            string command = parts[0].Trim().ToLower();
+            await ExecuteCommand(line);
+        }
+    }
+    public static async Task ExecuteCommand(string line)
+    {
+        string[] parts = line.Split(' ');
+        string command = parts[0].Trim().ToLower();
 
-            switch (command)
-            {
-                case "num": HandleNum(parts); break;
-                case "str": HandleStr(parts); break;
-                case "breakwhile": HandleBreakWhile(parts); break;
-                case "continuewhile": HandleContinueWhile(parts); break;
-                case "if": HandleIf(parts); break;
-                case "endif": break; // Marker
-                case "while": HandleWhile(parts); break;
-                case "endwhile": HandleEndWhile(parts); break;
-                case "func": HandleFunc(parts); break;
-                case "endfunc": HandleEndFunc(); break;
-                case "call": HandleCall(parts); break;
-                case "sleep": await HandleSleep(parts); break;
-                case "wait": await HandleWait(parts); break;
-                default:
-                    if (BuiltinFunctions.TryGetValue(command, out var func))
-                        HandleBuiltin(func, parts);
-                    else
-                        Console.WriteLine($"Unknown command: {line}");
-                    break;
-            }
+        switch (command)
+        {
+            case "num": HandleNum(parts); break;
+            case "str": HandleStr(parts); break;
+            case "breakwhile": HandleBreakWhile(parts); break;
+            case "continuewhile": HandleContinueWhile(parts); break;
+            case "if": HandleIf(parts); break;
+            case "endif": break; // Marker
+            case "while": HandleWhile(parts); break;
+            case "endwhile": HandleEndWhile(parts); break;
+            case "func": HandleFunc(parts); break;
+            case "endfunc": HandleEndFunc(); break;
+            case "call": HandleCall(parts); break;
+            case "sleep": await HandleSleep(parts); break;
+            case "wait": await HandleWait(parts); break;
+            default:
+                if (BuiltinFunctions.TryGetValue(command, out var func))
+                    HandleBuiltin(func, parts);
+                else
+                    Console.WriteLine($"Unknown command: {line}");
+                break;
         }
     }
     // Handlers
@@ -372,4 +376,7 @@ public static class Interpreter
             foreach (var kvp in resp.OutputVariables)
                 Variables[kvp.Key] = kvp.Value;
     }
+
+    [GeneratedRegex(@"\{([^}]*)\}", RegexOptions.Compiled)]
+    private static partial Regex CurlyExpressions();
 }
