@@ -258,6 +258,11 @@ The following are builtin functions that can be called just like commands:
 - `execute (command)` - executes a console command
 - `getitem (array), (index)` - gets an item from an array at the specified index
 - `getitem2d (2d-array), (x), (y)` - gets an item from a 2d array at the specified coordinates
+- `setitem (array), (idx), (value)` - sets an item in an array at the specified index
+- `setitem2d (2d-array), (x), (y), (value)` - sets an item in a 2d array at the specified coordinates
+- `append (array), (value)` - appends a value to the end of an array
+- `remove (array), (value)` - removes a value from an array
+- `insert (array), (index), (value)` - inserts a value into an array at the specified index`
 - `give (item,) (amount)` - gives the player a specific item and amount
 - `loadlevel (levelName)` - loads a specific level
 - `log (message)` - prints a message to the console
@@ -267,6 +272,8 @@ The following are builtin functions that can be called just like commands:
 - `unloadlevel (levelName)` - unloads a specific level
 - `warn (message)` - prints a warning message to the console
 - `notif (r), (g), (b), (duration seconds), (message)` - shows a notification on screen with the specified color and duration
+- `randomint (min), (max)` - generates a random integer between min and max (exclusive)
+- `randomfloat (min), (max)` - generates a random float between min and max (exclusive)
 
 ### Quest Engine Integration
 Quest Engine provides additional variables that can be accessed in Quill scripts.  

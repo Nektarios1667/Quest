@@ -12,7 +12,7 @@ public class GetItem2D : IBuiltinFunction
             return new(false, "TypeMismatch", $"Expected integer for third parameter, got '{args[2]}'");
 
         // Parse
-        string[] lines = args[0].Trim('\'').Split("/");
+        string[] lines = args[0].Split("/");
         if (y < 0 || y >= lines.Length)
             return new(false, "IndexOutOfRange", $"Y index {y} is out of range for provided data");
         string[] items = lines[y].Split(";");

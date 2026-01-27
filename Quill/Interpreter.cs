@@ -34,7 +34,7 @@ public struct QuillError
 }
 public static partial class Interpreter
 {
-    private static List<QuillError> Errors = [];
+    private readonly static List<QuillError> Errors = [];
     private static int l = 0;
     private static Dictionary<string, string> Variables = [];
     private static Dictionary<string, string> Parameters = [];
@@ -55,8 +55,14 @@ public static partial class Interpreter
         { "give", new Give() },
         { "getitem", new GetItem() },
         { "getitem2d", new GetItem2D() },
+        { "setitem", new SetItem() },
+        { "setitem2d", new SetItem2D() },
+        { "append", new Append() },
+        { "remove", new Remove() },
+        { "insert", new Insert() },
         { "contains", new Contains() },
         { "randomint", new RandomInt() },
+        { "randomfloat", new RandomFloat() },
         { "notif", new Notif() }
     };
 
