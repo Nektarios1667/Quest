@@ -1,12 +1,40 @@
 ﻿using NCalc;
 using Quest.Quill.Functions;
-using SharpDX.MediaFoundation.DirectX;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Quest.Quill;
+
+public enum QuillErrorType
+{
+    UnknownError,
+    SyntaxError,
+    RuntimeError,
+    ParameterMismatch,
+    UnknownCommand,
+    FunctionNotFound,
+    InvalidVariableName,
+    InvalidExpression,
+    BlockMismatch,
+    Fatal,
+}
+public struct QuillError
+{
+    public int Line { get; }
+    public QuillErrorType ErrorType { get; }
+    public string Message { get; }
+    public bool Fatal { get; }
+    public QuillError(int line, QuillErrorType errorType, string message, bool fatal = false)
+    {
+        Line = line;
+        ErrorType = errorType;
+        Message = message;
+        Fatal = fatal;
+    }
+}
 public static partial class Interpreter
 {
+    private static List<QuillError> Errors = [];
     private static int l = 0;
     private static Dictionary<string, string> Variables = [];
     private static Dictionary<string, string> Parameters = [];
@@ -87,16 +115,20 @@ public static partial class Interpreter
     static int FindLine(string[] lines, string target, int start = 0)
     {
         for (int i = start; i < lines.Length; i++)
-            if (lines[i].Split(' ')[0].Trim() == target)
+            if (lines[i].Trim().StartsWith(target.Trim()))
                 return i;
-        return -1;
+
+        Errors.Add(new(l, QuillErrorType.BlockMismatch, $"Failed to find line '{target}'", fatal:true));
+        return l;
     }
     static int FindLineBackwards(string[] lines, string target, int start = 0)
     {
         for (int i = start; i >= 0; i--)
-            if (lines[i].Split(' ')[0].Trim() == target)
+            if (lines[i].Trim().StartsWith(target.Trim()))
                 return i;
-        return -1;
+
+        Errors.Add(new(l, QuillErrorType.BlockMismatch, $"Failed to find line '{target}'", fatal:true));
+        return l;
     }
     static void ReplaceVariables(ref string line, Dictionary<string, string> vars)
     {
@@ -110,29 +142,42 @@ public static partial class Interpreter
         return false;
     }
     // Run
-    public static async Task RunScriptAsync(string code)
+    public static async Task RunScriptAsync(QuillScript script)
     {
         try
         {
-            await RunScriptCore(code);
+            await RunScriptCore(script);
         }
         catch (Exception ex)
         {
             Logger.Error($"Quill execution error: {ex.Message}");
         }
     }
-    private static async Task RunScriptCore(string code)
+    private static async Task RunScriptCore(QuillScript script)
     {
         Variables = [];
         Parameters = [];
         Functions = [];
         Callbacks = [];
 
-        Lines = code.Split("\n");
+        Lines = script.SourceCode.Split("\n");
         for (l = 0; l < Lines.Length; l++)
         {
-            if (l < 0 || l >= Lines.Length) break;
+            if (l < 0 || l >= Lines.Length)
+                Errors.Add(new(l, QuillErrorType.RuntimeError, $"Line index out of bounds - {l}", fatal: true));
             string line = Lines[l].Trim();
+
+            // Handle errors
+            foreach (QuillError error in Errors)
+            {
+                Logger.Error($"Quill | {script.ScriptName} @{error.Line} | {error.ErrorType} - {error.Message}");
+                if (error.Fatal)
+                {
+                    Logger.Error($"Quill | {script.ScriptName} | Execution stopped due to fatal error");
+                    return;
+                }
+            }
+            Errors.Clear();
 
             // Comment
             if (line.StartsWith("//") || string.IsNullOrWhiteSpace(line)) continue;
@@ -157,118 +202,169 @@ public static partial class Interpreter
     }
     public static async Task ExecuteCommand(string line)
     {
-        string[] parts = line.Split(' ');
-        string command = parts[0].Trim().ToLower();
+        string command = line.Split(' ')[0].Trim().ToLower();
+        string argsStr = line[command.Length..].Trim();
 
         switch (command)
         {
-            case "num": HandleNum(parts); break;
-            case "str": HandleStr(parts); break;
-            case "breakwhile": HandleBreakWhile(parts); break;
-            case "continuewhile": HandleContinueWhile(parts); break;
-            case "if": HandleIf(parts); break;
+            case "num": HandleNum(argsStr); break;
+            case "str": HandleStr(argsStr); break;
+            case "breakwhile": HandleBreakWhile(argsStr); break;
+            case "continuewhile": HandleContinueWhile(argsStr); break;
+            case "if": HandleIf(argsStr); break;
             case "endif": break; // Marker
-            case "while": HandleWhile(parts); break;
-            case "endwhile": HandleEndWhile(parts); break;
-            case "func": HandleFunc(parts); break;
+            case "while": HandleWhile(argsStr); break;
+            case "endwhile": HandleEndWhile(argsStr); break;
+            case "func": HandleFunc(argsStr); break;
             case "endfunc": HandleEndFunc(); break;
-            case "call": HandleCall(parts); break;
-            case "sleep": await HandleSleep(parts); break;
-            case "wait": await HandleWait(parts); break;
+            case "call": HandleCall(argsStr); break;
+            case "sleep": await HandleSleep(argsStr); break;
+            case "wait": await HandleWait(argsStr); break;
             default:
                 if (BuiltinFunctions.TryGetValue(command, out var func))
-                    HandleBuiltin(func, parts);
+                    HandleBuiltin(func, command, argsStr);
                 else
-                    Console.WriteLine($"Unknown command: {line}");
+                    Errors.Add(new(l, QuillErrorType.UnknownCommand, command));
                 break;
         }
     }
     // Handlers
-    private static void HandleNum(string[] parts)
+    private static void HandleNum(string argsStr)
     {
-        string varName = parts[1];
-        if (ContainsAny(varName, "`~!@#$%^&*()-=+[]{}\\|;:'\",<.>/?"))
+        string[] args = argsStr.Split(',', StringSplitOptions.TrimEntries);
+        if (args.Length != 2)
         {
-            Console.WriteLine($"Invalid variable name: {varName}");
+            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"num command expects 2 arguments, received {args.Length}"));
             return;
         }
 
-        string varValue = parts[2];
+        string varName = args[0];
+        if (ContainsAny(varName, "`~!@#$%^&*()-=+[]{}\\|;:'\",<.>/?"))
+        {
+            Errors.Add(new(l, QuillErrorType.InvalidVariableName, varName));
+            return;
+        }
+
+        string varValue = args[1];
         Expression expr = new(varValue);
         var result = expr.Evaluate();
         Variables[varName] = result?.ToString() ?? "";
     }
 
-    private static void HandleStr(string[] parts)
+    private static void HandleStr(string argsStr)
     {
-        string varName = parts[1];
-        if (ContainsAny(varName, "`~!@#$%^&*()-=+[]{}\\|;:'\",<.>/?"))
+        string[] args = argsStr.Split(',', StringSplitOptions.TrimEntries);
+        if (args.Length != 2)
         {
-            Console.WriteLine($"Invalid variable name: {varName}");
+            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"str command expects 2 arguments, received {args.Length}"));
             return;
         }
 
-        string varValue = parts[2];
+        string varName = args[0];
+        if (ContainsAny(varName, "`~!@#$%^&*()-=+[]{}\\|;:'\",<.>/?"))
+        {
+            Errors.Add(new(l, QuillErrorType.InvalidVariableName, varName));
+            return;
+        }
+
+        string varValue = args[1];
         Variables[varName] = varValue;
     }
 
-    private static void HandleBreakWhile(string[] parts)
+    private static void HandleBreakWhile(string argsStr)
     {
-        if (parts.Length < 2)
+        string[] args = argsStr.Split(' ');
+
+        if (args.Length == 1)
             l = FindLine(Lines, "endwhile", l);
+        else if (args.Length == 0)
+            l = FindLine(Lines, $"endwhile {args[0]}", l);
         else
-            l = FindLine(Lines, $"endwhile {parts[1]}", l);
+            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"breakwhile command expects 0 or 1 arguments, received {args.Length}"));
+
     }
 
-    private static void HandleContinueWhile(string[] parts)
+    private static void HandleContinueWhile(string argsStr)
     {
-        if (parts.Length < 2)
+        string[] args = argsStr.Split(' ');
+
+        if (args.Length == 1)
             l = FindLineBackwards(Lines, "while", l) - 1;
+        else if (args.Length == 0)
+            l = FindLineBackwards(Lines, $"while {args[0]}", l) - 1;
         else
-            l = FindLineBackwards(Lines, $"while {parts[1]}", l) - 1;
+            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"continuewhile command expects 0 or 1 arguments, received {args.Length}"));
     }
 
-    private static void HandleIf(string[] parts)
+    private static void HandleIf(string argsStr)
     {
-        string name = parts[1];
-        int conditionStart = name.StartsWith('.') ? 2 : 1;
-        Expression expr = new(string.Join(' ', parts[conditionStart..]));
-        var result = expr.Evaluate();
-        if (result is bool b && !b)
-            l = FindLine(Lines, $"endif{(name.StartsWith('.') ? $" {name}" : "")}", l);
+        string[] args = argsStr.Split(' ');
+        if (args.Length >= 2 && args[0].StartsWith('.'))
+        {
+            string label = args[0];
+            Expression expr = new(string.Join(' ', args[1..]));
+            var result = expr.Evaluate();
+            if (result is bool b && !b)
+                l = FindLine(Lines, $"endif {label}", l);
+        } else if (args.Length >= 1)
+        {
+            Expression expr = new(string.Join(' ', args[0..]));
+            var result = expr.Evaluate();
+            if (result is bool b && !b)
+                l = FindLine(Lines, $"endif", l);
+        } else
+            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"if command expects 1 or 2 arguments, received {args.Length}"));
     }
 
-    private static void HandleWhile(string[] parts)
+    private static void HandleWhile(string argsStr)
     {
-        string name = parts[1];
-        int conditionStart = name.StartsWith('.') ? 2 : 1;
-        Expression expr = new(string.Join(' ', parts[conditionStart..]));
-        var result = expr.Evaluate();
-        if (result is bool b && !b)
-            l = FindLine(Lines, $"endwhile{(name.StartsWith('.') ? $" {name}" : "")}", l);
+        string[] args = argsStr.Split(' ');
+        if (args.Length >= 2 && args[0].StartsWith('.'))
+        {
+            string label = args[0];
+            Expression expr = new(string.Join(' ', args[1..]));
+            var result = expr.Evaluate();
+            if (result is bool b && !b)
+                l = FindLine(Lines, $"endwhile {label}", l);
+        }
+        else if (args.Length >= 1)
+        {
+            Expression expr = new(string.Join(' ', args[0..]));
+            var result = expr.Evaluate();
+            if (result is bool b && !b)
+                l = FindLine(Lines, $"endwhile", l);
+        }
+        else
+            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"while command expects 1 or 2 arguments, received {args.Length}"));
     }
 
-    private static void HandleEndWhile(string[] parts)
+    private static void HandleEndWhile(string argsStr)
     {
-        if (parts.Length < 2)
+        string[] args = argsStr.Split(' ');
+
+        if (args.Length == 0)
             l = FindLineBackwards(Lines, "while", l) - 1;
+        else if (args.Length == 1)
+            l = FindLineBackwards(Lines, $"while {args[0]}", l) - 1;
         else
-            l = FindLineBackwards(Lines, $"while {parts[1]}", l) - 1;
+            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"endwhile command expects 0 or 1 arguments, received {args.Length}")   );
     }
 
-    private static void HandleFunc(string[] parts)
+    private static void HandleFunc(string argsStr)
     {
-        string funcName = parts[1];
-        string[] funcParams = parts.Length <= 2 ? [] : parts[2..];
+        string[] args = argsStr.Split(' ');
+
+        if (args.Length < 1)
+        {
+            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"func command expects at least 1 argument, received {args.Length}"));
+            return;
+        }
+
+        string funcName = args[0];
+        string[] funcParams = args.Length < 2 ? [] : args[1..];
+
         Functions[funcName] = (l, funcParams);
         l = FindLine(Lines, $"endfunc {funcName}", l);
-        if (l == -1)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Function '{funcName}' missing endfunc");
-            Console.ResetColor();
-            throw new InvalidOperationException();
-        }
     }
 
     private static void HandleEndFunc()
@@ -281,23 +377,31 @@ public static partial class Interpreter
         }
     }
 
-    private static void HandleCall(string[] parts)
+    private static void HandleCall(string argsStr)
     {
-        string funcName = parts[1];
-        var function = Functions.TryGetValue(funcName, out var f) ? f : (-1, []);
-        if (function.line == -1)
+        string[] args = argsStr.Split(',', StringSplitOptions.TrimEntries);
+
+        if (args.Length < 1)
         {
-            Console.WriteLine($"Function not found: {funcName}");
+            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"call command expects at least 1 argument, received {args.Length}"));
             return;
         }
 
-        string[] stringParams = parts.Length <= 2 ? [] : string.Join(' ', parts[1..]).Split(',');
+        string funcName = args[0];
+        var function = Functions.TryGetValue(funcName, out var f) ? f : (-1, []);
+        if (function.line == -1)
+        {
+            Errors.Add(new(l, QuillErrorType.FunctionNotFound, funcName));
+            return;
+        }
+
+        string[] stringParams = args.Length < 2 ? [] : args[1..];
         foreach (string param in stringParams)
         {
             string[] kvp = param.Split(':');
             if (kvp.Length != 2)
             {
-                Console.WriteLine($"Invalid parameter: {param}");
+                Errors.Add(new(l, QuillErrorType.InvalidExpression, $"Invalid parameter: {param}"));
                 continue;
             }
 
@@ -311,7 +415,7 @@ public static partial class Interpreter
         {
             if (!Parameters.ContainsKey(p))
             {
-                Console.WriteLine($"Function call '{funcName}' missing parameter '{p}' @ l{l}");
+                Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"Function call '{funcName}' missing parameter '{p}'"));
                 return;
             }
         }
@@ -320,26 +424,40 @@ public static partial class Interpreter
         l = function.line;
     }
 
-    private static async Task HandleSleep(string[] parts)
+    private static async Task HandleSleep(string argsStr)
     {
-        string waitTimeStr = parts[1];
+        string[] args = argsStr.Split(',');
+        if (args.Length != 1)
+        {
+            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"sleep command expects 1 argument, received {args.Length}"));
+            return;
+        }
+
+        string waitTimeStr = args[0];
         Expression expr = new(waitTimeStr);
         var result = expr.Evaluate();
         if (result is int ms)
             await Task.Delay(ms);
         else
-            Console.WriteLine($"Invalid sleep time: {waitTimeStr}");
+            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"Invalid sleep time: {waitTimeStr}"));
     }
 
-    private static async Task HandleWait(string[] parts)
+    private static async Task HandleWait(string argsStr)
     {
-        string waitTimeStr = parts[1];
-        string conditionStr = parts[2].Trim();
+        string[] args = argsStr.Split(',');
+        if (args.Length != 2)
+        {
+            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"wait command expects 2 arguments, received {args.Length}"));
+            return;
+        }
+
+        string conditionStr = args[0].Trim();
+        string waitTimeStr = args[1];
         Expression expr = new(conditionStr);
         var result = expr.Evaluate();
         if (result is not bool b || !int.TryParse(waitTimeStr, out int waitTime))
         {
-            Console.WriteLine($"Invalid wait command: {string.Join(' ', parts)}");
+            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"Invalid wait command: wait {argsStr}"));
             return;
         }
 
@@ -350,14 +468,13 @@ public static partial class Interpreter
         }
     }
 
-    private static void HandleBuiltin(IBuiltinFunction func, string[] parts)
+    private static void HandleBuiltin(IBuiltinFunction func, string funcName, string argsStr)
     {
-        string[] externalParams = parts.Length <= 1 ? [] : string.Join(' ', parts[1..])
-            .Split(',', StringSplitOptions.TrimEntries);
+        string[] args = argsStr.Split(',', StringSplitOptions.TrimEntries);
 
-        var resp = func.Run(externalParams);
+        var resp = func.Run(args);
         if (!resp.Success)
-            Console.WriteLine($"Builtin function '{parts[0]}' failed: {resp.ErrorType} - {resp.ErrorMessage}");
+            Errors.Add(new(l, QuillErrorType.UnknownError, $"Builtin function '{funcName}' failed: {resp.ErrorType} - {resp.ErrorMessage}"));
         else
             foreach (var kvp in resp.OutputVariables)
                 Variables[kvp.Key] = kvp.Value;

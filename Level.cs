@@ -44,7 +44,7 @@ public class Level
     {
         foreach (var script in Scripts)
         {
-            _ = Quill.Interpreter.RunScriptAsync(script.SourceCode);
+            _ = Quill.Interpreter.RunScriptAsync(script);
         }
     }
 }

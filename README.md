@@ -232,6 +232,7 @@ It is very simple and is still in early development.
 Each line of code (other than comments) represents a command.  
 Commands can have parameters separated by commas.  
 Comments start with `//` and make the entire line ignored.  
+Arguments are separated by commas, except for control flow commands which seperate parts by spaces.
 
 `(value)` denotes a parameter that must be provided.  
 `[value]` denotes an optional paramter.  
@@ -242,29 +243,30 @@ The following commands are currently supported:
 - `while [.label] (condition)` - runs the following block while the condition is true
 - `endwhile [.label]` - ends a while block
 - `breakwhile [.label]` - breaks out of the current while loop
-- `str (name) (value)` - creates a string variable
-- `num (name) (value)` - creates a number variable
+- `str (name), (value)` - creates a string variable
+- `num (name), (value)` - creates a number variable
 - `func (name)` - creates a function
 - `endfunc` - ends a function definition
 - `call (name)` - calls a function
 - `sleep (milliseconds)` - pauses execution for the specified time
-- `wait (recheck milliseconds) (condition)` - pauses execution until the condition is true; rechecks every specified milliseconds
+- `wait (condition), (recheck milliseconds) ` - pauses execution until the condition is true; rechecks every specified milliseconds
 
 ### Builtin Functions
 The following are builtin functions that can be called just like commands:  
-- `contains (array / 2d-array) (target)` - checks if the array contains a specific value
-- `error (message) (exit)` - prints an error message and optionally exits the script
+- `contains (array / 2d-array), (target)` - checks if the array contains a specific value
+- `error (message), (exit)` - prints an error message and optionally exits the script
 - `execute (command)` - executes a console command
-- `getitem (array) (index)` - gets an item from an array at the specified index
-- `getitem2d (2d-array) (x) (y)` - gets an item from a 2d array at the specified coordinates
-- `give (item) (amount)` - gives the player a specific item and amount
+- `getitem (array), (index)` - gets an item from an array at the specified index
+- `getitem2d (2d-array), (x), (y)` - gets an item from a 2d array at the specified coordinates
+- `give (item,) (amount)` - gives the player a specific item and amount
 - `loadlevel (levelName)` - loads a specific level
 - `log (message)` - prints a message to the console
 - `readfile (filePath)` - reads the contents of a file
 - `readlevel (levelName)` - reads the data of a specific level
-- `teleport (x) (y)` - teleports the player to the specified coordinates
+- `teleport (x), (y)` - teleports the player to the specified coordinates
 - `unloadlevel (levelName)` - unloads a specific level
 - `warn (message)` - prints a warning message to the console
+- `notif (r), (g), (b), (duration seconds), (message)` - shows a notification on screen with the specified color and duration
 
 ### Quest Engine Integration
 Quest Engine provides additional variables that can be accessed in Quill scripts.  
@@ -323,14 +325,21 @@ Some functions automatically evaluate expressions passed as parameters.
 
 ### Examples
 ```Quill
-// Wait for symbol system to be ready - not necessary but recommended
-wait 1000 =<ready>
+// Wait until the symbol system is ready
+wait =<ready>, 1000
 
-// Check if player has item
+// Main loop
 while .main true
-    if .hasApple contains =<inventoryitems>, 'Apple'
-        log 'Achievement Unlocked: An apple a day...!'
-        breakwhile
-    endif .hasApple
+	// Check for apple in inventory
+	contains =<inventoryitems>, Apple
+
+    // Achievement
+	if =[return]
+		notif 0, 255, 255, 10, Achievement:An apple a day...
+		breakwhile
+	endif
+
+    // Check every second
+	sleep 1000
 endwhile .main
 ```

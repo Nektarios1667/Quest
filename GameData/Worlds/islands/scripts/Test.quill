@@ -1,6 +1,6 @@
-﻿wait 100 =<ready>
+﻿wait =<ready>, 1000
 
-while true
+while .main true
 	// Check for apple in inventory
 	contains =<inventoryitems>, Apple
 	if =[return]
@@ -9,4 +9,4 @@ while true
 	endif
 
 	sleep 1000
-endwhile
+endwhile .main
