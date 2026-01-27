@@ -1,4 +1,6 @@
 ﻿wait =<ready>, 1000
+
+num start, =<totaltime>
 log Script Test.quill started at =<datetime>
 
 while .main true
@@ -12,4 +14,4 @@ while .main true
 	sleep 1000
 endwhile .main
 
-log Script Test.quill ended at =<datetime>
+log Script Test.quill ended at =<datetime> after {Round(=<totaltime> - =start, 1)} s

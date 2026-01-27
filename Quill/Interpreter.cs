@@ -107,8 +107,8 @@ public static partial class Interpreter
         ExternalSymbols["<equippeditemamount>"] = player.Inventory.Equipped?.Amount.ToString() ?? "0";
         // Technical
         ExternalSymbols["<ready>"] = "true";
-        ExternalSymbols["<time>"] = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
-        ExternalSymbols["<datetime>"] = DateTime.Now.ToString("yyyy;MM;dd/HH;mm;ss;");
+        ExternalSymbols["<time>"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+        ExternalSymbols["<datetime>"] = DateTime.Now.ToString("yyyy;MM;dd/HH;mm;ss");
         ExternalSymbols["<fps>"] = (1f / game.DeltaTime).ToString();
         ExternalSymbols["<deltatime>"] = game.DeltaTime.ToString();
         ExternalSymbols["<ispaused>"] = (StateManager.OverlayState == OverlayState.Pause).ToString();
@@ -239,6 +239,7 @@ public static partial class Interpreter
     // Handlers
     private static void HandleNum(string argsStr)
     {
+        // Args
         string[] args = argsStr.Split(',', StringSplitOptions.TrimEntries);
         if (args.Length != 2)
         {
@@ -246,6 +247,7 @@ public static partial class Interpreter
             return;
         }
 
+        // Name
         string varName = args[0];
         if (ContainsAny(varName, "`~!@#$%^&*()-=+[]{}\\|;:'\",<.>/?"))
         {
@@ -253,14 +255,18 @@ public static partial class Interpreter
             return;
         }
 
-        string varValue = args[1];
-        Expression expr = new(varValue);
-        var result = expr.Evaluate();
-        Variables[varName] = result?.ToString() ?? "";
+        // Value
+        if (!float.TryParse(args[1], out float num))
+        {
+            Errors.Add(new(l, QuillErrorType.InvalidExpression, $"Invalid number expression '{args[1]}'"));
+            return;
+        }
+        Variables[varName] = num.ToString("F20").TrimEnd('0').TrimEnd('.');
     }
 
     private static void HandleStr(string argsStr)
     {
+        // Args
         string[] args = argsStr.Split(',', StringSplitOptions.TrimEntries);
         if (args.Length != 2)
         {
@@ -268,6 +274,7 @@ public static partial class Interpreter
             return;
         }
 
+        // Name
         string varName = args[0];
         if (ContainsAny(varName, "`~!@#$%^&*()-=+[]{}\\|;:'\",<.>/?"))
         {
@@ -275,8 +282,8 @@ public static partial class Interpreter
             return;
         }
 
-        string varValue = args[1];
-        Variables[varName] = varValue;
+        // Value
+        Variables[varName] = args[1];
     }
 
     private static void HandleBreakWhile(string argsStr)
@@ -415,8 +422,7 @@ public static partial class Interpreter
 
             string pName = kvp[0].Trim();
             string pValue = kvp[1].Trim();
-            Expression expr = new(pValue);
-            Parameters[pName] = expr.Evaluate()?.ToString() ?? "";
+            Parameters[pName] = pValue;
         }
 
         foreach (string p in function.parameters)
@@ -442,9 +448,7 @@ public static partial class Interpreter
         }
 
         string waitTimeStr = args[0];
-        Expression expr = new(waitTimeStr);
-        var result = expr.Evaluate();
-        if (result is int ms)
+        if (int.TryParse(waitTimeStr, out var ms))
             await Task.Delay(ms);
         else
             Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"Invalid sleep time: {waitTimeStr}"));

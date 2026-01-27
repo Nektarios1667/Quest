@@ -7,14 +7,7 @@ public class Log : IBuiltinFunction
     {
         if (args.Length != 1)
             return new(false, "ParameterMismatch", $"Expected 1 parameter, got {args.Length}");
-        Expression expr = new(args[0]);
-        object? output = args[0];
-        try
-        {
-            output = expr.Evaluate();
-        }
-        catch { }
-        Logger.Log(output?.ToString() ?? string.Empty);
+        Logger.Log(args[0]);
         return new(true);
     }
 }
