@@ -107,6 +107,8 @@ public static partial class Interpreter
         ExternalSymbols["<equippeditemamount>"] = player.Inventory.Equipped?.Amount.ToString() ?? "0";
         // Technical
         ExternalSymbols["<ready>"] = "true";
+        ExternalSymbols["<time>"] = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+        ExternalSymbols["<datetime>"] = DateTime.Now.ToString("yyyy;MM;dd/HH;mm;ss;");
         ExternalSymbols["<fps>"] = (1f / game.DeltaTime).ToString();
         ExternalSymbols["<deltatime>"] = game.DeltaTime.ToString();
         ExternalSymbols["<ispaused>"] = (StateManager.OverlayState == OverlayState.Pause).ToString();

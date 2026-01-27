@@ -1,4 +1,5 @@
 ﻿wait =<ready>, 1000
+log Script Test.quill started at =<datetime>
 
 while .main true
 	// Check for apple in inventory
@@ -10,3 +11,5 @@ while .main true
 
 	sleep 1000
 endwhile .main
+
+log Script Test.quill ended at =<datetime>
