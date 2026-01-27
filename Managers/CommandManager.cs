@@ -20,7 +20,8 @@ public static class CommandManager
         public (bool success, string output) TryExecute(string command)
         {
             // Replace parts
-            string success = Success; string failure = Failure;
+            string success = Success;
+            string failure = Failure;
             string[] parts = command.Split(' ');
             for (int p = 0; p < parts.Length; p++)
                 success = success.Replace($"|{p}|", parts[p]);
@@ -59,7 +60,7 @@ public static class CommandManager
     private readonly static Dictionary<string, Func<string, bool>> predicateMap = new()
     {
         { "int", value => int.TryParse(value, out _)  },
-        { "decimal", value => decimal.TryParse(value, out _) && !decimal.TryParse(value, out _) },
+        { "decimal", value => decimal.TryParse(value, out _) && !int.TryParse(value, out _) },
         { "number", value => decimal.TryParse(value, out _) }, // Any numeric value
         { "string", value => true },
         { "bool", value => bool.TryParse(value, out _) },
@@ -89,6 +90,7 @@ public static class CommandManager
             new("gametime <modify> {-999999:999999}", CGameTime, "Game time |1| |2|", "Failed |1| gametime |2|"),
             new("macro *", CMacro, "Executed macro '|1|'.", "Failed to execute macro '|1|'."),
             new("give <item> {1:255}", CGive, "Gave |2| |1| to player", "Failed to give |2| |1| to player"),
+            new("notif <int> <int> <int> <number> **", CNotif, "Notification |*| created.", "Failed to create notification |*|."),
         ];
     }
     public static (bool success, string output) Execute(string command)
@@ -317,6 +319,17 @@ public static class CommandManager
         (bool success, Item leftover) = playerManager!.Inventory.AddItem(item);
         if (!success)
             levelManager!.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), CameraManager.PlayerFoot, gameManager!.GameTime));
+        return true;
+    }
+    private static bool CNotif(string command)
+    {
+        string[] parts = command.Split(' ');
+        int r = int.Parse(parts[1]);
+        int g = int.Parse(parts[2]);
+        int b = int.Parse(parts[3]);
+        decimal duration = decimal.Parse(parts[4]);
+        string message = string.Join(' ', parts[5..]);
+        gameManager!.UIManager.LootNotifications.AddNotification(message, color:new(r, g, b), (float)duration);
         return true;
     }
 }

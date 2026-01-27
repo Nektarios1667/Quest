@@ -1,8 +1,10 @@
-﻿while true
+﻿wait 100 =<ready>
+
+while true
 	// Check for apple in inventory
 	contains =<inventoryitems>, Apple
-	if =<gamestate> == 'Game' && =[return]
-		log 'Playerhasapple!'
+	if =[return]
+		notif 0, 255, 255, 10, Achievement:An apple a day...
 		breakwhile
 	endif
 

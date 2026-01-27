@@ -29,6 +29,7 @@ public static partial class Interpreter
         { "getitem2d", new GetItem2D() },
         { "contains", new Contains() },
         { "randomint", new RandomInt() },
+        { "notif", new Notif() }
     };
 
     private static readonly Dictionary<string, string> ExternalSymbols = new() {
@@ -37,9 +38,6 @@ public static partial class Interpreter
     public static void UpdateSymbols(GameManager game, PlayerManager player)
     {
         DebugManager.StartBenchmark("QuillSymbolsUpdate");
-
-        // Check
-        //if (StateManager.State != GameState.Game) return;
 
         // Player
         ExternalSymbols["<playercoord_x>"] = CameraManager.TileCoord.X.ToString();
@@ -86,13 +84,6 @@ public static partial class Interpreter
         DebugManager.EndBenchmark("QuillSymbolsUpdate");
     }
     // Helpers
-    static void FillParameters(ref Expression expr, Dictionary<string, string> vars)
-    {
-        foreach (var kvp in vars)
-        {
-            expr.Parameters[kvp.Key] = kvp.Value;
-        }
-    }
     static int FindLine(string[] lines, string target, int start = 0)
     {
         for (int i = start; i < lines.Length; i++)
@@ -204,7 +195,6 @@ public static partial class Interpreter
 
         string varValue = parts[2];
         Expression expr = new(varValue);
-        FillParameters(ref expr, Variables);
         var result = expr.Evaluate();
         Variables[varName] = result?.ToString() ?? "";
     }
@@ -253,7 +243,6 @@ public static partial class Interpreter
         string name = parts[1];
         int conditionStart = name.StartsWith('.') ? 2 : 1;
         Expression expr = new(string.Join(' ', parts[conditionStart..]));
-        FillParameters(ref expr, Variables);
         var result = expr.Evaluate();
         if (result is bool b && !b)
             l = FindLine(Lines, $"endwhile{(name.StartsWith('.') ? $" {name}" : "")}", l);
@@ -315,7 +304,6 @@ public static partial class Interpreter
             string pName = kvp[0].Trim();
             string pValue = kvp[1].Trim();
             Expression expr = new(pValue);
-            FillParameters(ref expr, Variables);
             Parameters[pName] = expr.Evaluate()?.ToString() ?? "";
         }
 
@@ -336,7 +324,6 @@ public static partial class Interpreter
     {
         string waitTimeStr = parts[1];
         Expression expr = new(waitTimeStr);
-        FillParameters(ref expr, Variables);
         var result = expr.Evaluate();
         if (result is int ms)
             await Task.Delay(ms);
@@ -349,7 +336,6 @@ public static partial class Interpreter
         string waitTimeStr = parts[1];
         string conditionStr = parts[2].Trim();
         Expression expr = new(conditionStr);
-        FillParameters(ref expr, Variables);
         var result = expr.Evaluate();
         if (result is not bool b || !int.TryParse(waitTimeStr, out int waitTime))
         {
