@@ -2,6 +2,7 @@
 using Quest.Quill.Functions;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Quest.Quill;
 
@@ -36,10 +37,11 @@ public static partial class Interpreter
 {
     private readonly static List<QuillError> Errors = [];
     private static int l = 0;
-    private static Dictionary<string, string> Variables = [];
-    private static Dictionary<string, string> Parameters = [];
-    private static Dictionary<string, (int line, string[] parameters)> Functions = [];
-    private static List<int> Callbacks = [];
+    private static readonly Dictionary<string, string> Variables = [];
+    private static readonly Dictionary<string, string> Parameters = [];
+    private static readonly Dictionary<string, (int line, string[] parameters)> Functions = [];
+    private static readonly List<int> Callbacks = [];
+    private static readonly Dictionary<int, int> OnceFlags = [];
     private static string[] Lines = [];
 
     private readonly static Dictionary<string, IBuiltinFunction> BuiltinFunctions = new() {
@@ -163,10 +165,11 @@ public static partial class Interpreter
     }
     private static async Task RunScriptCore(QuillScript script)
     {
-        Variables = [];
-        Parameters = [];
-        Functions = [];
-        Callbacks = [];
+        Variables.Clear();
+        Parameters.Clear();
+        Functions.Clear();
+        Callbacks.Clear();
+        OnceFlags.Clear();
 
         Lines = script.SourceCode.Split("\n");
         for (l = 0; l < Lines.Length; l++)
@@ -178,7 +181,7 @@ public static partial class Interpreter
             // Handle errors
             foreach (QuillError error in Errors)
             {
-                Logger.Error($"Quill | {script.ScriptName} @{error.Line} | {error.ErrorType} - {error.Message}");
+                Logger.Error($"Quill | {script.ScriptName} @{error.Line + 1} | {error.ErrorType} - {error.Message}");
                 if (error.Fatal)
                 {
                     Logger.Error($"Quill | {script.ScriptName} | Execution stopped due to fatal error");
@@ -228,6 +231,8 @@ public static partial class Interpreter
             case "call": HandleCall(argsStr); break;
             case "sleep": await HandleSleep(argsStr); break;
             case "wait": await HandleWait(argsStr); break;
+            case "only": HandleOnly(argsStr); break;
+            case "endonly": break; // Marker
             default:
                 if (BuiltinFunctions.TryGetValue(command, out var func))
                     HandleBuiltin(func, command, argsStr);
@@ -478,6 +483,49 @@ public static partial class Interpreter
             l--;
             await Task.Delay(waitTime);
         }
+    }
+    private static void HandleOnly(string argsStr)
+    {
+        // Parse args
+        string[] args = argsStr.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        string label = "";
+
+        int limit;
+        // [label] (times) / [label] / (times)
+        if (args.Length == 2 && args[0].StartsWith('.'))
+        {
+            label = args[0];
+            limit = int.TryParse(args[1], out int v) ? v : -1;
+        }
+        else if (args.Length == 1 && args[0].StartsWith('.'))
+        {
+            label = args[0];
+            limit = 1;
+        }
+        else if (args.Length == 1)
+            limit = int.TryParse(args[0], out int v) ? v : -1;
+        else if (args.Length == 0)
+            limit = 1;
+        else
+        {
+            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"sleep command expects 0, 1, or 2 arguments, received {args.Length}"));
+            return;
+        }
+
+        // Check limit
+        if (limit <= 0)
+        {
+            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"Invalid only amount"));
+            return;
+        }
+
+        // Check flag
+        if (!OnceFlags.TryGetValue(l, out int counter))
+            OnceFlags[l] = 1;
+        else if (counter < limit)
+            OnceFlags[l] = ++counter;
+        else
+            l = FindLine(Lines, $"endonly {label}", l);
     }
 
     private static void HandleBuiltin(IBuiltinFunction func, string funcName, string argsStr)

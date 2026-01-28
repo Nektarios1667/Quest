@@ -250,6 +250,8 @@ The following commands are currently supported:
 - `call (name)` - calls a function
 - `sleep (milliseconds)` - pauses execution for the specified time
 - `wait (condition), (recheck milliseconds) ` - pauses execution until the condition is true; rechecks every specified milliseconds
+- `only [.label] [times]` - allows the code block to run a specified number of times - defaults to 1
+- `endonly [.label]` - ends an only block
 
 ### Builtin Functions
 The following are builtin functions that can be called just like commands:  
