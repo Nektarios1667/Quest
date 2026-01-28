@@ -37,7 +37,7 @@ public class Door : Tile
         else
         {
             // Notif
-            game.UIManager.Notification($"{StringTools.FillCamelSpaces(Key.Name)} needed to unlock.", Color.Red, 5);
+            game.UIManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)} needed to unlock", Color.Red, 5);
 
             // Sound fx
             string timerName = $"DoorLocked_{X + Y * Constants.MapSize.X}";
