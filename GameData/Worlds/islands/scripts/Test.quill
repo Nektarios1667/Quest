@@ -3,6 +3,16 @@
 num start, =<totaltime>
 log Script Test.quill started at =<datetime>
 
+str dict, name:Nek/id:785239/xp:5200/lvl:Premium
+log =dict
+
+setvalue =dict, id, 000000
+str dict, =[return]
+log =dict
+
+getvalue =dict, id
+log =[return]
+
 while .main true
 	// Check for apple in inventory
 	contains =<inventoryitems>, Apple

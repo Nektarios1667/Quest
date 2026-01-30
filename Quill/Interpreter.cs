@@ -14,9 +14,13 @@ public enum QuillErrorType
     ParameterMismatch,
     UnknownCommand,
     FunctionNotFound,
+    VariableNotFound,
     InvalidVariableName,
     InvalidExpression,
     BlockMismatch,
+    OutOfBounds,
+    KeyNotFound,
+    IOError,
     Fatal,
 }
 public struct QuillError
@@ -65,7 +69,9 @@ public static partial class Interpreter
         { "contains", new Contains() },
         { "randomint", new RandomInt() },
         { "randomfloat", new RandomFloat() },
-        { "notif", new Notif() }
+        { "notif", new Notif() },
+        { "setvalue", new SetValue() },
+        { "getvalue", new GetValue() },
     };
 
     private static readonly Dictionary<string, string> ExternalSymbols = new() {
@@ -114,7 +120,7 @@ public static partial class Interpreter
         ExternalSymbols["<fps>"] = (1f / game.DeltaTime).ToString();
         ExternalSymbols["<deltatime>"] = game.DeltaTime.ToString();
         ExternalSymbols["<ispaused>"] = (StateManager.OverlayState == OverlayState.Pause).ToString();
-        ExternalSymbols["<vsync>"] = Constants.VSYNC.ToString();
+        ExternalSymbols["<vsync>"] = Constants.VSYNC.ToString().ToLower();
         ExternalSymbols["<resolution_x>"] = Constants.ScreenResolution.X.ToString();
         ExternalSymbols["<resolution_y>"] = Constants.ScreenResolution.X.ToString();
         ExternalSymbols["<resolution>"] = $"{Constants.ScreenResolution.X};{Constants.ScreenResolution.Y}";
@@ -532,12 +538,9 @@ public static partial class Interpreter
     {
         string[] args = argsStr.Split(',', StringSplitOptions.TrimEntries);
 
-        var resp = func.Run(args);
+        var resp = func.Run(Variables, args);
         if (!resp.Success)
-            Errors.Add(new(l, QuillErrorType.UnknownError, $"Builtin function '{funcName}' failed: {resp.ErrorType} - {resp.ErrorMessage}"));
-        else
-            foreach (var kvp in resp.OutputVariables)
-                Variables[kvp.Key] = kvp.Value;
+            Errors.Add(new(l, resp.ErrorType!.Value, resp.ErrorMessage!));
     }
 
     [GeneratedRegex(@"\{([^}]*)\}", RegexOptions.Compiled)]

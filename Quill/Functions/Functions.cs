@@ -3,19 +3,17 @@
 public struct FunctionResponse
 {
     public bool Success;
-    public string? ErrorType;
+    public QuillErrorType? ErrorType;
     public string? ErrorMessage;
-    public Dictionary<string, string> OutputVariables = [];
-    public FunctionResponse(bool success, string? errorType = null, string? errorMessage = null, Dictionary<string, string>? outputVariables = null)
+    public FunctionResponse(bool success, QuillErrorType? errorType = null, string? errorMessage = null)
     {
         Success = success;
         ErrorType = errorType;
         ErrorMessage = errorMessage;
-        OutputVariables = outputVariables ?? [];
     }
 }
 
 public interface IBuiltinFunction
 {
-    public FunctionResponse Run(string[] args);
+    public FunctionResponse Run(Dictionary<string, string> variables, string[] args);
 }

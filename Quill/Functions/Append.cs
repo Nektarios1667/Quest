@@ -1,11 +1,13 @@
 ﻿namespace Quest.Quill.Functions;
+// (list) (item)
 public class Append : IBuiltinFunction
 {
-    public FunctionResponse Run(string[] args)
+    public FunctionResponse Run(Dictionary<string, string> vars, string[] args)
     {
         if (args.Length != 2)
-            return new(false, "ParameterMismatch", $"Expected 2 parameters, got {args.Length}");
+            return new(false, QuillErrorType.ParameterMismatch, $"Expected 2 parameters, got {args.Length}");
 
-        return new(true, null, null, new() { { "[return]", $"{args[0]};{args[1]}"} });
+        vars["[return]"] = $"{args[0]};{args[1]}";
+        return new(true);
     }
 }
