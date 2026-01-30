@@ -31,22 +31,21 @@ public static class CameraManager
         if (StateManager.OverlayState == OverlayState.Pause) return;
 
         DebugManager.StartBenchmark("CameraUpdate");
+        Vector2 beforeCamera = Camera;
 
-        // Clamp
 
         // Lerp camera
         if (Vector2.DistanceSquared(Camera, CameraDest) < 4f) Camera = CameraDest; // If close enough snap to destination
         else if (deltaTime > 0)
         {
-            Vector2 beforeCamera = Camera;
             Camera = Vector2.Lerp(Camera, CameraDest, 1f - MathF.Pow(1f - Constants.CameraRigidity, deltaTime * 60f));
             Camera = Vector2.Clamp(Camera, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
-
-            // Events
-            if (beforeCamera != Camera)
-                CameraMove?.Invoke(beforeCamera, Camera);
         } 
         Camera = Vector2.Clamp(Camera, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
+
+        // Events
+        if (beforeCamera != Camera)
+            CameraMove?.Invoke(beforeCamera, Camera);
 
         DebugManager.EndBenchmark("CameraUpdate");
     }

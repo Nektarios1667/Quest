@@ -259,6 +259,10 @@ public class Window : Game
         debugSb.AppendFormat("L:{0} E:{1} I:{2}", UIDManager.Available(UIDCategory.Loot), UIDManager.Available(UIDCategory.Enemies), UIDManager.Available(UIDCategory.Items));
         debugSb.Append("\nCurrent Save: ");
         debugSb.Append(StateManager.CurrentSave);
+        debugSb.Append("\nLast Luxel: ");
+        debugSb.Append(overlayManager.lastLuxel);
+        debugSb.Append("\nCurrent Luxel: ");
+        debugSb.Append(CameraManager.Camera.ToPoint() / Constants.TileSize.Scaled(0.5f));
 
         FillRectangle(spriteBatch, new(0, 0, 220, debugSb.ToString().Split('\n').Length * 20), Color.Black * 0.8f);
         spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);

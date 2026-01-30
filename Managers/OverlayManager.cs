@@ -18,7 +18,7 @@ public class OverlayManager
     private Color[,] biomeColors = new Color[0, 0];
     private Point luxelSize = Point.Zero;
     private Point start;
-    private Point lastCamera = Point.Zero;
+    public Point lastLuxel = Point.Zero;
     private const int lightDivisions = 2;
     private const float invLightDivisions = 1f / lightDivisions;
     public bool UpdateLighting { private set; get; } = true;
@@ -54,7 +54,7 @@ public class OverlayManager
         CameraManager.TileChange += (_, _) => MarkUpdateLighting();
         CameraManager.CameraMove += (_, newCam) =>
         {
-            if (newCam.ToPoint() / Constants.TileSize != lastCamera / Constants.TileSize)
+            if (newCam.ToPoint() / Constants.TileSize.Scaled(invLightDivisions) != lastLuxel)
                 MarkUpdateLighting();
         };
     }
@@ -168,7 +168,7 @@ public class OverlayManager
 
         // Flood fill lighting                                                          one tile buffer at top
         start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize + PointTools.Up;
-        lastCamera = CameraManager.Camera.ToPoint();
+        lastLuxel = CameraManager.Camera.ToPoint() / Constants.TileSize.Scaled(invLightDivisions);
         Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
         int tileWidth = end.X - start.X + 1;
         int tileHeight = end.Y - start.Y + 3; // Extra row ontop and below for smoothness
