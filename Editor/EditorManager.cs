@@ -1,4 +1,5 @@
-﻿using Quest.Utilities;
+﻿using Quest.Managers;
+using Quest.Utilities;
 using SharpDX.Direct3D9;
 using System.Diagnostics;
 using System.IO;
@@ -24,6 +25,9 @@ public class EditorManager
         new(64, 192, 128), new(192, 64, 128), new(160, 80, 0), new(80, 160, 0), new(0, 160, 80),
         new(160, 0, 80), new(96, 96, 192), new(192, 96, 96), new(96, 192, 96), new(192, 192, 96)
     };
+    // Settings
+    public bool ShowBiomeMarkers = true;
+    // Private
     private GameManager GameManager { get; }
     private LevelManager LevelManager { get; }
     private LevelGenerator LevelGenerator { get; }
@@ -67,6 +71,22 @@ public class EditorManager
 
         if (RebuildMinimap) RebuildMiniMap();
     }
+    public void DrawBiomes()
+    {
+        Point start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
+        Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
+        for (int y = start.Y; y <= end.Y; y++)
+        {
+            for (int x = start.X; x <= end.X; x++)
+            {
+                Point loc = new(x, y);
+                Point dest = loc * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
+                BiomeType? biome = LevelManager.GetBiome(loc);
+                Color color = biome == null ? Color.Magenta : Biome.Colors[(int)biome];
+                SpriteBatch.Draw(Textures[TextureID.TileOutline], dest.ToVector2(), LevelManager.BiomeTextureSource(loc), color, 0, Vector2.Zero, Constants.TileSizeScale, SpriteEffects.None, 1.0f);
+            }
+        }
+    }
     public void DrawMiniMap()
     {
         DebugManager.StartBenchmark("DrawMinimap");
@@ -84,7 +104,6 @@ public class EditorManager
 
         DebugManager.EndBenchmark("DrawMinimap");
     }
-
     public void RebuildMiniMap()
     {
         Minimap = new RenderTarget2D(Graphics, Constants.MapSize.X, Constants.MapSize.Y);

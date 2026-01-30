@@ -1,6 +1,6 @@
 ﻿namespace Quest;
 
-// Limited to 16 biome types b/c of save files
+// Limited to 256 biome types b/c of save files
 public enum BiomeType : byte
 {
     Temperate,

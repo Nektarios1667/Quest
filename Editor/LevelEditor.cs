@@ -90,6 +90,7 @@ public class LevelEditor : Game
         mouseMenu.AddItem("Open", editorManager.OpenLevelDialog, []);
         mouseMenu.AddItem("Fill", editorManager.FloodFill, []);
         mouseMenu.AddItem("Edit", editorManager.EditTile, []);
+        mouseMenu.AddItem("Draw Biome", () => editorManager.ShowBiomeMarkers = !editorManager.ShowBiomeMarkers, []);
 
         MouseMenu newMenu = new(gui, Point.Zero, new(100, 80), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         newMenu.AddItem("New NPC", editorManager.NewNPC, []);
@@ -282,19 +283,10 @@ public class LevelEditor : Game
         uiManager.Draw(GraphicsDevice, gameManager, null);
 
         // Render biome markers
-        Point start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
-        Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
-        for (int y = start.Y; y <= end.Y; y++)
-        {
-            for (int x = start.X; x <= end.X; x++)
-            {
-                Point loc = new(x, y);
-                Point dest = loc * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
-                BiomeType? biome = levelManager.GetBiome(loc);
-                Color color = biome == null ? Color.Magenta : Biome.Colors[(int)biome];
-                spriteBatch.Draw(Textures[TextureID.TileOutline], dest.ToVector2(), levelManager.BiomeTextureSource(loc), color, 0, Vector2.Zero, Constants.TileSizeScale, SpriteEffects.None, 1.0f);
-            }
-        }
+        DebugManager.StartBenchmark("DrawBiomes");
+        if (editorManager.ShowBiomeMarkers)
+            editorManager.DrawBiomes();
+        DebugManager.EndBenchmark("DrawBiomes");
 
         // Text info
         DebugManager.StartBenchmark("DebugTextDraw");
