@@ -6,45 +6,15 @@ using System.Windows.Forms;
 
 namespace Quest.Quill;
 
-public enum QuillErrorType
-{
-    UnknownError,
-    SyntaxError,
-    RuntimeError,
-    ParameterMismatch,
-    UnknownCommand,
-    FunctionNotFound,
-    VariableNotFound,
-    InvalidVariableName,
-    InvalidExpression,
-    BlockMismatch,
-    OutOfBounds,
-    KeyNotFound,
-    IOError,
-    Fatal,
-}
-public struct QuillError
-{
-    public int Line { get; }
-    public QuillErrorType ErrorType { get; }
-    public string Message { get; }
-    public bool Fatal { get; }
-    public QuillError(int line, QuillErrorType errorType, string message, bool fatal = false)
-    {
-        Line = line;
-        ErrorType = errorType;
-        Message = message;
-        Fatal = fatal;
-    }
-}
 public static partial class Interpreter
 {
     private readonly static List<QuillError> Errors = [];
     private static int l = 0;
     private static readonly Dictionary<string, string> Variables = [];
-    private static readonly Dictionary<string, string> Parameters = [];
+    private static readonly Dictionary<string, string> Locals = [];
     private static readonly Dictionary<string, (int line, string[] parameters)> Functions = [];
     private static readonly List<int> Callbacks = [];
+    private static readonly Stack<string> Scopes = [];
     private static readonly Dictionary<int, int> OnceFlags = [];
     private static string[] Lines = [];
 
@@ -172,10 +142,11 @@ public static partial class Interpreter
     private static async Task RunScriptCore(QuillScript script)
     {
         Variables.Clear();
-        Parameters.Clear();
+        Locals.Clear();
         Functions.Clear();
         Callbacks.Clear();
         OnceFlags.Clear();
+        Scopes.Clear();
 
         Lines = script.SourceCode.Split("\n");
         for (l = 0; l < Lines.Length; l++)
@@ -201,7 +172,7 @@ public static partial class Interpreter
 
             // Fill variables
             ReplaceVariables(ref line, Variables);
-            ReplaceVariables(ref line, Parameters);
+            ReplaceVariables(ref line, Locals);
             ReplaceVariables(ref line, ExternalSymbols);
 
             // Evaluations
@@ -215,11 +186,12 @@ public static partial class Interpreter
             });
 
             await ExecuteCommand(line);
+            await Task.Delay(1);
         }
     }
     public static async Task ExecuteCommand(string line)
     {
-        string command = line.Split(' ')[0].Trim().ToLower();
+        string command = line.Split(' ')[0].Trim();
         string argsStr = line[command.Length..].Trim();
 
         switch (command)
@@ -234,14 +206,16 @@ public static partial class Interpreter
             case "endwhile": HandleEndWhile(argsStr); break;
             case "func": HandleFunc(argsStr); break;
             case "endfunc": HandleEndFunc(); break;
-            case "call": HandleCall(argsStr); break;
             case "sleep": await HandleSleep(argsStr); break;
             case "wait": await HandleWait(argsStr); break;
             case "only": HandleOnly(argsStr); break;
             case "endonly": break; // Marker
+            case "return": HandleReturn(argsStr); break;
             default:
-                if (BuiltinFunctions.TryGetValue(command, out var func))
-                    HandleBuiltin(func, command, argsStr);
+                if (BuiltinFunctions.TryGetValue(command, out var builtinFunc))
+                    HandleBuiltin(builtinFunc, command, argsStr);
+                else if (Functions.TryGetValue(command, out var func))
+                    HandleCall(func, command, argsStr);
                 else
                     Errors.Add(new(l, QuillErrorType.UnknownCommand, command));
                 break;
@@ -262,7 +236,7 @@ public static partial class Interpreter
         string varName = args[0];
         if (ContainsAny(varName, "`~!@#$%^&*()-=+[]{}\\|;:'\",<.>/?"))
         {
-            Errors.Add(new(l, QuillErrorType.InvalidVariableName, varName));
+            Errors.Add(new(l, QuillErrorType.InvalidName, varName));
             return;
         }
 
@@ -272,7 +246,10 @@ public static partial class Interpreter
             Errors.Add(new(l, QuillErrorType.InvalidExpression, $"Invalid number expression '{args[1]}'"));
             return;
         }
-        Variables[varName] = num.ToString("F20").TrimEnd('0').TrimEnd('.');
+        if (Scopes.Count == 0)
+            Variables[varName] = num.ToString("F20").TrimEnd('0').TrimEnd('.');
+        else
+            Locals[varName] = num.ToString("F20").TrimEnd('0').TrimEnd('.');
     }
 
     private static void HandleStr(string argsStr)
@@ -289,12 +266,15 @@ public static partial class Interpreter
         string varName = args[0];
         if (ContainsAny(varName, "`~!@#$%^&*()-=+[]{}\\|;:'\",<.>/?"))
         {
-            Errors.Add(new(l, QuillErrorType.InvalidVariableName, varName));
+            Errors.Add(new(l, QuillErrorType.InvalidName, varName));
             return;
         }
 
         // Value
-        Variables[varName] = args[1];
+        if (Scopes.Count == 0)
+            Variables[varName] = args[1];
+        else
+            Locals[varName] = args[1];
     }
 
     private static void HandleBreakWhile(string argsStr)
@@ -390,39 +370,32 @@ public static partial class Interpreter
         string[] funcParams = args.Length < 2 ? [] : args[1..];
 
         Functions[funcName] = (l, funcParams);
-        l = FindLine(Lines, $"endfunc {funcName}", l);
+        l = FindLine(Lines, "endfunc", l);
     }
 
     private static void HandleEndFunc()
     {
-        Parameters.Clear();
+        Locals.Clear();
         if (Callbacks.Count > 0)
         {
             l = Callbacks[^1];
             Callbacks.RemoveAt(Callbacks.Count - 1);
         }
+        if (Scopes.Count > 0)
+            Scopes.Pop();   
     }
 
-    private static void HandleCall(string argsStr)
+    private static void HandleCall((int line, string[] parameters) function, string funcName, string argsStr)
     {
         string[] args = argsStr.Split(',', StringSplitOptions.TrimEntries);
 
-        if (args.Length < 1)
-        {
-            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"call command expects at least 1 argument, received {args.Length}"));
-            return;
-        }
-
-        string funcName = args[0];
-        var function = Functions.TryGetValue(funcName, out var f) ? f : (-1, []);
         if (function.line == -1)
         {
             Errors.Add(new(l, QuillErrorType.FunctionNotFound, funcName));
             return;
         }
 
-        string[] stringParams = args.Length < 2 ? [] : args[1..];
-        foreach (string param in stringParams)
+        foreach (string param in args)
         {
             string[] kvp = param.Split(':');
             if (kvp.Length != 2)
@@ -433,18 +406,19 @@ public static partial class Interpreter
 
             string pName = kvp[0].Trim();
             string pValue = kvp[1].Trim();
-            Parameters[pName] = pValue;
+            Locals[pName] = pValue;
         }
 
         foreach (string p in function.parameters)
         {
-            if (!Parameters.ContainsKey(p))
+            if (!Locals.ContainsKey(p))
             {
                 Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"Function call '{funcName}' missing parameter '{p}'"));
                 return;
             }
         }
 
+        Scopes.Push(funcName);
         Callbacks.Add(l);
         l = function.line;
     }
@@ -532,6 +506,21 @@ public static partial class Interpreter
             OnceFlags[l] = ++counter;
         else
             l = FindLine(Lines, $"endonly {label}", l);
+    }
+    private static void HandleReturn(string argsStr)
+    {
+        string[] args = argsStr.Split(' ');
+        if (args.Length == 1)
+        {
+            Variables["[return]"] = args[0];
+        }
+        else if (args.Length != 0)
+        {
+            Errors.Add(new(l, QuillErrorType.ParameterMismatch, $"return command expects 0 or 1 arguments, received {args.Length}"));
+            return;
+        }
+
+        l = FindLine(Lines, "endfunc", l) - 1;
     }
 
     private static void HandleBuiltin(IBuiltinFunction func, string funcName, string argsStr)

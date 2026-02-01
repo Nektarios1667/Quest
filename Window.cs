@@ -257,10 +257,8 @@ public class Window : Game
         debugSb.AppendFormat(" [{0:0.00}]", StateManager.WeatherNoiseValue(gameManager.GameTime));
         debugSb.Append("\nUIDs: ");
         debugSb.AppendFormat("L:{0} E:{1} I:{2}", UIDManager.Available(UIDCategory.Loot), UIDManager.Available(UIDCategory.Enemies), UIDManager.Available(UIDCategory.Items));
-        debugSb.Append("\nCurrent Save: ");
+        debugSb.Append("\nSave: ");
         debugSb.Append(StateManager.CurrentSave);
-        debugSb.Append("\nLast Luxel: ");
-        debugSb.Append(overlayManager.lastLuxel);
         debugSb.Append("\nCurrent Luxel: ");
         debugSb.Append(CameraManager.Camera.ToPoint() / Constants.TileSize.Scaled(0.5f));
 

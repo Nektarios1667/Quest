@@ -1,27 +1,23 @@
 ﻿wait =<ready>, 1000
 
-num start, =<totaltime>
-log Script Test.quill started at =<datetime>
+func playerInBounds x1 y1 x2 y2
+	// Check position
+	num playerX, =<playercoord_x>
+	num playerY, =<playercoord_y>
 
-str dict, name:Nek/id:785239/xp:5200/lvl:Premium
-log =dict
-
-setvalue =dict, id, 000000
-str dict, =[return]
-log =dict
-
-getvalue =dict, id
-log =[return]
-
-while .main true
-	// Check for apple in inventory
-	contains =<inventoryitems>, Apple
-	if =[return]
-		notif 0, 255, 255, 10, Achievement:An apple a day...
-		breakwhile
+	if =playerX >= =x1 && =playerX <= =x2 && =playerY >= =y1 && =playerY <= =y2
+		return true
 	endif
 
-	sleep 1000
+	return false
+endfunc
+
+while .main true
+	playerInBounds x1:0, y1:0, x2:10, y2:10
+	if =[return]
+		log Player in top left corner
+		breakwhile .main
+	endif
 endwhile .main
 
-log Script Test.quill ended at =<datetime> after {Round(=<totaltime> - =start, 1)} s
+log Ended

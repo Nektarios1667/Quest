@@ -130,14 +130,7 @@ public static class LightingManager
     public static void ClearLights() => Lights.Clear();
     public static bool LightAffectsScreen(RadialLight light)
     {
-        // Light's circular bounds
-        float radius = light.Size;
-        float left = light.Position.X - radius * Constants.TileSize.X;
-        float right = light.Position.X + radius * Constants.TileSize.X;
-        float top = light.Position.Y - radius * Constants.TileSize.Y;
-        float bottom = light.Position.Y + radius * Constants.TileSize.Y;
-
-        // AABB check
-        return right > 0 && left < Constants.NativeResolution.X && bottom > 0 && top < Constants.NativeResolution.Y;
+        // TODO Check to make sure theyre on screen
+        return true;
     }
 }
