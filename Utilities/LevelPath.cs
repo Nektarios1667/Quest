@@ -21,6 +21,6 @@ public struct LevelPath
         WorldName = worldName;
         LevelName = levelName;
     }
-    public bool IsNull() => WorldName == "NUL_WORLD" && LevelName == "NUL_LEVEL";
-    public override string ToString() => $"{WorldName}/{LevelName}";
+    public readonly bool IsNull() => WorldName == "NUL_WORLD" && LevelName == "NUL_LEVEL";
+    public override readonly string ToString() => $"{WorldName}/{LevelName}";
 }

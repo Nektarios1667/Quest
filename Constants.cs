@@ -69,6 +69,9 @@ public static class Constants
     public static readonly string[] ItemTypeNames = Enum.GetNames(typeof(ItemTypeID));
     public static readonly string[] TextureIDNames = Enum.GetNames(typeof(TextureID));
 
+    // Quill
+    public const int QuillUpdatesPerFrame = 100;
+
     // Minimap pixel colors
     public static readonly Color[] MiniMapColors = [
         new(92, 221, 241), // Sky

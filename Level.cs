@@ -2,11 +2,11 @@
 
 public class QuillScript
 {
-    public string ScriptName { get; private set; }
+    public string Name { get; private set; }
     public string SourceCode { get; private set; }
     public QuillScript(string scriptName, string sourceCode)
     {
-        ScriptName = scriptName;
+        Name = scriptName;
         SourceCode = sourceCode;
     }
 }
@@ -44,7 +44,7 @@ public class Level
     {
         foreach (var script in Scripts)
         {
-            _ = Quill.Interpreter.RunScriptAsync(script);
+            Quill.Interpreter.RunScript(script);
         }
     }
 }

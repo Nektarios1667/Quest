@@ -138,7 +138,7 @@ public class Window : Game
         delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
         // Managers
-        Quill.Interpreter.UpdateSymbols(gameManager, playerManager);
+        Quill.Interpreter.Update(gameManager, playerManager);
         InputManager.Update(this);
         DebugManager.Update();
         CameraManager.Update(delta);
@@ -235,7 +235,7 @@ public class Window : Game
         debugSb.Append("\nCamera: ");
         debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.Camera.X, CameraManager.Camera.Y);
         debugSb.Append("\nTile Below: ");
-        debugSb.Append(playerManager.TileBelow == null ? "none" : playerManager.TileBelow.Type.ToString());
+        debugSb.Append(playerManager.TileBelow == null ? "none" : playerManager.TileBelow.Type.Texture.ToString());
         debugSb.Append("\nCoord: ");
         debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.TileCoord.X, CameraManager.TileCoord.Y);
         debugSb.Append("\nLevel: ");
@@ -261,6 +261,9 @@ public class Window : Game
         debugSb.Append(StateManager.CurrentSave);
         debugSb.Append("\nCurrent Luxel: ");
         debugSb.Append(CameraManager.Camera.ToPoint() / Constants.TileSize.Scaled(0.5f));
+        debugSb.Append("\nQuill: ");
+        foreach (var inst in Quill.Interpreter.GetQuillInstances())
+            debugSb.Append($"\n  {inst.Script.Name} | @{inst.L:000} | C:{inst.Callbacks.Count:0} | Sc:{(inst.Scopes.TryPeek(out string? sc) ? sc : "GLOBAL")}");
 
         FillRectangle(spriteBatch, new(0, 0, 220, debugSb.ToString().Split('\n').Length * 20), Color.Black * 0.8f);
         spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);

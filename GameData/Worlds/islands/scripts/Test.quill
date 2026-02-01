@@ -1,4 +1,6 @@
-﻿wait =<ready>, 1000
+﻿#perfmode 0
+// Wait until the symbol system is ready
+wait =<ready>, 1000
 
 func playerInBounds x1 y1 x2 y2
 	// Check position
@@ -7,7 +9,7 @@ func playerInBounds x1 y1 x2 y2
 
 	if =playerX >= =x1 && =playerX <= =x2 && =playerY >= =y1 && =playerY <= =y2
 		return true
-	endif
+    endif
 
 	return false
 endfunc
@@ -17,7 +19,5 @@ while .main true
 	if =[return]
 		log Player in top left corner
 		breakwhile .main
-	endif
+    endif
 endwhile .main
-
-log Ended

@@ -478,7 +478,7 @@ public class EditorManager
     }
     public void DeleteScript()
     {
-        var (success, values) = ShowInputForm("Delete Script", [new("Script Name", dropdownOptions: [.. LevelManager.Level.Scripts.Select(s => s.ScriptName)])]);
+        var (success, values) = ShowInputForm("Delete Script", [new("Script Name", dropdownOptions: [.. LevelManager.Level.Scripts.Select(s => s.Name)])]);
         if (!success || string.IsNullOrWhiteSpace(values[0]))
         {
             if (!PopupOpen) Logger.Error("Script deletion failed.");
@@ -486,7 +486,7 @@ public class EditorManager
         }
 
         string name = values[0];
-        LevelManager.Level.Scripts.RemoveAll(s => s.ScriptName == name);
+        LevelManager.Level.Scripts.RemoveAll(s => s.Name == name);
     }
     public void NewScript()
     {
@@ -502,7 +502,7 @@ public class EditorManager
             Logger.Error($"Source file '{path}' not found.");
             return;
         }
-        if (LevelManager.Level.Scripts.Any(s => s.ScriptName == values[0]))
+        if (LevelManager.Level.Scripts.Any(s => s.Name == values[0]))
         {
             Logger.Error($"A script with the name '{values[0]}' already exists.");
             return;
@@ -631,7 +631,7 @@ public class EditorManager
             for (int s = 0; s < LevelManager.Level.Scripts.Count; s++)
             {
                 QuillScript script = LevelManager.Level.Scripts[s];
-                writer.Write(script.ScriptName);
+                writer.Write(script.Name);
             }
         }
 

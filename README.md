@@ -99,74 +99,48 @@ Use the mouse menu or hotkey to save the current level. When saving the level, s
 To share a world, share the entire folder located in `GameData/Worlds/yourWorldName`. This folder contains all levels, loot tables, and saves for that world.  
 
 ## GameData Files
+GameData files are stored withing the folder and subfolders of `GameData`.
+This directory stores important data for the Quest game and should only be modified after
+reading and understanding the file purpose and strcture.  
+Documentation for each file can be found in `GameData/Docs`.  
 
 ### Terrain Files (.qtr)
-- **Overview**  
 Terrain files define behavior for terrain generated with the level generator. They are located in `GameData/Terrain`.  
-More documentation for the file format can be found in `GameData/Docs/Quest Terrain Files.txt`.  
-- **Structure**  
-They are written in binary format and can be edited with a hex editor or a custom tool. 
-Each entry in them defines a range of noise values and the corresponding tile type to use for that range.  
 
 ### Structure Files (.qst)
-- **Overview**  
 Structure files define pre-built structures that are placed in levels generated with the level generator. They are located in `GameData/Structures`.  
-More documentation for the file format can be found in `GameData/Docs/Quest Structure Files.txt`.  
-- **Structure**  
-Structure files are stored in binary format and can be edited with a hex editor or a custom tool.  
-They store the width and height of the structure with a byte each, and for each tile a byte representing the tile type.  
 
 ### Key Value Files (.qkv)
-- **Overview**  
-Key Value files are generice files that store key-value pairs. They are used for game data that should generally not be modified.  
-More documentation for the file format can be found in `GameData/Docs/Quest Key Value.txt`.  
-- **Structure**  
-Key Value files are stored in binary format and can be edited with a hex editor or a custom tool.  
-They contain a UInt16 representing the number of entries, followed by each entry consisting of a key string and a value string.  
+Key Value files are generic files that store key-value pairs. They are used for game data that should generally not be modified.  
 
 ### Loot Table Files (.qlt)
-- **Overview**  
-Loot Table files define loot that can be spawned in levels. They are located in `GameData/LootTables`.  
-More documentation for the file format can be found in `GameData/Docs/Quest Loot Table Files.txt`.  
+Loot Table files define loot that can be spawned in levels. They are located in `GameData/Worlds/yourWorldName/loot`.  
 The code generator (see next section) can be used to create and edit loot tables more easily.  
-- **Structure**  
-Loot Table files are stored in binary format and can be edited with a hex editor or a custom tool.  
-They contain a byte representing the number of loot entries, followed by each entry consisting of an item ID byte, percent chance byte, min quantity byte, and max quantity byte.  
 
 ### Loot Preset Files (.qlp)
-- **Overview**  
-Loot Preset files define preset loot configurations that can be used in loot tables. They are located in `GameData/Worlds/yourWorldName/loot`.  
-More documentation for the file format can be found in `GameData/Docs/Quest Loot Preset Files.txt`.  
-- **Structure**  
-Loot Preset files are stored in binary format and can be edited with a hex editor or a custom tool.  
-They contain a width and height byte, followed by a itemID byte and amount byte for each slot.  
+Loot Preset files define preset loot configurations that can be used instead of loot tables. They are located in `GameData/Worlds/yourWorldName/loot`.  
 The code generator (see next section) can be used to create and edit loot tables more easily.  
 
 ### Level Files (.qlv)
-- **Overview**  
 Level files store the data for each level in the game. They are located in `GameData/Worlds/yourWorldName/levels`.  
-More documentation for the file format can be found in `GameData/Docs/Quest Level Files.txt`.  
-- **Structure**  
 Level files are stored in binary format and compressed, making them difficult to edit manually.  
 The level editor should be used to create and modify levels.  
 
 ### Save files (.qsv)
-- **Overview**  
 Save files store player progress and are located in `GameData/Worlds/yourWorldName/saves`.  
-More documentation for the file format can be found in `GameData/Docs/Quest Save Files.txt`.  
-- **Structure**  
-Loot Preset files are stored in binary format.  
 It is not recommended to edit save files manually as they contain important player data.  
 
 ## Source Code
 
 ### Content  
+![MGCB](GameData/Docs/MGCB.PNG)
 - All content is stored in their respective folders in `/Content`.
 - Textures must be in the `TextureID` enum in `Texture.cs` to be used in the game.
 - They must also be loaded in the `LoadTextures` method in `TextureManager.cs` along with their metadata.
 - It is recommended for fonts to be stored as variables in `TextureManager.cs` for easy access.
 
 ### Managers
+![Level Manager](GameData/Docs/QuestLevelManager.PNG)
 - Most game logic is handled by manager classes in the `/Managers` folder.
 - Managers handle things like rendering, input, level loading, entity management, etc.
 - Managers can be modified to change game behavior or add new features.
@@ -192,7 +166,7 @@ It is not recommended to edit save files manually as they contain important play
 - Each item has `PrimaryUse` and `SecondaryUse` methods that can be overridden for custom behavior.
 
 ### Utilities
-- Some useful extnesions, methods, and functions are in the classes in the `/Utilities` folder.
+- Some useful extensions, methods, and functions are in the classes in the `/Utilities` folder.
 - These can be used throughout the codebase for common tasks.
 
 ### Constants
@@ -230,7 +204,6 @@ It is very simple and is still in early development.
 
 ### Commands
 Each line of code (other than comments) represents a command.  
-Commands can have parameters separated by commas.  
 Comments start with `//` and make the entire line ignored.  
 Arguments are separated by commas, except for control flow commands which seperate parts by spaces.
 
@@ -244,11 +217,10 @@ The following commands are currently supported:
 - `while [.label] (condition)` - runs the following block while the condition is true
 - `endwhile [.label]` - ends a while block
 - `breakwhile [.label]` - breaks out of the current while loop
-- `str (name), (value)` - creates a string variable
-- `num (name), (value)` - creates a number variable
+- `str (name), (value)` - creates a string variable (string, list, 2d-array, dict, bool)
+- `num (name), (value)` - creates a number variable (int, float)
 - `func (name)` - creates a function
 - `endfunc` - ends a function definition
-- `call (name)` - calls a function
 - `sleep (milliseconds)` - pauses execution for the specified time
 - `wait (condition), (recheck milliseconds) ` - pauses execution until the condition is true; rechecks every specified milliseconds
 - `only [.label] [times]` - allows the code block to run a specified number of times - defaults to 1
@@ -256,18 +228,19 @@ The following commands are currently supported:
 
 ### Builtin Functions
 The following are builtin functions that can be called just like commands:  
+- `#perfmode (0, 1, 2)` - sets the performance mode of the script. 0 = Low, 1 = Medium, 2 = High.  
 - `contains |array / 2d-array|, (target)` - checks if the array contains a specific value
-- `error (message), (exit)` - prints an error message and optionally exits the script
+- `error (message), (exit?)` - prints an error message and optionally exits the script
 - `execute (command)` - executes a console command
 - `getitem |array|, (index)` - gets an item from an array at the specified index
 - `getitem2d |2d-array|, (x), (y)` - gets an item from a 2d array at the specified coordinates
 - `setitem |array|, (idx), (value)` - sets an item in an array at the specified index
 - `setitem2d |2d-array|, (x), (y), (value)` - sets an item in a 2d array at the specified coordinates
 - `append |array|, (value)` - appends a value to the end of an array
-- `remove |array|, (value)` - removes a value from an array
+- `remove |array|, (value)` - removes a value from an array at the specified index
 - `insert |array|, (index), (value)` - inserts a value into an array at the specified index`
-- `give (item,) (amount)` - gives the player a specific item and amount
-- `loadlevel (levelName)` - loads a specific level
+- `give (item), (amount)` - gives the player a specific item and amount
+- `loadlevel (levelName)` - loads the specified level
 - `log (message)` - prints a message to the console
 - `readfile (filePath)` - reads the contents of a file
 - `readlevel (levelName)` - reads the data of a specific level
@@ -277,14 +250,15 @@ The following are builtin functions that can be called just like commands:
 - `notif (r), (g), (b), (duration seconds), (message)` - shows a notification on screen with the specified color and duration
 - `randomint (min), (max)` - generates a random integer between min and max (exclusive)
 - `randomfloat (min), (max)` - generates a random float between min and max (exclusive)
+- `(myFunction) (param1):(value1), (param2):(value2) ...` - calls a defined function
 
 ### Quest Engine Integration
 Quest Engine provides additional variables that can be accessed in Quill scripts.  
-It is recommended to check in the beginning of the script if the symbol system is ready using `<ready>`.  
+It is recommended to check in the beginning of the script if the symbol system is ready using `wait =<ready>, 1000`.  
 These include:
 - `<playercoord_x>` – player tile X coordinate
 - `<playercoord_y>` – player tile Y coordinate
-- `<playercoord>` – player tile coordinates as a formatted string
+- `<playercoord>` – player tile coordinates formatted as `x;y`
 - `<playerhealth>` – current player health
 - `<playermaxhealth>` – maximum player health
 - `<playerspeed>` – player movement speed constant
@@ -310,7 +284,7 @@ These include:
 - `<equippeditem>` – name of the equipped item, or `NUL`
 - `<equippeditemuid>` – unique ID of the equipped item, or `-1` if none
 - `<equippeditemamount>` – amount of the equipped item, or `0` if none
-- `<ready>` – indicates the symbol system is initialized
+- `<ready>` – indicates if the symbol system is initialized
 - `<fps>` – current frames per second
 - `<deltatime>` – delta time for the current frame
 - `<ispaused>` – whether the game is currently paused
@@ -320,11 +294,11 @@ These include:
 - `<resolution>` – screen resolution formatted as `width;height`
 - `<fpslimit>` – FPS limit setting
 
-
 ### Language
 Variables can be accessed with `=variableName`.  
 Arrays are stored as strings with values separated by `;`.  
 2D-arrays are stored as strings with rows separated by `/` and values in each row separated by `;`.  
+Dictionaries are stored as strings with key-value seperated with `:`, and pairs seperated by `/`.  
 Booleans are represented as `true` and `false`.  
 Numbers can be integers or decimals.  
 Strings must be enclosed in single quotes `'myString'`.  
@@ -333,8 +307,23 @@ Values are returned from functions in the variable `[return]`.
 Expressions can be enclosed in curly braces `{5 * 5}` to be evaluated.  
 Some functions automatically evaluate expressions passed as parameters.  
 
+### Performance Modes
+Each script has a performance mode, which is set to Normal by default. Performance mode affects things like integrated delays, steps per frame, and update priority.  
+There are three modes: Low, Medium, and High.  
+- Low: high delays, lower steps per frame - used for background script.
+- Normal: small delays, regular steps per frame - used for scripts needing updates often.
+- High: no delays, higher steps per frame - when highest priority and max updates are required.
+
+Low mode for any background scripts that do not need constant updates.  
+Medium mode is used for active scripts that need low delays and frequent updates.  
+High mode is only used when the script needs high priority and maximized updates.   
+
+The Quill Interpreter will automatically run a certain number of operations for each running script, every frame.
+The number depends on the script Performance Mode, the number of active scripts, and the budget as defined in Constants.cs.
 ### Examples
+Apple Achievement
 ```Quill
+#perfmode 0
 // Wait until the symbol system is ready
 wait =<ready>, 1000
 
@@ -346,10 +335,26 @@ while .main true
     // Achievement
 	if =[return]
 		notif 0, 255, 255, 10, Achievement:An apple a day...
-		breakwhile
+		breakwhile .main
 	endif
 
-    // Check every second
-	sleep 1000
+    // Automatic sleep since perfmode is Low
+endwhile .main
+```
+Quicksand
+```Quill
+#perfmode 1
+// Wait until the symbol system is ready
+wait =<ready>, 1000
+
+// Main loop
+while .main true
+    str isOnSand {'=<tilebelow>' == 'Sand'}
+    if =isOnSand
+        execute move_speed 200
+    endif
+    if !=isOnSand
+        execute move_speed 300
+    endif
 endwhile .main
 ```
