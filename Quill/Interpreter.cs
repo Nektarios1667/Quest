@@ -17,7 +17,7 @@ public enum QuillPerformanceMode
 
 public class QuillInstance
 {
-    public QuillPerformanceMode PerformanceMode { get; private set; } = QuillPerformanceMode.Normal; 
+    public QuillPerformanceMode PerformanceMode { get; private set; } = QuillPerformanceMode.Normal;
     public float SleepTimer { get; private set; } = 0;
     public bool IsSleeping => SleepTimer > 0;
     public QuillScript Script { get; private set; }
@@ -59,7 +59,6 @@ public class QuillInstance
             }
         } catch (Exception e)
         {
-            throw e;
             Errors.Add(new(L, QuillErrorType.RuntimeError, e.Message));
         }
         return stepsUsed;
@@ -105,6 +104,13 @@ public static partial class Interpreter
     {
         DebugManager.StartBenchmark("QuillSymbolsUpdate");
 
+        // Precheck
+        if (Scripts.Count == 0)
+        {
+            DebugManager.EndBenchmark("QuillSymbolsUpdate");
+            return;
+        }
+
         // Player
         ExternalSymbols["<playercoord_x>"] = CameraManager.TileCoord.X.ToString();
         ExternalSymbols["<playercoord_y>"] = CameraManager.TileCoord.Y.ToString();
@@ -149,6 +155,8 @@ public static partial class Interpreter
         ExternalSymbols["<resolution_y>"] = Constants.ScreenResolution.X.ToString();
         ExternalSymbols["<resolution>"] = $"{Constants.ScreenResolution.X};{Constants.ScreenResolution.Y}";
         ExternalSymbols["<fpslimit>"] = Constants.FPS.ToString();
+
+
         DebugManager.EndBenchmark("QuillSymbolsUpdate");
     }
     // Helpers
@@ -161,8 +169,10 @@ public static partial class Interpreter
         instance.Errors.Add(new(instance.L, QuillErrorType.BlockMismatch, $"Failed to find line '{target}'", fatal:true));
         return instance.L;
     }
-    private static int FindLineBackwards(QuillInstance instance, string target, int start = 0)
+    private static int FindLineBackwards(QuillInstance instance, string target, int start = -1)
     {
+        if (start == -1) start = instance.Lines.Length - 1;
+
         for (int i = start; i >= 0; i--)
             if (instance.Lines[i].Trim().StartsWith(target.Trim()))
                 return i;
@@ -173,15 +183,16 @@ public static partial class Interpreter
     private static void ReplaceVariables(ref string line, Dictionary<string, string> vars)
     {
         foreach (var kvp in vars)
-            line = line.Replace('=' + kvp.Key, kvp.Value);
+            if (line.Contains(kvp.Key))
+                line = line.Replace('=' + kvp.Key, kvp.Value);
     }
     private static bool ContainsAny(string str, string chars)
     {
         foreach (char c in chars)
-            if (str.Contains(c)) return true;
+            if (str.IndexOf(c) > 0) return true;
         return false;
     }
-    public static QuillInstance[] GetQuillInstances() => [.. Scripts];
+    public static IReadOnlyList<QuillInstance> GetQuillInstances() => Scripts;
     // Run
     public static void RunScript(QuillScript script)
     {
@@ -224,23 +235,15 @@ public static partial class Interpreter
         string line = instance.Lines[instance.L].Trim();
 
         // Handle errors
-        foreach (QuillError error in instance.Errors)
-        {
-            Logger.Error($"Quill | {instance.Script.Name} @{error.Line + 1} | {error.ErrorType} - {error.Message}");
-            if (error.Fatal)
-            {
-                Logger.Error($"Quill | {instance.Script.Name} | Execution stopped due to fatal error");
-                return;
-            }
-        }
-        instance.Errors.Clear();
+        if (instance.Errors.Count > 0)
+            OutputErrors(instance);
 
         // Comment
-        if (line.StartsWith("//") || string.IsNullOrWhiteSpace(line)) return;
+        if (line.StartsWith("//", StringComparison.Ordinal) || string.IsNullOrWhiteSpace(line)) return;
 
         // Fill variables
-        ReplaceVariables(ref line, instance.Variables);
         ReplaceVariables(ref line, instance.Locals);
+        ReplaceVariables(ref line, instance.Variables);
         ReplaceVariables(ref line, ExternalSymbols);
 
         // Evaluations
@@ -290,6 +293,19 @@ public static partial class Interpreter
                     instance.Errors.Add(new(instance.L, QuillErrorType.UnknownCommand, command));
                 break;
         }
+    }
+    public static void OutputErrors(QuillInstance instance)
+    {
+        foreach (QuillError error in instance.Errors)
+        {
+            Logger.Error($"Quill | {instance.Script.Name} @{error.Line + 1} | {error.ErrorType} - {error.Message}");
+            if (error.Fatal)
+            {
+                Logger.Error($"Quill | {instance.Script.Name} | Execution stopped due to fatal error");
+                return;
+            }
+        }
+        instance.Errors.Clear();
     }
     // Handlers
     private static void HandlePerfMode(QuillInstance inst, string argsStr)
@@ -382,9 +398,9 @@ public static partial class Interpreter
         string[] args = argsStr.Split(' ');
 
         if (args.Length == 1)
-            inst.L = FindLineBackwards(inst, "while", inst.L) - 1;
-        else if (args.Length == 0)
             inst.L = FindLineBackwards(inst, $"while {args[0]}", inst.L) - 1;
+        else if (args.Length == 0)
+            inst.L = FindLineBackwards(inst, "while", inst.L) - 1;
         else
             inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"continuewhile command expects 0 or 1 arguments, received {args.Length}"));
     }
