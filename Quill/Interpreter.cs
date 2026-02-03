@@ -31,6 +31,7 @@ public class QuillInstance
     public Dictionary<int, int> OnceFlags { get; private set; } = [];
     public string[] Lines { get; private set; }
     public QuillCommand[] CompiledLines { get; set; } = [];
+    public Dictionary<int, int> LinesVisited { get; private set; } = [];
     public List<QuillError> Errors { get; private set; } = [];
     public bool Done => L >= Lines.Length;
     public QuillInstance(QuillScript script)
@@ -42,6 +43,8 @@ public class QuillInstance
     public int Step(GameManager game, int budget)
     {
         int stepsUsed = 0;
+        int allowedReps = PerformanceMode == QuillPerformanceMode.High ? 3 : 1;
+
         try
         {
             // Check sleeping
@@ -52,11 +55,15 @@ public class QuillInstance
                     return stepsUsed;
             }
 
-            // Run lines
-            while (budget-- > 0 && !Done)
+            // Run lines - ensure enough step budget, not done, and line hasn't been run at all or above the allowance
+            while (budget-- > 0 && !Done && (!LinesVisited.TryGetValue(L, out var reps) || reps < allowedReps))
             {
+                // Run
                 Interpreter.RunLine(this);
                 stepsUsed++;
+                // Optimization to not run same lines in one frame
+                LinesVisited[L] = LinesVisited.TryGetValue(L, out reps) ? reps + 1 : 1;
+
                 L++;
             }
         } catch (Exception e)
@@ -64,6 +71,8 @@ public class QuillInstance
             Errors.Add(new(L, QuillErrorType.RuntimeError, e.Message));
             L++;
         }
+        LinesVisited.Clear();
+
         return stepsUsed;
     }
     public void Sleep(int ms) => SleepTimer = ms;
@@ -214,8 +223,6 @@ public static partial class Interpreter
     {
         var inst = new QuillInstance(script);
         Compiler.CompileScript(inst);
-        foreach (QuillCommand command in inst.CompiledLines)
-            Console.WriteLine(command);
 
         Scripts.Add(inst);
     }

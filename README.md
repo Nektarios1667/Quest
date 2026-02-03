@@ -317,7 +317,7 @@ There are three modes: Low, Medium, and High.
 
 Low mode for any background scripts that do not need constant updates.  
 Medium mode is used for active scripts that need low delays and frequent updates.  
-High mode is only used when the script needs high priority and maximized updates.   
+High mode is only used when the script needs highest priority and maximized updates.   
 **NOTE: High performance mode may severely affect frame rate if optimizations are not put into the script.**
 
 The Quill Interpreter will automatically run a certain number of operations for each running script, every frame.
