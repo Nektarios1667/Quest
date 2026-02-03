@@ -212,9 +212,9 @@ Arguments are separated by commas, except for control flow commands which sepera
 `.label` denotes an optional label for control flow commands. The labels are used when nesting flow commands to ensure the correct block is ended.  
 `|variable|` denotes a variable name that will be passed as a reference.  
 The following commands are currently supported:  
-- `if [.label] (condition)` - runs the following block if the condition is true
+- `if [.label], (condition)` - runs the following block if the condition is true
 - `endif [.label]` - ends an if block
-- `while [.label] (condition)` - runs the following block while the condition is true
+- `while [.label], (condition)` - runs the following block while the condition is true
 - `endwhile [.label]` - ends a while block
 - `breakwhile [.label]` - breaks out of the current while loop
 - `str (name), (value)` - creates a string variable (string, list, 2d-array, dict, bool)
@@ -223,7 +223,7 @@ The following commands are currently supported:
 - `endfunc` - ends a function definition
 - `sleep (milliseconds)` - pauses execution for the specified time
 - `wait (condition), (recheck milliseconds) ` - pauses execution until the condition is true; rechecks every specified milliseconds
-- `only [.label] [times]` - allows the code block to run a specified number of times - defaults to 1
+- `only [.label], [times]` - allows the code block to run a specified number of times - defaults to 1
 - `endonly [.label]` - ends an only block
 
 ### Builtin Functions
@@ -267,7 +267,8 @@ These include:
 - `<camera_x>` – camera X position
 - `<camera_y>` – camera Y position
 - `<camera>` – camera position formatted as `x;y`
-- `<currentlevel>` – name of the current level
+- `<currentlevel>` – full name of the current level
+- `<currentlevelname>` – name of the current level
 - `<currentworld>` – name of the current world
 - `<spawn>` – spawn point coordinates of the current level
 - `<gametime>` – current game time
@@ -317,6 +318,7 @@ There are three modes: Low, Medium, and High.
 Low mode for any background scripts that do not need constant updates.  
 Medium mode is used for active scripts that need low delays and frequent updates.  
 High mode is only used when the script needs high priority and maximized updates.   
+**NOTE: High performance mode may severely affect frame rate if optimizations are not put into the script.**
 
 The Quill Interpreter will automatically run a certain number of operations for each running script, every frame.
 The number depends on the script Performance Mode, the number of active scripts, and the budget as defined in Constants.cs.
