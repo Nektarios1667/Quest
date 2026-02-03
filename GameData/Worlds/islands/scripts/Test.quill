@@ -2,7 +2,7 @@
 // Wait until the symbol system is ready
 wait =<ready>, 1000
 
-func playerInBounds x1 y1 x2 y2
+func playerInBounds, x1, y1, x2, y2
 	// Check position
 	num playerX, =<playercoord_x>
 	num playerY, =<playercoord_y>
@@ -14,7 +14,7 @@ func playerInBounds x1 y1 x2 y2
 	return false
 endfunc
 
-while .main true
+while .main, =<currentlevel> == 'islands/islands'
 	playerInBounds x1:0, y1:0, x2:10, y2:10
 	if =[return]
 		log Player in top left corner

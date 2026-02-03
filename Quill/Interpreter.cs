@@ -1,6 +1,7 @@
 ﻿using HarfBuzzSharp;
 using NCalc;
 using Quest.Quill.Functions;
+using SharpDX.Direct2D1;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -29,6 +30,7 @@ public class QuillInstance
     public Stack<string> Scopes { get; private set; } = [];
     public Dictionary<int, int> OnceFlags { get; private set; } = [];
     public string[] Lines { get; private set; }
+    public QuillCommand[] CompiledLines { get; set; } = [];
     public List<QuillError> Errors { get; private set; } = [];
     public bool Done => L >= Lines.Length;
     public QuillInstance(QuillScript script)
@@ -60,6 +62,7 @@ public class QuillInstance
         } catch (Exception e)
         {
             Errors.Add(new(L, QuillErrorType.RuntimeError, e.Message));
+            L++;
         }
         return stepsUsed;
     }
@@ -71,7 +74,7 @@ public static partial class Interpreter
 {
     private static readonly List<QuillInstance> Scripts = [];
 
-    private readonly static Dictionary<string, IBuiltinFunction> BuiltinFunctions = new() {
+    private static readonly Dictionary<string, IBuiltinFunction> BuiltinFunctions  = new() {
         { "readfile", new ReadFile() },
         { "execute", new Execute() },
         { "log", new Log() },
@@ -96,6 +99,7 @@ public static partial class Interpreter
         { "setvalue", new SetValue() },
         { "getvalue", new GetValue() },
     };
+    public static IReadOnlyDictionary<string, IBuiltinFunction> GetBuiltinFunctions() => BuiltinFunctions;
 
     private static readonly Dictionary<string, string> ExternalSymbols = new() {
         { "<ready>", "false" },
@@ -103,13 +107,6 @@ public static partial class Interpreter
     public static void UpdateSymbols(GameManager game, PlayerManager player)
     {
         DebugManager.StartBenchmark("QuillSymbolsUpdate");
-
-        // Precheck
-        if (Scripts.Count == 0)
-        {
-            DebugManager.EndBenchmark("QuillSymbolsUpdate");
-            return;
-        }
 
         // Player
         ExternalSymbols["<playercoord_x>"] = CameraManager.TileCoord.X.ToString();
@@ -125,6 +122,7 @@ public static partial class Interpreter
         ExternalSymbols["<camera>"] = $"{CameraManager.Camera.X};{CameraManager.Camera.Y}";
         // Level
         ExternalSymbols["<currentlevel>"] = game.LevelManager.Level.Name.WrapSingleQuotes();
+        ExternalSymbols["<currentlevelname>"] = game.LevelManager.Level.LevelName.WrapSingleQuotes();
         ExternalSymbols["<currentworld>"] = game.LevelManager.Level.World.WrapSingleQuotes();
         ExternalSymbols["<spawn>"] = game.LevelManager.Level.Spawn.CoordString();
         // Game
@@ -180,11 +178,29 @@ public static partial class Interpreter
         instance.Errors.Add(new(instance.L, QuillErrorType.BlockMismatch, $"Failed to find line '{target}'", fatal:true));
         return instance.L;
     }
-    private static void ReplaceVariables(ref string line, Dictionary<string, string> vars)
+    private static void ReplaceVariables(string[] args, Dictionary<string, string> vars)
     {
-        foreach (var kvp in vars)
-            if (line.Contains(kvp.Key))
-                line = line.Replace('=' + kvp.Key, kvp.Value);
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (!args[i].Contains('=')) continue;
+            foreach (var kvp in vars)
+                args[i] = args[i].Replace("=" + kvp.Key, kvp.Value);
+        }
+    }
+    public static void EvaluateCurlyExpressions(string[] args)
+    {
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (!(args[i].Contains('{') && args[i].Contains('}'))) continue;
+            args[i] = CurlyExpressions().Replace(args[i], match =>
+            {
+                string exprStr = match.Groups[1].Value.Trim();
+                Expression expr = new(exprStr);
+                var result = expr.Evaluate();
+
+                return result?.ToString()?.ToLower() ?? "";
+            });
+        }
     }
     private static bool ContainsAny(string str, string chars)
     {
@@ -196,14 +212,20 @@ public static partial class Interpreter
     // Run
     public static void RunScript(QuillScript script)
     {
-        Scripts.Add(new QuillInstance(script));
+        var inst = new QuillInstance(script);
+        Compiler.CompileScript(inst);
+        foreach (QuillCommand command in inst.CompiledLines)
+            Console.WriteLine(command);
+
+        Scripts.Add(inst);
     }
+
     public static void Update(GameManager game, PlayerManager player)
     {
+        if (Scripts.Count == 0) return;
 
         UpdateSymbols(game, player);
 
-        if (Scripts.Count == 0) return;
         DebugManager.StartBenchmark("QuillUpdate");
         // Run scripts
         int budget = Constants.QuillUpdatesPerFrame;
@@ -218,7 +240,7 @@ public static partial class Interpreter
                 steps = stepsPerScript / 2;
             else if (script.PerformanceMode == QuillPerformanceMode.High)
                 steps = stepsPerScript * 2;
-            steps = Math.Clamp(steps, 1, Math.Min(budget, 50)); // Limit between 1 and 50/budget
+            steps = Math.Clamp(steps, 1, Math.Min(budget, Constants.QuillScriptMaxUpdatesPerFrame));
 
             // Run script
             int stepsUsed = script.Step(game, steps);
@@ -232,66 +254,58 @@ public static partial class Interpreter
     }
     public static void RunLine(QuillInstance instance)
     {
-        string line = instance.Lines[instance.L].Trim();
+        QuillCommand command = instance.CompiledLines[instance.L];
 
         // Handle errors
         if (instance.Errors.Count > 0)
             OutputErrors(instance);
 
-        // Comment
-        if (line.StartsWith("//", StringComparison.Ordinal) || string.IsNullOrWhiteSpace(line)) return;
+        // Check noop
+        if (command.Operation == QuillOp.NoOp) return;
 
-        // Fill variables
-        ReplaceVariables(ref line, instance.Locals);
-        ReplaceVariables(ref line, instance.Variables);
-        ReplaceVariables(ref line, ExternalSymbols);
+        // Fill variables and expressions
+        string[] args = [.. command.Args];
 
-        // Evaluations
-        line = CurlyExpressions().Replace(line, match =>
+        if (command.HasVariables)
         {
-            string exprStr = match.Groups[1].Value.Trim();
-            Expression expr = new(exprStr);
-            var result = expr.Evaluate();
+            ReplaceVariables(args, instance.Locals);
+            ReplaceVariables(args, instance.Variables);
+            ReplaceVariables(args, ExternalSymbols);
+        }
+        if (command.HasCurlyExpressions)
+            EvaluateCurlyExpressions(args);
 
-            return result?.ToString()?.ToLower() ?? "";
-        });
-
-        ExecuteCommand(line, instance);
+        ExecuteCommand(command.Operation, args, instance);
     }
-    public static void ExecuteCommand(string line, QuillInstance instance)
+    public static void ExecuteCommand(QuillOp op, string[] args, QuillInstance instance)
     {
-        string[] parts = line.Split(' ');
-        string command = parts[0].Trim();
-        string argsStr = "";
-        if (parts.Length > 1)
-            argsStr = string.Join(' ', parts[1..]).Trim();
-
-        switch (command)
+        switch (op)
         {
-            case "#perfmode": HandlePerfMode(instance, argsStr); break;
-            case "num": HandleNum(instance, argsStr); break;
-            case "str": HandleStr(instance, argsStr); break;
-            case "breakwhile": HandleBreakWhile(instance, argsStr); break;
-            case "continuewhile": HandleContinueWhile(instance, argsStr); break;
-            case "if": HandleIf(instance, argsStr); break;
-            case "endif": break; // Marker
-            case "while": HandleWhile(instance, argsStr); break;
-            case "endwhile": HandleEndWhile(instance, argsStr); break;
-            case "func": HandleFunc(instance, argsStr); break;
-            case "endfunc": HandleEndFunc(instance, argsStr); break;
-            case "sleep": HandleSleep(instance, argsStr); break;
-            case "wait": HandleWait(instance, argsStr); break;
-            case "only": HandleOnly(instance, argsStr); break;
-            case "endonly": break; // Marker
-            case "return": HandleReturn(instance, argsStr); break;
-            default:
-                if (BuiltinFunctions.TryGetValue(command, out var builtinFunc))
-                    HandleBuiltin(instance, builtinFunc, command, argsStr);
-                else if (instance.Functions.TryGetValue(command, out var func))
-                    HandleCall(instance, func, command, argsStr);
-                else
-                    instance.Errors.Add(new(instance.L, QuillErrorType.UnknownCommand, command));
+            case QuillOp.PerfMode: HandlePerfMode(instance, args); break;
+            case QuillOp.Num: HandleNum(instance, args); break;
+            case QuillOp.Str: HandleStr(instance, args); break;
+            case QuillOp.BreakWhile: HandleBreakWhile(instance, args); break;
+            case QuillOp.ContinueWhile: HandleContinueWhile(instance, args); break;
+            case QuillOp.If: HandleIf(instance, args); break;
+            case QuillOp.EndIf: break;
+            case QuillOp.While: HandleWhile(instance, args); break;
+            case QuillOp.EndWhile: HandleEndWhile(instance, args); break;
+            case QuillOp.Func: HandleFunc(instance, args); break;
+            case QuillOp.EndFunc: HandleEndFunc(instance, args); break;
+            case QuillOp.Sleep: HandleSleep(instance, args); break;
+            case QuillOp.Wait: HandleWait(instance, args); break;
+            case QuillOp.Only: HandleOnly(instance, args); break;
+            case QuillOp.EndOnly: break;
+            case QuillOp.Return: HandleReturn(instance, args); break;
+            case QuillOp.BuiltinFuncCall:
+                if (BuiltinFunctions.TryGetValue(args[0], out var builtinFunc))
+                    HandleBuiltin(instance, builtinFunc, args);
                 break;
+            case QuillOp.CustomFuncCall:
+                if (instance.Functions.TryGetValue(args[0], out var func))
+                    HandleCall(instance, func, args);
+                break;
+            default: instance.Errors.Add(new(instance.L, QuillErrorType.UnknownCommand, op.ToString())); break;
         }
     }
     public static void OutputErrors(QuillInstance instance)
@@ -306,344 +320,6 @@ public static partial class Interpreter
             }
         }
         instance.Errors.Clear();
-    }
-    // Handlers
-    private static void HandlePerfMode(QuillInstance inst, string argsStr)
-    {
-        string[] args = argsStr.Split(',');
-        if (args.Length != 1)
-        {
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"#perfmode expects 1 argument, received {args.Length}"));
-            return;
-        }
-        if (!int.TryParse(args[0], out int value) || value < 0 || value > 2)
-        {
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"Invalid perfmode: {args[0]}"));
-            return;
-        }
-
-        // Set performance mode
-        inst.SetPerformanceMode(Enum.Parse<QuillPerformanceMode>(args[0]));
-    }
-    private static void HandleNum(QuillInstance inst, string argsStr)
-    {
-        // Args
-        string[] args = argsStr.Split(',', StringSplitOptions.TrimEntries);
-        if (args.Length != 2)
-        {
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"num command expects 2 arguments, received {args.Length}"));
-            return;
-        }
-
-        // Name
-        string varName = args[0];
-        if (ContainsAny(varName, "`~!@#$%^&*()-=+[]{}\\|;:'\",<.>/?"))
-        {
-            inst.Errors.Add(new(inst.L, QuillErrorType.InvalidName, varName));
-            return;
-        }
-
-        // Value
-        if (!float.TryParse(args[1], out float num))
-        {
-            inst.Errors.Add(new(inst.L, QuillErrorType.InvalidExpression, $"Invalid number expression '{args[1]}'"));
-            return;
-        }
-        if (inst.Scopes.Count == 0)
-            inst.Variables[varName] = num.ToString("F20").TrimEnd('0').TrimEnd('.');
-        else
-            inst.Locals[varName] = num.ToString("F20").TrimEnd('0').TrimEnd('.');
-    }
-
-    private static void HandleStr(QuillInstance inst, string argsStr)
-    {
-        // Args
-        string[] args = argsStr.Split(',', StringSplitOptions.TrimEntries);
-        if (args.Length != 2)
-        {
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"str command expects 2 arguments, received {args.Length}"));
-            return;
-        }
-
-        // Name
-        string varName = args[0];
-        if (ContainsAny(varName, "`~!@#$%^&*()-=+[]{}\\|;:'\",<.>/?"))
-        {
-            inst.Errors.Add(new(inst.L, QuillErrorType.InvalidName, varName));
-            return;
-        }
-
-        // Value
-        if (inst.Scopes.Count == 0)
-            inst.Variables[varName] = args[1];
-        else
-            inst.Locals[varName] = args[1];
-    }
-
-    private static void HandleBreakWhile(QuillInstance inst, string argsStr)
-    {
-        string[] args = argsStr.Split(' ');
-
-        if (args.Length == 1)
-            inst.L = FindLine(inst, "endwhile", inst.L);
-        else if (args.Length == 0)
-            inst.L = FindLine(inst, $"endwhile {args[0]}", inst.L);
-        else
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"breakwhile command expects 0 or 1 arguments, received {args.Length}"));
-
-    }
-
-    private static void HandleContinueWhile(QuillInstance inst, string argsStr)
-    {
-        string[] args = argsStr.Split(' ');
-
-        if (args.Length == 1)
-            inst.L = FindLineBackwards(inst, $"while {args[0]}", inst.L) - 1;
-        else if (args.Length == 0)
-            inst.L = FindLineBackwards(inst, "while", inst.L) - 1;
-        else
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"continuewhile command expects 0 or 1 arguments, received {args.Length}"));
-    }
-
-    private static void HandleIf(QuillInstance inst, string argsStr)
-    {
-        string[] args = argsStr.Split(' ');
-        if (args.Length >= 2 && args[0].StartsWith('.'))
-        {
-            string label = args[0];
-            Expression expr = new(string.Join(' ', args[1..]));
-            var result = expr.Evaluate();
-            if (result is bool b && !b)
-                inst.L = FindLine(inst, $"endif {label}", inst.L);
-        } else if (args.Length >= 1)
-        {
-            Expression expr = new(string.Join(' ', args[0..]));
-            var result = expr.Evaluate();
-            if (result is bool b && !b)
-                inst.L = FindLine(inst, $"endif", inst.L);
-        } else
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"if command expects 1 or 2 arguments, received {args.Length}"));
-    }
-
-    private static void HandleWhile(QuillInstance inst, string argsStr)
-    {
-        string[] args = argsStr.Split(' ');
-        if (args.Length >= 2 && args[0].StartsWith('.'))
-        {
-            string label = args[0];
-            Expression expr = new(string.Join(' ', args[1..]));
-            var result = expr.Evaluate();
-            if (result is bool b && !b)
-                inst.L = FindLine(inst, $"endwhile {label}", inst.L);
-        }
-        else if (args.Length >= 1)
-        {
-            Expression expr = new(string.Join(' ', args[0..]));
-            var result = expr.Evaluate();
-            if (result is bool b && !b)
-                inst.L = FindLine(inst, $"endwhile", inst.L);
-        }
-        else
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"while command expects 1 or 2 arguments, received {args.Length}"));
-    }
-
-    private static void HandleEndWhile(QuillInstance inst, string argsStr)
-    {
-        string[] args = argsStr.Split(' ');
-
-        // Loop back
-        if (args.Length == 0)
-            inst.L = FindLineBackwards(inst, "while", inst.L) - 1;
-        else if (args.Length == 1)
-            inst.L = FindLineBackwards(inst, $"while {args[0]}", inst.L) - 1;
-        else
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"endwhile command expects 0 or 1 arguments, received {args.Length}")   );
-
-        // Delay
-        if (inst.PerformanceMode == QuillPerformanceMode.Low)
-            inst.Sleep(1000); // ms
-        else if (inst.PerformanceMode == QuillPerformanceMode.Normal)
-            inst.Sleep(100); // ms
-    }
-
-    private static void HandleFunc(QuillInstance inst, string argsStr)
-    {
-        string[] args = argsStr.Split(' ');
-
-        if (args.Length < 1)
-        {
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"func command expects at least 1 argument, received {args.Length}"));
-            return;
-        }
-
-        string funcName = args[0];
-        string[] funcParams = args.Length < 2 ? [] : args[1..];
-
-        inst.Functions[funcName] = (inst.L, funcParams);
-        inst.L = FindLine(inst, "endfunc", inst.L);
-    }
-
-    private static void HandleEndFunc(QuillInstance inst, string argsStr)
-    {
-        inst.Locals.Clear();
-        if (inst.Callbacks.Count > 0)
-        {
-            inst.L = inst.Callbacks[^1];
-            inst.Callbacks.RemoveAt(inst.Callbacks.Count - 1);
-        }
-        if (inst.Scopes.Count > 0)
-            inst.Scopes.Pop();   
-    }
-
-    private static void HandleCall(QuillInstance inst, (int line, string[] parameters) function, string funcName, string argsStr)
-    {
-        string[] args = argsStr.Split(',', StringSplitOptions.TrimEntries);
-
-        // Functions not found
-        if (function.line < 0)
-        {
-            inst.Errors.Add(new(inst.L, QuillErrorType.FunctionNotFound, funcName));
-            return;
-        }
-
-        // Parse parameters
-        foreach (string param in args)
-        {
-            string[] kvp = param.Split(':');
-            if (kvp.Length != 2)
-            {
-                inst.Errors.Add(new(inst.L, QuillErrorType.InvalidExpression, $"Invalid parameter: {param}"));
-                continue;
-            }
-
-            string pName = kvp[0].Trim();
-            string pValue = kvp[1].Trim();
-            inst.Locals[pName] = pValue;
-        }
-
-        // Check parameters match
-        foreach (string p in function.parameters)
-        {
-            if (!inst.Locals.ContainsKey(p))
-            {
-                inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"Function call '{funcName}' missing parameter '{p}'"));
-                return;
-            }
-        }
-
-        // Go to function
-        inst.Scopes.Push(funcName);
-        inst.Callbacks.Add(inst.L);
-        inst.L = function.line;
-    }
-
-    private static void HandleSleep(QuillInstance inst, string argsStr)
-    {
-        string[] args = argsStr.Split(',');
-        if (args.Length != 1)
-        {
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"sleep command expects 1 argument, received {args.Length}"));
-            return;
-        }
-
-        string waitTimeStr = args[0];
-        if (int.TryParse(waitTimeStr, out var ms))
-            inst.Sleep(ms);
-        else
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"Invalid sleep time: {waitTimeStr}"));
-    }
-
-    private static void HandleWait(QuillInstance inst, string argsStr)
-    {
-        string[] args = argsStr.Split(',');
-        if (args.Length != 2)
-        {
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"wait command expects 2 arguments, received {args.Length}"));
-            return;
-        }
-
-        string conditionStr = args[0].Trim();
-        string waitTimeStr = args[1];
-        Expression expr = new(conditionStr);
-        var result = expr.Evaluate();
-        if (result is not bool b || !int.TryParse(waitTimeStr, out int waitTime))
-        {
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"Invalid wait command: wait {argsStr}"));
-            return;
-        }
-
-        if (!b)
-        {
-            inst.L--;
-            inst.Sleep(waitTime);
-        }
-    }
-    private static void HandleOnly(QuillInstance inst, string argsStr)
-    {
-        // Parse args
-        string[] args = argsStr.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        string label = "";
-
-        int limit;
-        // [label] (times) / [label] / (times)
-        if (args.Length == 2 && args[0].StartsWith('.'))
-        {
-            label = args[0];
-            limit = int.TryParse(args[1], out int v) ? v : -1;
-        }
-        else if (args.Length == 1 && args[0].StartsWith('.'))
-        {
-            label = args[0];
-            limit = 1;
-        }
-        else if (args.Length == 1)
-            limit = int.TryParse(args[0], out int v) ? v : -1;
-        else if (args.Length == 0)
-            limit = 1;
-        else
-        {
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"sleep command expects 0, 1, or 2 arguments, received {args.Length}"));
-            return;
-        }
-
-        // Check limit
-        if (limit <= 0)
-        {
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"Invalid only amount"));
-            return;
-        }
-
-        // Check flag
-        if (!inst.OnceFlags.TryGetValue(inst.L, out int counter))
-            inst.OnceFlags[inst.L] = 1;
-        else if (counter < limit)
-            inst.OnceFlags[inst.L] = ++counter;
-        else
-            inst.L = FindLine(inst, $"endonly {label}", inst.L);
-    }
-    private static void HandleReturn(QuillInstance inst, string argsStr)
-    {
-        string[] args = argsStr.Split(' ');
-        if (args.Length == 1)
-        {
-            inst.Variables["[return]"] = args[0];
-        }
-        else if (args.Length != 0)
-        {
-            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"return command expects 0 or 1 arguments, received {args.Length}"));
-            return;
-        }
-
-        inst.L = FindLine(inst, "endfunc", inst.L) - 1;
-    }
-
-    private static void HandleBuiltin(QuillInstance inst, IBuiltinFunction func, string funcName, string argsStr)
-    {
-        string[] args = argsStr.Split(',', StringSplitOptions.TrimEntries);
-
-        var resp = func.Run(inst.Variables, args);
-        if (!resp.Success)
-            inst.Errors.Add(new(inst.L, resp.ErrorType!.Value, resp.ErrorMessage!));
     }
 
     [GeneratedRegex(@"\{([^}]*)\}", RegexOptions.Compiled)]
