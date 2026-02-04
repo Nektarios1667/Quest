@@ -219,6 +219,10 @@ public static partial class Interpreter
     }
     public static IReadOnlyList<QuillInstance> GetQuillInstances() => Scripts;
     // Run
+    public static void ClearScripts()
+    {
+        Scripts.Clear();
+    }
     public static void RunScript(QuillScript script)
     {
         var inst = new QuillInstance(script);

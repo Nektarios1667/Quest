@@ -48,7 +48,7 @@ public class QuillCommand
     public string[] Args { get; set; }
     public bool HasVariables { get; }
     public bool HasCurlyExpressions { get; }
-    public override string ToString() => $"{Operation} {string.Join(' ', Args)}";
+    public override string ToString() => $"{Operation.ToString().ToUpper()} {string.Join(' ', Args)}";
     public QuillCommand(QuillOp op, string[] args)
     {
         Operation = op;

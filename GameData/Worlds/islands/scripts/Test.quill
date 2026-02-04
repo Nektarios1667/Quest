@@ -4,10 +4,10 @@ wait =<ready>, 1000
 
 func playerInBounds, x1, y1, x2, y2
 	// Check position
-	num playerX, =<playercoord_x>
-	num playerY, =<playercoord_y>
+	num pX, =<playercoord_x>
+	num pY, =<playercoord_y>
 
-	if =playerX >= =x1 && =playerX <= =x2 && =playerY >= =y1 && =playerY <= =y2
+	if =pX >= =x1 && =pX <= =x2 && =pY >= =y1 && =pY <= =y2
 		return true
     endif
 
