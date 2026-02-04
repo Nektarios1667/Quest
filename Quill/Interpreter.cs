@@ -167,24 +167,25 @@ public static partial class Interpreter
         DebugManager.EndBenchmark("QuillSymbolsUpdate");
     }
     // Helpers
-    private static int FindLine(QuillInstance instance, string target, int start = 0)
+
+    private static int FindLine(QuillInstance instance, QuillOp op, string? label = null, int start = 0)
     {
         for (int i = start; i < instance.Lines.Length; i++)
-            if (instance.Lines[i].Trim().StartsWith(target.Trim()))
+            if (instance.CompiledLines[i].Operation == op && (label == null || instance.CompiledLines[i].Label == label))
                 return i;
 
-        instance.Errors.Add(new(instance.L, QuillErrorType.BlockMismatch, $"Failed to find line '{target}'", fatal:true));
+        instance.Errors.Add(new(instance.L, QuillErrorType.BlockMismatch, $"Failed to find line '{op}{(label != null ? $" {label}" : "")}'", fatal:true));
         return instance.L;
     }
-    private static int FindLineBackwards(QuillInstance instance, string target, int start = -1)
+    private static int FindLineBackwards(QuillInstance instance, QuillOp op, string? label = null, int start = -1)
     {
         if (start == -1) start = instance.Lines.Length - 1;
 
         for (int i = start; i >= 0; i--)
-            if (instance.Lines[i].Trim().StartsWith(target.Trim()))
+            if (instance.CompiledLines[i].Operation == op && (label == null || instance.CompiledLines[i].Label == label))
                 return i;
 
-        instance.Errors.Add(new(instance.L, QuillErrorType.BlockMismatch, $"Failed to find line '{target}'", fatal:true));
+        instance.Errors.Add(new(instance.L, QuillErrorType.BlockMismatch, $"Failed to find line '{op}{(label != null ? $" {label}" : "")}'", fatal: true));
         return instance.L;
     }
     private static void ReplaceVariables(string[] args, Dictionary<string, string> vars)

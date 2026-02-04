@@ -179,7 +179,7 @@ public class LevelManager
         gameManager.UIManager.RefreshMiniMap();
 
         // Close old QuillSciprs
-        Quill.Interpreter.ClearScripts();
+        Interpreter.ClearScripts();
 
         // Run
         LevelLoaded?.Invoke(Level.Name);

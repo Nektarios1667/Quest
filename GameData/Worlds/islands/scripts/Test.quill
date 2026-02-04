@@ -1,4 +1,4 @@
-﻿#perfmode 0
+﻿#perfmode 2
 // Wait until the symbol system is ready
 wait =<ready>, 1000
 

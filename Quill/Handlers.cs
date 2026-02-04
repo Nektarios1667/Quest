@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Quest.Quill;
-public partial class Interpreter
+public static partial class Interpreter
 {
     // Handlers
     private static void HandlePerfMode(QuillInstance inst, string[] args)
@@ -78,18 +78,18 @@ public partial class Interpreter
     private static void HandleBreakWhile(QuillInstance inst, string[] args)
     {
         if (args.Length == 1)
-            inst.L = FindLine(inst, "endwhile", inst.L);
+            inst.L = FindLine(inst, QuillOp.EndWhile, label: args[0], start: inst.L);
         else if (args.Length == 0)
-            inst.L = FindLine(inst, $"endwhile {args[0]}", inst.L);
+            inst.L = FindLine(inst, QuillOp.EndWhile, start: inst.L);
         else
             inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"breakwhile command expects 0 or 1 arguments, received {args.Length}"));
     }
     private static void HandleContinueWhile(QuillInstance inst, string[] args)
     {
         if (args.Length == 1)
-            inst.L = FindLineBackwards(inst, $"while {args[0]}", inst.L) - 1;
+            inst.L = FindLineBackwards(inst, QuillOp.While, label: args[0], start: inst.L) - 1;
         else if (args.Length == 0)
-            inst.L = FindLineBackwards(inst, "while", inst.L) - 1;
+            inst.L = FindLineBackwards(inst, QuillOp.While, start: inst.L) - 1;
         else
             inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"continuewhile command expects 0 or 1 arguments, received {args.Length}"));
     }
@@ -101,14 +101,14 @@ public partial class Interpreter
             Expression expr = new(string.Join(' ', args[1..]));
             var result = expr.Evaluate();
             if (result is bool b && !b)
-                inst.L = FindLine(inst, $"endif {label}", inst.L);
+                inst.L = FindLine(inst, QuillOp.EndIf, label: label, start: inst.L);
         }
         else if (args.Length >= 1)
         {
             Expression expr = new(string.Join(' ', args[0..]));
             var result = expr.Evaluate();
             if (result is bool b && !b)
-                inst.L = FindLine(inst, $"endif", inst.L);
+                inst.L = FindLine(inst, QuillOp.EndIf, start: inst.L);
         }
         else
             inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"if command expects 1 or 2 arguments, received {args.Length}"));
@@ -121,14 +121,14 @@ public partial class Interpreter
             Expression expr = new(string.Join(' ', args[1..]));
             var result = expr.Evaluate();
             if (result is bool b && !b)
-                inst.L = FindLine(inst, $"endwhile {label}", inst.L);
+                inst.L = FindLine(inst, QuillOp.EndWhile, label:label, start: inst.L);
         }
         else if (args.Length >= 1)
         {
             Expression expr = new(string.Join(' ', args[0..]));
             var result = expr.Evaluate();
             if (result is bool b && !b)
-                inst.L = FindLine(inst, $"endwhile", inst.L);
+                inst.L = FindLine(inst, QuillOp.EndWhile, start: inst.L);
         }
         else
             inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"while command expects 1 or 2 arguments, received {args.Length}"));
@@ -136,9 +136,9 @@ public partial class Interpreter
     private static void HandleEndWhile(QuillInstance inst, string[] args)
     {
         if (args.Length == 0)
-            inst.L = FindLineBackwards(inst, "while", inst.L) - 1;
+            inst.L = FindLineBackwards(inst, QuillOp.While, start: inst.L) - 1;
         else if (args.Length == 1)
-            inst.L = FindLineBackwards(inst, $"while {args[0]}", inst.L) - 1;
+            inst.L = FindLineBackwards(inst, QuillOp.While, label: args[0], start: inst.L) - 1;
         else
             inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"endwhile command expects 0 or 1 arguments, received {args.Length}"));
 
@@ -150,7 +150,7 @@ public partial class Interpreter
     }
     private static void HandleFunc(QuillInstance inst, string[] args)
     {
-        inst.L = FindLine(inst, "endfunc", inst.L);
+        inst.L = FindLine(inst, QuillOp.EndFunc, start: inst.L);
     }
     private static void HandleEndFunc(QuillInstance inst, string[] args)
     {
@@ -238,7 +238,7 @@ public partial class Interpreter
         else if (counter < limit)
             inst.OnceFlags[inst.L] = ++counter;
         else
-            inst.L = FindLine(inst, $"endonly {label}", inst.L);
+            inst.L = FindLine(inst, QuillOp.EndOnly, label: label, start: inst.L);
     }
     private static void HandleReturn(QuillInstance inst, string[] args)
     {
@@ -252,7 +252,7 @@ public partial class Interpreter
             return;
         }
 
-        inst.L = FindLine(inst, "endfunc", inst.L) - 1;
+        inst.L = FindLine(inst, QuillOp.EndFunc, start: inst.L) - 1;
     }
     private static void HandleCall(QuillInstance inst, (int line, string[] parameters) function, string[] args)
     {

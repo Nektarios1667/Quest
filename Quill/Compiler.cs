@@ -45,6 +45,7 @@ public enum QuillOp {
 public class QuillCommand
 {
     public QuillOp Operation { get; set; }
+    public string? Label { get; set; }
     public string[] Args { get; set; }
     public bool HasVariables { get; }
     public bool HasCurlyExpressions { get; }
@@ -53,6 +54,7 @@ public class QuillCommand
     {
         Operation = op;
         Args = args;
+        Label = args.FirstOrDefault(a => a[0] == '.');
 
         string argsStr = string.Join("", args);
         HasVariables = argsStr.Contains('=');
