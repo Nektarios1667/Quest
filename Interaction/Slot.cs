@@ -10,10 +10,12 @@ namespace Quest.Interaction;
 public class Slot : UIElement
 {
     public event Action? OnClicked;
+    public event Action? OnDropped;
     public Rectangle Bounds { get; protected set; }
     public ButtonState State { get; protected set; } = ButtonState.Normal;
     public Item? Item { get; protected set; }
-    protected Color Color { get; set; } = Color.White;
+    public Color Color { get; set; } = Color.White;
+    public Color? Marked { get; protected set; }
     // Consts/statics
     protected static readonly Point slotOffset = new(14, 14);
     protected const float itemScale = 3;
@@ -24,14 +26,15 @@ public class Slot : UIElement
     }
     public override void Update(UserInterface ui)
     {
+        // Clicking
         if (Bounds.Contains(InputManager.MousePosition))
         {
-            if (InputManager.LMouseClicked)
+            if (InputManager.LMouseClicked || InputManager.RMouseClicked)
             {
                 State = ButtonState.Pressed;
                 OnClicked?.Invoke();
             }
-            else if (InputManager.LMouseDown)
+            else if (InputManager.LMouseDown || InputManager.RMouseDown)
             {
                 State = ButtonState.Pressed;
             }
@@ -42,11 +45,21 @@ public class Slot : UIElement
         }
         else
             State = ButtonState.Normal;
+
+        // Dropping
+        if ((State == ButtonState.Hovered || State == ButtonState.Pressed) && InputManager.KeyPressed(Keys.D))
+            OnDropped?.Invoke();
+
+    }
+    public void Mark(Color color)
+    {
+        Marked = color;
     }
     public override void Draw(UserInterface ui)
     {
         // Draw inventory slots
-        DrawTexture(ui.Batch, TextureID.Slot, Location, color: Color);
+        DrawTexture(ui.Batch, TextureID.Slot, Location, color: Marked ?? Color);
+        Marked = null;
         // Respond to hover/press states
         if (State == ButtonState.Hovered)
             ui.Batch.FillRectangle(Bounds, Color.SlateGray * 0.3f);

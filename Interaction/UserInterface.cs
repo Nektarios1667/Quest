@@ -10,8 +10,10 @@ namespace Quest.Interaction;
 
 public partial class UserInterface
 {
-    public event Action<Slot>? SlotClicked;
+    public event Action<int, UserInterface>? OnSlotClick;
+    public event Action<int, UserInterface>? OnSlotDrop;
     private List<string> SlotElements { get; set; } = [];
+    public Container? BoundContainer { get; private set; }
     private Dictionary<string, UIElement> Elements { get; set; }
     public SpriteBatch Batch { get; private set; }
     public bool IsVisible { get; set; } = true;
@@ -30,6 +32,7 @@ public partial class UserInterface
             if (element.IsVisible && element.IsEnabled)
                 element.Update(this);
         }
+        Reload();
     }
     public void Draw()
     {
@@ -41,11 +44,17 @@ public partial class UserInterface
                 element.Draw(this);
         }
     }
-    public void BindSlots(Item?[] items)
+    public void BindContainer(Container cont) => BoundContainer = cont;
+    public void UnbindContainer() => BoundContainer = null;
+    public void Reload()
     {
-        for (int i = 0; i < Math.Min(SlotElements.Count, items.Length); i++)
+        if (BoundContainer == null) return;
+
+        for (int i = 0; i < Math.Min(SlotElements.Count, BoundContainer.Items.Length); i++)
+        {
             if (Elements[SlotElements[i]] is Slot slot)
-                slot.SetItem(items[i]);
+                slot.SetItem(BoundContainer.Items[i]);
+        }
     }
     public bool AddElement(string name, UIElement element)
     {
@@ -57,7 +66,8 @@ public partial class UserInterface
         if (element is Slot slot)
         {
             SlotElements.Add(name);
-            slot.OnClicked += () => SlotClicked?.Invoke(slot);
+            slot.OnClicked += () => OnSlotClick?.Invoke(SlotElements.IndexOf(name), this);
+            slot.OnDropped += () => OnSlotDrop?.Invoke(SlotElements.IndexOf(name), this);
         }
 
         return true;
@@ -68,5 +78,15 @@ public partial class UserInterface
         SlotElements.Remove(name);
     }
     public Dictionary<string, UIElement> GetElements() => Elements;
-    public string[] GetSlotElements() => [.. SlotElements];
+    public Slot GetSlot(string name) => Elements[name] as Slot ?? throw new Exception($"Element '{name}' is not a Slot.");
+    public Slot GetSlot(int idx) => GetSlot(SlotElements[idx]);
+
+    // Visibilty/Enablement
+    public void Enable() => IsEnabled = true;
+    public void Disable() => IsEnabled = false;
+    public void ToggleEnable() => IsEnabled = !IsEnabled;
+    public void Show() => IsVisible = true;
+    public void Hide() => IsVisible = false;
+    public void ToggleVisible() => IsVisible = !IsVisible;
+
 }

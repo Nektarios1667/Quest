@@ -34,15 +34,14 @@ public partial class UserInterface
         InventoryUI = new(batch);
 
         // Create slots
-        itemStart = new(Constants.Middle.X - Slot.SlotSize.X * Chest.Size.X / 2, Constants.NativeResolution.Y - (Slot.SlotSize.Y + 4) * 4);
+        itemStart = new(Constants.Middle.X - Slot.SlotSize.X * Chest.Size.X / 2, Constants.NativeResolution.Y - Slot.SlotSize.Y - 4);
         for (int y = 0; y < Chest.Size.Y + 1; y++)
         {
             for (int x = 0; x < Chest.Size.X; x++)
             {
-                Slot slot = new(new(itemStart.X + (Slot.SlotSize.X + 4) * x, itemStart.Y + (Slot.SlotSize.Y + 4) * y));
+                Slot slot = new(new(itemStart.X + (Slot.SlotSize.X + 4) * x, itemStart.Y - (Slot.SlotSize.Y + 4) * y));
                 InventoryUI.AddElement($"slot_{x + y * Chest.Size.X}", slot);
             }
         }
-
     }
 }

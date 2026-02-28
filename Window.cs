@@ -243,7 +243,7 @@ public class Window : Game
         debugSb.Append("\nLevel: ");
         debugSb.Append(levelManager.Level?.Name);
         debugSb.Append("\nInventory: ");
-        debugSb.Append(playerManager.Inventory.IsOpened);
+        debugSb.Append(playerManager.InventoryUI.IsVisible);
         debugSb.Append("\nGUI: ");
         debugSb.Append(overlayManager.Gui.Widgets.Count);
         debugSb.Append("\nMood: ");

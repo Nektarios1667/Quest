@@ -13,28 +13,34 @@ public class PlayerManager
     // Events
     public event Action<Item?>? ItemSelected;
     // Properties
+    // Inventory and UI
     public Container Inventory { get; }
+    public UserInterface InventoryUI { get; }
     public UserInterface? OpenedInterface { get; set; } = null;
     public int EquippedSlot { get; set; } = 0;
-    public Item? EquippedItem => Inventory.Items[EquippedSlot];
-    public Slot? MouseSlot { get; set; } // Item being moved with mouse and its original inventory
+    public Item? EquippedItem => EquippedSlot >= 0 && EquippedSlot < Inventory.Items.Length ? Inventory.Items[EquippedSlot] : null;
+    public (UserInterface ui, int idx)? MouseSelection { get; set; } // Item being moved with mouse and its original inventory
+    // Position and collision
     public Tile? TileBelow { get; private set; }
     public List<Tile> TileBumps { get; private set; } = [];
     public Direction PlayerDirection { get; private set; }
     public List<Attack> Attacks { get; private set; } = [];
     private float moveX, moveY;
+    private GameManager Game;
     public PlayerManager()
     {
-        Inventory = new(UserInterface.InventoryUI, Chest.Size.X * Chest.Size.Y);
-        CloseInventory();
-        Inventory.SlotClicked += SlotClicked;
+        Inventory = new(new Item[6*4]);
+        InventoryUI = UserInterface.InventoryUI;
+        InventoryUI.BindContainer(Inventory);
+        InventoryUI.OnSlotClick += SlotClicked;
+        InventoryUI.OnSlotDrop += SlotDropped;
 
         Inventory.SetSlot(0, new Item(ItemTypes.Apple, 1, "Green Apple"));
     }
 
-
     public void Update(GameManager gameManager)
     {
+        Game = gameManager;
         if (StateManager.State != GameState.Game && StateManager.State != GameState.Editor) return;
         if (StateManager.OverlayState == OverlayState.Pause) return;
 
@@ -45,7 +51,7 @@ public class PlayerManager
         // Toggle inventory
         if (InputManager.KeyPressed(Keys.I))
         {
-            if (Inventory.IsOpened)
+            if (InventoryUI.IsVisible)
             {
                 CloseInventory();
                 CloseInterface();
@@ -64,7 +70,7 @@ public class PlayerManager
         DebugManager.EndBenchmark("UpdateLoot");
 
         // Movement
-        if (!Inventory.IsOpened)
+        if (!InventoryUI.IsVisible)
         {
             // Movement
             DebugManager.StartBenchmark("UpdateMovement");
@@ -92,9 +98,27 @@ public class PlayerManager
 
         // Inventory
         DebugManager.StartBenchmark("InventoryUpdate");
-        Inventory.Update();
+
+        // Change equipped item with hotkeys
+        if (InputManager.KeyPressed(Keys.D1)) EquippedSlot = 0;
+        if (InputManager.KeyPressed(Keys.D2)) EquippedSlot = 1;
+        if (InputManager.KeyPressed(Keys.D3)) EquippedSlot = 2;
+        if (InputManager.KeyPressed(Keys.D4)) EquippedSlot = 3;
+        if (InputManager.KeyPressed(Keys.D5)) EquippedSlot = 4;
+        if (InputManager.KeyPressed(Keys.D6)) EquippedSlot = 5;
+        // Change equipped item with scroll
+        if (InputManager.ScrolledUp) EquippedSlot = (EquippedSlot - 1 + Chest.Size.X) % Chest.Size.X;
+        if (InputManager.ScrolledDown) EquippedSlot = (EquippedSlot + 1) % Chest.Size.X;
+
+        // 
+        InventoryUI.GetSlot(EquippedSlot).Mark(Color.Salmon);
+
+        // Inventory updates
+        InventoryUI.Update();
         OpenedInterface?.Update();
+
         DebugManager.EndBenchmark("InventoryUpdate");
+
 
         // NPC
         UpdateNPCInteractions(gameManager);
@@ -286,13 +310,13 @@ public class PlayerManager
     }
     public void OpenInventory()
     {
-        Inventory.Open();
+        InventoryUI.Show();
         StateManager.OverlayState = OverlayState.Container;
         SoundManager.PlaySound("Click");
     }
     public void CloseInventory()
     {
-        Inventory.Close();
+        InventoryUI.Hide();
         StateManager.OverlayState = OverlayState.None;
         SoundManager.PlaySound("Click");
     }
@@ -300,10 +324,11 @@ public class PlayerManager
     public void OpenInterface(UserInterface ui)
     {
         CloseInterface();
-        Inventory.Open();
+        InventoryUI.Show();
 
         OpenedInterface = ui;
-        OpenedInterface.SlotClicked += SlotClicked;
+        OpenedInterface.OnSlotClick += SlotClicked;
+        OpenedInterface.OnSlotDrop += SlotDropped;
 
         StateManager.OverlayState = OverlayState.Container;
         SoundManager.PlaySound("Click");
@@ -312,24 +337,31 @@ public class PlayerManager
     {
         if (OpenedInterface == null) return;
 
-        OpenedInterface.SlotClicked -= SlotClicked;
+        OpenedInterface.OnSlotClick -= SlotClicked;
+        OpenedInterface.OnSlotDrop -= SlotDropped;
         OpenedInterface = null;
     }
-    public void SlotClicked(Slot slot)
+    public void SlotClicked(int slot, UserInterface ui)
     {
-        if (MouseSlot == null)
+        if (MouseSelection == null)
         {
-            if (slot.Item == null) return;
-            MouseSlot = slot;
-            //slot.SetItem(null);
+            if (ui.BoundContainer?.Items[slot] == null) return;
+            MouseSelection = (ui, slot);
         }
-        else
+        else if (MouseSelection.Value.ui.BoundContainer != null && ui.BoundContainer != null)
         {
-            Item? temp = slot.Item;
-            slot.SetItem(MouseSlot.Item);
-            MouseSlot.SetItem(temp);
-            MouseSlot = null;
+            Container.MoveItem(MouseSelection.Value.ui.BoundContainer, MouseSelection.Value.idx, ui.BoundContainer, slot, split: InputManager.RMouseDown);
+            MouseSelection = null;
         }
+    }
+    public void SlotDropped(int slot, UserInterface ui)
+    {
+        if (ui.BoundContainer?.Items[slot] == null) return;
+        Item? item = ui.BoundContainer.Items[slot];
+        if (item == null) return;
+
+        Game.LevelManager.Level.Loot.Add(new Loot(new(item.Type, item.Amount, item.CustomName), CameraManager.PlayerFoot + new Point(0, 20), Game.GameTime));
+        ui.BoundContainer.SetSlot(slot, null);
     }
     public void UpdatePositions(GameManager gameManager)
     {

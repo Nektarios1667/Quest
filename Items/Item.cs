@@ -209,4 +209,19 @@ public class Item
     {
         UIDManager.Release(UIDCategory.Items, UID);
     }
+    public Item Take(byte amount)
+    {
+        // More than amount
+        if (amount > Amount)
+        {
+            Amount = 0;
+            return new Item(this);
+        // None
+        } else if (amount <= 0)
+            return new Item(Type, 0);
+
+        // Split
+        Amount -= amount;
+        return new Item(Type, amount, CustomName);
+    }
 }

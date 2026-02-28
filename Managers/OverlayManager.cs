@@ -92,11 +92,11 @@ public class OverlayManager
         if (playerManager != null)
         {
             playerManager.OpenedInterface?.Draw();
-            playerManager.Inventory.Draw();
+            playerManager.InventoryUI.Draw();
             // Draw gui mouse item
-            if (playerManager.Inventory.IsOpened && playerManager.MouseSlot != null)
+            if (playerManager.InventoryUI.IsVisible && playerManager.MouseSelection != null)
             {
-                Item? item = playerManager.MouseSlot.Item;
+                Item? item = playerManager.MouseSelection.Value.ui.BoundContainer?.Items[playerManager.MouseSelection.Value.idx];
                 if (item != null)
                     DrawTexture(gameManager.Batch, item.Texture, InputManager.MousePosition - new Point(20, 20), scale: 2);
             }

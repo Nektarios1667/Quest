@@ -291,7 +291,7 @@ public static class StateManager
         writer.Write(chest.TileID); // TileID - ushort
         writer.Write(chest.Generated); // IsGenerated - bool
         if (chest.Generated)
-            foreach (Item? item in chest.Items!)
+            foreach (Item? item in chest.Container.Items!)
                 WriteItemData(writer, item);
         else
         {
@@ -309,7 +309,7 @@ public static class StateManager
             {
                 chest.SetEmpty();
                 for (int s = 0; s < Chest.Size.X * Chest.Size.Y; s++)
-                    chest.Items![s] = ReadItemData(reader);
+                    chest.Container!.Items[s] = ReadItemData(reader);
             }
             else
             {

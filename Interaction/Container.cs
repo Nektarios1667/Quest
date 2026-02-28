@@ -10,31 +10,13 @@ namespace Quest.Interaction;
 
 public class Container
 {
-    public event Action<Slot>? SlotClicked;
-    public bool IsOpened => UI.IsVisible;
     public Item?[] Items { get; private set; }
-    public UserInterface UI { get; set; }
-    public int Slots { get; private set; }
-    public Container(UserInterface ui, int slots, Item?[]? items = null)
+    public Container(Item?[]? items = null)
     {
-        Items = items ?? new Item[slots];
-        UI = ui;
-        ui.SlotClicked += (Slot slot) => SlotClicked?.Invoke(slot);
-        Slots = slots;
-    }
-    // Management
-    public void Update()
-    {
-        UI.Update();
-        Reload();
-    }
-    public void Draw() => UI.Draw();
-    public void Reload()
-    {
-        UI.BindSlots(Items);
+        Items = items ?? [];
     }
     // Item management
-    public static void MoveItem(Container from, int fromIdx, Container to, int toIdx)
+    public static void MoveItem(Container from, int fromIdx, Container to, int toIdx, bool split = false)
     {
         // Get and check
         Item? fromItem = from.Items[fromIdx];
@@ -44,8 +26,15 @@ public class Container
         // Move
         if (toItem == null)
         {
-            to.SetSlot(toIdx, fromItem);
-            from.SetSlot(fromIdx, null);
+            if (split)
+            {
+                Split(from, fromIdx, to, toIdx);
+            }
+            else
+            {
+                to.SetSlot(toIdx, fromItem);
+                from.SetSlot(fromIdx, null);
+            }
         }
         // Merge
         else if (SameItem(fromItem, toItem))
@@ -75,7 +64,7 @@ public class Container
     {
         // Get and check
         Item? fromItem = from.Items[fromIdx];
-        Item? toItem = to.Items[fromIdx];
+        Item? toItem = to.Items[toIdx];
         if (fromItem == null) return; // Can't split empty slot
         if (toItem != null) return; // Can't split into non-empty slot
         // Split
@@ -144,7 +133,7 @@ public class Container
     public bool IsFull() => !Items.Any(item => item == null);
     public void SetSlot(int idx, Item? item)
     {
-        if (idx >= 0 && idx < Slots)
+        if (idx >= 0 && idx < Items.Length)
             Items[idx] = item;
     }
     public int? Locate(ItemType item)
@@ -161,13 +150,8 @@ public class Container
     }
     public void SetItems(Item?[] items)
     {
-        if (items.Length != Slots) return;
         Items = items;
     }
-    public void Clear() => Items = new Item?[Slots];
+    public void Clear() => Items = new Item?[Items.Length];
     public static bool SameItem(Item? item1, Item? item2) => item1 != null && item2 != null && item1.Type == item2.Type && item1.Name == item2.Name;
-    // Visibility
-    public void Open() => UI.IsVisible = true;
-    public void Close() => UI.IsVisible = false;
-    public void Toggle() => UI.IsVisible = !UI.IsVisible;
 }
