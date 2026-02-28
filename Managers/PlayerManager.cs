@@ -14,6 +14,7 @@ public class PlayerManager
     public event Action<Item?>? ItemSelected;
     // Properties
     // Inventory and UI
+    public bool InventoryOpen { get; set; } = false;
     public Container Inventory { get; }
     public UserInterface InventoryUI { get; }
     public UserInterface? OpenedInterface { get; set; } = null;
@@ -51,7 +52,7 @@ public class PlayerManager
         // Toggle inventory
         if (InputManager.KeyPressed(Keys.I))
         {
-            if (InventoryUI.IsVisible)
+            if (InventoryOpen)
             {
                 CloseInventory();
                 CloseInterface();
@@ -70,7 +71,7 @@ public class PlayerManager
         DebugManager.EndBenchmark("UpdateLoot");
 
         // Movement
-        if (!InventoryUI.IsVisible)
+        if (!InventoryOpen)
         {
             // Movement
             DebugManager.StartBenchmark("UpdateMovement");
@@ -114,7 +115,7 @@ public class PlayerManager
         InventoryUI.GetSlot(EquippedSlot).Mark(Color.Salmon);
 
         // Inventory updates
-        InventoryUI.Update();
+        InventoryUI.Update(InventoryOpen ? null : "hotbar");
         OpenedInterface?.Update();
 
         DebugManager.EndBenchmark("InventoryUpdate");
@@ -310,13 +311,13 @@ public class PlayerManager
     }
     public void OpenInventory()
     {
-        InventoryUI.Show();
+        InventoryOpen = true;
         StateManager.OverlayState = OverlayState.Container;
         SoundManager.PlaySound("Click");
     }
     public void CloseInventory()
     {
-        InventoryUI.Hide();
+        InventoryOpen = false;
         StateManager.OverlayState = OverlayState.None;
         SoundManager.PlaySound("Click");
     }
@@ -324,7 +325,7 @@ public class PlayerManager
     public void OpenInterface(UserInterface ui)
     {
         CloseInterface();
-        InventoryUI.Show();
+        InventoryOpen = true;
 
         OpenedInterface = ui;
         OpenedInterface.OnSlotClick += SlotClicked;

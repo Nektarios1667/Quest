@@ -92,9 +92,9 @@ public class OverlayManager
         if (playerManager != null)
         {
             playerManager.OpenedInterface?.Draw();
-            playerManager.InventoryUI.Draw();
+            playerManager.InventoryUI.Draw(playerManager.InventoryOpen ? null : "hotbar");
             // Draw gui mouse item
-            if (playerManager.InventoryUI.IsVisible && playerManager.MouseSelection != null)
+            if (playerManager.InventoryOpen && playerManager.MouseSelection != null)
             {
                 Item? item = playerManager.MouseSelection.Value.ui.BoundContainer?.Items[playerManager.MouseSelection.Value.idx];
                 if (item != null)

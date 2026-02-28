@@ -147,7 +147,7 @@ public static partial class Interpreter
         ExternalSymbols["<inventorysize_x>"] = Chest.Size.X.ToString();
         ExternalSymbols["<inventorysize_y>"] = Chest.Size.Y.ToString();
         ExternalSymbols["<inventorysize>"] = $"{Chest.Size.X};{Chest.Size.Y}";
-        ExternalSymbols["<isinventoryopen>"] = player.InventoryUI.IsVisible.ToString();
+        ExternalSymbols["<isinventoryopen>"] = player.InventoryOpen.ToString();
         ExternalSymbols["<equippedslot>"] = player.EquippedSlot.ToString();
         ExternalSymbols["<equippeditem>"] = (player.EquippedItem?.Name ?? "NUL").WrapSingleQuotes();
         ExternalSymbols["<equippeditemuid>"] = player.EquippedItem?.UID.ToString() ?? "-1";

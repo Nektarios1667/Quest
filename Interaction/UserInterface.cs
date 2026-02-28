@@ -1,4 +1,5 @@
-﻿using Quest.Managers;
+﻿using HarfBuzzSharp;
+using Quest.Managers;
 using ScottPlot.Colormaps;
 using System;
 using System.Collections.Generic;
@@ -23,24 +24,24 @@ public partial class UserInterface
         Elements = elements ?? [];
         Batch = batch;
     }
-    public void Update()
+    public void Update(string? tag = null)
     {
         if (!IsEnabled || !IsVisible) return;
 
         foreach (var element in Elements.Values)
         {
-            if (element.IsVisible && element.IsEnabled)
+            if (element.IsVisible && element.IsEnabled && (tag == null || element.Tags.Contains(tag)))
                 element.Update(this);
         }
         Reload();
     }
-    public void Draw()
+    public void Draw(string? tag = null)
     {
         if (!IsVisible) return;
 
         foreach (var element in Elements.Values)
         {
-            if (element.IsVisible)
+            if (element.IsVisible && (tag == null || element.Tags.Contains(tag)))
                 element.Draw(this);
         }
     }
@@ -77,7 +78,7 @@ public partial class UserInterface
         Elements.Remove(name);
         SlotElements.Remove(name);
     }
-    public Dictionary<string, UIElement> GetElements() => Elements;
+    public Dictionary<string, UIElement> GetElements(string? tag = null) => tag == null ? Elements : Elements.Where(kv => kv.Value.Tags.Contains(tag)).ToDictionary(kv => kv.Key, kv => kv.Value);
     public Slot GetSlot(string name) => Elements[name] as Slot ?? throw new Exception($"Element '{name}' is not a Slot.");
     public Slot GetSlot(int idx) => GetSlot(SlotElements[idx]);
 

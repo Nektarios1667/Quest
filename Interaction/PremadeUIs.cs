@@ -40,6 +40,7 @@ public partial class UserInterface
             for (int x = 0; x < Chest.Size.X; x++)
             {
                 Slot slot = new(new(itemStart.X + (Slot.SlotSize.X + 4) * x, itemStart.Y - (Slot.SlotSize.Y + 4) * y));
+                if (y == 0) slot.Tag("hotbar");
                 InventoryUI.AddElement($"slot_{x + y * Chest.Size.X}", slot);
             }
         }
