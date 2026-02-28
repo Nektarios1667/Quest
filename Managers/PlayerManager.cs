@@ -172,7 +172,7 @@ public class PlayerManager
     public void CheckForLoot(GameManager gameManager)
     {
         // Check if can pick up and search
-        if (!Inventory.IsFull()) return;
+        if (Inventory.IsFull()) return;
         for (int l = 0; l < gameManager.LevelManager.Level.Loot.Count; l++)
         {
             Loot loot = gameManager.LevelManager.Level.Loot[l];
