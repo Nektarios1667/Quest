@@ -11,6 +11,7 @@ public class Slot : UIElement
 {
     public event Action? OnClicked;
     public event Action? OnDropped;
+    public event Action? OnHovered;
     public Rectangle Bounds { get; protected set; }
     public ButtonState State { get; protected set; } = ButtonState.Normal;
     public Item? Item { get; protected set; }
@@ -40,6 +41,7 @@ public class Slot : UIElement
             }
             else
             {
+                OnHovered?.Invoke();
                 State = ButtonState.Hovered;
             }
         }

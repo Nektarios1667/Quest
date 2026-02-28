@@ -19,6 +19,7 @@ public class PlayerManager
     public UserInterface InventoryUI { get; }
     public UserInterface? OpenedInterface { get; set; } = null;
     public int EquippedSlot { get; set; } = 0;
+    public Item? HoveredItem { get; private set; }
     public Item? EquippedItem => EquippedSlot >= 0 && EquippedSlot < Inventory.Items.Length ? Inventory.Items[EquippedSlot] : null;
     public (UserInterface ui, int idx)? MouseSelection { get; set; } // Item being moved with mouse and its original inventory
     // Position and collision
@@ -33,8 +34,10 @@ public class PlayerManager
         Inventory = new(new Item[6*4]);
         InventoryUI = UserInterface.InventoryUI;
         InventoryUI.BindContainer(Inventory);
+
         InventoryUI.OnSlotClick += SlotClicked;
         InventoryUI.OnSlotDrop += SlotDropped;
+        InventoryUI.OnSlotHover += SlotHovered;
 
         Inventory.SetSlot(0, new Item(ItemTypes.Apple, 1, "Green Apple"));
     }
@@ -330,6 +333,7 @@ public class PlayerManager
         OpenedInterface = ui;
         OpenedInterface.OnSlotClick += SlotClicked;
         OpenedInterface.OnSlotDrop += SlotDropped;
+        OpenedInterface.OnSlotHover += SlotHovered;
 
         StateManager.OverlayState = OverlayState.Container;
         SoundManager.PlaySound("Click");
@@ -340,6 +344,7 @@ public class PlayerManager
 
         OpenedInterface.OnSlotClick -= SlotClicked;
         OpenedInterface.OnSlotDrop -= SlotDropped;
+        OpenedInterface.OnSlotHover -= SlotHovered;
         OpenedInterface = null;
     }
     public void SlotClicked(int slot, UserInterface ui)
@@ -363,6 +368,11 @@ public class PlayerManager
 
         Game.LevelManager.Level.Loot.Add(new Loot(new(item.Type, item.Amount, item.CustomName), CameraManager.PlayerFoot + new Point(0, 20), Game.GameTime));
         ui.BoundContainer.SetSlot(slot, null);
+    }
+    public void SlotHovered(int slot, UserInterface ui)
+    {
+        Item? hovered = ui.BoundContainer?.Items[slot];
+        HoveredItem = hovered;
     }
     public void UpdatePositions(GameManager gameManager)
     {

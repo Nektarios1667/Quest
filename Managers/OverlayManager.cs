@@ -88,19 +88,38 @@ public class OverlayManager
             DrawMiniMap(device, gameManager);
 
         // Inventories
-        DebugManager.StartBenchmark("InventoryGuiDraw");
         if (playerManager != null)
+            DrawUI(gameManager, playerManager);
+
+    }
+    public void DrawUI(GameManager gameManager, PlayerManager playerManager)
+    {
+        DebugManager.StartBenchmark("InventoryGuiDraw");
+        
+        // Draw interfaces
+        playerManager.OpenedInterface?.Draw();
+        playerManager.InventoryUI.Draw(playerManager.InventoryOpen ? null : "hotbar");
+
+        // Draw gui mouse item
+        if (playerManager.InventoryOpen && playerManager.MouseSelection != null)
         {
-            playerManager.OpenedInterface?.Draw();
-            playerManager.InventoryUI.Draw(playerManager.InventoryOpen ? null : "hotbar");
-            // Draw gui mouse item
-            if (playerManager.InventoryOpen && playerManager.MouseSelection != null)
-            {
-                Item? item = playerManager.MouseSelection.Value.ui.BoundContainer?.Items[playerManager.MouseSelection.Value.idx];
-                if (item != null)
-                    DrawTexture(gameManager.Batch, item.Texture, InputManager.MousePosition - new Point(20, 20), scale: 2);
-            }
+            Item? item = playerManager.MouseSelection.Value.ui.BoundContainer?.Items[playerManager.MouseSelection.Value.idx];
+            if (item != null)
+                DrawTexture(gameManager.Batch, item.Texture, InputManager.MousePosition - new Point(20, 20), scale: 2);
         }
+
+        // Draw hover label
+        if (playerManager.HoveredItem != null)
+        {
+
+            string display = StringTools.FillCamelSpaces(playerManager.HoveredItem.Name);
+            Point textSize = PixelOperator.MeasureString(display).ToPoint();
+            Vector2 labelPos = InputManager.MousePosition.ToVector2() - new Vector2(0, 17);
+            FillRectangle(gameManager.Batch, labelPos.ToPoint() + new Point(4, -8), new Point(textSize.X + 4, 30), Color.Black * 0.7f);
+            gameManager.Batch.DrawRectangle(labelPos + new Vector2(2, -10), new Vector2(textSize.X + 8, 34), Color.Blue * 0.7f, 2);
+            gameManager.Batch.DrawString(PixelOperator, display, labelPos + new Vector2(8, -8), playerManager.HoveredItem.CustomName == null ? Color.White : Color.Cyan);
+        }
+
         DebugManager.EndBenchmark("InventoryGuiDraw");
     }
     public void DrawPostProcessing(GameManager gameManager, PlayerManager? playerManager)

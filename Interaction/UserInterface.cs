@@ -13,6 +13,7 @@ public partial class UserInterface
 {
     public event Action<int, UserInterface>? OnSlotClick;
     public event Action<int, UserInterface>? OnSlotDrop;
+    public event Action<int, UserInterface>? OnSlotHover;
     private List<string> SlotElements { get; set; } = [];
     public Container? BoundContainer { get; private set; }
     private Dictionary<string, UIElement> Elements { get; set; }
@@ -69,6 +70,7 @@ public partial class UserInterface
             SlotElements.Add(name);
             slot.OnClicked += () => OnSlotClick?.Invoke(SlotElements.IndexOf(name), this);
             slot.OnDropped += () => OnSlotDrop?.Invoke(SlotElements.IndexOf(name), this);
+            slot.OnHovered += () => OnSlotHover?.Invoke(SlotElements.IndexOf(name), this);
         }
 
         return true;
