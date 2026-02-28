@@ -82,7 +82,7 @@ public static class BinaryReaderExtensions
             texID = (ushort)TextureID.Null;
         }
         TextureID texture = (TextureID)texID;
-        return new NPC(gameManager.UIManager, texture, location, name, dialog, Color.White, scale);
+        return new NPC(gameManager.OverlayManager, texture, location, name, dialog, Color.White, scale);
     }
     public static float ReadByteFloat(this BinaryReader reader)
     {

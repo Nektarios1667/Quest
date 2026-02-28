@@ -4,7 +4,8 @@ namespace Quest.Managers;
 public class GameManager
 {
     public LevelManager LevelManager { get; private set; }
-    public OverlayManager UIManager { get; private set; }
+    public OverlayManager OverlayManager { get; private set; }
+    public MenuManager MenuManager { get; private set; }
     public float DeltaTime { get; private set; } = 0f;
     public float GameTime { get; set; } = 0f;
     public float TotalTime { get; private set; } = 0f;
@@ -12,12 +13,12 @@ public class GameManager
     public SpriteBatch Batch { get; private set; }
     public SpriteBatch MinimapBatch { get; private set; }
 
-    public GameManager(ContentManager content, SpriteBatch batch, LevelManager level, OverlayManager ui)
+    public GameManager(ContentManager content, SpriteBatch batch, LevelManager level, OverlayManager overlay)
     {
         Batch = batch;
         MinimapBatch = new SpriteBatch(batch.GraphicsDevice);
         LevelManager = level;
-        UIManager = ui;
+        OverlayManager = overlay;
 
         // Load sounds
         SoundManager.LoadSound(content, "Footstep", "Sounds/Effects/Footstep");
@@ -35,13 +36,21 @@ public class GameManager
     {
         TotalTime += deltaTime;
 
-        // Pause
-        if (InputManager.KeyPressed(Keys.Escape) && StateManager.State == GameState.Game)
+        // Escape button
+        if (InputManager.KeyPressed(Keys.Escape))
         {
-            if (StateManager.OverlayState == OverlayState.None)
-                StateManager.OverlayState = OverlayState.Pause;
-            else if (StateManager.OverlayState == OverlayState.Pause)
+            // Close jukebox
+            if (StateManager.OverlayState == OverlayState.Jukebox)
                 StateManager.OverlayState = OverlayState.None;
+            // Pause/unpause
+            else if (StateManager.State == GameState.Game)
+            {
+                if (StateManager.OverlayState == OverlayState.None)
+                    StateManager.OverlayState = OverlayState.Pause;
+                else if (StateManager.OverlayState == OverlayState.Pause)
+                    StateManager.OverlayState = OverlayState.None;
+            }
+            
         }
 
         // Time
@@ -62,7 +71,7 @@ public class GameManager
         LevelManager.ReadLevel(this, level, reload: true);
         LevelManager.LoadLevel(this, level);
 
-        UIManager.HealthBar.CurrentValue = UIManager.HealthBar.MaxValue;
+        OverlayManager.HealthBar.CurrentValue = OverlayManager.HealthBar.MaxValue;
         //PlayerManager.Inventory = new(6, 4);
 
         CameraManager.Camera = LevelManager.Level.Spawn.ToVector2();

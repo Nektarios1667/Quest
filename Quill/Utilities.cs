@@ -28,4 +28,33 @@ public static class Utilities
 
         return dict;
     }
+    public static string ItemNamesQist(Item?[] items, int width)
+    {
+        StringBuilder sb = new();
+        for (int i = 0; i < items.Length; i++)
+        {
+            Item? item = items[i];
+            sb.Append(item?.Name ?? "NUL");
+
+            if (i % width == width - 1)
+                sb.Append('/');
+            else if (i != items.Length - 1)
+                sb.Append(';');
+        }
+        return sb.ToString();
+    }
+    public static string ItemAmountsQist(Item?[] items, int width)
+    {
+        StringBuilder sb = new();
+        for (int i = 0; i < items.Length; i++)
+        {
+            Item? item = items[i];
+            sb.Append(item?.Amount.ToString() ?? "0");
+            if (i % width == width - 1)
+                sb.Append('/');
+            else if (i != items.Length - 1)
+                sb.Append(';');
+        }
+        return sb.ToString();
+    }
 }

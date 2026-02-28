@@ -27,9 +27,9 @@ public class Door : Tile
             if (Key != null && ConsumeKey)
             {
                 player.Inventory.Consume(Key);
-                game.UIManager.Notification($"-{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
+                game.OverlayManager.Notification($"-{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
             } else if (Key != null)
-                game.UIManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Gray, 2);
+                game.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Gray, 2);
 
             SoundManager.PlaySoundInstance("DoorUnlock");
             Open(game);
@@ -37,7 +37,7 @@ public class Door : Tile
         else
         {
             // Notif
-            game.UIManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)} needed to unlock", Color.Red, 5);
+            game.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)} needed to unlock", Color.Red, 5);
 
             // Sound fx
             string timerName = $"DoorLocked_{X + Y * Constants.MapSize.X}";

@@ -28,6 +28,7 @@ public enum OverlayState
 {
     None,
     Container,
+    Jukebox,
     Pause,
 }
 public enum Mood
@@ -142,8 +143,8 @@ public static class StateManager
             writer.Write(CameraManager.CameraDest.X);
             writer.Write(CameraManager.CameraDest.Y);
             // Write PlayerManager data
-            writer.Write((byte)gameManager.UIManager.HealthBar.CurrentValue);
-            writer.Write((byte)gameManager.UIManager.HealthBar.MaxValue);
+            writer.Write((byte)gameManager.OverlayManager.HealthBar.CurrentValue);
+            writer.Write((byte)gameManager.OverlayManager.HealthBar.MaxValue);
             // Level specific data
             // All of the levels with extra data
             string[] levels = new[] {
@@ -186,11 +187,11 @@ public static class StateManager
                     writer.Write((ushort)0);
             }
 
-            // Write Inventory data
-            var inventory = playerManager.Inventory;
-            for (int y = 0; y < inventory.Items.GetLength(1); y++)
-                for (int x = 0; x < inventory.Items.GetLength(0); x++)
-                    WriteItemData(writer, inventory.Items[x, y]);
+            // Write Inventory data TODO
+            //var inventory = playerManager.Inventory;
+            //for (int y = 0; y < inventory.Items.GetLength(1); y++)
+            //    for (int x = 0; x < inventory.Items.GetLength(0); x++)
+            //        WriteItemData(writer, inventory.Items[x, y]);
             writer.Flush();
             data = ms.ToArray();
         }
@@ -202,7 +203,7 @@ public static class StateManager
         if (Constants.DEVMODE)
             File.Copy($"GameData/Worlds/{CurrentSave.WorldName}/saves/{CurrentSave.LevelName}.qsv", $"../../../GameData/Worlds/{CurrentSave.WorldName}/saves/{CurrentSave.LevelName}.qsv", true);
 
-        gameManager.UIManager.LootNotifications.AddNotification($"Game Saved", Color.Cyan);
+        gameManager.OverlayManager.LootNotifications.AddNotification($"Game Saved", Color.Cyan);
         Logger.System($"Saved game state to '{CurrentSave.LevelName}.qsv'.");
     }
     public static bool ReadGameState(GameManager gameManager, PlayerManager playerManager, string save)
@@ -235,8 +236,8 @@ public static class StateManager
             CameraManager.Camera = CameraManager.CameraDest;
             CameraManager.Update(0); // In bounds check
             // Read PlayerManager data
-            gameManager.UIManager.HealthBar.CurrentValue = reader.ReadByte();
-            gameManager.UIManager.HealthBar.MaxValue = reader.ReadByte();
+            gameManager.OverlayManager.HealthBar.CurrentValue = reader.ReadByte();
+            gameManager.OverlayManager.HealthBar.MaxValue = reader.ReadByte();
             // Read LevelManager data
             // Levels
             byte levelCount = reader.ReadByte();
@@ -265,18 +266,18 @@ public static class StateManager
             }
 
 
-            // Read Inventory data
-            for (int y = 0; y < playerManager.Inventory.Items.GetLength(1); y++)
-            {
-                for (int x = 0; x < playerManager.Inventory.Items.GetLength(0); x++)
-                {
-                    var item = ReadItemData(reader);
-                    playerManager.Inventory.SetSlot(x, y, item);
-                }
-            }
+            // Read Inventory data TODO
+            //for (int y = 0; y < playerManager.Inventory.Items.GetLength(1); y++)
+            //{
+            //    for (int x = 0; x < playerManager.Inventory.Items.GetLength(0); x++)
+            //    {
+            //        var item = ReadItemData(reader);
+            //        playerManager.Inventory.SetSlot(x, y, item);
+            //    }
+            //}
         }
 
-        gameManager.UIManager.LootNotifications.AddNotification($"Save Loaded", Color.Cyan);
+        gameManager.OverlayManager.LootNotifications.AddNotification($"Save Loaded", Color.Cyan);
         Logger.System("Loaded game state from save.qsv.");
         return true;
     }
@@ -290,9 +291,8 @@ public static class StateManager
         writer.Write(chest.TileID); // TileID - ushort
         writer.Write(chest.Generated); // IsGenerated - bool
         if (chest.Generated)
-            for (int y = 0; y < chest.Items!.GetLength(1); y++)
-                for (int x = 0; x < chest.Items!.GetLength(0); x++)
-                    WriteItemData(writer, chest.Items![x, y]);
+            foreach (Item? item in chest.Items!)
+                WriteItemData(writer, item);
         else
         {
             writer.Write(chest.Seed); // int (4 bytes)
@@ -309,7 +309,7 @@ public static class StateManager
             {
                 chest.SetEmpty();
                 for (int s = 0; s < Chest.Size.X * Chest.Size.Y; s++)
-                    chest.Items![s % Chest.Size.X, s / Chest.Size.X] = ReadItemData(reader);
+                    chest.Items![s] = ReadItemData(reader);
             }
             else
             {

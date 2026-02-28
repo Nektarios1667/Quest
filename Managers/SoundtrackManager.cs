@@ -2,63 +2,111 @@
 using System.Linq;
 
 namespace Quest.Managers;
-public class Soundtrack(string file, Mood mood)
+public enum Soundtracks
 {
-    public string File { get; } = file;
+    CavesOfDawn,
+    Clouds,
+    SacredGarden,
+    NightmareAlley,
+    TerrorHeights,
+    Pulse,
+    Beauty,
+    WanderingWind,
+    Mystical,
+    DuskToDawn,
+    Maps,
+    OldDevil,
+}
+public class Soundtrack(Soundtracks track, Mood mood)
+{
+    public Soundtracks Track { get; } = track;
     public Mood Mood { get; } = mood;
 }
 public static class SoundtrackManager
 {
-    public static Soundtrack? Playing { get; private set; }
-    private static Soundtrack[] Soundtracks { get; set; } = [];
-    private static Dictionary<Mood, Soundtrack[]> SoundtrackCategories { get; set; } = [];
+    // Events
+    public static event Action<Soundtracks?>? SoundtrackChanged;
+    //
+    public static Soundtracks? Playing { get; private set; }
+    private static Dictionary<Mood, Soundtracks[]> Tracks { get; set; } = [];
+    private static readonly Timer PlayNextSong = TimerManager.SetTimer("PlayNextSong", RandomManager.RandomIntRange(300, 600), () => playSong = true, repetitions:int.MaxValue);
+    private static bool playSong = false;
     public static void LoadSoundtracks(ContentManager content)
     {
-        // Setup music
-        SoundManager.MusicVolume = 0f;
 
-        // Load soundtrack objects
-        Soundtracks = [
-            new("CavesOfDawn", Mood.Dark),
-            new("Clouds", Mood.Calm),
-            new("SacredGarden", Mood.Calm),
-            new("NightmareAlley", Mood.Dark),
-            new("TerrorHeights", Mood.Dark),
-            new("Pulse", Mood.Dark),
-            new("Beauty", Mood.Calm),
-            new("WanderingWind", Mood.Dark),
-            new("Mystical", Mood.Calm)
-        ];
+        // Soundtracks and their categories
+        Tracks = new()
+        {
+            { Mood.Dark, [
+                Soundtracks.CavesOfDawn,
+                Soundtracks.NightmareAlley,
+                Soundtracks.TerrorHeights,
+                Soundtracks.Pulse,
+                Soundtracks.WanderingWind,
+            ]},
+            { Mood.Calm, [
+                Soundtracks.Clouds,
+                Soundtracks.SacredGarden,
+                Soundtracks.Mystical,
+            ]},
+            { Mood.Epic, [
+                Soundtracks.DuskToDawn,
+                Soundtracks.Maps,
+                Soundtracks.OldDevil,
+            ]},
+        };
 
         // Load sound files
-        foreach (Soundtrack soundtrack in Soundtracks)
+        foreach (string soundtrack in Enum.GetNames(typeof(Soundtracks)))
         {
             // Load the soundtrack file
-            string path = $"Sounds/Music/{soundtrack.File}";
-            SoundManager.LoadSong(content, soundtrack.File, path);
-            Logger.System($"Loaded soundtrack '{soundtrack.File}' with mood '{soundtrack.Mood}'");
+            string path = $"Sounds/Music/{soundtrack}";
+            try
+            {
+                SoundManager.LoadSong(content, soundtrack, path);
+                Logger.System($"Loaded soundtrack '{soundtrack}'");
+            }
+            catch
+            {
+                Logger.Error($"Failed to load soundtrack '{soundtrack}'");
+            }
         }
-
-        // Categorize
-        foreach (Mood mood in Enum.GetValues<Mood>())
-            SoundtrackCategories[mood] = Soundtracks.Where(s => s.Mood == mood).ToArray();
     }
     public static void Update()
     {
-        if (!SoundManager.IsMusicPlaying)
+        if (!SoundManager.IsMusicPlaying && playSong)
         {
-            Soundtrack soundtrack = GetRandomSoundtrack(StateManager.Mood);
-            SoundManager.PlayMusic(soundtrack.File);
+            Soundtracks? soundtrack = GetRandomSoundtrack(StateManager.Mood);
+            if (soundtrack != null && SoundManager.TryPlayMusic(soundtrack.ToString()!))
+                SoundtrackChanged?.Invoke(soundtrack.Value);
             Playing = soundtrack;
+            playSong = false;
         }
     }
-    public static Soundtrack GetRandomSoundtrack(Mood mood)
+    public static Soundtracks? GetRandomSoundtrack(Mood mood)
     {
-        if (SoundtrackCategories.TryGetValue(mood, out var soundtracks) && soundtracks.Length > 0)
-        {
+        if (Tracks.TryGetValue(mood, out var soundtracks) && soundtracks.Length > 0)
             return soundtracks[new Random().Next(soundtracks.Length)];
+
+        Logger.Error($"No soundtracks found for mood '{mood}'");
+        return null;
+    }
+    public static bool PlaySoundtrack(Soundtracks? soundtrack)
+    {
+        if (soundtrack != null && SoundManager.TryPlayMusic(soundtrack.ToString()!))
+        {
+            PlayNextSong.Left = 600 + RandomManager.RandomIntRange(300, 600); // 600 buffer for current track
+            Playing = soundtrack;
+            SoundtrackChanged?.Invoke(soundtrack.Value);
+            return true;
+        } else if (soundtrack == null)
+        {
+            SoundtrackChanged?.Invoke(null);
+            Playing = null;
+            PlayNextSong.Left = RandomManager.RandomIntRange(300, 600);
+            SoundManager.StopMusic();
         }
-        Logger.Error($"No soundtracks found for mood: {mood}");
-        return Soundtracks[0];
+
+        return false;
     }
 }

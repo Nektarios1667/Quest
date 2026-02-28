@@ -1,5 +1,6 @@
 ﻿using HarfBuzzSharp;
 using NCalc;
+using Quest.Interaction;
 using Quest.Quill.Functions;
 using SharpDX.Direct2D1;
 using System.Linq;
@@ -121,8 +122,8 @@ public static partial class Interpreter
         ExternalSymbols["<playercoord_x>"] = CameraManager.TileCoord.X.ToString();
         ExternalSymbols["<playercoord_y>"] = CameraManager.TileCoord.Y.ToString();
         ExternalSymbols["<playercoord>"] = $"{CameraManager.TileCoord.X};{CameraManager.TileCoord.Y}";
-        ExternalSymbols["<playerhealth>"] = game.UIManager.HealthBar.CurrentValue.ToString();
-        ExternalSymbols["<playermaxhealth>"] = game.UIManager.HealthBar.MaxValue.ToString();
+        ExternalSymbols["<playerhealth>"] = game.OverlayManager.HealthBar.CurrentValue.ToString();
+        ExternalSymbols["<playermaxhealth>"] = game.OverlayManager.HealthBar.MaxValue.ToString();
         ExternalSymbols["<playerspeed>"] = Constants.PlayerSpeed.ToString();
         ExternalSymbols["<isstuck>"] = (!(player.TileBelow?.Type.IsWalkable ?? true)).ToString().ToLower();
         ExternalSymbols["<tilebelow>"] = player.TileBelow?.Type.Texture.ToString() ?? "NUL";
@@ -140,16 +141,17 @@ public static partial class Interpreter
         ExternalSymbols["<totaltime>"] = game.TotalTime.ToString();
         ExternalSymbols["<gamestate>"] = StateManager.State.ToString().WrapSingleQuotes();
         // Inventory
-        ExternalSymbols["<inventoryitems>"] = player.Inventory.GetItemsString().WrapSingleQuotes();
-        ExternalSymbols["<inventoryamounts>"] = player.Inventory.GetItemsAmountString().WrapSingleQuotes();
-        ExternalSymbols["<inventorysize_x>"] = player.Inventory.Width.ToString();
-        ExternalSymbols["<inventorysize_y>"] = player.Inventory.Height.ToString();
-        ExternalSymbols["<inventorysize>"] = $"{player.Inventory.Width};{player.Inventory.Height}";
-        ExternalSymbols["<isinventoryopen>"] = player.Inventory.Opened.ToString();
-        ExternalSymbols["<equippedslot>"] = player.Inventory.EquippedSlot.ToString();
-        ExternalSymbols["<equippeditem>"] = (player.Inventory.Equipped?.Name ?? "NUL").WrapSingleQuotes();
-        ExternalSymbols["<equippeditemuid>"] = player.Inventory.Equipped?.UID.ToString() ?? "-1";
-        ExternalSymbols["<equippeditemamount>"] = player.Inventory.Equipped?.Amount.ToString() ?? "0";
+        // TODO
+        ExternalSymbols["<inventoryitems>"] = Utilities.ItemNamesQist(player.Inventory.Items, Chest.Size.X).WrapSingleQuotes();
+        ExternalSymbols["<inventoryamounts>"] = Utilities.ItemAmountsQist(player.Inventory.Items, Chest.Size.X).WrapSingleQuotes();
+        ExternalSymbols["<inventorysize_x>"] = Chest.Size.X.ToString();
+        ExternalSymbols["<inventorysize_y>"] = Chest.Size.Y.ToString();
+        ExternalSymbols["<inventorysize>"] = $"{Chest.Size.X};{Chest.Size.Y}";
+        ExternalSymbols["<isinventoryopen>"] = player.Inventory.IsOpened.ToString();
+        ExternalSymbols["<equippedslot>"] = player.EquippedSlot.ToString();
+        ExternalSymbols["<equippeditem>"] = (player.EquippedItem?.Name ?? "NUL").WrapSingleQuotes();
+        ExternalSymbols["<equippeditemuid>"] = player.EquippedItem?.UID.ToString() ?? "-1";
+        ExternalSymbols["<equippeditemamount>"] = player.EquippedItem?.Amount.ToString() ?? "0";
         // Technical
         ExternalSymbols["<ready>"] = "true";
         ExternalSymbols["<time>"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();

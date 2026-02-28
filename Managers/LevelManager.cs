@@ -176,7 +176,7 @@ public class LevelManager
         Level = Levels[levelIndex];
 
         // MiniMap
-        gameManager.UIManager.RefreshMiniMap();
+        gameManager.OverlayManager.RefreshMiniMap();
 
         // Close old QuillSciprs
         Interpreter.ClearScripts();
@@ -220,7 +220,7 @@ public class LevelManager
         Level = level;
 
         // MiniMap
-        gameManager.UIManager.RefreshMiniMap();
+        gameManager.OverlayManager.RefreshMiniMap();
 
         // Spawn
         CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
@@ -375,7 +375,7 @@ public class LevelManager
             // Scripts
             if (flags.HasFlag(LevelFeatures.QuillScripts))
             {
-                Directory.CreateDirectory("GameData/Worlds/{levelPath.WorldName}/scripts");
+                Directory.CreateDirectory($"GameData/Worlds/{levelPath.WorldName}/scripts");
                 byte scriptCount = reader.ReadByte();
                 for (int s = 0; s < scriptCount; s++)
                 {
@@ -428,11 +428,9 @@ public class LevelManager
             TileTypeID.Door => ReadDoor(loc),
             TileTypeID.Chest => ReadChest(loc),
             TileTypeID.Lamp => new Lamp(loc, reader.ReadByte()),
-            _ => new Tile(loc, type),
+            _ => TileFromId(type, loc),
         };
     }
-
-    public static Tile TileFromId(int id, ByteCoord location) => TileFromId(id, location);
     public static Tile TileFromId(int id, Point location)
     {
         // Create a tile from an id
@@ -443,6 +441,7 @@ public class LevelManager
             TileTypeID.Door => new Door(location, null),
             TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, "_"),
             TileTypeID.Lamp => new Lamp(location),
+            TileTypeID.Jukebox => new Jukebox(location),
             _ => new(location, type)
         };
     }
@@ -533,7 +532,7 @@ public class LevelManager
     public void DropLoot(GameManager gameManager, Loot loot)
     {
         Level.Loot.Add(loot);
-        gameManager.UIManager.LootNotifications.AddNotification($"-{loot.DisplayName}");
+        gameManager.OverlayManager.LootNotifications.AddNotification($"-{loot.DisplayName}");
     }
     public static Point TileCoord(Vector2 loc) => new((int)(loc.X / Constants.TileSize.X), (int)(loc.Y / Constants.TileSize.Y));
     public static Vector2 WorldCoord(Point tileCoord) => new(tileCoord.X * Constants.TileSize.X, tileCoord.Y * Constants.TileSize.Y);

@@ -6,9 +6,9 @@ using System.Linq;
 namespace Quest.Editor;
 public static class CodeGenerator
 {
-    private const string tileCodeTemplate = "namespace Quest.Tiles;\r\n\r\npublic class $name : Tile\r\n{\r\n    public $name(Point location) : base(location, TileTypes.$name) { }\r\n}\r\n";
+    private const string tileCodeTemplate = "namespace Quest.Tiles;\r\n\r\npublic class $name : Tile\r\n{\r\n    public $name(Point location) : base(location, TileTypeID.$name) { }\r\n}\r\n";
     private const string decalCodeTemplate = "namespace Quest.Decals;\r\npublic class $name(Point location) : Decal(location) {}\r\n";
-    private const string itemCodeTemplate = "namespace Quest.Items;\r\npublic class $name : Item\r\n{\r\n    public $name(int amount) : base(amount)\r\n    {\r\n        MaxAmount = $maxamount;\r\n        Description = \"$description\";\r\n    }\r\n}\r\n";
+    private const string itemCodeTemplate = "namespace Quest.Items;\r\npublic class $name : Item\r\n{\r\n    public $name(int amount) : base(ItemTypes.$name, amount)\r\n    {}\r\n}\r\n";
 
     private static string textureManagerSource = "";
     private static string levelManagerSource = "";
@@ -182,7 +182,7 @@ public static class CodeGenerator
         if (name == null || maxAmount == null || description == null) return;
 
         // Source code
-        string classSource = itemCodeTemplate.Replace("$name", name).Replace("$maxamount", maxAmount).Replace("$description", description);
+        string classSource = itemCodeTemplate.Replace("$name", name);
         File.WriteAllText($"{sourceDirectory}/Items/{name}.cs", classSource);
 
         // TextureManager TextureID enum

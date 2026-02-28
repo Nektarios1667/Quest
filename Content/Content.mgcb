@@ -55,6 +55,13 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/PixelOperatorLarge.spritefont
 
+#begin Fonts/PixelOperatorSmall.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/PixelOperatorSmall.spritefont
+
 #begin Fonts/PixelOperatorSubtitle.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -81,18 +88,6 @@
 /processorParam:TextureFormat=Color
 /build:Images/Characters/BlueMage.png
 
-#begin Images/Characters/BlueMage.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Characters/BlueMage.png
-
 #begin Images/Characters/CyanVillager.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -104,30 +99,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Characters/CyanVillager.png
-
-#begin Images/Characters/CyanVillager.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Characters/CyanVillager.png
-
-#begin Images/Characters/DarkGuard.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Characters/DarkGuard.png
 
 #begin Images/Characters/DarkGuard.png
 /importer:TextureImporter
@@ -153,18 +124,6 @@
 /processorParam:TextureFormat=Color
 /build:Images/Characters/Ghost.png
 
-#begin Images/Characters/Ghost.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Characters/Ghost.png
-
 #begin Images/Characters/GrayMage.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -176,30 +135,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Characters/GrayMage.png
-
-#begin Images/Characters/GrayMage.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Characters/GrayMage.png
-
-#begin Images/Characters/GreenVillager.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Characters/GreenVillager.png
 
 #begin Images/Characters/GreenVillager.png
 /importer:TextureImporter
@@ -225,18 +160,6 @@
 /processorParam:TextureFormat=Color
 /build:Images/Characters/Guard.png
 
-#begin Images/Characters/Guard.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Characters/Guard.png
-
 #begin Images/Characters/GuardLeader.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -248,30 +171,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Characters/GuardLeader.png
-
-#begin Images/Characters/GuardLeader.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Characters/GuardLeader.png
-
-#begin Images/Characters/Miner.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Characters/Miner.png
 
 #begin Images/Characters/Miner.png
 /importer:TextureImporter
@@ -333,30 +232,6 @@
 /processorParam:TextureFormat=Color
 /build:Images/Characters/PurpleWizard.png
 
-#begin Images/Characters/PurpleWizard.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Characters/PurpleWizard.png
-
-#begin Images/Characters/RedVillager.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Characters/RedVillager.png
-
 #begin Images/Characters/RedVillager.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -380,30 +255,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Characters/WhiteMage.png
-
-#begin Images/Characters/WhiteMage.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Characters/WhiteMage.png
-
-#begin Images/Characters/WhiteWizard.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Characters/WhiteWizard.png
 
 #begin Images/Characters/WhiteWizard.png
 /importer:TextureImporter
@@ -1029,6 +880,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/DiamondSword.png
 
+#begin Images/Items/Disc.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/Disc.png
+
 #begin Images/Items/EmeraldKey.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1437,6 +1300,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Tiles/IronWall.png
 
+#begin Images/Tiles/Jukebox.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Tiles/Jukebox.png
+
 #begin Images/Tiles/Lamp.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1827,6 +1702,18 @@
 /processorParam:Quality=Best
 /build:Sounds/Music/Clouds.mp3
 
+#begin Sounds/Music/DuskToDawn.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/DuskToDawn.mp3
+
+#begin Sounds/Music/Maps.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/Maps.mp3
+
 #begin Sounds/Music/Mystical.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
@@ -1838,6 +1725,12 @@
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:Sounds/Music/NightmareAlley.mp3
+
+#begin Sounds/Music/OldDevil.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/OldDevil.mp3
 
 #begin Sounds/Music/Pulse.mp3
 /importer:Mp3Importer

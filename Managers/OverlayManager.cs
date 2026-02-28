@@ -4,7 +4,7 @@ namespace Quest.Managers;
 
 public class OverlayManager
 {
-    public Gui.Gui Gui { get; private set; } // GUI handler
+    public Gui.Overlay Gui { get; private set; } // GUI handler
     public NotificationArea LootNotifications { get; private set; } // Loot pickup notifications
     public StatusBar HealthBar { get; private set; }
     public static readonly Point lootStackOffset = new(4, 4);
@@ -43,13 +43,14 @@ public class OverlayManager
                     return;
                 }
         }
-        if (playerManager != null)
-        {
-            playerManager.Inventory.EquippedItemChanged += (oldItem, newItem) => CheckUpdateLighting(oldItem, newItem);
-            playerManager.Inventory.ItemDropped += (item) => CheckUpdateLighting(item);
-            playerManager.Inventory.ItemAdded += (item) => MarkUpdateLighting();
+        // TODO
+        //if (playerManager != null)
+        //{
+        //    playerManager.EquippedItemItemChanged += (oldItem, newItem) => CheckUpdateLighting(oldItem, newItem);
+        //    playerManager.Inventory.ItemDropped += (item) => CheckUpdateLighting(item);
+        //    playerManager.Inventory.ItemAdded += (item) => MarkUpdateLighting();
 
-        }
+        //}
         TimerManager.SetTimer("LightingUpdate", 1f, MarkUpdateLighting, int.MaxValue);
         CameraManager.TileChange += (_, _) => MarkUpdateLighting();
         CameraManager.CameraMove += (_, newCam) =>
@@ -90,8 +91,15 @@ public class OverlayManager
         DebugManager.StartBenchmark("InventoryGuiDraw");
         if (playerManager != null)
         {
-            playerManager.ContainerInventory.Draw(gameManager, playerManager);
-            playerManager.Inventory.Draw(gameManager, playerManager);
+            playerManager.OpenedInterface?.Draw();
+            playerManager.Inventory.Draw();
+            // Draw gui mouse item
+            if (playerManager.Inventory.IsOpened && playerManager.MouseSlot != null)
+            {
+                Item? item = playerManager.MouseSlot.Item;
+                if (item != null)
+                    DrawTexture(gameManager.Batch, item.Texture, InputManager.MousePosition - new Point(20, 20), scale: 2);
+            }
         }
         DebugManager.EndBenchmark("InventoryGuiDraw");
     }

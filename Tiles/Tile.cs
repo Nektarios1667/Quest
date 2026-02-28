@@ -41,6 +41,7 @@ public enum TileTypeID : byte
     Lamp,
     Sandstone,
     SandstoneWall,
+    Jukebox,
     // TILES ID
 }
 
@@ -100,6 +101,7 @@ public static class TileTypes
         new(TileTypeID.Lamp, TextureID.Lamp, true, false),
         new(TileTypeID.Sandstone, TextureID.Sandstone, true, false),
         new(TileTypeID.SandstoneWall, TextureID.SandstoneWall, false, true),
+        new(TileTypeID.Jukebox, TextureID.Jukebox, false, false),
         // TILES REGISTER
     ];
 }

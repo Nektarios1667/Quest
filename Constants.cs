@@ -111,6 +111,7 @@ public static class Constants
         new(247, 255, 199), // Lamp
         new(225, 180, 0), // Sandstone
         new(255, 255, 90), // SandstoneWall
+        new(237, 103, 19), // Jukebox
         // MINIMAPCOLORS
     ];
 }

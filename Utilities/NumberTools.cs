@@ -44,3 +44,11 @@ public static class NumberTools
         ];
     }
 }
+
+public static class IntExtensions
+{
+    public static byte ToByte(this int num)
+    {
+        return (byte)Math.Clamp(num, byte.MinValue, byte.MaxValue);
+    }
+}

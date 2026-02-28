@@ -74,6 +74,7 @@ public static class TextureManager
         BottledWater,
         BottledCloud,
         BottledStorm,
+        Disc,
         // ITEMS ENUM INSERT
         Dirt,
         Flooring,
@@ -112,6 +113,7 @@ public static class TextureManager
         Lamp,
         Sandstone,
         SandstoneWall,
+        Jukebox,
         // TILES ENUM INSERT
         Torch,
         BlueTorch,
@@ -150,6 +152,7 @@ public static class TextureManager
     private static Texture2D Pixel { get; set; } = null!;
     // Fonts
     public static SpriteFont PixelOperator { get; private set; } = null!;
+    public static SpriteFont PixelOperatorSmall { get; private set; } = null!;
     public static Point PixelOperatorCharSize { get; private set; }
     public static SpriteFont PixelOperatorLarge { get; private set; } = null!;
     public static SpriteFont PixelOperatorBold { get; private set; } = null!;
@@ -223,6 +226,7 @@ public static class TextureManager
         Textures[TextureID.BottledWater] = content.Load<Texture2D>("Images/Items/BottledWater");
         Textures[TextureID.BottledCloud] = content.Load<Texture2D>("Images/Items/BottledCloud");
         Textures[TextureID.BottledStorm] = content.Load<Texture2D>("Images/Items/BottledStorm");
+        Textures[TextureID.Disc] = content.Load<Texture2D>("Images/Items/Disc");
         // ITEMS INSERT
         Textures[TextureID.Dirt] = content.Load<Texture2D>("Images/Tiles/Dirt");
         Textures[TextureID.Flooring] = content.Load<Texture2D>("Images/Tiles/Flooring");
@@ -262,6 +266,7 @@ public static class TextureManager
         Textures[TextureID.Lamp] = content.Load<Texture2D>("Images/Tiles/Lamp");
         Textures[TextureID.Sandstone] = content.Load<Texture2D>("Images/Tiles/Sandstone");
         Textures[TextureID.SandstoneWall] = content.Load<Texture2D>("Images/Tiles/SandstoneWall");
+        Textures[TextureID.Jukebox] = content.Load<Texture2D>("Images/Tiles/Jukebox");
         // TILES INSERT
         Textures[TextureID.Torch] = content.Load<Texture2D>("Images/Decals/Torch");
         Textures[TextureID.BlueTorch] = content.Load<Texture2D>("Images/Decals/BlueTorch");
@@ -362,6 +367,7 @@ public static class TextureManager
         Metadata[TextureID.BottledWater] = new(Textures[TextureID.BottledWater].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.BottledCloud] = new(Textures[TextureID.BottledCloud].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.BottledStorm] = new(Textures[TextureID.BottledStorm].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Disc] = new(Textures[TextureID.Disc].Bounds.Size, new(1, 1), "item");
         // ITEMS METADATA INSERT
         Metadata[TextureID.Dirt] = new(Textures[TextureID.Dirt].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Flooring] = new(Textures[TextureID.Flooring].Bounds.Size, new(4, 4), "tile");
@@ -401,6 +407,7 @@ public static class TextureManager
         Metadata[TextureID.Lamp] = new(Textures[TextureID.Lamp].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Sandstone] = new(Textures[TextureID.Sandstone].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.SandstoneWall] = new(Textures[TextureID.SandstoneWall].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.Jukebox] = new(Textures[TextureID.Jukebox].Bounds.Size, new(4, 4), "tile");
         // TILES METADATA INSERT
         Metadata[TextureID.Torch] = new(Textures[TextureID.Torch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), "decal");
@@ -446,6 +453,7 @@ public static class TextureManager
         PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");
         PixelOperator.LineSpacing -= 8;
         PixelOperator.Spacing = -2;
+        PixelOperatorSmall = Content.Load<SpriteFont>("Fonts/PixelOperatorSmall");
         PixelOperatorCharSize = PixelOperator.MeasureString("#").ToPoint();
         PixelOperatorLarge = Content.Load<SpriteFont>("Fonts/PixelOperatorLarge");
         PixelOperatorBold = Content.Load<SpriteFont>("Fonts/PixelOperatorBold");
@@ -498,7 +506,7 @@ public static class TextureManager
         // Get the texture ID from the content manager
         if (!Metadata.TryGetValue(texture, out Metadata? meta))
         {
-            Logger.Error($"TextureManager.Metadata for texture '{texture}' not found.");
+            Logger.Error($"Metadata for texture '{texture}' not found.");
             return new(0, 0, 64, 64);
         }
 

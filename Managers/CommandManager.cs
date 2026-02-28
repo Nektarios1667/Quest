@@ -202,8 +202,8 @@ public static class CommandManager
     private static bool CHealth(string command)
     {
         string[] parts = command.Split(' ');
-        if (parts[1] == "set") { gameManager!.UIManager.HealthBar.CurrentValue = int.Parse(parts[2]); return true; }
-        if (parts[1] == "change") { gameManager!.UIManager.HealthBar.CurrentValue += int.Parse(parts[2]); return true; }
+        if (parts[1] == "set") { gameManager!.OverlayManager.HealthBar.CurrentValue = int.Parse(parts[2]); return true; }
+        if (parts[1] == "change") { gameManager!.OverlayManager.HealthBar.CurrentValue += int.Parse(parts[2]); return true; }
         return false;
     }
     private static bool CMoveSpeed(string command)
@@ -316,8 +316,8 @@ public static class CommandManager
         int quantity = int.Parse(parts[2]);
         var item = Item.ItemFromName(itemName, quantity);
         if (item == null) return false;
-        (bool success, Item leftover) = playerManager!.Inventory.AddItem(item);
-        if (!success)
+        Item leftover = playerManager!.Inventory.AddItem(item);
+        if (leftover.Amount > 0)
             levelManager!.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), CameraManager.PlayerFoot, gameManager!.GameTime));
         return true;
     }
@@ -329,7 +329,7 @@ public static class CommandManager
         int b = int.Parse(parts[3]);
         decimal duration = decimal.Parse(parts[4]);
         string message = string.Join(' ', parts[5..]);
-        gameManager!.UIManager.LootNotifications.AddNotification(message, color:new(r, g, b), (float)duration);
+        gameManager!.OverlayManager.LootNotifications.AddNotification(message, color:new(r, g, b), (float)duration);
         return true;
     }
 }

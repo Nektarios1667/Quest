@@ -1,0 +1,25 @@
+﻿// Item label
+Point hoverCoord = Expand(HoverSlot);
+if (Opened && hoverCoord.X != -1 && Items[hoverCoord.X, hoverCoord.Y] is Item hovered)
+{
+    string display = StringTools.FillCamelSpaces(hovered.Name);
+    Point textSize = PixelOperator.MeasureString(display).ToPoint();
+    Vector2 labelPos = new(itemStart.X + (Slot.SlotSize.X - textSize.X) / 2 + (Slot.SlotSize.X + 4) * hoverCoord.X - 4, slotHitboxes[hoverCoord.X, hoverCoord.Y].Y - textSize.Y / 2);
+    FillRectangle(gameManager.Batch, labelPos.ToPoint() + new Point(4, -8), new Point(textSize.X + 4, 30), Color.Black * 0.7f);
+    gameManager.Batch.DrawRectangle(labelPos + new Vector2(2, -10), new Vector2(textSize.X + 8, 34), Color.Blue * 0.7f, 2);
+    gameManager.Batch.DrawString(PixelOperator, display, labelPos + new Vector2(8, -8), Color.White);
+}
+
+public void SetItems(Item?[,]? items)
+{
+    if (items == null)
+    {
+        Array.Clear(Items);
+        return;
+    }
+
+    if (items.GetLength(0) != Width || items.GetLength(1) != Height)
+        throw new ArgumentException($"Expected {Width}x{Height} array got {items.GetLength(0)}x{items.GetLength(1)}");
+
+    Items = (Item?[,])items.Clone();
+}

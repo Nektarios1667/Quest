@@ -1,4 +1,5 @@
 ﻿using Quest.Editor;
+using Quest.Interaction;
 using System.Linq;
 using System.Text;
 
@@ -84,12 +85,13 @@ public class Window : Game
         SoundtrackManager.LoadSoundtracks(Content);
 
         // Managers
+        UserInterface.Init(spriteBatch);
         playerManager = new();
         levelManager = new();
         overlayManager = new(levelManager, playerManager);
         gameManager = new(Content, spriteBatch, levelManager, overlayManager);
         menuManager = new(this, spriteBatch, Content, gameManager, playerManager);
-        levelManager.LevelLoaded += _ => playerManager.CloseContainer();
+        levelManager.LevelLoaded += _ => playerManager.CloseInterface();
         CommandManager.Init(this, gameManager, levelManager, playerManager);
         Pathfinder.Init(gameManager);
         Logger.System("Initialized managers.");
@@ -241,13 +243,13 @@ public class Window : Game
         debugSb.Append("\nLevel: ");
         debugSb.Append(levelManager.Level?.Name);
         debugSb.Append("\nInventory: ");
-        debugSb.Append(playerManager.Inventory.Opened);
+        debugSb.Append(playerManager.Inventory.IsOpened);
         debugSb.Append("\nGUI: ");
         debugSb.Append(overlayManager.Gui.Widgets.Count);
         debugSb.Append("\nMood: ");
         debugSb.Append(StateManager.Mood);
         debugSb.Append("\nMusic: ");
-        debugSb.Append(SoundtrackManager.Playing?.File ?? "none");
+        debugSb.Append(SoundtrackManager.Playing.ToString() ?? "none");
         debugSb.Append("\nDaylight: ");
         debugSb.AppendFormat("{0:0}%", ColorTools.GetDaylightPercent(gameManager.DayTime));
         debugSb.Append("\nLighting: ");

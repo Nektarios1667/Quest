@@ -167,7 +167,7 @@ public class EditorManager
         DebugSb.Append("\nLevel: ");
         DebugSb.Append(LevelManager.Level?.Name);
         DebugSb.Append("\nGUI: ");
-        DebugSb.Append(GameManager.UIManager.Gui.Widgets.Count);
+        DebugSb.Append(GameManager.OverlayManager.Gui.Widgets.Count);
 
         SpriteBatch.DrawString(Arial, DebugSb.ToString(), new Vector2(10, 10), Color.White);
     }
@@ -376,7 +376,7 @@ public class EditorManager
             scale = 1;
         }
         TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), values[3]);
-        LevelManager.Level.NPCs.Add(new NPC(GameManager.UIManager, texture, MouseSelectionCoord, name, dialog, Color.White, scale));
+        LevelManager.Level.NPCs.Add(new NPC(GameManager.OverlayManager, texture, MouseSelectionCoord, name, dialog, Color.White, scale));
     }
     public void DeleteNPC()
     {
@@ -546,8 +546,8 @@ public class EditorManager
         // Parse
         if (world == "" || world == "NUL_WORLD")
         {
-            world = "new_world";
             name = name.Split('\\', '/')[0]; // Remove world
+            world = name;
         }
         else if (name.Contains('\\') || name.Contains('/'))
         {

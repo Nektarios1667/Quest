@@ -13,6 +13,8 @@ public class MenuManager
     public GUI LevelSelectMenu { get; private set; }
     public GUI PauseMenu { get; private set; }
     public GUI DebugMenu { get; private set; }
+    public GUI JukeboxMenu { get; private set; }
+
     private readonly GameManager gameManager;
     private readonly PlayerManager playerManager;
     // Widgets
@@ -115,10 +117,26 @@ public class MenuManager
         HorizontalSlider timeSlider = new(DebugMenu, new(Constants.Middle.X, 20), 200, Color.Black, Color.Gray);
         timeSlider.ValueChanged += (value) => gameManager.DayTime = value * 500;
         Label timeLabel = new(DebugMenu, new(Constants.Middle.X - 100, 0), Color.Black, "Daytime");
-        HorizontalSlider weatherSlider = new(DebugMenu, new(Constants.Middle.X, 40), 200, Color.Black, Color.Gray);
-        //weatherSlider.ValueChanged += (value) => StateManager.currentWeatherNoise = value;
-        Label weatherLabel = new(DebugMenu, new(Constants.Middle.X - 100, 20), Color.Black, "Weather");
-        DebugMenu.Widgets = [timeSlider, timeLabel, weatherLabel, weatherSlider];
+        DebugMenu.Widgets = [timeSlider, timeLabel];
+
+        // Jukebox menu
+        JukeboxMenu = new(window, batch, PixelOperatorSmall);
+        JukeboxMenu.LoadContent(content, "Images/Gui");
+        string text = $"Playing: {(SoundtrackManager.Playing.ToString() ?? "None")}";
+        Label playingLabel = new(DebugMenu, new(Constants.Middle.X - (int)PixelOperatorSmall.MeasureString(text).X / 2, 0), Color.Blue, text);
+        Button stopButton = new(JukeboxMenu, new(Constants.Middle.X - 65, 50), new(130, 40), Color.Red, Color.Black * 0.6f, Color.Black * 0.4f, SoundtrackManager.PlaySoundtrack, args: [null], text: "Stop");
+        Button nextButton = new(JukeboxMenu, new(Constants.Middle.X - 65, 100), new(130, 40), Color.Green, Color.Black * 0.6f, Color.Black * 0.4f, () => SoundtrackManager.PlaySoundtrack(SoundtrackManager.GetRandomSoundtrack(StateManager.Mood)), args: [], text: "Next");
+        Dropdown songSelect = new(JukeboxMenu, new(Constants.Middle.X - 100, 150), new(200, 40), Color.Blue, Color.Black * 0.6f, Color.Black * 0.4f);
+        songSelect.AddItems(Enum.GetNames(typeof(Soundtracks)));
+        songSelect.ItemSelected += (song) => SoundtrackManager.PlaySoundtrack(Enum.Parse<Soundtracks>(song));
+        SoundtrackManager.SoundtrackChanged += (track) =>
+        {
+            playingLabel.Text = $"Playing: {(track.ToString() ?? "None")}";
+            playingLabel.Location = new(Constants.Middle.X - (int)(PixelOperatorSmall.MeasureString(playingLabel.Text).X / 2), 0);
+            songSelect.Selected = track.ToString() ?? "";
+        };
+
+        JukeboxMenu.Widgets = [playingLabel, stopButton, nextButton, songSelect];
     }
     public void ExitToMainMenu()
     {
@@ -219,6 +237,10 @@ public class MenuManager
     public void Update(GameManager gameManager)
     {
         DebugManager.StartBenchmark("MenuUpdate");
+
+        if (StateManager.OverlayState == OverlayState.Jukebox)
+            JukeboxMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+
         switch (StateManager.State)
         {
             case GameState.MainMenu:
@@ -254,6 +276,10 @@ public class MenuManager
     public void Draw()
     {
         DebugManager.StartBenchmark("MenuDraw");
+
+        if (StateManager.OverlayState == OverlayState.Jukebox)
+            JukeboxMenu.Draw();
+
         switch (StateManager.State)
         {
             case GameState.MainMenu:

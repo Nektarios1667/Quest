@@ -34,6 +34,7 @@ public enum ItemTypeID : byte
     BottledWater,
     BottledCloud,
     BottledStorm,
+    Disc,
     // ITEMS
 }
 
@@ -94,6 +95,7 @@ public class ItemTypes
     public static readonly ItemType BottledWater = new(ItemTypeID.BottledWater, "A glass bottle of potable water.", 3);
     public static readonly ItemType BottledCloud = new(ItemTypeID.BottledCloud, "A cloud somehow trapped in a glass bottle...", 3);
     public static readonly ItemType BottledStorm = new(ItemTypeID.BottledStorm, "A storm somehow trapped in a glass bottle...", 3);
+    public static readonly ItemType Disc = new(ItemTypeID.Disc, "A music disc.");
     // ITEMS REGISTER
     public static readonly ItemType[] All = [
     ActivePalantir,
@@ -126,6 +128,7 @@ public class ItemTypes
     BottledWater,
     BottledCloud,
     BottledStorm,
+    Disc,
     // ITEMS
     ];
 }
@@ -133,20 +136,17 @@ public class ItemRef
 {
     public byte Amount { get; set; }
     public ItemType Type { get; }
-    public string Name => Type.Name;
+    public string? CustomName { get; set; }
+    public string Name => CustomName ?? Type.Name;
     public string Description => Type.Description;
     public byte MaxAmount => Type.MaxAmount;
     public TextureID Texture => Type.Texture;
     public bool IsLight => Type.IsLight;
-    public ItemRef(ItemType type, byte amount)
+    public ItemRef(ItemType type, byte amount, string? name = null)
     {
         Type = type;
         Amount = amount;
-    }
-    public ItemRef(ItemType type, int amount)
-    {
-        Type = type;
-        Amount = (byte)amount;
+        CustomName = name;
     }
 }
 public class Item
@@ -154,22 +154,32 @@ public class Item
     public byte Amount { get; set; }
     public ItemType Type { get; protected set; }
     public ushort UID { get; protected set; }
-    public string Name => Type.Name;
+    public string? CustomName { get; set; }
+    public string Name => CustomName ?? Type.Name;
     public string Description => Type.Description;
     public byte MaxAmount => Type.MaxAmount;
     public TextureID Texture => Type.Texture;
     public bool IsLight => Type.IsLight;
-    public Item(ItemType itemType, int amount)
+    public Item(ItemType itemType, int amount, string? name = null)
     {
         Type = itemType;
         Amount = (byte)amount;
         UID = UIDManager.Get(UIDCategory.Items);
+        CustomName = name;
     }
-    public Item(ItemRef itemRef)
+    public Item(ItemRef itemRef, string? name = null)
     {
         Type = itemRef.Type;
         Amount = itemRef.Amount;
         UID = UIDManager.Get(UIDCategory.Items);
+        CustomName = name;
+    }
+    public Item(Item item)
+    {
+        Type = item.Type;
+        Amount = item.Amount;
+        UID = UIDManager.Get(UIDCategory.Items);
+        CustomName = item.CustomName;
     }
     public virtual void PrimaryUse(PlayerManager player) { }
     public virtual void SecondaryUse(PlayerManager player) { }

@@ -1,4 +1,5 @@
 ﻿using Quest.Gui;
+using Quest.Interaction;
 
 namespace Quest.Entities;
 
@@ -13,15 +14,6 @@ public class ShopOption
         Item = item;
         Cost = cost;
         Stock = stock;
-    }
-
-    public bool Buy(Inventory inventory)
-    {
-        if (Cost == null || inventory.Consume(Cost))
-            inventory.AddItem(new(Item));
-        else
-            return false;
-        return true;
     }
 }
 
@@ -105,19 +97,18 @@ public class NPC
 
         return dialog;
     }
-    public bool Buy(ShopOption option, Inventory inv, GameManager gameManager)
+    public bool Buy(ShopOption option, Container cont, GameManager gameManager)
     {
         // Check
         if (!ShopOptions.Contains(option)) return false;
 
         // Buy
-        if ((option.Cost == null || inv.Consume(option.Cost)) && option.Stock > 0)
+        if ((option.Cost == null || cont.Consume(option.Cost)) && option.Stock > 0)
         {
-            (bool success, Item leftover) = inv.AddItem(new(option.Item));
-            if (!success)
+            Item leftover = cont.AddItem(new(option.Item));
+            if (leftover.Amount > 0)
                 gameManager.LevelManager.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), Location, gameManager.GameTime));
-            if (leftover.Amount < option.Item.Amount)
-                SoundManager.PlaySound("Trinkets");
+            SoundManager.PlaySound("Trinkets");
             option.Stock -= 1;
         }
 
@@ -126,9 +117,9 @@ public class NPC
 
         return true;
     }
-    public bool Buy(int option, Inventory inv, GameManager gameManager)
+    public bool Buy(int option, Container cont, GameManager gameManager)
     {
         if (option >= ShopOptions.Count) return false;
-        return Buy(ShopOptions[option], inv, gameManager);
+        return Buy(ShopOptions[option], cont, gameManager);
     }
 }

@@ -71,13 +71,16 @@ public static class SoundManager
             instance.Stop();
     }
 
-    public static void PlayMusic(string key, bool loop = true)
+    public static bool TryPlayMusic(string key, bool loop = true)
     {
         if (songs.TryGetValue(key, out var song))
         {
+            StopMusic();
             MediaPlayer.IsRepeating = loop;
             MediaPlayer.Play(song);
+            return true;
         }
+        return false;
     }
 
     public static void StopMusic()
