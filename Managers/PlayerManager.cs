@@ -368,8 +368,9 @@ public class PlayerManager
         }
         else if (MouseSelection.Value.ui.BoundContainer != null && ui.BoundContainer != null)
         {
-            Container.MoveItem(MouseSelection.Value.ui.BoundContainer, MouseSelection.Value.idx, ui.BoundContainer, slot, split: InputManager.RMouseDown);
-            MouseSelection = null;
+            bool success = Container.MoveItemUI(MouseSelection.Value.ui, MouseSelection.Value.idx, ui, slot, split: InputManager.RMouseDown);
+            if (success)
+                MouseSelection = null;
         }
     }
     public void SlotDropped(int slot, UserInterface ui)

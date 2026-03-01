@@ -16,6 +16,18 @@ public class Container
         Items = items ?? [];
     }
     // Item management
+    public static bool MoveItemUI(UserInterface from, int fromIdx, UserInterface to, int toIdx, bool split = false)
+    {
+        // Check nulls
+        if (from.BoundContainer == null || to.BoundContainer == null) return false;
+
+        // Check acceptance for both slots
+        if (!from.GetSlot(fromIdx).CanAccept(to.BoundContainer.Items[toIdx])) return false;
+        if (!to.GetSlot(toIdx).CanAccept(from.BoundContainer.Items[fromIdx])) return false;
+        MoveItem(from.BoundContainer, fromIdx, to.BoundContainer, toIdx, split);
+
+        return true;
+    }
     public static void MoveItem(Container from, int fromIdx, Container to, int toIdx, bool split = false)
     {
         // Get and check

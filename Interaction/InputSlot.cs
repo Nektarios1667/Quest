@@ -18,11 +18,11 @@ public class InputSlot : Slot
         Color = Color.LightGreen;
         Allowed = allowed ?? [];
     }
-    public override bool SetItem(Item? item)
-    {
-        if (CanAccept(item))
-            return base.SetItem(item);
-        return false;
-    }
+    //public override bool SetItem(Item? item)
+    //{
+    //    if (CanAccept(item))
+    //        return base.SetItem(item);
+    //    return false;
+    //}
     public override bool CanAccept(Item? item) => item == null || Allowed.Contains(item.Type);
 }
