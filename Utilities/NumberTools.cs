@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Quest.Utilities;
 public static class NumberTools
@@ -50,5 +51,14 @@ public static class IntExtensions
     public static byte ToByte(this int num)
     {
         return (byte)Math.Clamp(num, byte.MinValue, byte.MaxValue);
+    }
+    public static float Pow(this float num, int pow)
+    {
+        if (pow <= 0) return 1;
+
+        float total = num;
+        for (int i = 0; i < pow - 1; i++)
+            total *= num;
+        return total;
     }
 }
