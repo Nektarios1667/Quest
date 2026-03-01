@@ -65,7 +65,7 @@ public partial class UserInterface
             // Get the disc in the first slot
             InputSlot slot = (InputSlot)JukeboxUI.GetElements()["disc"]!;
             if (slot.Item != null)
-                SoundManager.TryPlayMusic(slot.Item.Name);
+                SoundtrackManager.PlaySoundtrack(slot.Item.Name);
         };
         JukeboxUI.AddElement("play_button", play);
     }

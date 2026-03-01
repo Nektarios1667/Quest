@@ -201,7 +201,7 @@ public static class StateManager
         if (Constants.DEVMODE)
             File.Copy($"GameData/Worlds/{CurrentSave.WorldName}/saves/{CurrentSave.LevelName}.qsv", $"../../../GameData/Worlds/{CurrentSave.WorldName}/saves/{CurrentSave.LevelName}.qsv", true);
 
-        gameManager.OverlayManager.LootNotifications.AddNotification($"Game Saved", Color.Cyan);
+        gameManager.OverlayManager.Notification($"Game Saved", Color.Cyan);
         Logger.System($"Saved game state to '{CurrentSave.LevelName}.qsv'.");
     }
     public static bool ReadGameState(GameManager gameManager, PlayerManager playerManager, string save)
@@ -272,7 +272,7 @@ public static class StateManager
             }
         }
 
-        gameManager.OverlayManager.LootNotifications.AddNotification($"Save Loaded", Color.Cyan);
+        gameManager.OverlayManager.Notification($"Save Loaded", Color.Cyan);
         Logger.System("Loaded game state from save.qsv.");
         return true;
     }

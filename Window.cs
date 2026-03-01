@@ -94,6 +94,8 @@ public class Window : Game
         levelManager.LevelLoaded += _ => playerManager.CloseInterface();
         CommandManager.Init(this, gameManager, levelManager, playerManager);
         Pathfinder.Init(gameManager);
+        SoundtrackManager.SoundtrackChanged += (Soundtracks? st) =>{ if (st != null) overlayManager.Notification($"Now Playing: {st}", Color.Cyan); };
+
         Logger.System("Initialized managers.");
 
         // Levels
@@ -263,6 +265,8 @@ public class Window : Game
         debugSb.Append(StateManager.CurrentSave);
         debugSb.Append("\nCurrent Luxel: ");
         debugSb.Append(CameraManager.Camera.ToPoint() / Constants.TileSize.Scaled(0.5f));
+        debugSb.Append("\nSoundtrack: ");
+        debugSb.Append(SoundtrackManager.Playing);
         debugSb.Append("\nQuill: ");
         foreach (var inst in Quill.Interpreter.GetQuillInstances())
             debugSb.Append($"\n  {inst.Script.Name} | @{inst.L:000} | C:{inst.Callbacks.Count:0} | Sc:{(inst.Scopes.TryPeek(out string? sc) ? sc : "GLOBAL")}");

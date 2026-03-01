@@ -13,7 +13,6 @@ public class MenuManager
     public GUI LevelSelectMenu { get; private set; }
     public GUI PauseMenu { get; private set; }
     public GUI DebugMenu { get; private set; }
-    public GUI JukeboxMenu { get; private set; }
 
     private readonly GameManager gameManager;
     private readonly PlayerManager playerManager;
@@ -118,25 +117,6 @@ public class MenuManager
         timeSlider.ValueChanged += (value) => gameManager.DayTime = value * 500;
         Label timeLabel = new(DebugMenu, new(Constants.Middle.X - 100, 0), Color.Black, "Daytime");
         DebugMenu.Widgets = [timeSlider, timeLabel];
-
-        // Jukebox menu
-        JukeboxMenu = new(window, batch, PixelOperatorSmall);
-        JukeboxMenu.LoadContent(content, "Images/Gui");
-        string text = $"Playing: {(SoundtrackManager.Playing.ToString() ?? "None")}";
-        Label playingLabel = new(DebugMenu, new(Constants.Middle.X - (int)PixelOperatorSmall.MeasureString(text).X / 2, 0), Color.Blue, text);
-        Button stopButton = new(JukeboxMenu, new(Constants.Middle.X - 65, 50), new(130, 40), Color.Red, Color.Black * 0.6f, Color.Black * 0.4f, SoundtrackManager.PlaySoundtrack, args: [null], text: "Stop");
-        Button nextButton = new(JukeboxMenu, new(Constants.Middle.X - 65, 100), new(130, 40), Color.Green, Color.Black * 0.6f, Color.Black * 0.4f, () => SoundtrackManager.PlaySoundtrack(SoundtrackManager.GetRandomSoundtrack(StateManager.Mood)), args: [], text: "Next");
-        Dropdown songSelect = new(JukeboxMenu, new(Constants.Middle.X - 100, 150), new(200, 40), Color.Blue, Color.Black * 0.6f, Color.Black * 0.4f);
-        songSelect.AddItems(Enum.GetNames(typeof(Soundtracks)));
-        songSelect.ItemSelected += (song) => SoundtrackManager.PlaySoundtrack(Enum.Parse<Soundtracks>(song));
-        SoundtrackManager.SoundtrackChanged += (track) =>
-        {
-            playingLabel.Text = $"Playing: {(track.ToString() ?? "None")}";
-            playingLabel.Location = new(Constants.Middle.X - (int)(PixelOperatorSmall.MeasureString(playingLabel.Text).X / 2), 0);
-            songSelect.Selected = track.ToString() ?? "";
-        };
-
-        JukeboxMenu.Widgets = [playingLabel, stopButton, nextButton, songSelect];
     }
     public void ExitToMainMenu()
     {

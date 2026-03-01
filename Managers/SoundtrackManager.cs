@@ -91,22 +91,28 @@ public static class SoundtrackManager
         Logger.Error($"No soundtracks found for mood '{mood}'");
         return null;
     }
-    public static bool PlaySoundtrack(Soundtracks? soundtrack)
+    public static bool PlaySoundtrack(string soundtrack)
     {
-        if (soundtrack != null && SoundManager.TryPlayMusic(soundtrack.ToString()!))
+        if (Enum.TryParse<Soundtracks>(soundtrack, out var st))
+            return PlaySoundtrack(st);
+        return false;
+    }
+    public static bool PlaySoundtrack(Soundtracks soundtrack)
+    {
+        if (SoundManager.TryPlayMusic(soundtrack.ToString()!))
         {
             PlayNextSong.Left = 600 + RandomManager.RandomIntRange(300, 600); // 600 buffer for current track
             Playing = soundtrack;
-            SoundtrackChanged?.Invoke(soundtrack.Value);
+            SoundtrackChanged?.Invoke(soundtrack);
             return true;
-        } else if (soundtrack == null)
-        {
-            SoundtrackChanged?.Invoke(null);
-            Playing = null;
-            PlayNextSong.Left = RandomManager.RandomIntRange(300, 600);
-            SoundManager.StopMusic();
         }
-
         return false;
+    }
+    public static void StopSoundtrack()
+    {
+        SoundtrackChanged?.Invoke(null);
+        Playing = null;
+        PlayNextSong.Left = RandomManager.RandomIntRange(300, 600);
+        SoundManager.StopMusic();
     }
 }

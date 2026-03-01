@@ -280,7 +280,7 @@ public class OverlayManager
 
         DebugManager.EndBenchmark("DrawMinimap");
     }
-    public void Notification(string text, Color? color = null, float duration = 4f)
+    public void Notification(string text, Color? color = null, float duration = 5f)
     {
         LootNotifications.AddNotification(text, color, duration);
     }
