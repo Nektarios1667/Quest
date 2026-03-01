@@ -55,21 +55,17 @@ public partial class UserInterface
         JukeboxUI.AddElement("title", title);
 
         // Tracks - 5 horizontal slots
-        itemStart = new(Constants.Middle.X - Slot.SlotSize.X * 5 / 2, Constants.NativeResolution.Y - Slot.SlotSize.Y - 4);
-        for (int i = 0; i < 5; i++)
-        {
-            InputSlot slot = new(new(itemStart.X + (Slot.SlotSize.X + 4) * i, itemStart.Y), [ItemTypes.Disc]);
-            JukeboxUI.AddElement($"slot_{i}", slot);
-        }
+        InputSlot input = new(new(Constants.Middle.X - Slot.SlotSize.X / 2, 75), [ItemTypes.Disc]);
+        JukeboxUI.AddElement($"disc", input);
 
         // Play button in the middle of the track slots - green text
-        Button play = new(new(Constants.Middle.X - 50, itemStart.Y - 60), new(100, 35), "PLAY", PixelOperatorLarge, Color.Green, Color.DarkGreen, Color.White);
+        Button play = new(new(Constants.Middle.X - 50, 160), new(100, 35), "Play", PixelOperatorLarge, Color.White, Color.Green * 0.6f, Color.Green * 0.4f);
         play.Clicked += () =>
         {
             // Get the disc in the first slot
-            InputSlot slot = (InputSlot)JukeboxUI.GetElements()["slot_0"]!;
+            InputSlot slot = (InputSlot)JukeboxUI.GetElements()["disc"]!;
             if (slot.Item != null)
-                SoundManager.TryPlayMusic("Maps");
+                SoundManager.TryPlayMusic(slot.Item.Name);
         };
         JukeboxUI.AddElement("play_button", play);
     }

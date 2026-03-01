@@ -39,7 +39,9 @@ public class PlayerManager
         InventoryUI.OnSlotDrop += SlotDropped;
         InventoryUI.OnSlotHover += SlotHovered;
 
-        Inventory.SetSlot(0, new Item(ItemTypes.Apple, 1, "Green Apple"));
+        Inventory.SetSlot(0, new Item(ItemTypes.Disc, 1, "Maps"));
+        Inventory.SetSlot(1, new Item(ItemTypes.Disc, 1, "DuskToDawn"));
+        Inventory.SetSlot(2, new Item(ItemTypes.Apple, 1));
     }
 
     public void Update(GameManager gameManager)

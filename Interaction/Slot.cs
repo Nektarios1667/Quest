@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -75,22 +76,10 @@ public class Slot : UIElement
         Vector2 textDest = Location.ToVector2() + SlotSize.ToVector2() - new Vector2(PixelOperatorCharSize.X * Item.Amount.ToString().Length + 6, 36);
         ui.Batch.DrawString(PixelOperatorBold, $"{Item.Amount}", textDest, Color.White);
     }
-    public virtual void SetItem(Item? item) => Item = item;
-    public virtual Item AddItem(Item item)
+    public virtual bool SetItem(Item? item)
     {
-        if (Item == null)
-        {
-            byte addAmount = Math.Min(item.Amount, item.MaxAmount);
-            Item = new(item.Type, addAmount, item.Name);
-            item.Amount -= addAmount;
-        }
-        else if (Container.SameItem(item, Item))
-        {
-            byte addAmount = (byte)Math.Min(item.Amount, Item.MaxAmount - Item.Amount);
-            Item.Amount += addAmount;
-            item.Amount -= addAmount;
-        }
-
-        return item;
+        Item = item;
+        return true;
     }
+    public virtual bool CanAccept(Item? item) => true;
 }

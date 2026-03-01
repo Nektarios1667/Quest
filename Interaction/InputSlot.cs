@@ -15,14 +15,14 @@ public class InputSlot : Slot
     public ItemType[] Allowed { get; }
     public InputSlot(Point location, ItemType[]? allowed = null) : base(location)
     {
-        Bounds = new Rectangle(Location, new Point(32, 32));
         Color = Color.LightGreen;
         Allowed = allowed ?? [];
     }
-    public override Item AddItem(Item item)
+    public override bool SetItem(Item? item)
     {
-        if (Allowed.Contains(item.Type))
-            return base.AddItem(item);
-        return item;
+        if (CanAccept(item))
+            return base.SetItem(item);
+        return false;
     }
+    public override bool CanAccept(Item? item) => item == null || Allowed.Contains(item.Type);
 }

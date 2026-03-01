@@ -10,7 +10,7 @@ namespace Quest.Interaction;
 
 public partial class UserInterface
 {
-    public event Action<int, UserInterface>? OnSlotClick;
+    public event Action<int ,UserInterface>? OnSlotClick;
     public event Action<int, UserInterface>? OnSlotDrop;
     public event Action<int, UserInterface>? OnSlotHover;
     private List<string> SlotElements { get; set; } = [];
