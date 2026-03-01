@@ -39,18 +39,14 @@ public class GameManager
         // Escape button
         if (InputManager.KeyPressed(Keys.Escape))
         {
-            // Close jukebox
-            if (StateManager.OverlayState == OverlayState.Jukebox)
-                StateManager.OverlayState = OverlayState.None;
             // Pause/unpause
-            else if (StateManager.State == GameState.Game)
+            if (StateManager.State == GameState.Game)
             {
                 if (StateManager.OverlayState == OverlayState.None)
                     StateManager.OverlayState = OverlayState.Pause;
                 else if (StateManager.OverlayState == OverlayState.Pause)
                     StateManager.OverlayState = OverlayState.None;
             }
-            
         }
 
         // Time

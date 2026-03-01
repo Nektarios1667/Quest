@@ -46,9 +46,9 @@ public class OverlayManager
         // TODO
         //if (playerManager != null)
         //{
-        //    playerManager.EquippedItemItemChanged += (oldItem, newItem) => CheckUpdateLighting(oldItem, newItem);
-        //    playerManager.Inventory.ItemDropped += (item) => CheckUpdateLighting(item);
-        //    playerManager.Inventory.ItemAdded += (item) => MarkUpdateLighting();
+        //    playerManager.EquippedItemChanged += (oldItem, newItem) => CheckUpdateLighting(oldItem, newItem);
+        //    playerManager.InventoryUI.OnSlotDrop += (_, _) => MarkUpdateLighting();
+        //    playerManager.InventoryUI.ItemAdded +=  MarkUpdateLighting();
 
         //}
         TimerManager.SetTimer("LightingUpdate", 1f, MarkUpdateLighting, int.MaxValue);
@@ -109,7 +109,7 @@ public class OverlayManager
         }
 
         // Draw hover label
-        if (playerManager.HoveredItem != null)
+        if (playerManager.InventoryOpen && playerManager.HoveredItem != null)
         {
 
             string display = StringTools.FillCamelSpaces(playerManager.HoveredItem.Name);

@@ -28,7 +28,6 @@ public enum OverlayState
 {
     None,
     Container,
-    Jukebox,
     Pause,
 }
 public enum Mood

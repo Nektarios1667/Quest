@@ -20,6 +20,7 @@ public class Chest : Tile
         TryGenerateLoot();
         UserInterface.ChestUI.BindContainer(Container);
         player.OpenInterface(UserInterface.ChestUI);
+        StateManager.OverlayState = OverlayState.Container;
     }
     public void RegenerateLoot(ILootGenerator lootGenerator)
     {

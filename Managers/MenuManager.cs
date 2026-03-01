@@ -238,9 +238,6 @@ public class MenuManager
     {
         DebugManager.StartBenchmark("MenuUpdate");
 
-        if (StateManager.OverlayState == OverlayState.Jukebox)
-            JukeboxMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
-
         switch (StateManager.State)
         {
             case GameState.MainMenu:
@@ -276,9 +273,6 @@ public class MenuManager
     public void Draw()
     {
         DebugManager.StartBenchmark("MenuDraw");
-
-        if (StateManager.OverlayState == OverlayState.Jukebox)
-            JukeboxMenu.Draw();
 
         switch (StateManager.State)
         {

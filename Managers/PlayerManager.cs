@@ -116,6 +116,7 @@ public class PlayerManager
 
         // 
         InventoryUI.GetSlot(EquippedSlot).Mark(Color.Salmon);
+        HoveredItem = null;
 
         // Inventory updates
         InventoryUI.Update(InventoryOpen ? null : "hotbar");
@@ -185,7 +186,7 @@ public class PlayerManager
             if (PointTools.DistanceSquared(CameraManager.PlayerFoot, loot.Location + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
             {
                 gameManager.OverlayManager.LootNotifications.AddNotification($"+{loot.DisplayName}");
-                Item leftover = Inventory.AddItem(new(loot.Item.Type, loot.Item.Amount));
+                Item leftover = Inventory.AddItem(new(loot.Item.Type, loot.Item.Amount, loot.Item.CustomName));
                 if (leftover.Amount <= 0)
                 {
                     loot.Dispose();
@@ -363,6 +364,7 @@ public class PlayerManager
     public void SlotDropped(int slot, UserInterface ui)
     {
         if (ui.BoundContainer?.Items[slot] == null) return;
+        if (!InventoryOpen) return;
         Item? item = ui.BoundContainer.Items[slot];
         if (item == null) return;
 

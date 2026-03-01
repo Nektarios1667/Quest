@@ -86,7 +86,7 @@ public class Container
             if (item == null)
             {
                 byte moved = Math.Min(adding.Amount, adding.MaxAmount);
-                SetSlot(i, new(adding.Type, moved, adding.Name));
+                SetSlot(i, new(adding.Type, moved, adding.CustomName));
                 adding.Amount -= moved; // Reduce amount of new item
             }
             if (SameItem(item, adding))

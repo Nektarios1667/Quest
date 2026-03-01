@@ -1,5 +1,4 @@
-﻿using HarfBuzzSharp;
-using Quest.Managers;
+﻿using Quest.Managers;
 using ScottPlot.Colormaps;
 using System;
 using System.Collections.Generic;
