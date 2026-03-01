@@ -89,7 +89,7 @@ public static class CommandManager
             new("store * *", CStore, "Stored |2| to '|1|'", "Failed to store |2| to '|1|'"),
             new("gametime <modify> {-999999:999999}", CGameTime, "Game time |1| |2|", "Failed |1| gametime |2|"),
             new("macro *", CMacro, "Executed macro '|1|'.", "Failed to execute macro '|1|'."),
-            new("give <item> {1:255}", CGive, "Gave |2| |1| to player", "Failed to give |2| |1| to player"),
+            new("give <item> {1:255} *", CGive, "Gave |2| |1| (|3|) to player", "Failed to give |2| |1| (|3|) to player"),
             new("notif <int> <int> <int> <number> **", CNotif, "Notification |*| created.", "Failed to create notification |*|."),
         ];
     }
@@ -323,7 +323,7 @@ public static class CommandManager
         string[] parts = command.Split(' ');
         string itemName = parts[1];
         int quantity = int.Parse(parts[2]);
-        var item = ItemFromName(itemName, quantity);
+        var item = ItemFromName(itemName, quantity, parts.Length > 3 ? parts[3] : null);
         if (item == null) return false;
         Item leftover = playerManager!.Inventory.AddItem(item);
         if (leftover.Amount > 0)
