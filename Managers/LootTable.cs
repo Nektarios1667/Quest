@@ -76,7 +76,7 @@ public class LootPreset : ILootGenerator
                     // Item
                     ItemTypeID item = (ItemTypeID)id;
                     byte amount = reader.ReadByte();
-                    items[x, y] = Item.ItemFromItemType(item!, 0);
+                    items[x, y] = Item.Create(item!, 0);
                 }
             }
         }
@@ -159,7 +159,7 @@ public class LootTable : ILootGenerator
                 float chance = reader.ReadByte() / 100f;
                 byte minAmount = reader.ReadByte();
                 byte maxAmount = reader.ReadByte();
-                entries.Add(new(Item.ItemFromItemType(item, 0), minAmount, maxAmount, chance));
+                entries.Add(new(Item.Create(item, 0), minAmount, maxAmount, chance));
             }
         }
         return new(entries, file);

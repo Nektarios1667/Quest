@@ -34,23 +34,12 @@ public class OverlayManager
 
 
         // Trigger lighting updates
-        void CheckUpdateLighting(params Item?[] items)
+        if (playerManager != null)
         {
-            foreach (var item in items)
-                if (item != null && (item is Light || item.IsLight))
-                {
-                    MarkUpdateLighting();
-                    return;
-                }
+            playerManager.EquippedSlotChanged += (_) => MarkUpdateLighting();
+            playerManager.InventoryUI.OnSlotDrop += (_, _) => MarkUpdateLighting();
+            playerManager.InventoryUI.OnSlotItemChange += (_, _) => MarkUpdateLighting();
         }
-        // TODO
-        //if (playerManager != null)
-        //{
-        //    playerManager.EquippedItemChanged += (oldItem, newItem) => CheckUpdateLighting(oldItem, newItem);
-        //    playerManager.InventoryUI.OnSlotDrop += (_, _) => MarkUpdateLighting();
-        //    playerManager.InventoryUI.ItemAdded +=  MarkUpdateLighting();
-
-        //}
         TimerManager.SetTimer("LightingUpdate", 1f, MarkUpdateLighting, int.MaxValue);
         CameraManager.TileChange += (_, _) => MarkUpdateLighting();
         CameraManager.CameraMove += (_, newCam) =>

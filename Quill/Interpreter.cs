@@ -141,7 +141,6 @@ public static partial class Interpreter
         ExternalSymbols["<totaltime>"] = game.TotalTime.ToString();
         ExternalSymbols["<gamestate>"] = StateManager.State.ToString().WrapSingleQuotes();
         // Inventory
-        // TODO
         ExternalSymbols["<inventoryitems>"] = Utilities.ItemNamesQist(player.Inventory.Items, Chest.Size.X).WrapSingleQuotes();
         ExternalSymbols["<inventoryamounts>"] = Utilities.ItemAmountsQist(player.Inventory.Items, Chest.Size.X).WrapSingleQuotes();
         ExternalSymbols["<inventorysize_x>"] = Chest.Size.X.ToString();

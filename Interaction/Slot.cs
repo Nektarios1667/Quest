@@ -13,6 +13,7 @@ public class Slot : UIElement
     public event Action? OnClicked;
     public event Action? OnDropped;
     public event Action? OnHovered;
+    public event Action? OnItemChange;
     public Rectangle Bounds { get; protected set; }
     public ButtonState State { get; protected set; } = ButtonState.Normal;
     public Item? Item { get; protected set; }
@@ -78,6 +79,7 @@ public class Slot : UIElement
     }
     public virtual bool SetItem(Item? item)
     {
+        OnItemChange?.Invoke();
         Item = item;
         return true;
     }

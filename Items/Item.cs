@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Design;
+using System.Runtime.CompilerServices;
 
 namespace Quest.Items;
 public enum ItemTypeID : byte
@@ -183,22 +184,18 @@ public class Item
     }
     public virtual void PrimaryUse(PlayerManager player) { }
     public virtual void SecondaryUse(PlayerManager player) { }
-
-    public static Item ItemFromName(string name, int amount)
+    public static Item Create(ItemType type, int amount, string? customName = null)
     {
-        if (!Enum.TryParse<ItemTypeID>(name, out var typeID))
-            throw new ArgumentException($"Item {name} does not exist");
-
-        ItemType type = ItemTypes.All[(byte)typeID];
-        return new(type, amount);
+        return Create(type.TypeID, amount, customName);
     }
-    public static Item ItemFromItemType(ItemTypeID itemType, int amount)
+
+    public static Item Create(ItemTypeID itemType, int amount, string? customName = null)
     {
         ItemType type = ItemTypes.All[(byte)itemType];
         return itemType switch
         {
-            ItemTypeID.Lantern => new Lantern(amount),
-            _ => new Item(type, amount),
+            ItemTypeID.Lantern => new Lantern(amount, customName),
+            _ => new Item(type, amount, customName),
         };
     }
     public Item ShallowCopy()
@@ -216,7 +213,7 @@ public class Item
         {
             Amount = 0;
             return new Item(this);
-        // None
+            // None
         } else if (amount <= 0)
             return new Item(Type, 0);
 
@@ -224,4 +221,11 @@ public class Item
         Amount -= amount;
         return new Item(Type, amount, CustomName);
     }
+    private string Tags()
+    {
+        string tags = "";
+        if (this is Light) tags += "L";
+        return tags;
+    }
+    public override string ToString() => $"{Name}{(CustomName != null ? $" [{CustomName}]" : "")} x{Amount} {Tags()}";
 }

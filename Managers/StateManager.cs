@@ -186,11 +186,10 @@ public static class StateManager
                     writer.Write((ushort)0);
             }
 
-            // Write Inventory data TODO
-            //var inventory = playerManager.Inventory;
-            //for (int y = 0; y < inventory.Items.GetLength(1); y++)
-            //    for (int x = 0; x < inventory.Items.GetLength(0); x++)
-            //        WriteItemData(writer, inventory.Items[x, y]);
+            // Write Inventory data
+            var inventory = playerManager.Inventory;
+            for (int i = 0; i < inventory.Items.Length; i++)
+                    WriteItemData(writer, inventory.Items[i]);
             writer.Flush();
             data = ms.ToArray();
         }
@@ -265,15 +264,12 @@ public static class StateManager
             }
 
 
-            // Read Inventory data TODO
-            //for (int y = 0; y < playerManager.Inventory.Items.GetLength(1); y++)
-            //{
-            //    for (int x = 0; x < playerManager.Inventory.Items.GetLength(0); x++)
-            //    {
-            //        var item = ReadItemData(reader);
-            //        playerManager.Inventory.SetSlot(x, y, item);
-            //    }
-            //}
+            // Read Inventory data
+            for (int i = 0; i < playerManager.Inventory.Items.Length; i++)
+            {
+                var item = ReadItemData(reader);
+                playerManager.Inventory.SetSlot(i, item);
+            }
         }
 
         gameManager.OverlayManager.LootNotifications.AddNotification($"Save Loaded", Color.Cyan);
@@ -343,7 +339,7 @@ public static class StateManager
         if (id == 0) return null;
         ItemTypeID itemType = (ItemTypeID)(id - 1);
         byte amount = reader.ReadByte();
-        return Item.ItemFromItemType(itemType, amount);
+        return Item.Create(itemType, amount);
     }
     public static Dictionary<string, string> ReadKeyValueFile(string name)
     {

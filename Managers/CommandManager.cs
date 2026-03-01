@@ -66,7 +66,7 @@ public static class CommandManager
         { "bool", value => bool.TryParse(value, out _) },
         { "coordinate", value => IsCoordinate(value) },
         { "modify", value => value == "set" || value == "change" },
-        { "item", value => Item.ItemFromName(value, 1).Amount != 0 },
+        { "item", value => ItemFromName(value, 1).Amount != 0 },
     };
     public static void Init(Game game, GameManager gameManager, LevelManager levelManager, PlayerManager playerManager)
     {
@@ -117,6 +117,15 @@ public static class CommandManager
             return (false, "No command entered.");
 
         return (true, result[0]);
+    }
+    // Helpers
+    private static Item ItemFromName(string name, int amount, string? customName = null)
+    {
+        if (!Enum.TryParse<ItemTypeID>(name, out var typeID))
+            throw new ArgumentException($"Item {name} does not exist");
+
+        ItemType type = ItemTypes.All[(byte)typeID];
+        return new(type, amount, customName);
     }
     // Custom type predicates
     static bool IsCoordinate(string val)
@@ -314,7 +323,7 @@ public static class CommandManager
         string[] parts = command.Split(' ');
         string itemName = parts[1];
         int quantity = int.Parse(parts[2]);
-        var item = Item.ItemFromName(itemName, quantity);
+        var item = ItemFromName(itemName, quantity);
         if (item == null) return false;
         Item leftover = playerManager!.Inventory.AddItem(item);
         if (leftover.Amount > 0)

@@ -79,14 +79,14 @@ public class Container
         (from.Items[fromIdx], to.Items[toIdx]) = (to.Items[toIdx], from.Items[fromIdx]);
     }
     public Item AddItem(Item adding)
-    {
+    {        
         for (int i = 0; i < Items.Length; i++)
         {
             Item? item = Items[i];
             if (item == null)
             {
                 byte moved = Math.Min(adding.Amount, adding.MaxAmount);
-                SetSlot(i, new(adding.Type, moved, adding.CustomName));
+                SetSlot(i, Item.Create(adding.Type, moved, adding.CustomName));
                 adding.Amount -= moved; // Reduce amount of new item
             }
             if (SameItem(item, adding))

@@ -12,13 +12,18 @@ public class PlayerManager
 {
     // Events
     public event Action<Item?>? ItemSelected;
+    public event Action<int> EquippedSlotChanged;
     // Properties
     // Inventory and UI
     public bool InventoryOpen { get; set; } = false;
     public Container Inventory { get; }
     public UserInterface InventoryUI { get; }
     public UserInterface? OpenedInterface { get; set; } = null;
-    public int EquippedSlot { get; set; } = 0;
+    private int equippedSlot = 0;
+    public int EquippedSlot {
+        get => equippedSlot;
+        set { equippedSlot = value; EquippedSlotChanged?.Invoke(equippedSlot); }
+    }
     public Item? HoveredItem { get; private set; }
     public Item? EquippedItem => EquippedSlot >= 0 && EquippedSlot < Inventory.Items.Length ? Inventory.Items[EquippedSlot] : null;
     public (UserInterface ui, int idx)? MouseSelection { get; set; } // Item being moved with mouse and its original inventory
@@ -42,6 +47,9 @@ public class PlayerManager
         Inventory.SetSlot(0, new Item(ItemTypes.Disc, 1, "Maps"));
         Inventory.SetSlot(1, new Item(ItemTypes.Disc, 1, "DuskToDawn"));
         Inventory.SetSlot(2, new Item(ItemTypes.Apple, 1));
+
+        // DEBUG
+        EquippedSlotChanged += (slot) => Console.WriteLine(Inventory.Items[slot]);
     }
 
     public void Update(GameManager gameManager)
@@ -188,7 +196,8 @@ public class PlayerManager
             if (PointTools.DistanceSquared(CameraManager.PlayerFoot, loot.Location + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
             {
                 gameManager.OverlayManager.LootNotifications.AddNotification($"+{loot.DisplayName}");
-                Item leftover = Inventory.AddItem(new(loot.Item.Type, loot.Item.Amount, loot.Item.CustomName));
+                Item adding = Item.Create(loot.Item.Type, loot.Item.Amount, loot.Item.CustomName);
+                Item leftover = Inventory.AddItem(adding);
                 if (leftover.Amount <= 0)
                 {
                     loot.Dispose();
