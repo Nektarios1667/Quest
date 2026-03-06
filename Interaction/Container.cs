@@ -121,21 +121,23 @@ public class Container
 
         return count;
     }
-    public bool Consume(ItemRef consume)
+    public bool Consume(ItemRef consume, bool ignoreCheck = false)
     {
         // Not enough
-        if (Count(consume.Type) < consume.Amount) return false;
+        if (!ignoreCheck && Count(consume.Type) < consume.Amount) return false;
 
         // Consume
-        foreach (Item? item in Items)
+        for (int i = 0; i < Items.Length; i++)
         {
-            if (item == null || item.Type != consume.Type) continue; // Skip empty slots or different items
+            Item? item = Items[i];
+            if (item == null || item.Type != consume.Type || item.Amount <= 0) continue; // Skip empty slots or different items
 
             // Consume in this slot
             byte toConsume = Math.Min(item.Amount, consume.Amount);
             item.Amount -= toConsume;
             consume.Amount -= toConsume;
             // Check if enough
+            if (item.Amount <= 0) Items[i] = null;
             if (consume.Amount <= 0) return true;
         }
 

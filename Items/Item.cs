@@ -149,6 +149,7 @@ public class ItemRef
         Amount = amount;
         CustomName = name;
     }
+    public ItemRef Copy() => new(Type, Amount, CustomName);
 }
 public class Item
 {

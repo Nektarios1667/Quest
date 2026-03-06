@@ -14,7 +14,7 @@ public static class PopupFactory
 {
     public static bool PopupOpen { get; private set; } = false;
     public static Form? Form { get; private set; }
-    public static (bool success, string[] values) ShowInputForm(string title, InputField[] fields, bool close = true)
+    public static (bool success, string[] values) ShowInputForm(string title, InputField[] fields, bool close = true, Action<string[]>? action = null)
     {
         if (PopupOpen) return (false, Array.Empty<string>());
         PopupOpen = true;
@@ -116,7 +116,9 @@ public static class PopupFactory
             string[] values = GetValues(inputs);
 
             // Close
-            if (close)
+            if (action != null)
+                action?.Invoke(values);
+            else if (close)
                 Form.DialogResult = DialogResult.OK;
         };
 
@@ -130,9 +132,8 @@ public static class PopupFactory
         {
             string[] values = GetValues(inputs);
             return (true, values);
-        }
-
-        return (false, Array.Empty<string>());
+        } else
+            return (false, Array.Empty<string>());
     }
     public static void ShowMessage(string title, string message)
     {

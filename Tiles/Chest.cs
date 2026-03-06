@@ -36,8 +36,8 @@ public class Chest : Tile
         {
             if (Key != null && ConsumeKey)
             {
-                player.Inventory.Consume(Key);
                 game.OverlayManager.Notification($"-{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
+                player.Inventory.Consume(Key, ignoreCheck: true);
             }
             else if (Key != null)
                 game.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Gray, 2);
