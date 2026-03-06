@@ -227,5 +227,6 @@ public class Item
         if (this is Light) tags += "L";
         return tags;
     }
+    public ItemRef GetItemRef() => new(Type, Amount, CustomName);
     public override string ToString() => $"{Name}{(CustomName != null ? $" [{CustomName}]" : "")} x{Amount} {Tags()}";
 }

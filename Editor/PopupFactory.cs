@@ -2,18 +2,19 @@
 using System.Windows.Forms;
 using SysColor = System.Drawing.Color;
 namespace Quest.Editor;
-public class InputField(string label, Func<string, bool>? validate = null, string?[]? dropdownOptions = null)
+public class InputField(string label, Func<string, bool>? validate = null, string?[]? dropdownOptions = null, string? placeholder = null)
 {
     public string Label { get; set; } = label;
     public Func<string, bool> Validate { get; set; } = validate ?? (_ => true);
     public string?[]? DropdownOptions { get; set; } = dropdownOptions;
+    public string Placeholder { get; set; } = placeholder ?? "";
 }
 
 public static class PopupFactory
 {
     public static bool PopupOpen { get; private set; } = false;
     public static Form? Form { get; private set; }
-    public static (bool success, string[] values) ShowInputForm(string title, InputField[] fields, bool closeOnEnter = true, Action<string[]>? onSubmit = null)
+    public static (bool success, string[] values) ShowInputForm(string title, InputField[] fields, bool close = true)
     {
         if (PopupOpen) return (false, Array.Empty<string>());
         PopupOpen = true;
@@ -58,7 +59,8 @@ public static class PopupFactory
                 {
                     Left = 165,
                     Top = 10 + i * 35,
-                    Width = 200
+                    Width = 200,
+                    PlaceholderText = field.Placeholder,
                 };
                 inputControl = textBox;
             }
@@ -113,15 +115,8 @@ public static class PopupFactory
 
             string[] values = GetValues(inputs);
 
-            // If handler
-            if (onSubmit != null)
-            {
-                onSubmit(values);
-                return; // Don't close the form now
-            }
-
-            // No handler
-            if (closeOnEnter)
+            // Close
+            if (close)
                 Form.DialogResult = DialogResult.OK;
         };
 

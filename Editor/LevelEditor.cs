@@ -330,9 +330,9 @@ public class LevelEditor : Game
         if (mouseTile is Stairs stair)
             DrawBottomInfo($"[Stairs] dest: '{stair.DestLevel}' @ {stair.Dest}");
         else if (mouseTile is Door door)
-            DrawBottomInfo($"[Door] key: {(door.Key == null ? "None" : $"'{door.Key.Name}' x{door.Key.Amount}")} consume: {door.ConsumeKey}");
+            DrawBottomInfo($"[Door] key: {(door.Key == null ? "NUL" : $"'{door.Key.Name}' x{door.Key.Amount}")} consume: {door.ConsumeKey}");
         else if (mouseTile is Chest chest)
-            DrawBottomInfo($"[Chest] gen: '{chest.LootGenerator.FileName}'");
+            DrawBottomInfo($"[Chest] gen: '{chest.LootGenerator.FileName}' key: {(chest.Key == null ? "NUL" : $"'{chest.Key.Name}' x{chest.Key.Amount}")} consume: {chest.ConsumeKey}");
         else if (mouseTile is Lamp lamp)
             DrawBottomInfo($"[Lamp] radius: {lamp.LightRadius}");
         else

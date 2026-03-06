@@ -1,11 +1,12 @@
+using Quest.Quill;
+using Quest.Tiles;
 using System.Diagnostics;
 using System.IO;
-using IO = System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using Quest.Quill;
+using IO = System.IO;
 
 namespace Quest.Managers;
 public class LevelManager
@@ -412,10 +413,15 @@ public class LevelManager
         {
             string lootGenFile = reader.ReadString();
             ILootGenerator lootGen = LootGeneratorHelper.Read(levelPath.WorldName, lootGenFile);
-            if (lootGen.FileName.IsNUL() || lootGen.FileName == "_")
-                return new Chest(loc, LootPreset.EmptyPreset, levelPath.LevelName);
-            else
-                return new Chest(loc, lootGen, levelPath.LevelName);
+            lootGen = (lootGen.FileName.IsNUL() || lootGen.FileName == "_") ? LootPreset.EmptyPreset : lootGen;
+
+            string keyStr = reader.ReadString();
+            if (keyStr != "")
+            {
+                ItemRef? key = Item.Create(Enum.Parse<ItemTypeID>(keyStr), reader.ReadByte()).GetItemRef();
+                return new Chest(loc, lootGen, lootGenFile, key, reader.ReadBoolean());
+            }
+            return new Chest(loc, lootGen, lootGenFile);
         }
 
         // Read tile data

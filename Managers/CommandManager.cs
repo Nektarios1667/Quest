@@ -105,13 +105,14 @@ public static class CommandManager
     public static (bool success, string output) OpenCommandPrompt()
     {
         string[]? result = null;
-        PopupFactory.ShowInputForm("Command", [new("Enter command")], false, values =>
-        {
+        (bool success, string[] values) = PopupFactory.ShowInputForm("Command", [new("Enter command")], false);
+
+        if (success) {
             string command = values[0].Trim();
-            var (success, output) = Execute(command);
+            var (commandSuccess, output) = Execute(command);
             if (output != "$noout")
-                PopupFactory.SetOutputLabel(output, success ? SysColor.Green : SysColor.Red);
-        });
+                PopupFactory.SetOutputLabel(output, commandSuccess ? SysColor.Green : SysColor.Red);
+        };
 
         if (result == null)
             return (false, "No command entered.");

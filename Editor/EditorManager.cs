@@ -231,18 +231,22 @@ public class EditorManager
         // Chest
         else if (tile is Chest chest)
         {
-            var (success, values) = ShowInputForm("Chest Editor", [new("Loot File Name", null), new("Loot Type", null, ["Loot Preset", "Loot Table"])]);
+            var (success, values) = ShowInputForm("Chest Editor", [new("Loot File Name", null), new("Loot Type", null, ["Loot Preset", "Loot Table"]), new("Key", null, Enum.GetNames(typeof(ItemTypeID))), new("Amount", IsByte), new("Consume Key", null, ["true", "false"])]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Chest edit failed.");
                 return;
             }
+            // Loot
             if (values[1] == "Loot Table")
                 chest.RegenerateLoot(LootTable.ReadLootTable(world, $"{values[0]}.qlt"));
             else if (values[1] == "Loot Preset")
                 chest.RegenerateLoot(LootPreset.ReadLootPreset(world, $"{values[0]}.qlp"));
             else
-                Logger.Error("Chest edit failed.");
+                Logger.Error("Chest loot edit failed.");
+            // Key
+            chest.Key = new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[2])], byte.Parse(values[3]));
+            chest.ConsumeKey = bool.Parse(values[4]);
         }
         // Lamp
         else if (tile is Lamp lamp)
@@ -599,7 +603,13 @@ public class EditorManager
                 writer.Write(door.ConsumeKey);
             }
             else if (tile is Chest chest)
+            {
                 writer.Write(chest.LootGenerator);
+                writer.Write(chest.Key == null ? "" : chest.Key.Name);
+                if (chest.Key == null) continue;
+                writer.Write(chest.Key.Amount);
+                writer.Write(chest.ConsumeKey);
+            }
             else if (tile is Lamp lamp)
                 writer.Write(lamp.LightRadius);
         }
