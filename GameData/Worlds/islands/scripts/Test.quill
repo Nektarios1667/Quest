@@ -2,8 +2,6 @@
 // Wait until the symbol system is ready
 wait =<ready>, 1000
 
-#meta 19
-
 func playerInBounds, x1, y1, x2, y2
 	// Check position
 	num pX, =<playercoord_x>

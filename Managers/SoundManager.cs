@@ -71,7 +71,7 @@ public static class SoundManager
             instance.Stop();
     }
 
-    public static bool TryPlayMusic(string key, bool loop = true)
+    public static bool TryPlayMusic(string key, bool loop = false)
     {
         if (songs.TryGetValue(key, out var song))
         {

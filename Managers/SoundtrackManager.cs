@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Media;
 using System.Linq;
 
 namespace Quest.Managers;
@@ -29,8 +30,8 @@ public static class SoundtrackManager
     //
     public static Soundtracks? Playing { get; private set; }
     private static Dictionary<Mood, Soundtracks[]> Tracks { get; set; } = [];
-    private static readonly Timer PlayNextSong = TimerManager.SetTimer("PlayNextSong", RandomManager.RandomIntRange(300, 600), () => playSong = true, repetitions:int.MaxValue);
-    private static bool playSong = false;
+    private static readonly Timer PlayNextSong = TimerManager.SetTimer("PlayNextSong", RandomManager.RandomIntRange(0, 10), EndSong, repetitions:int.MaxValue);
+    private static bool QueueNextSong = false;
     public static void LoadSoundtracks(ContentManager content)
     {
 
@@ -74,13 +75,11 @@ public static class SoundtrackManager
     }
     public static void Update()
     {
-        if (!SoundManager.IsMusicPlaying && playSong)
+        if (!SoundManager.IsMusicPlaying && QueueNextSong)
         {
             Soundtracks? soundtrack = GetRandomSoundtrack(StateManager.Mood);
-            if (soundtrack != null && SoundManager.TryPlayMusic(soundtrack.ToString()!))
-                SoundtrackChanged?.Invoke(soundtrack.Value);
-            Playing = soundtrack;
-            playSong = false;
+            if (soundtrack != null)
+                PlaySoundtrack(soundtrack.Value);
         }
     }
     public static Soundtracks? GetRandomSoundtrack(Mood mood)
@@ -101,18 +100,17 @@ public static class SoundtrackManager
     {
         if (SoundManager.TryPlayMusic(soundtrack.ToString()!))
         {
-            PlayNextSong.Left = 600 + RandomManager.RandomIntRange(300, 600); // 600 buffer for current track
+            PlayNextSong.Left = (int)MediaPlayer.Queue.ActiveSong.Duration.TotalSeconds + RandomManager.RandomIntRange(60, 120);
             Playing = soundtrack;
             SoundtrackChanged?.Invoke(soundtrack);
+            QueueNextSong = false;
             return true;
         }
         return false;
     }
-    public static void StopSoundtrack()
+    private static void EndSong()
     {
-        SoundtrackChanged?.Invoke(null);
+        QueueNextSong = true;
         Playing = null;
-        PlayNextSong.Left = RandomManager.RandomIntRange(300, 600);
-        SoundManager.StopMusic();
     }
 }
