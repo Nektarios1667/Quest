@@ -59,4 +59,13 @@ public class Decal
         Rectangle source = GetAnimationSource(Texture, gameManager.GameTime, duration: .75f);
         DrawTexture(gameManager.Batch, Texture, dest, source: source, scale: Constants.TileSizeScale);
     }
+    public static Decal CreateDecal(DecalType type, Point location)
+    {
+        return type switch
+        {
+            DecalType.Torch => new Torch(location),
+            DecalType.BlueTorch => new BlueTorch(location),
+            _ => new Decal(location, type)
+        };
+    }
 }

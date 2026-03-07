@@ -49,7 +49,7 @@ public class LevelManager
             if (loot.Item.Type == ItemTypes.Lantern)
             {
                 Point loc = loot.Location - CameraManager.Camera.ToPoint() + Constants.Middle + TextureManager.Metadata[loot.Texture].Size;
-                LightingManager.SetLight($"Loot_{loot.UID}", loc, 2, Color.Transparent);
+                LightingManager.SetLight($"Loot_{loot.UID}", loc, 2);
             }
     }
     public void UpdateSky(GameManager gameManager)

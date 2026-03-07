@@ -100,7 +100,7 @@ public static class BinaryReaderExtensions
     {
         DecalType type = (DecalType)reader.ReadByte();
         Point location = reader.ReadByteCoord().ToPoint();
-        return new Decal(location, type);
+        return Decal.CreateDecal(type, location);
     }
 }
 

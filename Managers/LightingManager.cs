@@ -81,13 +81,11 @@ public readonly struct RadialLight
 {
     public Point Position { get; }
     public int Size { get; }
-    public Color Color { get; }
     public bool SingleFrame { get; init; }
-    public RadialLight(Point pos, int size, Color color, bool singleFrame = false)
+    public RadialLight(Point pos, int size, bool singleFrame = false)
     {
         Position = pos;
         Size = size;
-        Color = color;
         SingleFrame = singleFrame;
     }
 }
@@ -119,12 +117,7 @@ public static class LightingManager
                 Lights.Remove(key);
         }
     }
-    public static void CreateLight(string name, Point pos, float tileSize, Color color)
-    {
-        if (Lights.ContainsKey(name)) return;
-        Lights[name] = new(pos, (int)(tileSize * Constants.TileSize.X), color);
-    }
-    public static void SetLight(string name, Point pos, float tileSize, Color color, bool singleFrame = false) => Lights[name] = new(pos, (int)(tileSize * Constants.TileSize.X), color, singleFrame);
+    public static void SetLight(string name, Point pos, float tileSize, bool singleFrame = false) => Lights[name] = new(pos, (int)(tileSize * Constants.TileSize.X), singleFrame);
     public static RadialLight[] GetVisibleLights() => [.. Lights.Values.Where(LightAffectsScreen)];
     public static void RemoveLight(string name) => Lights.Remove(name);
     public static void ClearLights() => Lights.Clear();
