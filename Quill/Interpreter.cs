@@ -277,14 +277,14 @@ public static partial class Interpreter
         if (command.Operation == QuillOp.NoOp) return;
 
         // Fill variables and expressions
-        string[] args = [.. command.Args];
-
+        string[] args = command.Args;
         if (command.HasVariables)
         {
             ReplaceVariables(args, instance.Locals);
             ReplaceVariables(args, instance.Variables);
-            ReplaceVariables(args, ExternalSymbols);
         }
+        if (command.HasExternals)
+            ReplaceVariables(args, ExternalSymbols);
         if (command.HasCurlyExpressions)
             EvaluateCurlyExpressions(args);
 
@@ -295,6 +295,7 @@ public static partial class Interpreter
         switch (op)
         {
             case QuillOp.PerfMode: HandlePerfMode(instance, args); break;
+            case QuillOp.Meta: HandleMeta(instance, args); break;
             case QuillOp.Num: HandleNum(instance, args); break;
             case QuillOp.Str: HandleStr(instance, args); break;
             case QuillOp.BreakWhile: HandleBreakWhile(instance, args); break;

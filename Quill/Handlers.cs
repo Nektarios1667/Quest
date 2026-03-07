@@ -10,6 +10,23 @@ namespace Quest.Quill;
 public static partial class Interpreter
 {
     // Handlers
+    private static void HandleMeta(QuillInstance inst, string[] args)
+    {
+        if (args.Length != 1)
+        {
+            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"#meta expects 1 argument, received {args.Length}"));
+            return;
+        }
+        if (!int.TryParse(args[0], out int l) || l < 1 || l > inst.CompiledLines.Length)
+        {
+            inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"Invalid line number: {args.Length}"));
+            return;
+        }
+        // Since index starts at 0
+        l--;
+        Logger.Log($"{inst.Script.Name} | @{inst.L} | {inst.CompiledLines[l]} | {inst.CompiledLines[l].Flags()} | e:{inst.Errors.Count} | pf:{inst.PerformanceMode} | sc:{inst.Scopes.LastOrDefault() ?? "NUL"} | {string.Join(',', inst.Callbacks)} | ln:{inst.CompiledLines.Length}");
+
+    }
     private static void HandlePerfMode(QuillInstance inst, string[] args)
     {
         if (args.Length != 1)

@@ -89,9 +89,14 @@ public readonly struct RadialLight
         SingleFrame = singleFrame;
     }
 }
-
+// TODO Fix lights disappearing when going offscreen
+// Options:
+// - Add buffer around screen - will lower framerate though
+// - Sort of autmatically transpose a nearby light to edge of screen - not fully accurate
 public static class LightingManager
 {
+    public const int LightDivisions = 2;
+    public const float InvLightDivisions = 1f / LightDivisions;
     public const int LightScale = 10;
     public const float LightBoost = 0.7f;
     public static Dictionary<string, RadialLight> Lights { get; private set; } = [];
@@ -99,12 +104,12 @@ public static class LightingManager
     static LightingManager()
     {
         // Precompute light to intensity mapping
-        LightToIntensityCache = new float[LightScale * 2 + 1];
-        for (float i = 0; i <= LightScale; i += 0.5f)
+        LightToIntensityCache = new float[LightScale * LightDivisions + 1];
+        for (float i = 0; i <= LightScale; i += InvLightDivisions)
         {
             float intensity = MathF.Exp((i * LightBoost) / LightScale) - 1;
             intensity = Math.Clamp(intensity, 0f, 1f);
-            LightToIntensityCache[(int)(i * 2)] = intensity;
+            LightToIntensityCache[(int)Math.Round(i * LightDivisions)] = intensity;
         }
         Logger.System("Precomputed light to intensity mapping.");
     }
