@@ -30,7 +30,7 @@ public static class SoundtrackManager
     //
     public static Soundtracks? Playing { get; private set; }
     private static Dictionary<Mood, Soundtracks[]> Tracks { get; set; } = [];
-    private static readonly Timer PlayNextSong = TimerManager.SetTimer("PlayNextSong", RandomManager.RandomIntRange(0, 10), EndSong, repetitions:int.MaxValue);
+    private static readonly Timer PlayNextSong = TimerManager.SetTimer("PlayNextSong", RandomManager.RandomIntRange(30, 60), EndSong, repetitions:int.MaxValue);
     private static bool QueueNextSong = false;
     public static void LoadSoundtracks(ContentManager content)
     {
