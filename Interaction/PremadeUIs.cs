@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MonoGUI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ public partial class UserInterface
     public static UserInterface ChestUI { get; private set; } = null!;
     public static UserInterface InventoryUI { get; private set; } = null!;
     public static UserInterface JukeboxUI { get; private set; } = null!;
+    public static UserInterface DiscWriterUI { get; private set; } = null!;
     public static void Init(SpriteBatch batch)
     {
         // ----- Chest UI -----
@@ -54,9 +56,9 @@ public partial class UserInterface
         title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "JUKEBOX", PixelOperatorLarge, Color.White);
         JukeboxUI.AddElement("title", title);
 
-        // Tracks - 5 horizontal slots
+        // Track
         InputSlot input = new(new(Constants.Middle.X - Slot.SlotSize.X / 2, 75), [ItemTypes.Disc]);
-        JukeboxUI.AddElement($"disc", input);
+        JukeboxUI.AddElement("disc", input);
 
         // Play button in the middle of the track slots - green text
         Button play = new(new(Constants.Middle.X - 50, 160), new(100, 35), "Play", PixelOperatorLarge, Color.White, Color.Green * 0.6f, Color.Green * 0.4f);
@@ -65,8 +67,39 @@ public partial class UserInterface
             // Get the disc in the first slot
             InputSlot slot = (InputSlot)JukeboxUI.GetElements()["disc"]!;
             if (slot.Item != null)
-                SoundtrackManager.PlaySoundtrack(slot.Item.Name);
+                SoundtrackManager.PlaySoundtrack(slot.Item.Name.Replace(" ", ""));
         };
         JukeboxUI.AddElement("play_button", play);
+
+        // ----- Disc Writer -----
+        DiscWriterUI = new(batch);
+
+        // Title
+        titleSize = PixelOperatorLarge.MeasureString("DISC WRITER").ToPoint();
+        title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "DISC WRITER", PixelOperatorLarge, Color.White);
+        DiscWriterUI.AddElement("title", title);
+
+        // Input disc
+        input = new(new(Constants.Middle.X - Slot.SlotSize.X / 2, 75), [ItemTypes.Disc]);
+        DiscWriterUI.AddElement("disc", input);
+
+        // Rename input
+        TextInput discName = new(new(Constants.Middle.X - 100, 160), new(200, 35), PixelOperator, Color.White, Color.Black * 0.6f, Color.Black * 0.4f, borderThickness:0);
+        DiscWriterUI.AddElement("disc_name", discName);
+        input.OnItemChange += () =>
+        {
+            if (input.Item != null)
+                discName.SetText(StringTools.FillCamelSpaces(input.Item.Name));
+            else
+                discName.SetText("");
+        };
+        // Rename button
+        Button rename = new(new(Constants.Middle.X - 50, 215), new(100, 35), "Rename", PixelOperator, Color.White, Color.Black * 0.6f, Color.Black * 0.4f, borderThickness: 0);
+        rename.Clicked += () =>
+        {
+            if (input.Item != null && discName.Text != "")
+                input.Item.CustomName = discName.Text;
+        };
+        DiscWriterUI.AddElement("rename", rename);
     }
 }

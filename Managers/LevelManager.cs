@@ -448,6 +448,7 @@ public class LevelManager
             TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, "_"),
             TileTypeID.Lamp => new Lamp(location),
             TileTypeID.Jukebox => new Jukebox(location),
+            TileTypeID.DiscWriter => new DiscWriter(location),
             _ => new(location, type)
         };
     }

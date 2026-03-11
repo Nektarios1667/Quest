@@ -114,6 +114,7 @@ public static class TextureManager
         Sandstone,
         SandstoneWall,
         Jukebox,
+        DiscWriter,
         // TILES ENUM INSERT
         Torch,
         BlueTorch,
@@ -267,6 +268,7 @@ public static class TextureManager
         Textures[TextureID.Sandstone] = content.Load<Texture2D>("Images/Tiles/Sandstone");
         Textures[TextureID.SandstoneWall] = content.Load<Texture2D>("Images/Tiles/SandstoneWall");
         Textures[TextureID.Jukebox] = content.Load<Texture2D>("Images/Tiles/Jukebox");
+        Textures[TextureID.DiscWriter] = content.Load<Texture2D>("Images/Tiles/DiscWriter");
         // TILES INSERT
         Textures[TextureID.Torch] = content.Load<Texture2D>("Images/Decals/Torch");
         Textures[TextureID.BlueTorch] = content.Load<Texture2D>("Images/Decals/BlueTorch");
@@ -408,6 +410,7 @@ public static class TextureManager
         Metadata[TextureID.Sandstone] = new(Textures[TextureID.Sandstone].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.SandstoneWall] = new(Textures[TextureID.SandstoneWall].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Jukebox] = new(Textures[TextureID.Jukebox].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.DiscWriter] = new(Textures[TextureID.DiscWriter].Bounds.Size, new(4, 4), "tile");
         // TILES METADATA INSERT
         Metadata[TextureID.Torch] = new(Textures[TextureID.Torch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), "decal");

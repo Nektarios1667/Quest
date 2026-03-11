@@ -1,4 +1,6 @@
-﻿namespace Quest.Managers;
+﻿using System.Linq;
+
+namespace Quest.Managers;
 public static class InputManager
 {
     // Devices
@@ -17,7 +19,8 @@ public static class InputManager
         MouseState = Mouse.GetState();
     }
     public static Point MousePosition => MouseState.Position;
-    public static Keys[] KeysPressed => KeyboardState.GetPressedKeys();
+    public static Keys[] KeysDown => KeyboardState.GetPressedKeys();
+    public static Keys[] LastKeysDown => LastKeyboardState.GetPressedKeys();
     public static bool KeyPressed(Keys key) => KeyboardState.IsKeyDown(key) && LastKeyboardState.IsKeyUp(key);
     public static bool KeyDown(Keys key) => KeyboardState.IsKeyDown(key);
     public static bool AnyKeyDown(params Keys[] keys)

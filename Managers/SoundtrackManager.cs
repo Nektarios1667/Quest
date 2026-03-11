@@ -34,7 +34,6 @@ public static class SoundtrackManager
     private static bool QueueNextSong = false;
     public static void LoadSoundtracks(ContentManager content)
     {
-
         // Soundtracks and their categories
         Tracks = new()
         {
