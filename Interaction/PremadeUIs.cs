@@ -98,7 +98,7 @@ public partial class UserInterface
         rename.Clicked += () =>
         {
             if (input.Item != null && discName.Text != "")
-                input.Item.CustomName = discName.Text;
+                input.Item.CustomName = discName.Text.Replace(" ", "");
         };
         DiscWriterUI.AddElement("rename", rename);
     }

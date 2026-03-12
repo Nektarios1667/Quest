@@ -68,13 +68,13 @@ public class Enemy
                 if (move.LengthSquared() <= 9)
                     Location += move;
                 else
-                    Location += Vector2.Normalize(move) * Speed * gameManager.DeltaTime;
+                    Location += Vector2.Normalize(move) * Speed * GameManager.DeltaTime;
             }
         }
     }
     public virtual void Draw(GameManager gameManager)
     {
-        Rectangle source = GetAnimationSource(Texture, gameManager.GameTime, duration: 0.5f);
+        Rectangle source = GetAnimationSource(Texture, GameManager.GameTime, duration: 0.5f);
         DrawTexture(gameManager.Batch, Texture, Location.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, source: source);
     }
     public virtual void Hurt(int damage)

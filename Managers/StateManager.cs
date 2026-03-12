@@ -135,7 +135,7 @@ public static class StateManager
             // Write GameManager data
             writer.Write(gameManager.LevelManager.Level.Name);
             writer.Write(gameManager.DayTime);
-            writer.Write(gameManager.GameTime);
+            writer.Write(GameManager.GameTime);
             writer.Write(WeatherSeed);
             writer.Write(lastWeather);
             // Write CameraManager data
@@ -225,10 +225,10 @@ public static class StateManager
             gameManager.LevelManager.LoadLevel(gameManager, level);
 
             gameManager.DayTime = reader.ReadSingle();
-            gameManager.GameTime = reader.ReadSingle();
+            GameManager.GameTime = reader.ReadSingle();
             WeatherSeed = reader.ReadInt32();
             lastWeather = reader.ReadSingle();
-            SetWeatherPersistent(lastWeatherTime: lastWeather, lastTimeValue: gameManager.GameTime);
+            SetWeatherPersistent(lastWeatherTime: lastWeather, lastTimeValue: GameManager.GameTime);
             // Read CameraManager data
             CameraManager.CameraDest = new(reader.ReadSingle(), reader.ReadSingle());
             CameraManager.Camera = CameraManager.CameraDest;

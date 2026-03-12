@@ -94,7 +94,7 @@ public static class BinaryReaderExtensions
         byte amount = reader.ReadByte();
         ushort x = reader.ReadUInt16();
         ushort y = reader.ReadUInt16();
-        return new Loot(new ItemRef(type, amount), new Point(x, y), gameManager.GameTime);
+        return new Loot(new ItemRef(type, amount), new Point(x, y), GameManager.GameTime);
     }
     public static Decal ReadDecal(this BinaryReader reader)
     {

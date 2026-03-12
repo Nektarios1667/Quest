@@ -66,7 +66,7 @@ public class LevelManager
     {
         // Calculate sky colors from weather, biome, and time
         BiomeType? currentBiome = GetBiome(loc);
-        blend ??= StateManager.WeatherIntensity(gameManager.GameTime);
+        blend ??= StateManager.WeatherIntensity(GameManager.GameTime);
 
         Color weatherColor = default;
         if (currentBiome == null || currentBiome == BiomeType.Indoors || blend == 0) weatherColor = Color.Transparent;
@@ -128,7 +128,7 @@ public class LevelManager
         {
             Loot loot = Level.Loot[l];
             Point pos = loot.Location - CameraManager.Camera.ToPoint() + Constants.Middle;
-            pos.Y += (int)(Math.Sin((gameManager.GameTime - loot.Birth) * 2 % (Math.PI * 2)) * 6); // Bob up and down
+            pos.Y += (int)(Math.Sin((GameManager.GameTime - loot.Birth) * 2 % (Math.PI * 2)) * 6); // Bob up and down
             DrawTexture(gameManager.Batch, loot.Texture, pos, scale: 2);
             // Draw stacks if multiple
             if (loot.Item.Amount > 1)

@@ -77,7 +77,16 @@ public class TextInput : UIElement
         if (BorderColor.HasValue)
             ui.Batch.DrawRectangle(Bounds, BorderColor.Value, BorderThickness);
         // Text
-        ui.Batch.DrawString(Font, Text, Location.ToVector2() + new Vector2(BorderThickness + 3, BorderThickness + 1), Foreground);
+        Vector2 textPos = Location.ToVector2() + new Vector2(BorderThickness + 3, BorderThickness + 1);
+        ui.Batch.DrawString(Font, Text, textPos, Foreground);
+        // Cursor
+        if (State == ButtonState.Pressed && GameManager.GameTime % 1 < 0.5f) {
+            if (Text == "")
+                ui.Batch.DrawLine(textPos, textPos + new Vector2(0, Font.MeasureString("|").Y), Foreground, 3);
+            else
+                ui.Batch.DrawLine(textPos + new Vector2(Font.MeasureString(Text).X, 0), textPos + Font.MeasureString(Text), Foreground, 3);
+        }
+
     }
     public void SetText(string text)
     {
@@ -100,6 +109,20 @@ public class TextInput : UIElement
     public static string KeyToString(Keys key, bool shift)
     {
         if (key == Keys.Back) return "\b";
+        else if (key == Keys.OemTilde) return shift ? "~" : "`";
+        else if (key == Keys.OemMinus) return shift ? "_" : "-";
+        else if (key == Keys.OemPlus) return shift ? "+" : "=";
+        else if (key == Keys.OemOpenBrackets) return shift ? "{" : "[";
+        else if (key == Keys.OemCloseBrackets) return shift ? "}" : "]";
+        else if (key == Keys.OemPipe) return shift ? "|" : "\\";
+        else if (key == Keys.OemBackslash) return shift ? "|" : "\\";
+        else if (key == Keys.OemSemicolon) return shift ? ":" : ";";
+        else if (key == Keys.OemQuotes) return shift ? "\"" : "'";
+        else if (key == Keys.OemComma) return shift ? "<" : ",";
+        else if (key == Keys.OemPeriod) return shift ? ">" : ".";
+        else if (key == Keys.OemQuestion) return shift ? "?" : "/";
+        else if (key == Keys.Space) return " ";
+        else if (key == Keys.Enter) return "\x0D";
         else if (key.ToString().Length > 1) return "";
         else
             return shift ? key.ToString().ToUpper() : key.ToString().ToLower();

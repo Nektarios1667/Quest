@@ -289,12 +289,12 @@ public static class CommandManager
         int daytime = int.Parse(parts[2]);
         if (parts[1] == "set")
         {
-            gameManager!.GameTime = daytime;
+            GameManager.GameTime = daytime;
             return true;
         }
         else if (parts[1] == "change")
         {
-            gameManager!.GameTime += daytime;
+            GameManager.GameTime += daytime;
             return true;
         }
         return false;
@@ -327,7 +327,7 @@ public static class CommandManager
         if (item == null) return false;
         Item leftover = playerManager!.Inventory.AddItem(item);
         if (leftover.Amount > 0)
-            levelManager!.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), CameraManager.PlayerFoot, gameManager!.GameTime));
+            levelManager!.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), CameraManager.PlayerFoot, GameManager.GameTime));
         return true;
     }
     private static bool CNotif(string command)

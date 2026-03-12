@@ -3,12 +3,14 @@
 namespace Quest.Managers;
 public class GameManager
 {
+    // Static times
+    public static float DeltaTime { get; private set; } = 0f;
+    public static float GameTime { get; set; } = 0f;
+    public static float TotalTime { get; private set; } = 0f;
+
     public LevelManager LevelManager { get; private set; }
     public OverlayManager OverlayManager { get; private set; }
     public MenuManager MenuManager { get; private set; }
-    public float DeltaTime { get; private set; } = 0f;
-    public float GameTime { get; set; } = 0f;
-    public float TotalTime { get; private set; } = 0f;
     public float DayTime { get; set; } = 0f;
     public SpriteBatch Batch { get; private set; }
     public SpriteBatch MinimapBatch { get; private set; }

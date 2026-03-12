@@ -191,7 +191,7 @@ public class PlayerManager
         for (int l = 0; l < gameManager.LevelManager.Level.Loot.Count; l++)
         {
             Loot loot = gameManager.LevelManager.Level.Loot[l];
-            if (gameManager.GameTime - loot.Birth < 3) continue; // Prevent picking up things just dropped
+            if (GameManager.GameTime - loot.Birth < 3) continue; // Prevent picking up things just dropped
             // Pick up loot
             if (PointTools.DistanceSquared(CameraManager.PlayerFoot, loot.Location + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
             {
@@ -246,7 +246,7 @@ public class PlayerManager
         int sourceRow = (int)PlayerDirection;
         // Draw player
         Point pos = Constants.Middle - Constants.MageHalfSize + CameraManager.CameraOffset.ToPoint();
-        Rectangle source = GetAnimationSource(TextureID.BlueMage, gameManager.GameTime, duration: sourceRow == 0 ? .5f : .25f, row: sourceRow);
+        Rectangle source = GetAnimationSource(TextureID.BlueMage, GameManager.GameTime, duration: sourceRow == 0 ? .5f : .25f, row: sourceRow);
         DrawTexture(gameManager.Batch, TextureID.BlueMage, pos, scale: Constants.PlayerScale, source: source);
         // Draw equipped item
         if (EquippedItem != null)
@@ -268,7 +268,7 @@ public class PlayerManager
     {
         // Move
         if (move == Vector2.Zero) return;
-        Vector2 finalMove = Vector2.Normalize(move) * gameManager.DeltaTime * Constants.PlayerSpeed;
+        Vector2 finalMove = Vector2.Normalize(move) * GameManager.DeltaTime * Constants.PlayerSpeed;
 
         // Stuck in block
         if (IsColliding(gameManager)) return;
@@ -380,7 +380,7 @@ public class PlayerManager
         Item? item = ui.BoundContainer.Items[slot];
         if (item == null) return;
 
-        Game.LevelManager.Level.Loot.Add(new Loot(new(item.Type, item.Amount, item.CustomName), CameraManager.PlayerFoot + new Point(0, 20), Game.GameTime));
+        Game.LevelManager.Level.Loot.Add(new Loot(new(item.Type, item.Amount, item.CustomName), CameraManager.PlayerFoot + new Point(0, 20), GameManager.GameTime));
         ui.BoundContainer.SetSlot(slot, null);
     }
     public void SlotHovered(int slot, UserInterface ui)

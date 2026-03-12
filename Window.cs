@@ -231,11 +231,11 @@ public class Window : Game
         debugSb.Append("FPS: ");
         debugSb.AppendFormat("{0:0.0}", cacheDelta != 0 ? 1f / cacheDelta : 0);
         debugSb.Append("\nGameTime: ");
-        debugSb.AppendFormat("{0:0.00}", gameManager.GameTime);
+        debugSb.AppendFormat("{0:0.00}", GameManager.GameTime);
         debugSb.Append("\nDayTime: ");
         debugSb.AppendFormat("{0:0.00}", gameManager.DayTime);
         debugSb.Append("\nTotalTime: ");
-        debugSb.AppendFormat("{0:0.00}", gameManager.TotalTime);
+        debugSb.AppendFormat("{0:0.00}", GameManager.GameTime);
         debugSb.Append("\nCamera: ");
         debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.Camera.X, CameraManager.Camera.Y);
         debugSb.Append("\nTile Below: ");
@@ -257,8 +257,8 @@ public class Window : Game
         debugSb.Append("\nLighting: ");
         debugSb.AppendFormat("{0}/{1}", LightingManager.GetVisibleLights().Length, LightingManager.Lights.Count);
         debugSb.Append("\nWeather: ");
-        debugSb.Append(StateManager.WeatherIntensity(gameManager.GameTime));
-        debugSb.AppendFormat(" [{0:0.00}]", StateManager.WeatherNoiseValue(gameManager.GameTime));
+        debugSb.Append(StateManager.WeatherIntensity(GameManager.GameTime));
+        debugSb.AppendFormat(" [{0:0.00}]", StateManager.WeatherNoiseValue(GameManager.GameTime));
         debugSb.Append("\nUIDs: ");
         debugSb.AppendFormat("L:{0} E:{1} I:{2}", UIDManager.Available(UIDCategory.Loot), UIDManager.Available(UIDCategory.Enemies), UIDManager.Available(UIDCategory.Items));
         debugSb.Append("\nSave: ");
@@ -302,6 +302,6 @@ public class Window : Game
     {
         frameTimes.Clear();
         frameTimes = new(DebugManager.FrameTimes);
-        cacheDelta = gameManager.DeltaTime;
+        cacheDelta = GameManager.DeltaTime;
     }
 }

@@ -129,7 +129,7 @@ public class OverlayManager
         // Death
         if (StateManager.State == GameState.Death)
         {
-            if (deathTime == -1) deathTime = gameManager.GameTime;
+            if (deathTime == -1) deathTime = GameManager.GameTime;
             gameManager.Batch.DrawString(PixelOperator, "YOU DIED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("You died!") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
             gameManager.Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
         }
@@ -228,7 +228,7 @@ public class OverlayManager
         // Biome
         if (biomeColors.GetLength(0) != tileWidth || biomeColors.GetLength(1) != tileHeight)
             biomeColors = new Color[tileWidth, tileHeight];
-        float blend = StateManager.WeatherIntensity(gameManager.GameTime);
+        float blend = StateManager.WeatherIntensity(GameManager.GameTime);
         for (int y = 0; y < tileHeight; y++)
         {
             for (int x = 0; x < tileWidth; x++)

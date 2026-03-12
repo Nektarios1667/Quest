@@ -20,7 +20,7 @@ public class Jukebox : Tile
     public override void Draw(GameManager gameManager)
     {
         Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
-        Rectangle source = GetAnimationSource(TextureID.Jukebox, gameManager.GameTime, 0.5f, row: SoundtrackManager.Playing == null ? 0 : 1);
+        Rectangle source = GetAnimationSource(TextureID.Jukebox, GameManager.GameTime, 0.5f, row: SoundtrackManager.Playing == null ? 0 : 1);
         DrawTexture(gameManager.Batch, Type.Texture, dest, source: source, scale: Constants.TileSizeScale);
     }
 }

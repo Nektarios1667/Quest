@@ -12,9 +12,9 @@ public class Timer(float duration, Action? call, int repetitions = 1)
     public bool IsExpired => Left <= 0f && Completions >= Repetitions;
     public event Action? Completed;
 
-    public void Update(GameManager manager)
+    public void Update(GameManager gameManager)
     {
-        Left -= manager.DeltaTime;
+        Left -= GameManager.DeltaTime;
         if (Left <= 0f)
         {
             Completions++;

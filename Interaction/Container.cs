@@ -167,5 +167,5 @@ public class Container
         Items = items;
     }
     public void Clear() => Items = new Item?[Items.Length];
-    public static bool SameItem(Item? item1, Item? item2) => item1 != null && item2 != null && item1.Type == item2.Type && item1.Name == item2.Name;
+    public static bool SameItem(Item? item1, Item? item2) => item1 != null && item2 != null && item1.Type == item2.Type && item1.CustomName == item2.CustomName;
 }

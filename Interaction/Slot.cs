@@ -79,8 +79,10 @@ public class Slot : UIElement
     }
     public virtual bool SetItem(Item? item)
     {
-        OnItemChange?.Invoke();
+        bool changed = Item != item;
         Item = item;
+        if (changed)
+            OnItemChange?.Invoke();
         return true;
     }
     public virtual bool CanAccept(Item? item) => true;

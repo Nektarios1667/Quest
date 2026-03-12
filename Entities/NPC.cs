@@ -52,7 +52,7 @@ public class NPC
         // Npc
         Vector2 origin = new(tilesize.X / 2, tilesize.Y);
         Point pos = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle + tilesize / Constants.TwoPoint;
-        Rectangle source = GetAnimationSource(Texture, gameManager.GameTime);
+        Rectangle source = GetAnimationSource(Texture, GameManager.GameTime);
         DrawTexture(gameManager.Batch, Texture, pos, color: TextureColor, scale: Scale * Constants.NPCScale, source: source, origin: origin);
         // Debug
         if (DebugManager.DrawHitboxes)
@@ -107,7 +107,7 @@ public class NPC
         {
             Item leftover = cont.AddItem(new(option.Item));
             if (leftover.Amount > 0)
-                gameManager.LevelManager.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), Location, gameManager.GameTime));
+                gameManager.LevelManager.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), Location, GameManager.GameTime));
             SoundManager.PlaySound("Trinkets");
             option.Stock -= 1;
         }

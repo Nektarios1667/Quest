@@ -221,19 +221,19 @@ public class MenuManager
         switch (StateManager.State)
         {
             case GameState.MainMenu:
-                MainMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                MainMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
             case GameState.Settings:
-                SettingsMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                SettingsMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
             case GameState.Credits:
-                CreditsMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                CreditsMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
             case GameState.LevelSelect:
-                LevelSelectMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                LevelSelectMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
             case GameState.Game:
-                //DebugMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                //DebugMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
             case GameState.Loading:
                 DrawLoading();
@@ -243,7 +243,7 @@ public class MenuManager
         switch (StateManager.OverlayState)
         {
             case OverlayState.Pause:
-                PauseMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                PauseMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
         }
 
