@@ -114,15 +114,18 @@ public class PlayerManager
         DebugManager.StartBenchmark("InventoryUpdate");
 
         // Change equipped item with hotkeys
-        if (InputManager.KeyPressed(Keys.D1)) EquippedSlot = 0;
-        if (InputManager.KeyPressed(Keys.D2)) EquippedSlot = 1;
-        if (InputManager.KeyPressed(Keys.D3)) EquippedSlot = 2;
-        if (InputManager.KeyPressed(Keys.D4)) EquippedSlot = 3;
-        if (InputManager.KeyPressed(Keys.D5)) EquippedSlot = 4;
-        if (InputManager.KeyPressed(Keys.D6)) EquippedSlot = 5;
-        // Change equipped item with scroll
-        if (InputManager.ScrolledUp) EquippedSlot = (EquippedSlot - 1 + Chest.Size.X) % Chest.Size.X;
-        if (InputManager.ScrolledDown) EquippedSlot = (EquippedSlot + 1) % Chest.Size.X;
+        if (!InventoryUI.IsVisible)
+        {
+            if (InputManager.KeyPressed(Keys.D1)) EquippedSlot = 0;
+            if (InputManager.KeyPressed(Keys.D2)) EquippedSlot = 1;
+            if (InputManager.KeyPressed(Keys.D3)) EquippedSlot = 2;
+            if (InputManager.KeyPressed(Keys.D4)) EquippedSlot = 3;
+            if (InputManager.KeyPressed(Keys.D5)) EquippedSlot = 4;
+            if (InputManager.KeyPressed(Keys.D6)) EquippedSlot = 5;
+            // Change equipped item with scroll
+            if (InputManager.ScrolledUp) EquippedSlot = (EquippedSlot - 1 + Chest.Size.X) % Chest.Size.X;
+            if (InputManager.ScrolledDown) EquippedSlot = (EquippedSlot + 1) % Chest.Size.X;
+        }
 
         // 
         InventoryUI.GetSlot(EquippedSlot).Mark(Color.Salmon);

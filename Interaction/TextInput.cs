@@ -123,6 +123,16 @@ public class TextInput : UIElement
         else if (key == Keys.OemQuestion) return shift ? "?" : "/";
         else if (key == Keys.Space) return " ";
         else if (key == Keys.Enter) return "\x0D";
+        else if (key == Keys.D1) return shift ? "!" : "1";
+        else if (key == Keys.D2) return shift ? "@" : "2";
+        else if (key == Keys.D3) return shift ? "#" : "3";
+        else if (key == Keys.D4) return shift ? "$" : "4";
+        else if (key == Keys.D5) return shift ? "%" : "5";
+        else if (key == Keys.D6) return shift ? "^" : "6";
+        else if (key == Keys.D7) return shift ? "&" : "7";
+        else if (key == Keys.D8) return shift ? "*" : "8";
+        else if (key == Keys.D9) return shift ? "(" : "9";
+        else if (key == Keys.D0) return shift ? ")" : "0";
         else if (key.ToString().Length > 1) return "";
         else
             return shift ? key.ToString().ToUpper() : key.ToString().ToLower();
