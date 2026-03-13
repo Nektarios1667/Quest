@@ -75,6 +75,9 @@ public static class TextureManager
         BottledCloud,
         BottledStorm,
         Disc,
+        Cloth,
+        Coal,
+        RawIron,
         // ITEMS ENUM INSERT
         Dirt,
         Flooring,
@@ -228,6 +231,10 @@ public static class TextureManager
         Textures[TextureID.BottledCloud] = content.Load<Texture2D>("Images/Items/BottledCloud");
         Textures[TextureID.BottledStorm] = content.Load<Texture2D>("Images/Items/BottledStorm");
         Textures[TextureID.Disc] = content.Load<Texture2D>("Images/Items/Disc");
+        Textures[TextureID.Cloth] = content.Load<Texture2D>("Images/Items/Cloth");
+        Textures[TextureID.Coal] = content.Load<Texture2D>("Images/Items/Coal");
+        Textures[TextureID.Coal] = content.Load<Texture2D>("Images/Items/Coal");
+        Textures[TextureID.RawIron] = content.Load<Texture2D>("Images/Items/RawIron");
         // ITEMS INSERT
         Textures[TextureID.Dirt] = content.Load<Texture2D>("Images/Tiles/Dirt");
         Textures[TextureID.Flooring] = content.Load<Texture2D>("Images/Tiles/Flooring");
@@ -370,6 +377,10 @@ public static class TextureManager
         Metadata[TextureID.BottledCloud] = new(Textures[TextureID.BottledCloud].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.BottledStorm] = new(Textures[TextureID.BottledStorm].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Disc] = new(Textures[TextureID.Disc].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Cloth] = new(Textures[TextureID.Cloth].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Coal] = new(Textures[TextureID.Coal].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Coal] = new(Textures[TextureID.Coal].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.RawIron] = new(Textures[TextureID.RawIron].Bounds.Size, new(1, 1), "item");
         // ITEMS METADATA INSERT
         Metadata[TextureID.Dirt] = new(Textures[TextureID.Dirt].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Flooring] = new(Textures[TextureID.Flooring].Bounds.Size, new(4, 4), "tile");
