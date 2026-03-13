@@ -27,6 +27,8 @@ public class EditorManager
     };
     // Settings
     public bool ShowBiomeMarkers = true;
+    // Helper
+    public string[] KeyOptions = ["NONE", ..Enum.GetNames(typeof(ItemTypeID))];
     // Private
     private GameManager GameManager { get; }
     private LevelManager LevelManager { get; }
@@ -219,19 +221,21 @@ public class EditorManager
         // Door
         else if (tile is Door door)
         {
-            var (success, values) = ShowInputForm("Door Editor", [new("Key", null, Enum.GetNames(typeof(ItemTypeID))), new("Amount", IsByte), new("Consume Key", null, ["true", "false"])]);
+            var (success, values) = ShowInputForm("Door Editor", [new("Key", null, KeyOptions), new("Amount", IsByte), new("Consume Key", null, ["true", "false"])]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Stair edit failed.");
                 return;
             }
-            door.Key = new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[0])], byte.Parse(values[1]));
+            door.Key = values[0].Equals("none", StringComparison.CurrentCultureIgnoreCase) ? null : new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[0])], byte.Parse(values[1]));
+            if (door.Key?.Amount <= 0)
+                door.Key = null;
             door.ConsumeKey = bool.Parse(values[2]);
         }
         // Chest
         else if (tile is Chest chest)
         {
-            var (success, values) = ShowInputForm("Chest Editor", [new("Loot File Name", null), new("Loot Type", null, ["Loot Preset", "Loot Table"]), new("Key", null, Enum.GetNames(typeof(ItemTypeID))), new("Amount", IsByte), new("Consume Key", null, ["true", "false"])]);
+            var (success, values) = ShowInputForm("Chest Editor", [new("Loot File Name", null), new("Loot Type", null, ["Loot Preset", "Loot Table"]), new("Key", null, KeyOptions), new("Amount", IsByte), new("Consume Key", null, ["true", "false"])]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Chest edit failed.");
@@ -245,7 +249,9 @@ public class EditorManager
             else
                 Logger.Error("Chest loot edit failed.");
             // Key
-            chest.Key = new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[2])], byte.Parse(values[3]));
+            chest.Key = values[2].Equals("none", StringComparison.CurrentCultureIgnoreCase) ? null : new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[2])], byte.Parse(values[3]));
+            if (chest.Key?.Amount <= 0)
+                chest.Key = null;
             chest.ConsumeKey = bool.Parse(values[4]);
         }
         // Lamp
