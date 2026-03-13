@@ -1,4 +1,6 @@
-﻿using Quest.Gui;
+﻿using Antlr.Runtime;
+using Quest.Gui;
+using SharpDX.Direct3D11;
 using static Quest.Managers.LightingManager;
 
 namespace Quest.Managers;
@@ -132,6 +134,14 @@ public class OverlayManager
             if (deathTime == -1) deathTime = GameManager.GameTime;
             gameManager.Batch.DrawString(PixelOperator, "YOU DIED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("You died!") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
             gameManager.Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
+        } else if (StateManager.State == GameState.Completed)
+        {
+            TimerManager.NewTimer("CompleteScreenFade", 2, null);
+            float fade = TimerManager.GetTimer("CompleteScreenFade").Progress;
+
+            gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * fade);
+            gameManager.Batch.DrawString(PixelOperator, "YOU WIN!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("You win!") * 2, Color.White * fade, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
+            gameManager.Batch.DrawString(PixelOperator, "Press space to continue", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White * fade);
         }
 
         DebugManager.EndBenchmark("PostProcessing");

@@ -114,7 +114,7 @@ public class PlayerManager
         DebugManager.StartBenchmark("InventoryUpdate");
 
         // Change equipped item with hotkeys
-        if (!InventoryUI.IsVisible)
+        if (!InventoryOpen)
         {
             if (InputManager.KeyPressed(Keys.D1)) EquippedSlot = 0;
             if (InputManager.KeyPressed(Keys.D2)) EquippedSlot = 1;

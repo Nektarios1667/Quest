@@ -78,6 +78,30 @@ public static class TextureManager
         Cloth,
         Coal,
         RawIron,
+        Iron,
+        Ink,
+        RawCopper,
+        Copper,
+        RawGold,
+        Gold,
+        Diamond,
+        Emerald,
+        Ruby,
+        CopperMedal,
+        IronMedal,
+        GoldMedal,
+        DiamondMedal,
+        EmeraldMedal,
+        RubyMedal,
+        HeartRune,
+        LightningStaff,
+        TimeStaff,
+        Scroll,
+        Carrot,
+        RawFish,
+        CookedFish,
+        RawBeef,
+        CookedBeef,
         // ITEMS ENUM INSERT
         Dirt,
         Flooring,
@@ -235,6 +259,30 @@ public static class TextureManager
         Textures[TextureID.Coal] = content.Load<Texture2D>("Images/Items/Coal");
         Textures[TextureID.Coal] = content.Load<Texture2D>("Images/Items/Coal");
         Textures[TextureID.RawIron] = content.Load<Texture2D>("Images/Items/RawIron");
+        Textures[TextureID.Iron] = content.Load<Texture2D>("Images/Items/Iron");
+        Textures[TextureID.Ink] = content.Load<Texture2D>("Images/Items/Ink");
+        Textures[TextureID.RawCopper] = content.Load<Texture2D>("Images/Items/RawCopper");
+        Textures[TextureID.Copper] = content.Load<Texture2D>("Images/Items/Copper");
+        Textures[TextureID.RawGold] = content.Load<Texture2D>("Images/Items/RawGold");
+        Textures[TextureID.Gold] = content.Load<Texture2D>("Images/Items/Gold");
+        Textures[TextureID.Diamond] = content.Load<Texture2D>("Images/Items/Diamond");
+        Textures[TextureID.Emerald] = content.Load<Texture2D>("Images/Items/Emerald");
+        Textures[TextureID.Ruby] = content.Load<Texture2D>("Images/Items/Ruby");
+        Textures[TextureID.CopperMedal] = content.Load<Texture2D>("Images/Items/CopperMedal");
+        Textures[TextureID.IronMedal] = content.Load<Texture2D>("Images/Items/IronMedal");
+        Textures[TextureID.GoldMedal] = content.Load<Texture2D>("Images/Items/GoldMedal");
+        Textures[TextureID.DiamondMedal] = content.Load<Texture2D>("Images/Items/DiamondMedal");
+        Textures[TextureID.EmeraldMedal] = content.Load<Texture2D>("Images/Items/EmeraldMedal");
+        Textures[TextureID.RubyMedal] = content.Load<Texture2D>("Images/Items/RubyMedal");
+        Textures[TextureID.HeartRune] = content.Load<Texture2D>("Images/Items/HeartRune");
+        Textures[TextureID.LightningStaff] = content.Load<Texture2D>("Images/Items/LightningStaff");
+        Textures[TextureID.TimeStaff] = content.Load<Texture2D>("Images/Items/TimeStaff");
+        Textures[TextureID.Scroll] = content.Load<Texture2D>("Images/Items/Scroll");
+        Textures[TextureID.Carrot] = content.Load<Texture2D>("Images/Items/Carrot");
+        Textures[TextureID.RawFish] = content.Load<Texture2D>("Images/Items/RawFish");
+        Textures[TextureID.CookedFish] = content.Load<Texture2D>("Images/Items/CookedFish");
+        Textures[TextureID.RawBeef] = content.Load<Texture2D>("Images/Items/RawBeef");
+        Textures[TextureID.CookedBeef] = content.Load<Texture2D>("Images/Items/CookedBeef");
         // ITEMS INSERT
         Textures[TextureID.Dirt] = content.Load<Texture2D>("Images/Tiles/Dirt");
         Textures[TextureID.Flooring] = content.Load<Texture2D>("Images/Tiles/Flooring");
@@ -381,6 +429,30 @@ public static class TextureManager
         Metadata[TextureID.Coal] = new(Textures[TextureID.Coal].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Coal] = new(Textures[TextureID.Coal].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.RawIron] = new(Textures[TextureID.RawIron].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Iron] = new(Textures[TextureID.Iron].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Ink] = new(Textures[TextureID.Ink].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.RawCopper] = new(Textures[TextureID.RawCopper].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Copper] = new(Textures[TextureID.Copper].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.RawGold] = new(Textures[TextureID.RawGold].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Gold] = new(Textures[TextureID.Gold].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Diamond] = new(Textures[TextureID.Diamond].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Emerald] = new(Textures[TextureID.Emerald].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Ruby] = new(Textures[TextureID.Ruby].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.CopperMedal] = new(Textures[TextureID.CopperMedal].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.IronMedal] = new(Textures[TextureID.IronMedal].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.GoldMedal] = new(Textures[TextureID.GoldMedal].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.DiamondMedal] = new(Textures[TextureID.DiamondMedal].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.EmeraldMedal] = new(Textures[TextureID.EmeraldMedal].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.RubyMedal] = new(Textures[TextureID.RubyMedal].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.HeartRune] = new(Textures[TextureID.HeartRune].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.LightningStaff] = new(Textures[TextureID.LightningStaff].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.TimeStaff] = new(Textures[TextureID.TimeStaff].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Scroll] = new(Textures[TextureID.Scroll].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Carrot] = new(Textures[TextureID.Carrot].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.RawFish] = new(Textures[TextureID.RawFish].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.CookedFish] = new(Textures[TextureID.CookedFish].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.RawBeef] = new(Textures[TextureID.RawBeef].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.CookedBeef] = new(Textures[TextureID.CookedBeef].Bounds.Size, new(1, 1), "item");
         // ITEMS METADATA INSERT
         Metadata[TextureID.Dirt] = new(Textures[TextureID.Dirt].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Flooring] = new(Textures[TextureID.Flooring].Bounds.Size, new(4, 4), "tile");

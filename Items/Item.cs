@@ -39,6 +39,30 @@ public enum ItemTypeID : byte
     Cloth,
     Coal,
     RawIron,
+    Iron,
+    Ink,
+    RawCopper,
+    Copper,
+    RawGold,
+    Gold,
+    Diamond,
+    Emerald,
+    Ruby,
+    CopperMedal,
+    IronMedal,
+    GoldMedal,
+    DiamondMedal,
+    EmeraldMedal,
+    RubyMedal,
+    HeartRune,
+    LightningStaff,
+    TimeStaff,
+    Scroll,
+    Carrot,
+    RawFish,
+    CookedFish,
+    RawBeef,
+    CookedBeef,
     // ITEMS ENUM
 }
 
@@ -103,6 +127,30 @@ public class ItemTypes
     public static readonly ItemType Cloth = new(ItemTypeID.Cloth, "A piece of fabric.");
     public static readonly ItemType Coal = new(ItemTypeID.Coal, "A hard lump of coal.");
     public static readonly ItemType RawIron = new(ItemTypeID.RawIron, "Unprocessed iron ore.");
+    public static readonly ItemType Iron = new(ItemTypeID.Iron, "Processed iron ore.");
+    public static readonly ItemType Ink = new(ItemTypeID.Ink, "Ink used for dyes and writing.");
+    public static readonly ItemType RawCopper = new(ItemTypeID.RawCopper, "Unprocessed copper ore.");
+    public static readonly ItemType Copper = new(ItemTypeID.Copper, "Processed copper ore.");
+    public static readonly ItemType RawGold = new(ItemTypeID.RawGold, "Unprocessed gold ore.");
+    public static readonly ItemType Gold = new(ItemTypeID.Gold, "Processed gold ore.");
+    public static readonly ItemType Diamond = new(ItemTypeID.Diamond, "Pure shiny diamond.");
+    public static readonly ItemType Emerald = new(ItemTypeID.Emerald, "Pure shiny emerald.");
+    public static readonly ItemType Ruby = new(ItemTypeID.Ruby, "Pure shiny ruby.");
+    public static readonly ItemType CopperMedal = new(ItemTypeID.CopperMedal, "Award medal made of copper.");
+    public static readonly ItemType IronMedal = new(ItemTypeID.IronMedal, "Award medal made of iron.");
+    public static readonly ItemType GoldMedal = new(ItemTypeID.GoldMedal, "Award medal made of gold.");
+    public static readonly ItemType DiamondMedal = new(ItemTypeID.DiamondMedal, "Award medal made of diamond.");
+    public static readonly ItemType EmeraldMedal = new(ItemTypeID.EmeraldMedal, "Award medal made of emerald.");
+    public static readonly ItemType RubyMedal = new(ItemTypeID.RubyMedal, "Award medal made of ruby.");
+    public static readonly ItemType HeartRune = new(ItemTypeID.HeartRune, "A mysterious rune in the shape of a heart.", 1);
+    public static readonly ItemType LightningStaff = new(ItemTypeID.LightningStaff, "A magical staff infused with lightning.", 1);
+    public static readonly ItemType TimeStaff = new(ItemTypeID.TimeStaff, "A magical staff able to control time.", 1);
+    public static readonly ItemType Scroll = new(ItemTypeID.Scroll, "An antique scroll with writings on it.", 1);
+    public static readonly ItemType Carrot = new(ItemTypeID.Carrot, "A hearty carrot from the ground.");
+    public static readonly ItemType RawFish = new(ItemTypeID.RawFish, "Uncooked fish from the sea.");
+    public static readonly ItemType CookedFish = new(ItemTypeID.CookedFish, "Cooked fish from the sea.");
+    public static readonly ItemType RawBeef = new(ItemTypeID.RawBeef, "Uncooked cow meat.");
+    public static readonly ItemType CookedBeef = new(ItemTypeID.CookedBeef, "Cooked cow meat.");
     // ITEMS REGISTER
     public static readonly ItemType[] All = [
     ActivePalantir,
@@ -139,6 +187,30 @@ public class ItemTypes
     Cloth,
     Coal,
     RawIron,
+    Iron,
+    Ink,
+    RawCopper,
+    Copper,
+    RawGold,
+    Gold,
+    Diamond,
+    Emerald,
+    Ruby,
+    CopperMedal,
+    IronMedal,
+    GoldMedal,
+    DiamondMedal,
+    EmeraldMedal,
+    RubyMedal,
+    HeartRune,
+    LightningStaff,
+    TimeStaff,
+    Scroll,
+    Carrot,
+    RawFish,
+    CookedFish,
+    RawBeef,
+    CookedBeef,
     // ITEMS ENUM
     ];
 }

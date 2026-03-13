@@ -1,17 +1,26 @@
-﻿namespace Quest.Managers;
-public class Timer(float duration, Action? call, int repetitions = 1)
-{
-    public float Left = duration;
-    public int Completions = 0;
-    public bool Paused = false;
+﻿using ScottPlot.AxisPanels;
 
-    public readonly int Repetitions = repetitions;
-    public readonly Action? Call = call;
-    public readonly float Duration = duration;
+namespace Quest.Managers;
+public class Timer
+{
+    public float Left { get; set; }
+    public int Completions { get; private set; } = 0;
+    public bool Paused { get; private set; } = false;
+
+    public readonly int Repetitions;
+    public readonly Action? Call;
+    public readonly float Duration;
+    public float Progress => 1 - Left / Duration;
 
     public bool IsExpired => Left <= 0f && Completions >= Repetitions;
     public event Action? Completed;
-
+    public Timer(float duration, Action? call, int repetitions = 1)
+    {
+        Left = duration;
+        Repetitions = repetitions;
+        Call = call;
+        Duration = duration;
+    }
     public void Update(GameManager gameManager)
     {
         Left -= GameManager.DeltaTime;
@@ -74,11 +83,24 @@ public static class TimerManager
             return timer.Left;
         throw new KeyNotFoundException($"No timer with name '{name}' found");
     }
+    public static Timer GetTimer(string  name)
+    {
+        if (timers.TryGetValue(name, out var timer))
+            return timer;
+        throw new KeyNotFoundException($"No timer with name '{name}' found");
+    }
+
     public static float TryTimeLeft(string name)
     {
         if (timers.TryGetValue(name, out var timer))
             return timer.Left;
         return 0;
+    }
+    public static Timer? TryGetTimer(string name)
+    {
+        if (timers.TryGetValue(name, out var timer))
+            return timer;
+        return null;
     }
     public static bool IsComplete(string name)
     {
