@@ -362,14 +362,14 @@ public class EditorManager
     public void NewNPC()
     {
         // Check
-        if (LevelManager.Level.NPCs.Count >= 255)
+        if (LevelManager.Level.NPCs.Count >= ushort.MaxValue)
         {
-            Logger.Error("Maximum number of NPCs reached (255).");
+            Logger.Error("Maximum number of NPCs reached (65,535).");
             return;
         }
 
         // Winforms
-        var (success, values) = ShowInputForm("NPC Editor", [new("Name", null), new("Dialog", null), new("Size [1-25.5]", IsScaleValue), new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())])]);
+        var (success, values) = ShowInputForm("NPC Editor", [new("Name", null), new("Dialog", null), new("Size [0.1-25.5]", IsScaleValue), new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())])]);
         if (!success)
         {
             if (!PopupOpen) Logger.Error("NPC creation failed.");
@@ -380,9 +380,9 @@ public class EditorManager
         string name = values[0];
         string dialog = values[1];
         float scale = float.Parse(values[2]);
-        if (scale <= 0 || scale > 25.5)
+        if (scale < 0.1 || scale > 25.5)
         {
-            Logger.Warning("Scale must be between 1 and 25.5. Scale defaulted to 1.");
+            Logger.Warning("Scale must be between 0.1 and 25.5. Scale defaulted to 1.");
             scale = 1;
         }
         TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), values[3]);
@@ -403,9 +403,9 @@ public class EditorManager
     public void NewDecal()
     {
         // Check
-        if (LevelManager.Level.Decals.Count >= 255)
+        if (LevelManager.Level.Decals.Count >= ushort.MaxValue)
         {
-            Logger.Error("Maximum number of Decals reached (255).");
+            Logger.Error("Maximum number of Decals reached (65,535).");
             return;
         }
 
@@ -426,9 +426,9 @@ public class EditorManager
     {
         // Check
         if (PreviousDecal == null) return;
-        if (LevelManager.Level.Decals.Count >= 255)
+        if (LevelManager.Level.Decals.Count >= ushort.MaxValue)
         {
-            Logger.Error("Maximum number of Decals reached (255).");
+            Logger.Error("Maximum number of Decals reached (65,535).");
             return;
         }
 
@@ -449,9 +449,9 @@ public class EditorManager
     public void NewLoot()
     {
         // Check
-        if (LevelManager.Level.Loot.Count >= 255)
+        if (LevelManager.Level.Loot.Count >= ushort.MaxValue)
         {
-            Logger.Error("Maximum number of Loot reached (255).");
+            Logger.Error("Maximum number of Loot reached (65,535).");
             return;
         }
 
@@ -626,18 +626,18 @@ public class EditorManager
                 writer.Write((byte)(int)LevelManager.Level.Biome[i]);
 
         // NPCs
-        writer.Write((byte)Math.Min(LevelManager.Level.NPCs.Count, 255));
-        for (int n = 0; n < Math.Min(LevelManager.Level.NPCs.Count, 255); n++)
+        writer.Write((ushort)Math.Min(LevelManager.Level.NPCs.Count, ushort.MaxValue));
+        for (int n = 0; n < Math.Min(LevelManager.Level.NPCs.Count, ushort.MaxValue); n++)
             writer.Write(LevelManager.Level.NPCs[n]);
 
         // Floor loot
-        writer.Write((byte)Math.Min(LevelManager.Level.Loot.Count, 255));
-        for (int n = 0; n < Math.Min(LevelManager.Level.Loot.Count, 255); n++)
+        writer.Write((ushort)Math.Min(LevelManager.Level.Loot.Count, ushort.MaxValue));
+        for (int n = 0; n < Math.Min(LevelManager.Level.Loot.Count, ushort.MaxValue); n++)
             writer.Write(LevelManager.Level.Loot[n]);
 
         // Decals
-        writer.Write((byte)Math.Min(LevelManager.Level.Decals.Count, 255));
-        for (int n = 0; n < Math.Min(LevelManager.Level.Decals.Count, 255); n++)
+        writer.Write((ushort)Math.Min(LevelManager.Level.Decals.Count, ushort.MaxValue));
+        for (int n = 0; n < Math.Min(LevelManager.Level.Decals.Count, ushort.MaxValue); n++)
             writer.Write(LevelManager.Level.Decals[n]);
 
         // Scripts

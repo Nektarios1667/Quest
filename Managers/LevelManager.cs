@@ -359,17 +359,17 @@ public class LevelManager
                 biomeBuffer = [];
 
             // NPCs
-            int npcCount = reader.ReadByte();
+            ushort npcCount = reader.ReadUInt16();
             for (int n = 0; n < npcCount; n++)
                 npcBuffer.Add(reader.ReadNPC(gameManager));
 
             // Loot
-            byte lootCount = reader.ReadByte();
+            ushort lootCount = reader.ReadUInt16();
             for (int n = 0; n < lootCount; n++)
                 lootBuffer.Add(reader.ReadLoot(gameManager));
 
             // Decals
-            byte decalCount = reader.ReadByte();
+            ushort decalCount = reader.ReadUInt16();
             for (int n = 0; n < decalCount; n++)
                 decalBuffer.Add(reader.ReadDecal());
 
