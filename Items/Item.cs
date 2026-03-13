@@ -36,7 +36,10 @@ public enum ItemTypeID : byte
     BottledCloud,
     BottledStorm,
     Disc,
-    // ITEMS
+    Cloth,
+    Coal,
+    RawIron,
+    // ITEMS ENUM
 }
 
 public class ItemType
@@ -97,6 +100,9 @@ public class ItemTypes
     public static readonly ItemType BottledCloud = new(ItemTypeID.BottledCloud, "A cloud somehow trapped in a glass bottle...", 3);
     public static readonly ItemType BottledStorm = new(ItemTypeID.BottledStorm, "A storm somehow trapped in a glass bottle...", 3);
     public static readonly ItemType Disc = new(ItemTypeID.Disc, "A music disc.");
+    public static readonly ItemType Cloth = new(ItemTypeID.Cloth, "A piece of fabric.");
+    public static readonly ItemType Coal = new(ItemTypeID.Coal, "A hard lump of coal.");
+    public static readonly ItemType RawIron = new(ItemTypeID.RawIron, "Unprocessed iron ore.");
     // ITEMS REGISTER
     public static readonly ItemType[] All = [
     ActivePalantir,
@@ -130,7 +136,10 @@ public class ItemTypes
     BottledCloud,
     BottledStorm,
     Disc,
-    // ITEMS
+    Cloth,
+    Coal,
+    RawIron,
+    // ITEMS ENUM
     ];
 }
 public class ItemRef

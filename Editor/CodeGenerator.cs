@@ -145,6 +145,11 @@ public static class CodeGenerator
         // Minimap color
         string newConstantsSource = constantsSource.Replace("        // MINIMAPCOLORS", $"        {color}, // {name}\r\n        // MINIMAPCOLORS");
         File.WriteAllText($"{sourceDirectory}/Constants.cs", newConstantsSource);
+
+        // Placeholder
+        bool createPlaceholderTexture = Ask("Create placeholder texture [y/n]: ")?.ToLower() == "y";
+        if (createPlaceholderTexture)
+            File.Copy($"{sourceDirectory}/Content/Images/Tiles/Template.png", $"{sourceDirectory}/Content/Images/Tiles/{name}.png");
     }
     public static void WriteDecalCode()
     {
@@ -196,9 +201,14 @@ public static class CodeGenerator
         File.WriteAllText($"{sourceDirectory}/Managers/TextureManager.cs", newTextureManagerSource);
 
         // ItemType enum in item.cs
-        string newItemSource = itemSource.Replace("    // ITEMS", $"    {name},\r\n    // ITEMS");
+        string newItemSource = itemSource.Replace("    // ITEMS ENUM", $"    {name},\r\n    // ITEMS ENUM");
         newItemSource = newItemSource.Replace("    // ITEMS REGISTER", $"    public static readonly ItemType {name} = new(ItemTypeID.{name}, \"{description}\"{(maxAmount == "10" ? "" : $", {maxAmount}")});\r\n    // ITEMS REGISTER");
         File.WriteAllText($"{sourceDirectory}/Items/Item.cs", newItemSource);
+
+        // Placeholder
+        bool createPlaceholderTexture = Ask("Create placeholder texture [y/n]: ")?.ToLower() == "y";
+        if (createPlaceholderTexture)
+            File.Copy($"{sourceDirectory}/Content/Images/Items/Template.png", $"{sourceDirectory}/Content/Images/Items/{name}.png");
     }
     public static void WriteLootTable()
     {
