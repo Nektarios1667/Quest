@@ -452,6 +452,7 @@ public class LevelManager
             TileTypeID.Lamp => new Lamp(location),
             TileTypeID.Jukebox => new Jukebox(location),
             TileTypeID.DiscWriter => new DiscWriter(location),
+            TileTypeID.Inscriber => new Inscriber(location),
             _ => new(location, type)
         };
     }

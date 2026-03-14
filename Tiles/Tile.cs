@@ -43,6 +43,7 @@ public enum TileTypeID : byte
     SandstoneWall,
     Jukebox,
     DiscWriter,
+    Inscriber,
     // TILES ID
 }
 
@@ -104,6 +105,7 @@ public static class TileTypes
         new(TileTypeID.SandstoneWall, TextureID.SandstoneWall, false, true),
         new(TileTypeID.Jukebox, TextureID.Jukebox, false, false),
         new(TileTypeID.DiscWriter, TextureID.DiscWriter, false, false),
+        new(TileTypeID.Inscriber, TextureID.Inscriber, false, false),
         // TILES REGISTER
     ];
 }

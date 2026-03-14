@@ -113,6 +113,7 @@ public static class Constants
         new(255, 255, 90), // SandstoneWall
         new(237, 103, 19), // Jukebox
         Color.Gray, // DiscWriter
+        new(172, 179, 157), // Inscriber
         // MINIMAPCOLORS
     ];
 }

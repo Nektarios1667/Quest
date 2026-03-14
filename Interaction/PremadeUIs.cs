@@ -12,6 +12,7 @@ public partial class UserInterface
     public static UserInterface InventoryUI { get; private set; } = null!;
     public static UserInterface JukeboxUI { get; private set; } = null!;
     public static UserInterface DiscWriterUI { get; private set; } = null!;
+    public static UserInterface InscriberUI { get; private set; } = null!;
     public static void Init(SpriteBatch batch)
     {
         // ----- Chest UI -----
@@ -57,7 +58,7 @@ public partial class UserInterface
         JukeboxUI.AddElement("title", title);
 
         // Track
-        InputSlot input = new(new(Constants.Middle.X - Slot.SlotSize.X / 2, 75), [ItemTypes.Disc]);
+        InputSlot input = new(new(Constants.Middle.X - Slot.SlotSize.X / 2, 75), new([ItemTypeID.Disc], FilterType.Whitelist));
         JukeboxUI.AddElement("disc", input);
 
         // Play button in the middle of the track slots - green text
@@ -80,7 +81,7 @@ public partial class UserInterface
         DiscWriterUI.AddElement("title", title);
 
         // Input disc
-        input = new(new(Constants.Middle.X - Slot.SlotSize.X / 2, 75), [ItemTypes.Disc]);
+        input = new(new(Constants.Middle.X - Slot.SlotSize.X / 2, 75), new([ItemTypeID.Disc], FilterType.Whitelist));
         DiscWriterUI.AddElement("disc", input);
 
         // Rename input
@@ -101,5 +102,46 @@ public partial class UserInterface
                 input.Item.CustomName = discName.Text.Replace(" ", "");
         };
         DiscWriterUI.AddElement("rename", rename);
+
+        // ----- Inscriber -----
+        InscriberUI = new(batch);
+
+        // Title
+        titleSize = PixelOperatorLarge.MeasureString("INSCRIBER").ToPoint();
+        title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "INSCRIBER", PixelOperatorLarge, Color.White);
+        InscriberUI.AddElement("title", title);
+
+        // Input item
+        InputSlot itemInput = new(new(Constants.Middle.X - Slot.SlotSize.X / 2, 75), new([ItemTypeID.Disc], FilterType.Blacklist));
+        InscriberUI.AddElement("item", itemInput);
+
+        // Rename input
+        TextInput itemName = new(new(Constants.Middle.X - 100, 160), new(200, 35), PixelOperator, Color.White, Color.Black * 0.6f, Color.Black * 0.4f, borderThickness: 0);
+        InscriberUI.AddElement("itemName", itemName);
+        itemInput.OnItemChange += () =>
+        {
+            if (itemInput.Item != null)
+                itemName.SetText(StringTools.FillCamelSpaces(itemInput.Item.Name));
+            else
+                itemName.SetText("");
+        };
+        // Rename button
+        Button itemRename = new(new(Constants.Middle.X - 50, 215), new(100, 35), "Rename", PixelOperator, Color.White, Color.Black * 0.6f, Color.Black * 0.4f, borderThickness: 0);
+        itemRename.Clicked += () =>
+        {
+            if (itemInput.Item != null && itemName.Text != "")
+                itemInput.Item.CustomName = itemName.Text.Replace(" ", "");
+        };
+        InscriberUI.AddElement("rename", itemRename);
+        // Clear name button
+        Button clear = new(new(Constants.Middle.X - 50, 270), new(100, 35), "Clear", PixelOperator, Color.Red, Color.Black * 0.6f, Color.Black * 0.4f, borderThickness: 0);
+        clear.Clicked += () =>
+        {
+            if (itemInput.Item != null)
+                itemInput.Item.CustomName = null;
+            itemName.SetText("");
+        };
+        InscriberUI.AddElement("clear", clear);
+
     }
 }
