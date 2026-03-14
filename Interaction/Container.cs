@@ -102,7 +102,7 @@ public class Container
             }
             if (SameItem(item, adding))
             {
-                byte moved = (byte)Math.Min(item!.Amount, item.MaxAmount - item.Amount);
+                byte moved = (byte)Math.Min(adding.Amount, item!.MaxAmount - item.Amount);
                 item.Amount += moved; // Add to existing item
                 adding.Amount -= moved; // Reduce amount of new item
             }
