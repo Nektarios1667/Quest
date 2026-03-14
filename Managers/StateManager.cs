@@ -30,6 +30,7 @@ public enum OverlayState
     None,
     Container,
     Pause,
+    Typing,
     Finished,
 }
 public enum Mood
@@ -49,6 +50,7 @@ public static class StateManager
     private static float lastTime = -1f;
     // States
     public static Action<GameState>? OnStateChanged;
+    public static Action<OverlayState>? OnOverlayStateChanged;
     public static bool IsPlayingState => State == GameState.Game || State == GameState.Editor;
     private static GameState _state = GameState.MainMenu;
     public static GameState State
@@ -61,8 +63,19 @@ public static class StateManager
             _state = value;
         }
     }
-    public static GameState PreviousState { get; private set; } = GameState.MainMenu;
-    public static OverlayState OverlayState { get; set; } = OverlayState.None;
+    private static GameState PreviousState { get; set; } = GameState.MainMenu;
+    private static OverlayState _overlaystate = OverlayState.None;
+    public static OverlayState OverlayState
+    {
+        get => _overlaystate;
+        set
+        {
+            PreviousOverlayState = _overlaystate;
+            OnOverlayStateChanged?.Invoke(value);
+            _overlaystate = value;
+        }
+    }
+    private static OverlayState PreviousOverlayState { get; set; } = OverlayState.None;
     public static Mood Mood { get; set; } = Mood.Calm;
     public static LevelPath CurrentSave { get; set; } = new();
     // Save State changes
@@ -86,6 +99,10 @@ public static class StateManager
     public static void RevertGameState()
     {
         State = PreviousState;
+    }
+    public static void RevertOverlayState()
+    {
+        OverlayState = PreviousOverlayState;
     }
     public static float WeatherNoiseValue(float time)
     {

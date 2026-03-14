@@ -38,6 +38,12 @@ public class TextInput : UIElement
         BorderColor = borderColor;
         BorderThickness = borderThickness;
         Bounds = new Rectangle(Location, Size).Inflated(BorderThickness, BorderThickness);
+
+        StateManager.OnOverlayStateChanged += (state) =>
+        {
+            if (state == OverlayState.None)
+                State = ButtonState.Normal;
+        };
     }
     public override void Update(UserInterface ui)
     {
@@ -47,9 +53,13 @@ public class TextInput : UIElement
             if (Bounds.Contains(InputManager.MousePosition))
             {
                 State = ButtonState.Pressed;
+                StateManager.OverlayState = OverlayState.Typing;
                 Clicked?.Invoke();
-            } else
+            } else if (State != ButtonState.Normal)
+            {
+                StateManager.RevertOverlayState();
                 State = ButtonState.Normal;
+            }
         }
 
         if (State != ButtonState.Pressed) return;

@@ -56,7 +56,7 @@ public class PlayerManager
         UpdatePositions(gameManager);
 
         // Toggle inventory
-        if (InputManager.KeyPressed(Keys.I))
+        if (InputManager.KeyPressed(Keys.I) && StateManager.OverlayState != OverlayState.Typing)
         {
             if (InventoryOpen)
             {

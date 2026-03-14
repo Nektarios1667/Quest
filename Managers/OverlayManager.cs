@@ -74,7 +74,7 @@ public class OverlayManager
         Gui.Draw(gameManager.Batch);
 
         // Minimap
-        if (StateManager.OverlayState == OverlayState.Container)
+        if (StateManager.OverlayState != OverlayState.None)
             DrawMiniMap(device, gameManager);
 
         // Inventories
@@ -125,7 +125,7 @@ public class OverlayManager
         }
 
         // Guis
-        if (StateManager.OverlayState == OverlayState.Container || StateManager.OverlayState == OverlayState.Pause)
+        if (StateManager.OverlayState == OverlayState.Container || StateManager.OverlayState == OverlayState.Pause || StateManager.OverlayState == OverlayState.Typing)
             gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * 0.6f);
 
         // Death
