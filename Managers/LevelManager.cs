@@ -422,9 +422,9 @@ public class LevelManager
             if (keyStr != "")
             {
                 ItemRef? key = Item.Create(Enum.Parse<ItemTypeID>(keyStr), reader.ReadByte()).GetItemRef();
-                return new Chest(loc, lootGen, lootGenFile, key, reader.ReadBoolean());
+                return new Chest(loc, lootGen, levelPath.LevelName, key, reader.ReadBoolean());
             }
-            return new Chest(loc, lootGen, lootGenFile);
+            return new Chest(loc, lootGen, levelPath.LevelName);
         }
 
         // Read tile data

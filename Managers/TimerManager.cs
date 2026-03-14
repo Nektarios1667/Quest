@@ -34,6 +34,7 @@ public class Timer
                 Left = Duration;
         }
     }
+    public void Restart() => Left = Duration;
     public void Pause() => Paused = true;
     public void Unpause() => Paused = false;
     public void TogglePause() => Paused = !Paused;

@@ -1,6 +1,7 @@
 ﻿using Quest.Tiles;
 using Quest.Utilities;
 using ScottPlot.Colormaps;
+using SharpDX.Direct3D9;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Json;
@@ -159,10 +160,10 @@ public static class StateManager
                 writer.Write(level);
                 Level levelObj = gameManager.LevelManager.GetLevel($"{worldName}/{level}");
                 // Loot
-                writer.Write((byte)levelObj.Loot.Count);
+                writer.Write((ushort)levelObj.Loot.Count);
                 foreach (var loot in levelObj.Loot)
                 {
-                    writer.Write((byte)((byte)loot.Item.Type.TypeID + 1));
+                    writer.Write((byte)(loot.Item.Type.TypeID + 1));
                     writer.Write(loot.Item.Amount);
                     writer.Write((ushort)loot.Location.X);
                     writer.Write((ushort)loot.Location.Y);
@@ -189,6 +190,7 @@ public static class StateManager
 
             // Write Inventory data
             var inventory = playerManager.Inventory;
+            writer.Write((byte)inventory.Items.Length);
             for (int i = 0; i < inventory.Items.Length; i++)
                     WriteItemData(writer, inventory.Items[i]);
             writer.Flush();
@@ -245,7 +247,7 @@ public static class StateManager
                 string lvl = $"{levelPath.WorldName}/{reader.ReadString()}";
                 Level current = gameManager.LevelManager.GetLevel(lvl);
                 // Loot
-                byte lootCount = reader.ReadByte();
+                ushort lootCount = reader.ReadUInt16();
                 for (int l = 0; l < lootCount; l++)
                 {
                     byte typeID = (byte)(reader.ReadByte() - 1);
@@ -266,7 +268,8 @@ public static class StateManager
 
 
             // Read Inventory data
-            for (int i = 0; i < playerManager.Inventory.Items.Length; i++)
+            byte invLength = reader.ReadByte();
+            for (int i = 0; i < invLength; i++)
             {
                 var item = ReadItemData(reader);
                 playerManager.Inventory.SetSlot(i, item);
@@ -287,8 +290,11 @@ public static class StateManager
         writer.Write(chest.TileID); // TileID - ushort
         writer.Write(chest.Generated); // IsGenerated - bool
         if (chest.Generated)
+        {
+            writer.Write((byte)chest.Container.Items!.Length);
             foreach (Item? item in chest.Container.Items!)
                 WriteItemData(writer, item);
+        }
         else
         {
             writer.Write(chest.Seed); // int (4 bytes)
@@ -304,7 +310,8 @@ public static class StateManager
             if (isGenerated)
             {
                 chest.SetEmpty();
-                for (int s = 0; s < Chest.Size.X * Chest.Size.Y; s++)
+                byte chestSize = reader.ReadByte();
+                for (int s = 0; s < chestSize; s++)
                     chest.Container!.Items[s] = ReadItemData(reader);
             }
             else
@@ -330,7 +337,7 @@ public static class StateManager
     }
     public static void WriteItemData(BinaryWriter writer, Item? item)
     {
-        writer.Write((byte)(item == null ? 0 : (byte)Enum.Parse(typeof(ItemTypeID), item.Name, true) + 1));
+        writer.Write((byte)(item == null ? 0 : item.Type.TypeID + 1));
         if (item != null)
             writer.Write(item.Amount);
     }

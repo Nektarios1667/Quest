@@ -81,8 +81,7 @@ public class Container
         if (toItem != null) return; // Can't split into non-empty slot
         // Split
         byte half = (byte)Math.Ceiling(fromItem.Amount / 2f);
-        to.SetSlot(toIdx, new(fromItem.Type, half, fromItem.Name));
-        fromItem.Amount -= half;
+        to.SetSlot(toIdx, fromItem.Take(half));
         if (fromItem.Amount < 1)
             from.SetSlot(fromIdx, null);
     }

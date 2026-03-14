@@ -69,6 +69,7 @@ public class Decal
             DecalType.Torch => new Torch(location),
             DecalType.BlueTorch => new BlueTorch(location),
             DecalType.Finish => new Finish(location),
+            DecalType.Checkpoint => new Checkpoint(location),
             _ => new Decal(location, type)
         };
     }
