@@ -43,13 +43,6 @@ public class PlayerManager
         InventoryUI.OnSlotClick += SlotClicked;
         InventoryUI.OnSlotDrop += SlotDropped;
         InventoryUI.OnSlotHover += SlotHovered;
-
-        Inventory.SetSlot(0, new Item(ItemTypes.Disc, 1, "Maps"));
-        Inventory.SetSlot(1, new Item(ItemTypes.Disc, 1, "DuskToDawn"));
-        Inventory.SetSlot(2, new Item(ItemTypes.Apple, 1));
-
-        // DEBUG
-        EquippedSlotChanged += (slot) => Console.WriteLine(Inventory.Items[slot]);
     }
 
     public void Update(GameManager gameManager)
@@ -291,6 +284,10 @@ public class PlayerManager
         UpdatePositions(gameManager);
         if (TileBelow == null) return;
         TileBelow.OnPlayerEnter(gameManager, this);
+
+        // Decal
+        if (gameManager.LevelManager.Level.Decals.TryGetValue(CameraManager.TileCoord.ToByteCoord(), out var dec))
+            dec.OnPlayerEnter(gameManager, this);
     }
     public bool IsColliding(GameManager gameManager)
     {

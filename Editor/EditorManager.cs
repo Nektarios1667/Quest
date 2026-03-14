@@ -420,7 +420,7 @@ public class EditorManager
         string name = values[0];
         DecalType decal = Enum.TryParse<DecalType>(name, true, out var dec) ? dec : DecalType.Torch;
         PreviousDecal = decal;
-        LevelManager.Level.Decals.Add(LevelManager.DecalFromId(decal, MouseSelectionCoord));
+        LevelManager.Level.Decals[MouseSelectionCoord.ToByteCoord()] = (LevelManager.DecalFromId(decal, MouseSelectionCoord));
     }
     public void PasteDecal()
     {
@@ -432,15 +432,15 @@ public class EditorManager
             return;
         }
 
-        LevelManager.Level.Decals.Add(LevelManager.DecalFromId(PreviousDecal.Value, MouseCoord));
+        LevelManager.Level.Decals[MouseCoord.ToByteCoord()] = LevelManager.DecalFromId(PreviousDecal.Value, MouseCoord);
     }
     public void DeleteDecal()
     {
-        foreach (Decal decal in LevelManager.Level.Decals)
+        foreach (Decal decal in LevelManager.Level.Decals.Values)
         {
             if (decal.Location == MouseSelectionCoord)
             {
-                LevelManager.Level.Decals.Remove(decal);
+                LevelManager.Level.Decals.Remove(decal.Location);
                 Logger.Log($"Deleted decal '{decal.Type}' @ {MouseSelectionCoord.X}, {MouseSelectionCoord.Y}.");
                 break;
             }
@@ -638,7 +638,7 @@ public class EditorManager
         // Decals
         writer.Write((ushort)Math.Min(LevelManager.Level.Decals.Count, ushort.MaxValue));
         for (int n = 0; n < Math.Min(LevelManager.Level.Decals.Count, ushort.MaxValue); n++)
-            writer.Write(LevelManager.Level.Decals[n]);
+            writer.Write(LevelManager.Level.Decals.Values.ToArray()[n]);
 
         // Scripts
         if (flags.HasFlag(LevelFeatures.QuillScripts))

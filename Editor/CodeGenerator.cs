@@ -177,6 +177,12 @@ public static class CodeGenerator
         // DecalFromID in LevelManager.cs
         string newLevelManagerSource = levelManagerSource.Replace("            // DECALFROMID INSERT", $"            DecalType.{name} => new {name}(location),\r\n            // DECALFROMID INSERT");
         File.WriteAllText($"{sourceDirectory}/Managers/LevelManager.cs", newLevelManagerSource);
+
+        // Placeholder
+        bool createPlaceholderTexture = Ask("Create placeholder texture [y/n]: ")?.ToLower() == "y";
+        if (createPlaceholderTexture)
+            File.Copy($"{sourceDirectory}/Content/Images/Decals/Template.png", $"{sourceDirectory}/Content/Images/Decals/{name}.png");
+
     }
     public static void WriteItemCode()
     {

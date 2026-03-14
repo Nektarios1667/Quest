@@ -116,7 +116,7 @@ public class LevelManager
     {
         // Draw each decal
         DebugManager.StartBenchmark("DecalDraws");
-        foreach (Decal decal in Level.Decals)
+        foreach (Decal decal in Level.Decals.Values)
             decal.Draw(gameManager);
         DebugManager.EndBenchmark("DecalDraws");
     }
@@ -323,7 +323,7 @@ public class LevelManager
         BiomeType[] biomeBuffer = new BiomeType[totalTiles];
         List<NPC> npcBuffer = [];
         List<Loot> lootBuffer = [];
-        List<Decal> decalBuffer = [];
+        Dictionary<ByteCoord, Decal> decalBuffer = [];
         List<QuillScript> scriptBuffer = [];
 
         // Context
@@ -371,7 +371,10 @@ public class LevelManager
             // Decals
             ushort decalCount = reader.ReadUInt16();
             for (int n = 0; n < decalCount; n++)
-                decalBuffer.Add(reader.ReadDecal());
+            {
+                Decal decal = reader.ReadDecal();
+                decalBuffer[decal.Location] = decal;
+            }
 
             // Scripts
             if (flags.HasFlag(LevelFeatures.QuillScripts))

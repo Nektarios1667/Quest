@@ -134,14 +134,17 @@ public class OverlayManager
             if (deathTime == -1) deathTime = GameManager.GameTime;
             gameManager.Batch.DrawString(PixelOperator, "YOU DIED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("You died!") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
             gameManager.Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
-        } else if (StateManager.State == GameState.Completed)
+        } else if (StateManager.OverlayState == OverlayState.Finished)
         {
             TimerManager.NewTimer("CompleteScreenFade", 2, null);
-            float fade = TimerManager.GetTimer("CompleteScreenFade").Progress;
+            float fade = TimerManager.GetTimer("CompleteScreenFade").Progress * 0.5f;
 
             gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * fade);
-            gameManager.Batch.DrawString(PixelOperator, "YOU WIN!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("You win!") * 2, Color.White * fade, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
-            gameManager.Batch.DrawString(PixelOperator, "Press space to continue", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White * fade);
+            gameManager.Batch.DrawString(PixelOperator, "LEVEL FINISHED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("LEVEL FINISHED!") * 2, Color.White * fade, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
+            gameManager.Batch.DrawString(PixelOperator, "Press space to close", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to close") / 2 + new Vector2(0, 80), Color.White * fade);
+
+            if (InputManager.KeyPressed(Keys.Space))
+                StateManager.OverlayState = OverlayState.None;
         }
 
         DebugManager.EndBenchmark("PostProcessing");

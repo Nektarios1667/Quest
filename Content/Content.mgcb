@@ -340,6 +340,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Decals/Bush3.png
 
+#begin Images/Decals/Checkpoint.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Decals/Checkpoint.png
+
 #begin Images/Decals/Cracks1.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -387,6 +399,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Decals/DarkTint.png
+
+#begin Images/Decals/Finish.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Decals/Finish.png
 
 #begin Images/Decals/Footprint.png
 /importer:TextureImporter

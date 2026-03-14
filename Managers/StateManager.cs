@@ -23,13 +23,13 @@ public enum GameState
     Game,
     Editor,
     Death,
-    Completed,
 }
 public enum OverlayState
 {
     None,
     Container,
     Pause,
+    Finished,
 }
 public enum Mood
 {

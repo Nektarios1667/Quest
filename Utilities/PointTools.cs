@@ -22,6 +22,10 @@ public static class PointExtensions
     {
         return point * PointTools.Negative;
     }
+    public static ByteCoord ToByteCoord(this Point point)
+    {
+        return new((byte)Math.Clamp(point.X, 0, 255), (byte)Math.Clamp(point.Y, 0, 255));
+    }
 }
 public static class PointTools
 {

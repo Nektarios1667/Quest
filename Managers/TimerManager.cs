@@ -23,7 +23,8 @@ public class Timer
     }
     public void Update(GameManager gameManager)
     {
-        Left -= GameManager.DeltaTime;
+        if (Left > 0)
+            Left -= GameManager.DeltaTime;
         if (Left <= 0f)
         {
             Completions++;
@@ -40,23 +41,13 @@ public class Timer
 public static class TimerManager
 {
     private static readonly Dictionary<string, Timer> timers = [];
-    private static readonly List<string> removals = [];
     public static void Update(GameManager gameManager)
     {
         DebugManager.StartBenchmark("TimerUpdates");
 
         // Update timers
-        foreach (var (key, timer) in timers)
-        {
+        foreach (var timer in timers.Values)
             timer.Update(gameManager);
-            if (timer.IsExpired)
-                removals.Add(key);
-        }
-
-        // Remove expired timers
-        foreach (string timer in removals)
-            timers.Remove(timer);
-        removals.Clear();
 
         DebugManager.EndBenchmark("TimerUpdates");
     }
