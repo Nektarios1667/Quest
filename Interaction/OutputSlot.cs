@@ -13,4 +13,6 @@ public class OutputSlot : Slot
     {
         Color = Color.LightBlue;
     }
+    // Prevents any player from adding items
+    public override bool CanAccept(Item? item) => item == null;
 }

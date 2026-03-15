@@ -30,20 +30,11 @@ public struct ItemFilter
 }
 public class InputSlot : Slot
 {
-    // Preset whitelists
-    // public static readonly ItemType[] CoinTypes = [ItemTypes.DeltaCoin, ItemTypes.GammaCoin, ItemTypes.PhiCoin];
-    //
     public ItemFilter Filter { get; private set; }
     public InputSlot(Point location, ItemFilter filter) : base(location)
     {
         Color = Color.LightGreen;
         Filter = filter;
     }
-    //public override bool SetItem(Item? item)
-    //{
-    //    if (CanAccept(item))
-    //        return base.SetItem(item);
-    //    return false;
-    //}
     public override bool CanAccept(Item? item) => item == null || Filter.Passes(item.Type.TypeID);
 }

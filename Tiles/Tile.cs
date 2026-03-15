@@ -44,6 +44,8 @@ public enum TileTypeID : byte
     Jukebox,
     DiscWriter,
     Inscriber,
+    Stove,
+    Furnace,
     // TILES ID
 }
 
@@ -106,6 +108,8 @@ public static class TileTypes
         new(TileTypeID.Jukebox, TextureID.Jukebox, false, false),
         new(TileTypeID.DiscWriter, TextureID.DiscWriter, false, false),
         new(TileTypeID.Inscriber, TextureID.Inscriber, false, false),
+        new(TileTypeID.Stove, TextureID.Stove, false, false),
+        new(TileTypeID.Furnace, TextureID.Furnace, false, false),
         // TILES REGISTER
     ];
 }
@@ -142,4 +146,23 @@ public class Tile
 
     public virtual void OnPlayerEnter(GameManager game, PlayerManager player) { }
     public virtual void OnPlayerCollide(GameManager game, PlayerManager player) { }
+    public static Tile TileFromId(int id, Point location)
+    {
+        // Create a tile from an id
+        TileTypeID type = (TileTypeID)id;
+        return type switch
+        {
+            TileTypeID.Stairs => new Stairs(location, "", Constants.MiddleCoord),
+            TileTypeID.Door => new Door(location, null),
+            TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, "_"),
+            TileTypeID.Lamp => new Lamp(location),
+            TileTypeID.Jukebox => new Jukebox(location),
+            TileTypeID.DiscWriter => new DiscWriter(location),
+            TileTypeID.Inscriber => new Inscriber(location),
+            TileTypeID.Furnace => new Furnace(location),
+            TileTypeID.Stove => new Stove(location),
+            _ => new(location, type)
+        };
+    }
+    public static Tile TileFromId(TileTypeID id, Point location) => TileFromId((int)id, location);
 }

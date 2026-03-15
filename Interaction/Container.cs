@@ -26,6 +26,9 @@ public class Container
         if (!to.GetSlot(toIdx).CanAccept(from.BoundContainer.Items[fromIdx])) return false;
         MoveItem(from.BoundContainer, fromIdx, to.BoundContainer, toIdx, split);
 
+        // Cleanup
+        from.BoundContainer.RemoveEmptyItems();
+        to.BoundContainer.RemoveEmptyItems();
         return true;
     }
     public static void MoveItem(Container from, int fromIdx, Container to, int toIdx, bool split = false)
@@ -57,6 +60,10 @@ public class Container
         else {
             Swap(from, fromIdx, to, toIdx);
         }
+
+        // Cleanup
+        from.RemoveEmptyItems();
+        to.RemoveEmptyItems();
     }
     public static void MergeItems(Container from, int fromIdx, Container to, int toIdx)
     {
@@ -69,8 +76,10 @@ public class Container
         byte moved = (byte)Math.Min(fromItem.Amount, destItem.MaxAmount - destItem.Amount);
         destItem.Amount += moved;
         fromItem.Amount -= moved;
-        if (fromItem.Amount < 1)
-            from.SetSlot(fromIdx, null);
+
+        // Cleanup
+        from.RemoveEmptyItems();
+        to.RemoveEmptyItems();
     }
     public static void Split(Container from, int fromIdx, Container to, int toIdx)
     {
@@ -82,12 +91,18 @@ public class Container
         // Split
         byte half = (byte)Math.Ceiling(fromItem.Amount / 2f);
         to.SetSlot(toIdx, fromItem.Take(half));
-        if (fromItem.Amount < 1)
-            from.SetSlot(fromIdx, null);
+
+        // Cleanup
+        from.RemoveEmptyItems();
+        to.RemoveEmptyItems();
     }
     public static void Swap(Container from, int fromIdx, Container to, int toIdx)
     {
         (from.Items[fromIdx], to.Items[toIdx]) = (to.Items[toIdx], from.Items[fromIdx]);
+
+        // Cleanup
+        from.RemoveEmptyItems();
+        to.RemoveEmptyItems();
     }
     public Item AddItem(Item adding)
     {        
@@ -110,6 +125,10 @@ public class Container
             // Check if done
             if (adding.Amount <= 0) break;
         }
+
+        // Cleanup
+        RemoveEmptyItems();
+
         return adding;
     }
     public int Count(ItemType itemType)
@@ -148,6 +167,9 @@ public class Container
     {
         if (idx >= 0 && idx < Items.Length)
             Items[idx] = item;
+
+        if (item?.Amount <= 0)
+            Items[idx] = null;
     }
     public int? Locate(ItemType item)
     {
@@ -164,7 +186,18 @@ public class Container
     public void SetItems(Item?[] items)
     {
         Items = items;
+        // Cleanup
+        RemoveEmptyItems();
     }
     public void Clear() => Items = new Item?[Items.Length];
+    public void RemoveEmptyItems()
+    {
+        for (int i = 0; i < Items.Length; i++)
+        {
+            Item? item = Items[i];
+            if (item != null && item.Amount <= 0)
+                Items[i] = null;
+        }
+    }
     public static bool SameItem(Item? item1, Item? item2) => item1 != null && item2 != null && item1.Type == item2.Type && item1.CustomName == item2.CustomName;
 }

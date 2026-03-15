@@ -437,26 +437,9 @@ public class LevelManager
             TileTypeID.Door => ReadDoor(loc),
             TileTypeID.Chest => ReadChest(loc),
             TileTypeID.Lamp => new Lamp(loc, reader.ReadByte()),
-            _ => TileFromId(type, loc),
+            _ => Tile.TileFromId(type, loc),
         };
     }
-    public static Tile TileFromId(int id, Point location)
-    {
-        // Create a tile from an id
-        TileTypeID type = (TileTypeID)id;
-        return type switch
-        {
-            TileTypeID.Stairs => new Stairs(location, "", Constants.MiddleCoord),
-            TileTypeID.Door => new Door(location, null),
-            TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, "_"),
-            TileTypeID.Lamp => new Lamp(location),
-            TileTypeID.Jukebox => new Jukebox(location),
-            TileTypeID.DiscWriter => new DiscWriter(location),
-            TileTypeID.Inscriber => new Inscriber(location),
-            _ => new(location, type)
-        };
-    }
-    public static Tile TileFromId(TileTypeID id, Point location) => TileFromId((int)id, location);
     public static Decal DecalFromId(DecalType id, Point location) => new(location, id);
     public int TileConnectionsMask(Tile tile)
     {

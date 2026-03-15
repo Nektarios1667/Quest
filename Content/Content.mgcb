@@ -1624,6 +1624,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Tiles/Flooring.png
 
+#begin Images/Tiles/Furnace.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Tiles/Furnace.png
+
 #begin Images/Tiles/Grass.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1923,6 +1935,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Tiles/StoneWall.png
+
+#begin Images/Tiles/Stove.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Tiles/Stove.png
 
 #begin Images/Tiles/Template.png
 /importer:TextureImporter

@@ -114,6 +114,8 @@ public static class Constants
         new(237, 103, 19), // Jukebox
         Color.Gray, // DiscWriter
         new(172, 179, 157), // Inscriber
+        Color.Gray, // Stove
+        new(80,80,80), // Furnace
         // MINIMAPCOLORS
     ];
 }

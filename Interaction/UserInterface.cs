@@ -46,7 +46,16 @@ public partial class UserInterface
                 element.Draw(this);
         }
     }
-    public void BindContainer(Container cont) => BoundContainer = cont;
+    public void BindContainer(Container cont)
+    {
+        BoundContainer = cont;
+
+        // Errors
+        if (cont.Items.Length < SlotElements.Count)
+            Logger.Error($"Container has {cont.Items.Length} items but UI expects {SlotElements.Count}", exit: true);
+        else if (cont.Items.Length > SlotElements.Count)
+            Logger.Warning($"Container has {cont.Items.Length} items but UI will only take {SlotElements.Count}");
+    }
     public void UnbindContainer() => BoundContainer = null;
     public void Reload()
     {
@@ -84,7 +93,16 @@ public partial class UserInterface
     public Dictionary<string, UIElement> GetElements(string? tag = null) => tag == null ? Elements : Elements.Where(kv => kv.Value.Tags.Contains(tag)).ToDictionary(kv => kv.Key, kv => kv.Value);
     public Slot GetSlot(string name) => Elements[name] as Slot ?? throw new Exception($"Element '{name}' is not a Slot.");
     public Slot GetSlot(int idx) => GetSlot(SlotElements[idx]);
-
+    public Item? AddItem(Item? item)
+    {
+        if (BoundContainer == null || item == null) return null;
+        return BoundContainer.AddItem(item);
+    }
+    public void SetSlotItem(string slot, Item? item)
+    {
+        if (BoundContainer == null) return;
+        BoundContainer.Items[SlotElements.IndexOf(slot)] = item;
+    }
     // Visibilty/Enablement
     public void Enable() => IsEnabled = true;
     public void Disable() => IsEnabled = false;

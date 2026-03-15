@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Runtime.CompilerServices;
 
@@ -250,6 +251,13 @@ public class Item
         UID = UIDManager.Get(UIDCategory.Items);
         CustomName = name;
     }
+    public Item(ItemTypeID itemTypeID, int amount, string? name = null)
+    {
+        Type = ItemTypes.All[(int)itemTypeID];
+        Amount = (byte)amount;
+        UID = UIDManager.Get(UIDCategory.Items);
+        CustomName = name;
+    }
     public Item(ItemRef itemRef, string? name = null)
     {
         Type = itemRef.Type;
@@ -288,21 +296,19 @@ public class Item
     {
         UIDManager.Release(UIDCategory.Items, UID);
     }
-    public Item Take(byte amount)
+    public Item? Take(byte amount)
     {
-        // More than amount
+        // Failed
         if (amount > Amount)
-        {
-            Amount = 0;
-            return new Item(this);
-            // None
-        } else if (amount <= 0)
-            return new Item(Type, 0);
+            return null;
+        else if (amount <= 0)
+            return null;
 
         // Split
         Amount -= amount;
         return new Item(Type, amount, CustomName);
     }
+    public bool Consume(byte amount) => Take(amount) != null;
     private string Tags()
     {
         string tags = "";

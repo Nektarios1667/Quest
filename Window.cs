@@ -85,9 +85,9 @@ public class Window : Game
         SoundtrackManager.LoadSoundtracks(Content);
 
         // Managers
-        UserInterface.Init(spriteBatch);
-        playerManager = new();
         levelManager = new();
+        UserInterface.Init(spriteBatch, levelManager);
+        playerManager = new();
         overlayManager = new(levelManager, playerManager);
         gameManager = new(Content, spriteBatch, levelManager, overlayManager);
         menuManager = new(this, spriteBatch, Content, gameManager, playerManager);
