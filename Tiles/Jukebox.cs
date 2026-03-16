@@ -9,7 +9,7 @@ public class Jukebox : Tile
     public bool IsPlaying { get; set; } = false;
     public Jukebox(Point location) : base(location, TileTypeID.Jukebox)
     {
-        Container = new(new Item[5]);
+        Container = new([null]);
     }
     public override void OnPlayerCollide(GameManager game, PlayerManager player)
     {
