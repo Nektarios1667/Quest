@@ -2074,6 +2074,18 @@
 /processorParam:Quality=Best
 /build:Sounds/Effects/DoorUnlock.wav
 
+#begin Sounds/Effects/Fire.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Fire.wav
+
+#begin Sounds/Effects/Fire2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Fire2.wav
+
 #begin Sounds/Effects/Footstep.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor

@@ -46,6 +46,7 @@ public class Button : UIElement
             if (InputManager.LMouseClicked)
             {
                 State = ButtonState.Pressed;
+                SoundManager.PlaySound("Click");
                 Clicked?.Invoke();
             }
             else if (InputManager.LMouseDown)

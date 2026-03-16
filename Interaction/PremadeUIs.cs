@@ -149,6 +149,7 @@ public partial class UserInterface
             if (input.Item == null || fuel.Item == null) return;
 
             // Convert to cooked
+            SoundManager.PlaySoundInstance("Fire2");
             Item? outputItem = RecipeRegistry.UseRecipe(input.Item, RecipeType.Furnace, fuel.Item);
             if (FurnaceUI.BoundContainer != null && outputItem != null)
             {
@@ -277,6 +278,7 @@ public partial class UserInterface
             Item? outputItem = RecipeRegistry.UseRecipe(input.Item, RecipeType.Stove, fuel.Item);
             if (StoveUI.BoundContainer != null && outputItem != null)
             {
+                SoundManager.PlaySoundInstance("Fire");
                 Item? leftover = StoveUI.AddItem(outputItem);
                 if (leftover != null && leftover.Amount > 0)
                     levelManager.Level.Loot.Add(new(leftover.GetItemRef(), CameraManager.PlayerFoot, GameManager.GameTime));
