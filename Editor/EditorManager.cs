@@ -28,7 +28,7 @@ public class EditorManager
     // Settings
     public bool ShowBiomeMarkers = true;
     // Helper
-    public string[] KeyOptions = ["NONE", ..Enum.GetNames(typeof(ItemTypeID))];
+    public string[] ItemsOptionsWNone = ["NONE", ..Constants.ItemTypeNames];
     // Private
     private GameManager GameManager { get; }
     private LevelManager LevelManager { get; }
@@ -221,7 +221,7 @@ public class EditorManager
         // Door
         else if (tile is Door door)
         {
-            var (success, values) = ShowInputForm("Door Editor", [new("Key", null, KeyOptions), new("Amount", IsByte), new("Consume Key", null, ["true", "false"])]);
+            var (success, values) = ShowInputForm("Door Editor", [new("Key", null, ItemsOptionsWNone), new("Amount", IsByte), new("Consume Key", null, ["true", "false"])]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Stair edit failed.");
@@ -235,7 +235,7 @@ public class EditorManager
         // Chest
         else if (tile is Chest chest)
         {
-            var (success, values) = ShowInputForm("Chest Editor", [new("Loot File Name", null), new("Loot Type", null, ["Loot Preset", "Loot Table"]), new("Key", null, KeyOptions), new("Amount", IsByte), new("Consume Key", null, ["true", "false"])]);
+            var (success, values) = ShowInputForm("Chest Editor", [new("Loot File Name", null), new("Loot Type", null, ["Loot Preset", "Loot Table"]), new("Key", null, ItemsOptionsWNone), new("Amount", IsByte), new("Consume Key", null, ["true", "false"])]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Chest edit failed.");
@@ -264,6 +264,17 @@ public class EditorManager
                 return;
             }
             lamp.LightRadius = byte.Parse(values[4]);
+        }
+        // Display case
+        else if (tile is DisplayCase displayCase)
+        {
+            var (success, values) = ShowInputForm("Lamp Editor", [new("Item", null, ItemsOptionsWNone), new("Amount", IsNonZeroByte)]);
+            if (!success)
+            {
+                if (!PopupOpen) Logger.Error("Display case edit failed.");
+                return;
+            }
+            displayCase.Container.Items[0] = new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[0])], byte.Parse(values[1]));
         }
     }
     public void FloodFill()
@@ -618,6 +629,8 @@ public class EditorManager
             }
             else if (tile is Lamp lamp)
                 writer.Write(lamp.LightRadius);
+            else if (tile is DisplayCase displayCase)
+                StateManager.WriteItemData(writer, displayCase.Container.Items[0]);
         }
 
         // Biome

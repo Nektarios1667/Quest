@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Forms;
 using IO = System.IO;
 
 namespace Quest.Managers;
@@ -442,6 +443,13 @@ public class LevelManager
             }
             return new Chest(loc, lootGen, levelPath.LevelName);
         }
+        DisplayCase ReadDisplayCase(Point loc)
+        {
+            Item? item = StateManager.ReadItemData(reader);
+            DisplayCase displayCase = new(loc, levelPath.LevelName);
+            displayCase.Container.Items[0] = item;
+            return displayCase;
+        }
 
         // Read tile data
         Point loc = new(x, y);
@@ -453,6 +461,7 @@ public class LevelManager
             TileTypeID.Door => ReadDoor(loc),
             TileTypeID.Chest => ReadChest(loc),
             TileTypeID.Lamp => new Lamp(loc, reader.ReadByte()),
+            TileTypeID.DisplayCase => ReadDisplayCase(loc),
             _ => Tile.TileFromId(type, loc, levelPath.LevelName),
         };
     }

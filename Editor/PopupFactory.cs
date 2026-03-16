@@ -191,6 +191,13 @@ public static class PopupFactory
         return byte.TryParse(value, out _);
 
     }
+    public static bool IsNonZeroByte(string value)
+    {
+        if (!IsByte(value)) return false;
+        if (byte.Parse(value) == 0) return false;
+
+        return true;
+    }
     public static bool IsUInt16(string value)
     {
         if (string.IsNullOrWhiteSpace(value)) return false;
