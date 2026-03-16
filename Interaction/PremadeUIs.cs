@@ -9,6 +9,7 @@ namespace Quest.Interaction;
 public partial class UserInterface
 {
     public static UserInterface ChestUI { get; private set; } = null!;
+    public static UserInterface CrateUI { get; private set; } = null!;
     public static UserInterface DiscWriterUI { get; private set; } = null!;
     public static UserInterface DisplayCaseUI { get; private set; } = null!;
     public static UserInterface FurnaceUI { get; private set; } = null!;
@@ -19,6 +20,7 @@ public partial class UserInterface
     public static void Init(SpriteBatch batch, LevelManager levelManager)
     {
         CreateChestUI(batch);
+        CreateCrateUI(batch);
         CreateDiscWriterUI(batch);
         CreateDisplayCaseUI(batch);
         CreateFurnaceUI(batch, levelManager);
@@ -33,6 +35,11 @@ public partial class UserInterface
         // ----- Chest UI -----
         ChestUI = new(batch);
 
+        // Title
+        Point titleSize = PixelOperatorLarge.MeasureString("CHEST").ToPoint();
+        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "CHEST", PixelOperatorLarge, Color.White);
+        ChestUI.AddElement("title", title);
+
         // Create slots
         Point itemStart = new(Constants.Middle.X - Slot.SlotSize.X * Chest.Size.X / 2, Constants.NativeResolution.Y - (Slot.SlotSize.Y + 4) * 8);
         for (int y = 0; y < Chest.Size.Y; y++)
@@ -43,11 +50,27 @@ public partial class UserInterface
                 ChestUI.AddElement($"slot_{x + y * Chest.Size.X}", slot);
             }
         }
+    }
+    private static void CreateCrateUI(SpriteBatch batch)
+    {
+        // ----- Crate UI -----
+        CrateUI = new(batch);
 
         // Title
-        Point titleSize = PixelOperatorLarge.MeasureString("CHEST").ToPoint();
-        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "CHEST", PixelOperatorLarge, Color.White);
-        ChestUI.AddElement("title", title);
+        Point titleSize = PixelOperatorLarge.MeasureString("CRATE").ToPoint();
+        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "CRATE", PixelOperatorLarge, Color.White);
+        CrateUI.AddElement("title", title);
+
+        // Create slots
+        Point itemStart = new(Constants.Middle.X - Slot.SlotSize.X * Crate.Size.X / 2, Constants.NativeResolution.Y - (Slot.SlotSize.Y + 4) * 8);
+        for (int y = 0; y < Crate.Size.Y; y++)
+        {
+            for (int x = 0; x < Crate.Size.X; x++)
+            {
+                Slot slot = new(new(itemStart.X + (Slot.SlotSize.X + 4) * x, itemStart.Y + (Slot.SlotSize.Y + 4) * y));
+                CrateUI.AddElement($"slot_{x + y * Crate.Size.X}", slot);
+            }
+        }
     }
     private static void CreateDiscWriterUI(SpriteBatch batch)
     {

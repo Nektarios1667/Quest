@@ -117,6 +117,7 @@ public static class Constants
         Color.Gray, // Stove
         new(80,80,80), // Furnace
         new(89, 55, 18), // DisplayCase
+        new(158, 114, 17), // Crate
         // MINIMAPCOLORS
     ];
 }

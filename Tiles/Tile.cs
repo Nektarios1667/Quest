@@ -47,6 +47,7 @@ public enum TileTypeID : byte
     Stove,
     Furnace,
     DisplayCase,
+    Crate,
     // TILES ID
 }
 
@@ -112,6 +113,7 @@ public static class TileTypes
         new(TileTypeID.Stove, TextureID.Stove, false, false),
         new(TileTypeID.Furnace, TextureID.Furnace, false, false),
         new(TileTypeID.DisplayCase, TextureID.DisplayCase, false, false),
+        new(TileTypeID.Crate, TextureID.Crate, false, false),
         // TILES REGISTER
     ];
 }
@@ -164,6 +166,7 @@ public class Tile
             TileTypeID.Furnace => new Furnace(location),
             TileTypeID.Stove => new Stove(location),
             TileTypeID.DisplayCase => new DisplayCase(location),
+            TileTypeID.Crate => new Crate(location),
             _ => new(location, type)
         };
     }
