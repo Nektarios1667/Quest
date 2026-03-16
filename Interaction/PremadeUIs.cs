@@ -10,6 +10,7 @@ public partial class UserInterface
 {
     public static UserInterface ChestUI { get; private set; } = null!;
     public static UserInterface DiscWriterUI { get; private set; } = null!;
+    public static UserInterface DisplayCaseUI { get; private set; } = null!;
     public static UserInterface FurnaceUI { get; private set; } = null!;
     public static UserInterface InscriberUI { get; private set; } = null!;
     public static UserInterface InventoryUI { get; private set; } = null!;
@@ -19,6 +20,7 @@ public partial class UserInterface
     {
         CreateChestUI(batch);
         CreateDiscWriterUI(batch);
+        CreateDisplayCaseUI(batch);
         CreateFurnaceUI(batch, levelManager);
         CreateInscriberUI(batch);
         CreateInventoryUI(batch);
@@ -80,6 +82,20 @@ public partial class UserInterface
                 input.Item.CustomName = discName.Text.Replace(" ", "");
         };
         DiscWriterUI.AddElement("rename", rename);
+    }
+    private static void CreateDisplayCaseUI(SpriteBatch batch)
+    {
+        // ----- Display Case -----
+        DisplayCaseUI = new(batch);
+
+        // Title
+        Point titleSize = PixelOperatorLarge.MeasureString("DISPLAY CASE").ToPoint();
+        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "DISPLAY CASE", PixelOperatorLarge, Color.White);
+        DisplayCaseUI.AddElement("title", title);
+
+        // Display item
+        Slot display = new(new(Constants.Middle.X - Slot.SlotSize.X / 2, 75));
+        DisplayCaseUI.AddElement("display", display);
     }
     private static void CreateFurnaceUI(SpriteBatch batch, LevelManager levelManager)
     {

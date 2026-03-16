@@ -116,6 +116,7 @@ public static class Constants
         new(172, 179, 157), // Inscriber
         Color.Gray, // Stove
         new(80,80,80), // Furnace
+        new(89, 55, 18), // DisplayCase
         // MINIMAPCOLORS
     ];
 }

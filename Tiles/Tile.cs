@@ -46,6 +46,7 @@ public enum TileTypeID : byte
     Inscriber,
     Stove,
     Furnace,
+    DisplayCase,
     // TILES ID
 }
 
@@ -110,6 +111,7 @@ public static class TileTypes
         new(TileTypeID.Inscriber, TextureID.Inscriber, false, false),
         new(TileTypeID.Stove, TextureID.Stove, false, false),
         new(TileTypeID.Furnace, TextureID.Furnace, false, false),
+        new(TileTypeID.DisplayCase, TextureID.DisplayCase, false, false),
         // TILES REGISTER
     ];
 }
@@ -161,6 +163,7 @@ public class Tile
             TileTypeID.Inscriber => new Inscriber(location),
             TileTypeID.Furnace => new Furnace(location),
             TileTypeID.Stove => new Stove(location),
+            TileTypeID.DisplayCase => new DisplayCase(location),
             _ => new(location, type)
         };
     }
