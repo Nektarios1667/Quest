@@ -413,7 +413,10 @@ public static class StateManager
     {
         writer.Write((byte)(item == null ? 0 : item.Type.TypeID + 1));
         if (item != null)
+        {
             writer.Write(item.Amount);
+            writer.Write(item.CustomName ?? "");
+        }
     }
     public static Item? ReadItemData(BinaryReader reader)
     {
@@ -421,7 +424,8 @@ public static class StateManager
         if (id == 0) return null;
         ItemTypeID itemType = (ItemTypeID)(id - 1);
         byte amount = reader.ReadByte();
-        return Item.Create(itemType, amount);
+        string customName = reader.ReadString();
+        return Item.Create(itemType, amount, customName == "" ? null : customName);
     }
     public static Dictionary<string, string> ReadKeyValueFile(string name)
     {
