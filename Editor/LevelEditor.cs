@@ -44,6 +44,7 @@ public class LevelEditor : Game
     // Render targets
     public LevelEditor()
     {
+        Constants.EDITOR = true;
         graphics = new GraphicsDeviceManager(this)
         {
             //PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,

@@ -55,7 +55,7 @@ public class LevelManager
 
         // Weather sounds
         float weatherIntensity = StateManager.WeatherIntensity(GameManager.GameTime);
-        if (weatherIntensity > 0)
+        if (!Constants.EDITOR && weatherIntensity > 0)
         {
             BiomeType currentBiome = Level.Biome[CameraManager.TileCoord.X + CameraManager.TileCoord.Y * Constants.MapSize.X];
             switch (currentBiome)
@@ -423,25 +423,14 @@ public class LevelManager
     }
     private static Tile ReadTile(BinaryReader reader, LevelFeatures flags, LevelPath levelPath, int x, int y)
     {
-        // Helper
-        Door ReadDoor(Point loc)
-        {
-            string keyName = reader.ReadString();
-            return new Door(loc, keyName.IsNUL() ? null : new(ItemTypes.Get(keyName), reader.ReadByte()), keyName.IsNUL() || reader.ReadBoolean());
-        }
+        // Helpers
         Chest ReadChest(Point loc)
         {
             string lootGenFile = reader.ReadString();
             ILootGenerator lootGen = LootGeneratorHelper.Read(levelPath.WorldName, lootGenFile);
             lootGen = (lootGen.FileName.IsNUL() || lootGen.FileName == "_") ? LootPreset.EmptyPreset : lootGen;
 
-            string keyStr = reader.ReadString();
-            if (keyStr != "")
-            {
-                ItemRef? key = Item.Create(Enum.Parse<ItemTypeID>(keyStr), reader.ReadByte()).GetItemRef();
-                return new Chest(loc, lootGen, levelPath.LevelName, key, reader.ReadBoolean());
-            }
-            return new Chest(loc, lootGen, levelPath.LevelName);
+            return new Chest(loc, lootGen, levelPath.LevelName, StateManager.ReadItemData(reader)?.GetItemRef(), reader.ReadBoolean());
         }
         DisplayCase ReadDisplayCase(Point loc)
         {
@@ -458,7 +447,7 @@ public class LevelManager
         return type switch
         {
             TileTypeID.Stairs => new Stairs(loc, $"{levelPath.WorldName}/{reader.ReadString()}", new(reader.ReadByte(), reader.ReadByte())),
-            TileTypeID.Door => ReadDoor(loc),
+            TileTypeID.Door => new Door(loc, StateManager.ReadItemData(reader)?.GetItemRef(), reader.ReadBoolean()),
             TileTypeID.Chest => ReadChest(loc),
             TileTypeID.Lamp => new Lamp(loc, reader.ReadByte()),
             TileTypeID.DisplayCase => ReadDisplayCase(loc),

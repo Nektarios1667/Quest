@@ -614,17 +614,13 @@ public class EditorManager
             else if (tile is Door door)
             {
                 // Write door key
-                writer.Write(door.Key == null ? "" : door.Key.Name);
-                if (door.Key == null) continue;
-                writer.Write(door.Key.Amount);
+                StateManager.WriteItemData(writer, door.Key);
                 writer.Write(door.ConsumeKey);
             }
             else if (tile is Chest chest)
             {
                 writer.Write(chest.LootGenerator);
-                writer.Write(chest.Key == null ? "" : chest.Key.Name);
-                if (chest.Key == null) continue;
-                writer.Write(chest.Key.Amount);
+                StateManager.WriteItemData(writer, chest.Key);
                 writer.Write(chest.ConsumeKey);
             }
             else if (tile is Lamp lamp)

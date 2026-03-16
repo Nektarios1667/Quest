@@ -6,6 +6,7 @@ public static class Constants
     // Debug
     public const bool COMMANDS = true;
     public const bool DEVMODE = true;
+    public static bool EDITOR = false;
 
     // Game
     public static int PlayerSpeed = 999; // normal is 300

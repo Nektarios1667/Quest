@@ -6,6 +6,7 @@ using SharpDX.Direct3D9;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Json;
+using System.Security.Policy;
 
 namespace Quest.Managers;
 [Flags]
@@ -408,6 +409,12 @@ public static class StateManager
                 reader.ReadString();
             }
         }
+    }
+    public static void WriteItemData(BinaryWriter writer, ItemRef? itemRef)
+    {
+        Item? item = itemRef == null ? null : new(itemRef);
+        WriteItemData(writer, item);
+        item?.Dispose();
     }
     public static void WriteItemData(BinaryWriter writer, Item? item)
     {
