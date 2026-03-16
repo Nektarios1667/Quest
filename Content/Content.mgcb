@@ -2092,6 +2092,12 @@
 /processorParam:Quality=Best
 /build:Sounds/Effects/Footstep.wav
 
+#begin Sounds/Effects/MetalScrape.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/MetalScrape.wav
+
 #begin Sounds/Effects/Pickup.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -2109,6 +2115,12 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Sounds/Effects/Sandstorm.wav
+
+#begin Sounds/Effects/Scribble.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Scribble.wav
 
 #begin Sounds/Effects/Spook.wav
 /importer:WavImporter
