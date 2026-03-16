@@ -51,6 +51,22 @@ public class LevelManager
                 Point loc = loot.Location - CameraManager.Camera.ToPoint() + Constants.Middle + TextureManager.Metadata[loot.Texture].Size;
                 LightingManager.SetLight($"Loot_{loot.UID}", loc, 2);
             }
+
+        // Weather sounds
+        float weatherIntensity = StateManager.WeatherIntensity(GameManager.GameTime);
+        if (weatherIntensity > 0)
+        {
+            BiomeType currentBiome = Level.Biome[CameraManager.TileCoord.X + CameraManager.TileCoord.Y * Constants.MapSize.X];
+            switch (currentBiome)
+            {
+                case BiomeType.Temperate: SoundManager.PlaySoundInstance("Rain", volume: weatherIntensity * 0.5f); break;
+                case BiomeType.Ocean: SoundManager.PlaySoundInstance("Rain", volume: weatherIntensity * 0.5f); break;
+                case BiomeType.Indoors: break;
+                case BiomeType.Snowy: break; // TODO
+                case BiomeType.Desert: SoundManager.PlaySoundInstance("Sandstorm", volume: weatherIntensity * 0.25f); break;
+            }
+
+        }
     }
     public void UpdateSky(GameManager gameManager)
     {

@@ -258,7 +258,7 @@ public class Window : Game
         debugSb.AppendFormat("{0}", LightingManager.Lights.Count);
         debugSb.Append("\nWeather: ");
         debugSb.Append(StateManager.WeatherIntensity(GameManager.GameTime));
-        debugSb.AppendFormat(" [{0:0.00}]", StateManager.WeatherNoiseValue(GameManager.GameTime));
+        debugSb.AppendFormat(" [{0:0.00}]", StateManager.WeatherValue(GameManager.GameTime));
         debugSb.Append("\nUIDs: ");
         debugSb.AppendFormat("L:{0} E:{1} I:{2}", UIDManager.Available(UIDCategory.Loot), UIDManager.Available(UIDCategory.Enemies), UIDManager.Available(UIDCategory.Items));
         debugSb.Append("\nSave: ");

@@ -26,6 +26,8 @@ public class GameManager
         SoundManager.LoadSound(content, "Footstep", "Sounds/Effects/Footstep");
         SoundManager.LoadSound(content, "Fire", "Sounds/Effects/Fire");
         SoundManager.LoadSound(content, "Fire2", "Sounds/Effects/Fire2");
+        SoundManager.LoadSound(content, "Rain", "Sounds/Effects/Rain");
+        SoundManager.LoadSound(content, "Sandstorm", "Sounds/Effects/Sandstorm");
         SoundManager.LoadSound(content, "Trinkets", "Sounds/Effects/Trinkets");
         SoundManager.LoadSound(content, "Click", "Sounds/Effects/Click");
         SoundManager.LoadSound(content, "DoorLocked", "Sounds/Effects/DoorLocked");

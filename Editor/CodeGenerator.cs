@@ -58,7 +58,7 @@ public static class CodeGenerator
         StateManager.SetWeatherPersistent(lastTimeValue: offset);
         for (int t = 0; t < seconds; t++)
         {
-            values[t] = StateManager.WeatherNoiseValue(t + offset);
+            values[t] = StateManager.WeatherValue(t + offset);
             times[t] = t;
             boost[t] = StateManager.WeatherBoost(t + offset);
             intensity[t] = StateManager.WeatherIntensity(t + offset);

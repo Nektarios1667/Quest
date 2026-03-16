@@ -104,7 +104,7 @@ public static class StateManager
     {
         OverlayState = PreviousOverlayState;
     }
-    public static float WeatherNoiseValue(float time)
+    public static float WeatherValue(float time)
     {
         float val = WeatherNoise.GetNoise(time, 0) * 0.5f + 0.5f;
         val = 1f / (1 + (float)Math.Pow(MathHelper.E, -8 * (val - 0.5f)));
@@ -126,8 +126,8 @@ public static class StateManager
         if (time - lastWeather > 600) return Math.Min((time - lastWeather - 600) / 1800f, 0.1f);
         return 0;
     }
-    public static float NoiseToIntensity(float noise) => Math.Min((float)Math.Sqrt(Math.Max(noise - weatherThreshold, 0) / (1 - weatherThreshold)), 0.8f);
-    public static float WeatherIntensity(float time) => NoiseToIntensity(WeatherNoiseValue(time));
+    private static float NoiseToIntensity(float noise) => Math.Min((float)Math.Sqrt(Math.Max(noise - weatherThreshold, 0) / (1 - weatherThreshold)), 0.8f);
+    public static float WeatherIntensity(float time) => NoiseToIntensity(WeatherValue(time));
     public static void SaveDoorOpened(ushort idx, string level)
     {
         if (openedDoors.TryGetValue(level, out var levelDoors))
