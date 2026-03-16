@@ -3,12 +3,13 @@ using System.ComponentModel;
 
 namespace Quest.Tiles;
 
-public class DisplayCase : Tile
+public class DisplayCase : Tile, IContainer
 {
     public Interaction.Container Container { get; private set; }
-    public DisplayCase(Point location) : base(location, TileTypeID.DisplayCase)
+    public DisplayCase(Point location, string levelName) : base(location, TileTypeID.DisplayCase)
     {
         Container = new([null]);
+        StateManager.SaveContainer(this, levelName);
     }
     public override void Draw(GameManager gameManager)
     {

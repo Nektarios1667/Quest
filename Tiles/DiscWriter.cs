@@ -3,12 +3,13 @@ using System.ComponentModel;
 
 namespace Quest.Tiles;
 
-public class DiscWriter : Tile
+public class DiscWriter : Tile, IContainer
 {
     public Interaction.Container Container { get; private set; }
-    public DiscWriter(Point location) : base(location, TileTypeID.DiscWriter)
+    public DiscWriter(Point location, string levelName) : base(location, TileTypeID.DiscWriter)
     {
         Container = new([null]);
+        StateManager.SaveContainer(this, levelName);
     }
     public override void OnPlayerCollide(GameManager game, PlayerManager player)
     {

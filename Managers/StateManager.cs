@@ -1,4 +1,5 @@
-﻿using Quest.Tiles;
+﻿using Quest.Items;
+using Quest.Tiles;
 using Quest.Utilities;
 using ScottPlot.Colormaps;
 using SharpDX.Direct3D9;
@@ -81,6 +82,7 @@ public static class StateManager
     // Save State changes
     private static readonly Dictionary<string, HashSet<ushort>> openedDoors = [];
     private static readonly Dictionary<string, HashSet<Chest>> chests = [];
+    private static readonly Dictionary<string, HashSet<IContainer>> containers = [];
     static StateManager()
     {
         WeatherNoise.SetSeed(WeatherSeed);
@@ -142,6 +144,21 @@ public static class StateManager
         else
             chests[level] = [chest];
     }
+    public static void SaveContainer(IContainer container, string level)
+    {
+        // Don't allow Chest even though it is IContainer
+        if (container is Chest)
+        {
+            Logger.Warning("Chest should not be saved as IContainer as it has seperate logic - use SaveChestGenerator instead");
+            return;
+        }
+
+        // Add
+        if (containers.TryGetValue(level, out var levelContainers))
+            levelContainers.Add(container);
+        else
+            containers[level] = [container];
+    }
     public static void SaveGameState(GameManager gameManager, PlayerManager playerManager)
     {
         WriteKeyValueFile("continue", new() { { "save", CurrentSave.ToString() } });
@@ -194,12 +211,21 @@ public static class StateManager
                 }
                 else
                     writer.Write((ushort)0);
+                // Chests
                 if (chests.TryGetValue(level, out var levelChests))
                 {
-                    // Chests
                     writer.Write((ushort)levelChests.Count);
                     foreach (Chest chest in levelChests)
                         WriteChestData(writer, chest);
+                }
+                else
+                    writer.Write((ushort)0);
+                // Containers
+                if (containers.TryGetValue(level, out var levelContainers))
+                {
+                    writer.Write((ushort)levelContainers.Count);
+                    foreach (IContainer cont in levelContainers)
+                        WriteContainerData(writer, cont);
                 }
                 else
                     writer.Write((ushort)0);
@@ -281,8 +307,11 @@ public static class StateManager
                 ushort chestCount = reader.ReadUInt16();
                 for (int c = 0; c < chestCount; c++)
                     ReadChestData(reader, current, levelPath);
+                // Containers
+                ushort containerCount = reader.ReadUInt16();
+                for (int o = 0; o < containerCount; o++)
+                    ReadContainerData(reader, current);
             }
-
 
             // Read Inventory data
             byte invLength = reader.ReadByte();
@@ -318,11 +347,39 @@ public static class StateManager
             writer.Write(chest.LootGenerator.FileName.Split('\\', '/')[^1]);
         }
     }
+    public static void WriteContainerData(BinaryWriter writer, IContainer container)
+    {
+        // Idx
+        writer.Write((ushort)(container.Location.Y * Constants.MapSize.X + container.Location.X));
+        // Amount of items
+        byte amount = (byte)Math.Clamp(container.Container.Items.Length, 0, 255);
+        writer.Write(amount);
+        // Write items
+        for (int i = 0; i < amount; i++)
+            WriteItemData(writer, container.Container.Items[i]);
+    }
+    public static void ReadContainerData(BinaryReader reader, Level current)
+    {
+        // Idx
+        ushort idx = reader.ReadUInt16();
+
+        // Read items
+        byte amount = reader.ReadByte();
+        Item?[] items = new Item?[amount];
+        for (int i = 0; i < items.Length; i++)
+            items[i] = ReadItemData(reader);
+
+        // Apply buffer to IContainer
+        if (idx < Constants.MapSize.X * Constants.MapSize.Y && current.Tiles[idx] is IContainer cont)
+            cont.Container.SetItems(items);
+        else
+            Logger.Error($"Tile {idx} is not an IContainer");
+    }
     public static void ReadChestData(BinaryReader reader, Level current, LevelPath levelPath)
     {
         int idx = reader.ReadUInt16(); // TileID
         bool isGenerated = reader.ReadBoolean(); // IsGenerated
-        if (idx >= 0 && idx <= Constants.MapSize.X * Constants.MapSize.Y && current.Tiles[idx] is Chest chest)
+        if (idx < Constants.MapSize.X * Constants.MapSize.Y && current.Tiles[idx] is Chest chest)
         {
             if (isGenerated)
             {

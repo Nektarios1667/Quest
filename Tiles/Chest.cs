@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace Quest.Tiles;
 
-public class Chest : Tile
+public class Chest : Tile, IContainer
 {
     public readonly static Point Size = new(6, 3);
     public ILootGenerator LootGenerator { get; private set; }

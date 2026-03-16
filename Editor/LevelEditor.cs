@@ -190,7 +190,7 @@ public class LevelEditor : Game
                 if (TileSelection == TileTypeID.Stairs)
                     tile = new Stairs(mouseCoord, "", Constants.MiddleCoord);
                 else
-                    tile = Tile.TileFromId(TileSelection, mouseCoord);
+                    tile = Tile.TileFromId(TileSelection, mouseCoord, "NUL");
 
                 editorManager.SetTile(tile);
             }

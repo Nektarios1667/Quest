@@ -150,7 +150,7 @@ public class Tile
 
     public virtual void OnPlayerEnter(GameManager game, PlayerManager player) { }
     public virtual void OnPlayerCollide(GameManager game, PlayerManager player) { }
-    public static Tile TileFromId(int id, Point location)
+    public static Tile TileFromId(int id, Point location, string levelName)
     {
         // Create a tile from an id
         TileTypeID type = (TileTypeID)id;
@@ -160,15 +160,15 @@ public class Tile
             TileTypeID.Door => new Door(location, null),
             TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, "_"),
             TileTypeID.Lamp => new Lamp(location),
-            TileTypeID.Jukebox => new Jukebox(location),
-            TileTypeID.DiscWriter => new DiscWriter(location),
-            TileTypeID.Inscriber => new Inscriber(location),
-            TileTypeID.Furnace => new Furnace(location),
-            TileTypeID.Stove => new Stove(location),
-            TileTypeID.DisplayCase => new DisplayCase(location),
-            TileTypeID.Crate => new Crate(location),
+            TileTypeID.Jukebox => new Jukebox(location, levelName),
+            TileTypeID.DiscWriter => new DiscWriter(location, levelName),
+            TileTypeID.Inscriber => new Inscriber(location, levelName),
+            TileTypeID.Furnace => new Furnace(location, levelName),
+            TileTypeID.Stove => new Stove(location, levelName),
+            TileTypeID.DisplayCase => new DisplayCase(location, levelName),
+            TileTypeID.Crate => new Crate(location, levelName),
             _ => new(location, type)
         };
     }
-    public static Tile TileFromId(TileTypeID id, Point location) => TileFromId((int)id, location);
+    public static Tile TileFromId(TileTypeID id, Point location, string levelName) => TileFromId((int)id, location, levelName);
 }

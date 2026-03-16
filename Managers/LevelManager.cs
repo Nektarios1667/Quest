@@ -453,7 +453,7 @@ public class LevelManager
             TileTypeID.Door => ReadDoor(loc),
             TileTypeID.Chest => ReadChest(loc),
             TileTypeID.Lamp => new Lamp(loc, reader.ReadByte()),
-            _ => Tile.TileFromId(type, loc),
+            _ => Tile.TileFromId(type, loc, levelPath.LevelName),
         };
     }
     public static Decal DecalFromId(DecalType id, Point location) => new(location, id);

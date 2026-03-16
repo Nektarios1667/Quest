@@ -281,6 +281,11 @@ public class Item
 
     public static Item Create(ItemTypeID itemType, int amount, string? customName = null)
     {
+        // Error check
+        if ((byte)itemType >= ItemTypes.All.Length)
+            Logger.Error($"Item Create failed - ItemTypeID {(byte)itemType} does not exist", exit: true);
+
+        // Create
         ItemType type = ItemTypes.All[(byte)itemType];
         return itemType switch
         {
