@@ -63,7 +63,7 @@ public class LevelManager
                 case BiomeType.Temperate: SoundManager.PlaySoundInstance("Rain", volume: weatherIntensity * 0.5f); break;
                 case BiomeType.Ocean: SoundManager.PlaySoundInstance("Rain", volume: weatherIntensity * 0.5f); break;
                 case BiomeType.Indoors: break;
-                case BiomeType.Snowy: break; // TODO
+                case BiomeType.Snowy: SoundManager.PlaySoundInstance("Sandstorm", volume: weatherIntensity * 0.1f); break;
                 case BiomeType.Desert: SoundManager.PlaySoundInstance("Sandstorm", volume: weatherIntensity * 0.25f); break;
             }
 
