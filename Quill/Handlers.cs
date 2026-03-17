@@ -10,7 +10,7 @@ namespace Quest.Quill;
 public static partial class Interpreter
 {
     // Handlers
-    private static void HandleMeta(QuillInstance inst, string[] args)
+    private static void HandleMeta(QuillInstance inst, string[] args, string? label)
     {
         if (args.Length != 1)
         {
@@ -27,7 +27,7 @@ public static partial class Interpreter
         Logger.Log($"{inst.Script.Name} | @{inst.L} | {inst.CompiledLines[l]} | {inst.CompiledLines[l].Flags()} | e:{inst.Errors.Count} | pf:{inst.PerformanceMode} | sc:{inst.Scopes.LastOrDefault() ?? "NUL"} | {string.Join(',', inst.Callbacks)} | ln:{inst.CompiledLines.Length}");
 
     }
-    private static void HandlePerfMode(QuillInstance inst, string[] args)
+    private static void HandlePerfMode(QuillInstance inst, string[] args, string? label)
     {
         if (args.Length != 1)
         {
@@ -43,7 +43,7 @@ public static partial class Interpreter
         // Set performance mode
         inst.SetPerformanceMode(Enum.Parse<QuillPerformanceMode>(args[0]));
     }
-    private static void HandleNum(QuillInstance inst, string[] args)
+    private static void HandleNum(QuillInstance inst, string[] args, string? label)
     {
         if (args.Length != 2)
         {
@@ -70,7 +70,7 @@ public static partial class Interpreter
         else
             inst.Locals[varName] = num.ToString("F20").TrimEnd('0').TrimEnd('.');
     }
-    private static void HandleStr(QuillInstance inst, string[] args)
+    private static void HandleStr(QuillInstance inst, string[] args, string? label)
     {
         if (args.Length != 2)
         {
@@ -92,70 +92,48 @@ public static partial class Interpreter
         else
             inst.Locals[varName] = args[1];
     }
-    private static void HandleBreakWhile(QuillInstance inst, string[] args)
+    private static void HandleBreakWhile(QuillInstance inst, string[] args, string? label)
     {
-        if (args.Length == 1)
-            inst.L = FindLine(inst, QuillOp.EndWhile, label: args[0], start: inst.L);
-        else if (args.Length == 0)
-            inst.L = FindLine(inst, QuillOp.EndWhile, start: inst.L);
+        if (args.Length == 0)
+            inst.L = FindLine(inst, QuillOp.EndWhile, label: label, start: inst.L);
         else
             inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"breakwhile command expects 0 or 1 arguments, received {args.Length}"));
     }
-    private static void HandleContinueWhile(QuillInstance inst, string[] args)
+    private static void HandleContinueWhile(QuillInstance inst, string[] args, string? label)
     {
-        if (args.Length == 1)
-            inst.L = FindLineBackwards(inst, QuillOp.While, label: args[0], start: inst.L) - 1;
-        else if (args.Length == 0)
-            inst.L = FindLineBackwards(inst, QuillOp.While, start: inst.L) - 1;
+        if (args.Length == 0)
+            inst.L = FindLineBackwards(inst, QuillOp.While, label: label, start: inst.L) - 1;
         else
             inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"continuewhile command expects 0 or 1 arguments, received {args.Length}"));
     }
-    private static void HandleIf(QuillInstance inst, string[] args)
+    private static void HandleIf(QuillInstance inst, string[] args, string? label)
     {
-        if (args.Length >= 2 && args[0].StartsWith('.'))
+        if (args.Length >= 1)
         {
-            string label = args[0];
-            Expression expr = new(string.Join(' ', args[1..]));
+            Expression expr = new(string.Join(' ', args));
             var result = expr.Evaluate();
             if (result is bool b && !b)
                 inst.L = FindLine(inst, QuillOp.EndIf, label: label, start: inst.L);
         }
-        else if (args.Length >= 1)
-        {
-            Expression expr = new(string.Join(' ', args[0..]));
-            var result = expr.Evaluate();
-            if (result is bool b && !b)
-                inst.L = FindLine(inst, QuillOp.EndIf, start: inst.L);
-        }
         else
             inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"if command expects 1 or 2 arguments, received {args.Length}"));
     }
-    private static void HandleWhile(QuillInstance inst, string[] args)
+    private static void HandleWhile(QuillInstance inst, string[] args, string? label)
     {
-        if (args.Length >= 2 && args[0].StartsWith('.'))
+        if (args.Length >= 1)
         {
-            string label = args[0];
-            Expression expr = new(string.Join(' ', args[1..]));
+            Expression expr = new(string.Join(' ', args));
             var result = expr.Evaluate();
             if (result is bool b && !b)
-                inst.L = FindLine(inst, QuillOp.EndWhile, label:label, start: inst.L);
-        }
-        else if (args.Length >= 1)
-        {
-            Expression expr = new(string.Join(' ', args[0..]));
-            var result = expr.Evaluate();
-            if (result is bool b && !b)
-                inst.L = FindLine(inst, QuillOp.EndWhile, start: inst.L);
+                inst.L = FindLine(inst, QuillOp.EndWhile, label: label, start: inst.L);
         }
         else
             inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"while command expects 1 or 2 arguments, received {args.Length}"));
     }
-    private static void HandleEndWhile(QuillInstance inst, string[] args)
+    private static void HandleEndWhile(QuillInstance inst, string[] args, string? label)
     {
         if (args.Length == 0)
-            inst.L = FindLineBackwards(inst, QuillOp.While, start: inst.L) - 1;
-        else if (args.Length == 1)
-            inst.L = FindLineBackwards(inst, QuillOp.While, label: args[0], start: inst.L) - 1;
+            inst.L = FindLineBackwards(inst, QuillOp.While, label: label, start: inst.L) - 1;
         else
             inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"endwhile command expects 0 or 1 arguments, received {args.Length}"));
 
@@ -165,11 +143,11 @@ public static partial class Interpreter
         else if (inst.PerformanceMode == QuillPerformanceMode.Normal)
             inst.Sleep(100); // ms
     }
-    private static void HandleFunc(QuillInstance inst, string[] args)
+    private static void HandleFunc(QuillInstance inst, string[] args, string? label)
     {
         inst.L = FindLine(inst, QuillOp.EndFunc, start: inst.L);
     }
-    private static void HandleEndFunc(QuillInstance inst, string[] args)
+    private static void HandleEndFunc(QuillInstance inst, string[] args, string? label)
     {
         inst.Locals.Clear();
         if (inst.Callbacks.Count > 0)
@@ -180,7 +158,7 @@ public static partial class Interpreter
         if (inst.Scopes.Count > 0)
             inst.Scopes.Pop();
     }
-    private static void HandleSleep(QuillInstance inst, string[] args)
+    private static void HandleSleep(QuillInstance inst, string[] args, string? label)
     {
         if (args.Length != 1)
         {
@@ -193,7 +171,7 @@ public static partial class Interpreter
         else
             inst.Errors.Add(new(inst.L, QuillErrorType.ParameterMismatch, $"Invalid sleep time: {args[0]}"));
     }
-    private static void HandleWait(QuillInstance inst, string[] args)
+    private static void HandleWait(QuillInstance inst, string[] args, string? label)
     {
         if (args.Length != 2)
         {
@@ -217,22 +195,10 @@ public static partial class Interpreter
             inst.Sleep(waitTime);
         }
     }
-    private static void HandleOnly(QuillInstance inst, string[] args)
+    private static void HandleOnly(QuillInstance inst, string[] args, string? label)
     {
-        string label = "";
         int limit;
-
-        if (args.Length == 2 && args[0].StartsWith('.'))
-        {
-            label = args[0];
-            limit = int.TryParse(args[1], out int v) ? v : -1;
-        }
-        else if (args.Length == 1 && args[0].StartsWith('.'))
-        {
-            label = args[0];
-            limit = 1;
-        }
-        else if (args.Length == 1)
+        if (args.Length == 1)
             limit = int.TryParse(args[0], out int v) ? v : -1;
         else if (args.Length == 0)
             limit = 1;
@@ -257,7 +223,7 @@ public static partial class Interpreter
         else
             inst.L = FindLine(inst, QuillOp.EndOnly, label: label, start: inst.L);
     }
-    private static void HandleReturn(QuillInstance inst, string[] args)
+    private static void HandleReturn(QuillInstance inst, string[] args, string? label)
     {
         if (args.Length == 1)
         {

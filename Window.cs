@@ -125,7 +125,7 @@ public class Window : Game
         CursorArrow = Content.Load<Texture2D>("Images/Gui/CursorArrow");
 
         // Timer
-        TimerManager.NewTimer("FrameTimeUpdate", 1, UpdateFrameTimes, int.MaxValue);
+        TimerManager.NewTimer("FrameTimeUpdate", 0.5f, UpdateFrameTimes, int.MaxValue);
 
         // Final
         Logger.System("Game finished initializing.");
