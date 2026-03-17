@@ -71,8 +71,8 @@ public static class Constants
     public static readonly string[] TextureIDNames = Enum.GetNames(typeof(TextureID));
 
     // Quill
-    public const int QuillUpdatesPerFrame = 200;
-    public const int QuillScriptMaxUpdatesPerFrame = 50;
+    public const int QuillUpdatesPerFrame = 500;
+    public const int QuillScriptMaxUpdatesPerFrame = 500;
 
     // Minimap pixel colors
     public static readonly Color[] MiniMapColors = [
