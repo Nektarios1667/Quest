@@ -55,8 +55,8 @@ public class QuillCommand
     public QuillCommand(QuillOp op, string[] args)
     {
         Operation = op;
-        Args = args;
         Label = args.FirstOrDefault(a => a[0] == '.');
+        Args = [.. args.Where(a => a != Label)]; // Strip label
 
         string argsStr = string.Join("", args);
         HasVariables = argsStr.Contains('=');
