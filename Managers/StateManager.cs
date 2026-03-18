@@ -200,8 +200,8 @@ public static class StateManager
                 {
                     writer.Write((byte)(loot.Item.Type.TypeID + 1));
                     writer.Write(loot.Item.Amount);
-                    writer.Write((ushort)loot.Location.X);
-                    writer.Write((ushort)loot.Location.Y);
+                    writer.Write((ushort)loot.Position.X);
+                    writer.Write((ushort)loot.Position.Y);
                 }
                 // Doors
                 if (openedDoors.TryGetValue(level, out var levelDoors))

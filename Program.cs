@@ -3,7 +3,6 @@ global using Microsoft.Xna.Framework.Graphics;
 global using Microsoft.Xna.Framework.Input;
 global using MonoGame.Extended;
 global using Quest.Decals;
-global using Quest.Enemies;
 global using Quest.Entities;
 global using Quest.Items;
 global using Quest.Managers;

@@ -91,6 +91,7 @@ public static class CommandManager
             new("macro *", CMacro, "Executed macro '|1|'.", "Failed to execute macro '|1|'."),
             new("give <item> {1:255} *", CGive, "Gave |2| |1| (|3|) to player", "Failed to give |2| |1| (|3|) to player"),
             new("notif <int> <int> <int> <number> **", CNotif, "Notification |*| created.", "Failed to create notification |*|."),
+            new("enemy", CEnemy, "Spawned enemy.", "Failed to spawn enemy."),
         ];
     }
     public static (bool success, string output) Execute(string command)
@@ -339,6 +340,11 @@ public static class CommandManager
         decimal duration = decimal.Parse(parts[4]);
         string message = string.Join(' ', parts[5..]);
         gameManager!.OverlayManager.LootNotifications.AddNotification(message, color:new(r, g, b), (float)duration);
+        return true;
+    }
+    private static bool CEnemy(string command)
+    {
+        gameManager!.LevelManager.Level.Enemies.Add(new(CameraManager.PlayerFoot));
         return true;
     }
 }

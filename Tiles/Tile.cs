@@ -57,12 +57,14 @@ public class TileType
     public TextureID Texture { get; }
     public bool IsWalkable { get; }
     public bool IsWall { get; }
-    public TileType(TileTypeID id, TextureID texture, bool isWalkable, bool isWall)
+    public float Weight { get; }
+    public TileType(TileTypeID id, TextureID texture, bool isWalkable, bool isWall, float weight = 1f)
     {
         ID = id;
         Texture = texture;
         IsWalkable = isWalkable;
         IsWall = isWall;
+        Weight = weight;
     }
 }
 
@@ -75,36 +77,36 @@ public static class TileTypes
         new(TileTypeID.Grass, TextureID.Grass, true, false),
         new(TileTypeID.Water, TextureID.Water, false, false),
         new(TileTypeID.StoneWall, TextureID.StoneWall, false, true),
-        new(TileTypeID.Stairs, TextureID.Stairs, true, false),
-        new(TileTypeID.Flooring, TextureID.Flooring, true, false),
-        new(TileTypeID.Sand, TextureID.Sand, true, false),
-        new(TileTypeID.Dirt, TextureID.Dirt, true, false),
+        new(TileTypeID.Stairs, TextureID.Stairs, true, false, weight: float.MaxValue),
+        new(TileTypeID.Flooring, TextureID.Flooring, true, false, weight : 0.75f),
+        new(TileTypeID.Sand, TextureID.Sand, true, false, weight : 1.5f),
+        new(TileTypeID.Dirt, TextureID.Dirt, true, false, weight : 1.1f),
         new(TileTypeID.Darkness, TextureID.Darkness, false, false),
         new(TileTypeID.Door, TextureID.Door, false, true),
-        new(TileTypeID.WoodFlooring, TextureID.WoodFlooring, true, false),
-        new(TileTypeID.Stone, TextureID.Stone, true, false),
+        new(TileTypeID.WoodFlooring, TextureID.WoodFlooring, true, false, weight:0.75f),
+        new(TileTypeID.Stone, TextureID.Stone, true, false, weight : 0.9f),
         new(TileTypeID.Chest, TextureID.Chest, false, false),
         new(TileTypeID.ConcreteWall, TextureID.ConcreteWall, false, true),
         new(TileTypeID.WoodWall, TextureID.WoodWall, false, true),
-        new(TileTypeID.Path, TextureID.Path, true, false),
+        new(TileTypeID.Path, TextureID.Path, true, false, weight:0.5f),
         new(TileTypeID.Lava, TextureID.Lava, false, false),
-        new(TileTypeID.StoneTiles, TextureID.StoneTiles, true, false),
-        new(TileTypeID.RedTiles, TextureID.RedTiles, true, false),
-        new(TileTypeID.OrangeTiles, TextureID.OrangeTiles, true, false),
-        new(TileTypeID.YellowTiles, TextureID.YellowTiles, true, false),
-        new(TileTypeID.LimeTiles, TextureID.LimeTiles, true, false),
-        new(TileTypeID.GreenTiles, TextureID.GreenTiles, true, false),
-        new(TileTypeID.CyanTiles, TextureID.CyanTiles, true, false),
-        new(TileTypeID.BlueTiles, TextureID.BlueTiles, true, false),
-        new(TileTypeID.PurpleTiles, TextureID.PurpleTiles, true, false),
-        new(TileTypeID.PinkTiles, TextureID.PinkTiles, true, false),
-        new(TileTypeID.BlackTiles, TextureID.BlackTiles, true, false),
-        new(TileTypeID.BrownTiles, TextureID.BrownTiles, true, false),
+        new(TileTypeID.StoneTiles, TextureID.StoneTiles, true, false, weight: 0.75f),
+        new(TileTypeID.RedTiles, TextureID.RedTiles, true, false, weight: 0.75f),
+        new(TileTypeID.OrangeTiles, TextureID.OrangeTiles, true, false, weight: 0.75f),
+        new(TileTypeID.YellowTiles, TextureID.YellowTiles, true, false, weight: 0.75f),
+        new(TileTypeID.LimeTiles, TextureID.LimeTiles, true, false, weight: 0.75f),
+        new(TileTypeID.GreenTiles, TextureID.GreenTiles, true, false, weight: 0.75f),
+        new(TileTypeID.CyanTiles, TextureID.CyanTiles, true, false, weight: 0.75f),
+        new(TileTypeID.BlueTiles, TextureID.BlueTiles, true, false, weight: 0.75f),
+        new(TileTypeID.PurpleTiles, TextureID.PurpleTiles, true, false, weight: 0.75f),
+        new(TileTypeID.PinkTiles, TextureID.PinkTiles, true, false, weight: 0.75f),
+        new(TileTypeID.BlackTiles, TextureID.BlackTiles, true, false, weight: 0.75f),
+        new(TileTypeID.BrownTiles, TextureID.BrownTiles, true, false, weight: 0.75f),
         new(TileTypeID.IronWall, TextureID.IronWall, false, true),
-        new(TileTypeID.Snow, TextureID.Snow, true, false),
-        new(TileTypeID.Ice, TextureID.Ice, true, false),
+        new(TileTypeID.Snow, TextureID.Snow, true, false, weight:1.5f),
+        new(TileTypeID.Ice, TextureID.Ice, true, false, weight:3),
         new(TileTypeID.SnowyGrass, TextureID.SnowyGrass, true, false),
-        new(TileTypeID.Lamp, TextureID.Lamp, true, false),
+        new(TileTypeID.Lamp, TextureID.Lamp, true, false, weight:1.5f),
         new(TileTypeID.Sandstone, TextureID.Sandstone, true, false),
         new(TileTypeID.SandstoneWall, TextureID.SandstoneWall, false, true),
         new(TileTypeID.Jukebox, TextureID.Jukebox, false, false),
@@ -128,6 +130,7 @@ public class Tile
     public byte Y => Location.Y;
     public virtual bool IsWalkable => Type.IsWalkable;
     public bool IsWall => Type.IsWall;
+    public virtual float Weight => Type.Weight;
     public ushort TileID => (ushort)(X + Y * Constants.MapSize.X);
     public TileType Type => TileTypes.All[TypeID];
 
@@ -156,6 +159,8 @@ public class Tile
         TileTypeID type = (TileTypeID)id;
         return type switch
         {
+            TileTypeID.Water => new Water(location),
+            TileTypeID.Lava => new Lava(location),
             TileTypeID.Stairs => new Stairs(location, "", Constants.MiddleCoord),
             TileTypeID.Door => new Door(location, null),
             TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, "_"),

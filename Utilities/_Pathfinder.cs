@@ -13,12 +13,12 @@ public class Node(Point pos)
     public override int GetHashCode() => Position.X * 73856093 ^ Position.Y * 19349663;
 }
 
-public static class Pathfinder
+public static class _Pathfinder
 {
     private static GameManager gameManager { get; set; } = null!;
     public static void Init(GameManager gameManager)
     {
-        Pathfinder.gameManager = gameManager;
+        _Pathfinder.gameManager = gameManager;
     }
     public static Point[]? FindTilePathAStar(Point from, Point to)
     {

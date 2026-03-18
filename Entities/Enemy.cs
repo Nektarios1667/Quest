@@ -1,6 +1,12 @@
-﻿namespace Quest.Enemies;
-public class Enemy
+﻿using Migs.MPath.Core.Data;
+using SharpDX.Direct2D1.Effects;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+
+namespace Quest.Entities;
+public class Enemy : IEntity
 {
+    public event Action<int>? OnAttack;
     public ushort UID { get; }
     public bool IsAlive => Health >= 0;
     public string Name { get; protected set; }
@@ -12,17 +18,18 @@ public class Enemy
     public int ViewRange { get; protected set; } // Pixels
     public int AttackRange { get; protected set; } // Pixels
     public TextureID Texture { get; protected set; }
-    public Vector2 Location { get; protected set; }
-    public RectangleF Hitbox => new(Location, tileSize);
-    private Point tileSize { get; set; }
-    private Point[]? path { get; set; }
+    public Vector2 Position { get; protected set; }
+    public float Scale { get; protected set; }
+    public RectangleF Bounds => new(Position, Size);
+    public Point Size { get; set; }
+    private List<Point>? Path { get; set; }
     public Enemy(Point location)
     {
         Name = GetType().Name;
-        Texture = TextureID.PurpleWizard; // TODO remove this line when all enemies have textures
+        Texture = TextureID.PurpleWizard; // DEBUG TODO remove this line when all enemies have textures
         UID = UIDManager.Get(UIDCategory.Enemies);
-        tileSize = TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap;
-        Location = location.ToVector2();
+        Size = (TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap).Scaled(Scale);
+        Position = location.ToVector2();
 
         // Stats
         Health = 100;
@@ -32,7 +39,7 @@ public class Enemy
         Speed = 80;
         ViewRange = 900;
         AttackRange = 50;
-
+        Scale = Constants.PlayerScale;
     }
     public virtual void Update(GameManager gameManager)
     {
@@ -43,13 +50,13 @@ public class Enemy
             UIDManager.Release(UIDCategory.Enemies, UID);
 
         // View range
-        float playerDistSq = Vector2.DistanceSquared(Location, CameraManager.CameraDest);
+        float playerDistSq = Vector2.DistanceSquared(Position, CameraManager.CameraDest);
 
         // Attack
         if (TimerManager.IsCompleteOrMissing($"EnemyAttack_{UID}") && playerDistSq < AttackRange * AttackRange)
         {
             Attack();
-            TimerManager.SetTimer($"EnemyAttack_{UID}", 0, null);
+            TimerManager.SetTimer($"EnemyAttack_{UID}", AttackSpeed, null);
         }
 
         // Move
@@ -58,24 +65,31 @@ public class Enemy
             // Update pathfinding
             if (TimerManager.IsCompleteOrMissing($"EnemyPathfind_{UID}"))
             {
-                path = Pathfinder.FindTilePathAStar(LevelManager.TileCoord(Location + tileSize.ToVector2() / 2), CameraManager.TileCoord);
+                Point from = LevelManager.TileCoord(Position + Size.ToVector2() / 2) - CameraManager.TopLeftTileCoord;
+                Point to = CameraManager.TileCoord - CameraManager.TopLeftTileCoord;
+                var path = PathfindingManager.GetPath(from, to);
+                Path = path != null ? [.. path.Select(p => p.ToPoint() + CameraManager.TopLeftTileCoord)] : null;
                 TimerManager.SetTimer($"EnemyPathfind_{UID}", 0.5f, null);
             }
             // Move along path
-            if (path != null && path.Length > 0)
+            if (Path != null && Path.Count > 0)
             {
-                Vector2 move = LevelManager.WorldCoord(path[0]) - Location;
+                Vector2 move = LevelManager.WorldCoord(Path[0]) - Position;
                 if (move.LengthSquared() <= 9)
-                    Location += move;
+                {
+                    Position += move;
+                    Path.RemoveAt(0);
+                }
                 else
-                    Location += Vector2.Normalize(move) * Speed * GameManager.DeltaTime;
+                    Position += Vector2.Normalize(move) * Speed * GameManager.DeltaTime;
             }
         }
     }
     public virtual void Draw(GameManager gameManager)
     {
         Rectangle source = GetAnimationSource(Texture, GameManager.GameTime, duration: 0.5f);
-        DrawTexture(gameManager.Batch, Texture, Location.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, source: source);
+        DrawTexture(gameManager.Batch, Texture, Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, source: source, scale: Constants.PlayerScale);
+        DebugManager.DrawHitbox(gameManager.Batch, this);
     }
     public virtual void Hurt(int damage)
     {
@@ -84,7 +98,7 @@ public class Enemy
     }
     public virtual void Attack()
     {
-
+        OnAttack?.Invoke(Damage);
     }
     public virtual void Dispose()
     {

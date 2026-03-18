@@ -61,4 +61,13 @@ public static class DebugManager
         else
             Logger.Error($"Benchmark '{name}' not started.");
     }
+    public static void DrawHitbox(SpriteBatch batch, IEntity entity)
+    {
+        if (!DrawHitboxes) return;
+
+        Vector2 screnPos = entity.Bounds.Position - CameraManager.Camera + Constants.Middle.ToVector2();
+        batch.DrawRectangle(screnPos, entity.Bounds.Size, Constants.DebugGreenTint, thickness: 2);
+        batch.DrawPoint(screnPos + entity.Bounds.Size.ToVector2() * 0.5f, Constants.DebugPinkTint, 3);
+        batch.DrawPoint(screnPos + entity.Bounds.Size.ToVector2() * new Vector2(0.5f, 1), Constants.DebugPinkTint, 3);
+    }
 }

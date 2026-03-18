@@ -397,13 +397,13 @@ public class EditorManager
             scale = 1;
         }
         TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), values[3]);
-        LevelManager.Level.NPCs.Add(new NPC(GameManager.OverlayManager, texture, MouseSelectionCoord, name, dialog, Color.White, scale));
+        LevelManager.Level.NPCs.Add(new NPC(texture, MouseSelectionCoord, name, dialog, Color.White, scale));
     }
     public void DeleteNPC()
     {
         foreach (NPC npc in LevelManager.Level.NPCs)
         {
-            if (npc.Location == MouseSelectionCoord)
+            if (npc.Position == MouseSelectionCoord)
             {
                 LevelManager.Level.NPCs.Remove(npc);
                 Logger.Log($"Deleted NPC '{npc.Name}' @ {MouseSelectionCoord.X}, {MouseSelectionCoord.Y}.");
@@ -482,7 +482,7 @@ public class EditorManager
     {
         foreach (Loot loot in LevelManager.Level.Loot)
         {
-            if (Vector2.DistanceSquared(loot.Location.ToVector2(), MouseSelection.ToVector2()) < 900)
+            if (Vector2.DistanceSquared(loot.Position.ToVector2(), MouseSelection.ToVector2()) < 900)
             {
                 LevelManager.Level.Loot.Remove(loot);
                 Logger.Log($"Deleted loot '{loot.Item}' @ {MouseCoord.X}, {MouseCoord.Y}.");

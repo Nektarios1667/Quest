@@ -13,15 +13,6 @@ public static class Constants
     public const int MaxStack = 10;
     public const int DayLength = 600; // Length of a day in seconds
 
-    // Screen
-    public static readonly Point ScreenResolution = new(1280, 720); // Actual screen resolution
-    public static readonly Point NativeResolution = new(1280, 720); // Game window resolution
-    public static readonly Vector2 ScreenScale = ScreenResolution.ToVector2() / NativeResolution.ToVector2(); // Scale factor from native resolution to actual screen resolution
-    public static readonly Rectangle WindowRect = new(Point.Zero, NativeResolution); // Game window rectangle
-    public static readonly float CameraRigidity = 0.07f; // Camera smoothing weight - 1 = no smoothing
-    public const int FPS = -1; // -1 = unlimited
-    public const bool VSYNC = false;
-
     // Tile and map
     public static readonly Point TileSize = new(64, 64); // In-game tile size
     public static readonly Point TileHalfSize = new(TileSize.X / 2, TileSize.Y / 2); // Half of the in-game tile size
@@ -33,8 +24,18 @@ public static class Constants
     public static readonly Point[] NeighborTiles = [new(0, 1), new(1, 0), new(0, -1), new(-1, 0)];
     public static readonly Point[] DiagonalNeighborTiles = [new(1, 1), new(1, -1), new(-1, 1), new(-1, -1)];
     public static readonly Point[] AllNeighborTiles = [.. NeighborTiles.Concat(DiagonalNeighborTiles)]; // All 8 neighbor tiles
+
+    // Screen
+    public static readonly Point ScreenResolution = new(1280, 720); // Actual screen resolution
+    public static readonly Point NativeResolution = new(1280, 720); // Game window resolution
+    public static readonly Point NativeResolutionTiles = NativeResolution / TileSize;
+    public static readonly Vector2 ScreenScale = ScreenResolution.ToVector2() / NativeResolution.ToVector2(); // Scale factor from native resolution to actual screen resolution
+    public static readonly Rectangle WindowRect = new(Point.Zero, NativeResolution); // Game window rectangle
     public static readonly Point Middle = new(NativeResolution.X / 2, NativeResolution.Y / 2); // Center of the screen
     public static readonly Point MiddleCoord = Middle / TileSize; // Center tile coordinate
+    public static readonly float CameraRigidity = 0.07f; // Camera smoothing weight - 1 = no smoothing
+    public const int FPS = -1; // -1 = unlimited
+    public const bool VSYNC = false;
 
     // Utility
     public static readonly Vector2 HalfVec = new(0.5f);
@@ -62,6 +63,7 @@ public static class Constants
     public static readonly Color DarkenScreen = new(0, 0, 0, 188);
     public static readonly Color DebugPinkTint = new Color(255, 0, 255) * .5f;
     public static readonly Color DebugGreenTint = new Color(55, 255, 55) * .5f;
+    public static readonly Color DebugBlueTint = new Color(0, 0, 255) * .5f;
     public static readonly Color SemiTransparent = Color.White * .6f;
 
     // Enum string representations

@@ -93,7 +93,7 @@ public class Window : Game
         menuManager = new(this, spriteBatch, Content, gameManager, playerManager);
         levelManager.LevelLoaded += _ => playerManager.CloseInterface();
         CommandManager.Init(this, gameManager, levelManager, playerManager);
-        Pathfinder.Init(gameManager);
+        _Pathfinder.Init(gameManager);
         SoundtrackManager.SoundtrackChanged += (Soundtracks? st) =>{ if (st != null) overlayManager.Notification($"Now Playing: {st}", Color.Cyan); };
 
         Logger.System("Initialized managers.");

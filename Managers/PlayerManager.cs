@@ -8,7 +8,7 @@ public class Attack(int damage, RectangleF hitbox)
     public int Damage { get; } = damage;
     public RectangleF Hitbox { get; } = hitbox;
 }
-public class PlayerManager
+public class PlayerManager : IEntity
 {
     // Events
     public event Action<Item?>? ItemSelected;
@@ -28,6 +28,8 @@ public class PlayerManager
     public Item? EquippedItem => EquippedSlot >= 0 && EquippedSlot < Inventory.Items.Length ? Inventory.Items[EquippedSlot] : null;
     public (UserInterface ui, int idx)? MouseSelection { get; set; } // Item being moved with mouse and its original inventory
     // Position and collision
+    public RectangleF Bounds => GetHitbox();
+
     public Tile? TileBelow { get; private set; }
     public List<Tile> TileBumps { get; private set; } = [];
     public Direction PlayerDirection { get; private set; }
@@ -130,7 +132,6 @@ public class PlayerManager
 
         DebugManager.EndBenchmark("InventoryUpdate");
 
-
         // NPC
         UpdateNPCInteractions(gameManager);
 
@@ -189,7 +190,7 @@ public class PlayerManager
             Loot loot = gameManager.LevelManager.Level.Loot[l];
             if (GameManager.GameTime - loot.Birth < 3) continue; // Prevent picking up things just dropped
             // Pick up loot
-            if (PointTools.DistanceSquared(CameraManager.PlayerFoot, loot.Location + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
+            if (PointTools.DistanceSquared(CameraManager.PlayerFoot, loot.Position + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
             {
                 gameManager.OverlayManager.LootNotifications.AddNotification($"+{loot.DisplayName}");
                 Item adding = Item.Create(loot.Item.Type, loot.Item.Amount, loot.Item.CustomName);
@@ -217,7 +218,6 @@ public class PlayerManager
         DrawPlayer(gameManager);
         if (DebugManager.DrawHitboxes)
         {
-            DrawPlayerHitbox(gameManager);
             foreach (Attack attack in Attacks)
                 FillRectangle(gameManager.Batch, new(attack.Hitbox.Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, new Point((int)attack.Hitbox.Width, (int)attack.Hitbox.Height)), Constants.DebugPinkTint);
         }
@@ -252,13 +252,15 @@ public class PlayerManager
             Point itemPos = Constants.Middle + CameraManager.CameraOffset.ToPoint() - leftShift + Constants.MageItemShift.Scaled(left ? -1 : 1);
             DrawTexture(gameManager.Batch, EquippedItem.Texture, itemPos, scale: 2, effects: PlayerDirection == Direction.Left ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
         }
+        // Hitbox
+        DebugManager.DrawHitbox(gameManager.Batch, this);
     }
-    public void DrawPlayerHitbox(GameManager gameManager)
+    public static RectangleF GetHitbox()
     {
         Point[] points = new Point[4];
         for (int c = 0; c < Constants.PlayerCorners.Length; c++)
-            points[c] = CameraManager.PlayerFoot + Constants.PlayerCorners[c] - CameraManager.Camera.ToPoint() + Constants.Middle;
-        FillRectangle(gameManager.Batch, new Rectangle(points[0].X, points[0].Y, points[1].X - points[0].X, points[2].Y - points[1].Y), Constants.DebugPinkTint);
+            points[c] = CameraManager.PlayerFoot + Constants.PlayerCorners[c];
+        return new RectangleF(points[0].X, points[0].Y, points[1].X - points[0].X, points[2].Y - points[1].Y);
     }
     public void Move(GameManager gameManager, Vector2 move)
     {

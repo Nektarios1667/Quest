@@ -25,7 +25,7 @@ public static class BinaryWriterExtensions
     {
         writer.Write(npc.Name);
         writer.Write(npc.Dialog);
-        writer.Write(new ByteCoord(npc.Location));
+        writer.Write(new ByteCoord(npc.Position));
         writer.WriteByteFloat(npc.Scale);
         writer.Write((ushort)npc.Texture);
     }
@@ -37,8 +37,8 @@ public static class BinaryWriterExtensions
     {
         writer.Write(loot.Item.Name);
         writer.Write(LevelEditor.IntToByte(loot.Item.Amount));
-        writer.Write((ushort)loot.Location.X);
-        writer.Write((ushort)loot.Location.Y);
+        writer.Write((ushort)loot.Position.X);
+        writer.Write((ushort)loot.Position.Y);
     }
     public static void Write(this BinaryWriter writer, Decal decal)
     {
@@ -82,7 +82,7 @@ public static class BinaryReaderExtensions
             texID = (ushort)TextureID.Null;
         }
         TextureID texture = (TextureID)texID;
-        return new NPC(gameManager.OverlayManager, texture, location, name, dialog, Color.White, scale);
+        return new NPC(texture, location, name, dialog, Color.White, scale);
     }
     public static float ReadByteFloat(this BinaryReader reader)
     {

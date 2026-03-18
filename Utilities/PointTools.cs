@@ -1,4 +1,7 @@
-﻿namespace Quest.Utilities;
+﻿using Migs.MPath.Core.Data;
+using SharpDX.Direct2D1.Effects;
+
+namespace Quest.Utilities;
 
 public static class PointExtensions
 {
@@ -14,6 +17,11 @@ public static class PointExtensions
     {
         return new((int)(point.X * scale), (int)(point.Y * scale));
     }
+    public static Point Scaled(this Point point, float scaleX, float scaleY)
+    {
+        return new((int)(point.X * scaleX), (int)(point.Y * scaleY));
+
+    }
     public static string CoordString(this Point point)
     {
         return $"{point.X},{point.Y}";
@@ -26,6 +34,15 @@ public static class PointExtensions
     {
         return new((byte)Math.Clamp(point.X, 0, 255), (byte)Math.Clamp(point.Y, 0, 255));
     }
+}
+public static class CoordinateExtensions
+{
+    public static Point ToPoint(this Coordinate coord) => new(coord.X, coord.Y);
+}
+public static class SizeExtensions
+{
+    public static Vector2 ToVector2(this SizeF size) => new(size.Width, size.Height);
+    public static Point ToPoint(this Size size) => new(size.Width, size.Height);
 }
 public static class PointTools
 {

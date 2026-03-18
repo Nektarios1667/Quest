@@ -30,10 +30,23 @@ public class LevelManager
         // Empty
         Levels = [];
         Level = EmptyLevel;
+        //TimerManager.SetTimer("UpdatePathfindingGrid", 0.1f, () =>
+        //    PathfindingManager.SetGrid(Level,
+        //        CameraManager.TopLeftTileCoord,
+        //        Constants.NativeResolutionTiles
+        //    ),
+        //    int.MaxValue
+        //);
     }
     public void Update(GameManager gameManager)
     {
         if (!StateManager.IsPlayingState) return;
+
+        // Pathfinding
+        PathfindingManager.SetGrid(Level,
+            CameraManager.TopLeftTileCoord,
+            Constants.NativeResolutionTiles
+        );
 
         // Entities
         foreach (NPC npc in Level.NPCs) npc.Update(gameManager);
@@ -49,7 +62,7 @@ public class LevelManager
         foreach (Loot loot in Level.Loot)
             if (loot.Item.Type == ItemTypes.Lantern)
             {
-                Point loc = loot.Location - CameraManager.Camera.ToPoint() + Constants.Middle + TextureManager.Metadata[loot.Texture].Size;
+                Point loc = loot.Position - CameraManager.Camera.ToPoint() + Constants.Middle + TextureManager.Metadata[loot.Texture].Size;
                 LightingManager.SetLight($"Loot_{loot.UID}", loc, 2);
             }
 
@@ -66,7 +79,6 @@ public class LevelManager
                 case BiomeType.Snowy: SoundManager.PlaySoundInstance("Sandstorm", volume: weatherIntensity * 0.1f); break;
                 case BiomeType.Desert: SoundManager.PlaySoundInstance("Sandstorm", volume: weatherIntensity * 0.25f); break;
             }
-
         }
     }
     public void UpdateSky(GameManager gameManager)
@@ -140,22 +152,9 @@ public class LevelManager
     public void DrawLoot(GameManager gameManager)
     {
         DebugManager.StartBenchmark("DrawLoot");
-        // Draw each
-        for (int l = 0; l < Level.Loot.Count; l++)
-        {
-            Loot loot = Level.Loot[l];
-            Point pos = loot.Location - CameraManager.Camera.ToPoint() + Constants.Middle;
-            pos.Y += (int)(Math.Sin((GameManager.GameTime - loot.Birth) * 2 % (Math.PI * 2)) * 6); // Bob up and down
-            DrawTexture(gameManager.Batch, loot.Texture, pos, scale: 2);
-            // Draw stacks if multiple
-            if (loot.Item.Amount > 1)
-                DrawTexture(gameManager.Batch, loot.Texture, pos + lootStackOffset, scale: 2);
-            if (loot.Item.Amount > 2)
-                DrawTexture(gameManager.Batch, loot.Texture, pos + lootStackOffset + lootStackOffset, scale: 2);
-            // Draw hitbox if enabled
-            if (DebugManager.DrawHitboxes)
-                FillRectangle(gameManager.Batch, new(pos, new(32)), Constants.DebugPinkTint);
-        }
+        // Draw each loot
+        foreach (Loot loot in Level.Loot)
+            loot.Draw(gameManager);
         DebugManager.EndBenchmark("DrawLoot");
     }
     public void DrawCharacters(GameManager gameManager)

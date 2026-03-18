@@ -110,9 +110,16 @@ public class OverlayManager
         // Hitboxes
         if (DebugManager.DrawHitboxes)
         {
-            gameManager.Batch.DrawPoint(Constants.Middle.ToVector2(), Constants.DebugPinkTint, 5);
-            gameManager.Batch.DrawPoint(Constants.Middle.ToVector2() - new Vector2(0, Constants.MageHalfSize.Y + 12), Constants.DebugPinkTint, 5);
-            gameManager.Batch.DrawPoint(Constants.Middle.ToVector2() + CameraManager.CameraOffset, Constants.DebugGreenTint, 5);
+            // 9 points on the screen
+            gameManager.Batch.DrawPoint(Vector2.Zero, Constants.DebugBlueTint, 10);
+            gameManager.Batch.DrawPoint(new(Constants.Middle.X, 0), Constants.DebugBlueTint, 10);
+            gameManager.Batch.DrawPoint(new(Constants.NativeResolution.X, 0), Constants.DebugBlueTint, 10);
+            gameManager.Batch.DrawPoint(new(0, Constants.Middle.Y), Constants.DebugBlueTint, 10);
+            gameManager.Batch.DrawPoint(Constants.Middle.ToVector2(), Constants.DebugBlueTint, 10);
+            gameManager.Batch.DrawPoint(new(Constants.NativeResolution.X, Constants.Middle.Y), Constants.DebugBlueTint, 10);
+            gameManager.Batch.DrawPoint(new(0, Constants.NativeResolution.Y), Constants.DebugBlueTint, 10);
+            gameManager.Batch.DrawPoint(new(Constants.Middle.X, Constants.NativeResolution.Y), Constants.DebugBlueTint, 10);
+            gameManager.Batch.DrawPoint(Constants.NativeResolution.ToVector2(), Constants.DebugBlueTint, 10);
         }
 
         // Guis
