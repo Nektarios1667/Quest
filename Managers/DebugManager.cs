@@ -12,6 +12,7 @@ public static class DebugManager
     public static bool LogInfo { get; set; } = true;
     public static bool FrameBar { get; set; } = false;
     public static bool DrawHitboxes { get; set; } = false;
+    public static bool ProgramInfo { get; set; } = false;
 
     public static void Update()
     {
@@ -45,6 +46,11 @@ public static class DebugManager
         {
             DrawHitboxes = !DrawHitboxes;
             Logger.System($"DrawHitboxes set to: {DrawHitboxes}");
+        }
+        if (InputManager.Hotkey(Keys.LeftControl, Keys.F7))
+        {
+            ProgramInfo = !ProgramInfo;
+            Logger.System($"ProgramInfo set to: {ProgramInfo}");
         }
     }
     public static void StartBenchmark(string name)

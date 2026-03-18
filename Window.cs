@@ -1,12 +1,15 @@
 ﻿using Quest.Editor;
 using Quest.Interaction;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 
 namespace Quest;
 public class Window : Game
 {
     static readonly StringBuilder debugSb = new();
+    static readonly StringBuilder programDebugSb = new();
     // Devices and managers
     private readonly GraphicsDeviceManager graphics = null!;
     private SpriteBatch spriteBatch = null!;
@@ -183,6 +186,10 @@ public class Window : Game
         if (DebugManager.TextInfo)
             DrawTextInfo();
 
+        // Program info
+        if (DebugManager.ProgramInfo)
+            DrawProgramInfo();
+
         // Frame info
         if (DebugManager.FrameInfo)
             DrawFrameInfo();
@@ -223,6 +230,37 @@ public class Window : Game
         }
 
         spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.NativeResolution.X - 190, 0), Color.White);
+    }
+    public void DrawProgramInfo()
+    {
+        if (TimerManager.IsCompleteOrMissing("UpdateProgramInfo"))
+        {
+            programDebugSb.Clear();
+            var process = Process.GetCurrentProcess();
+
+            programDebugSb.Append("Memory: ");
+            programDebugSb.AppendFormat("{0:0.0} MB", process.WorkingSet64 / 1024.0 / 1024.0);
+            programDebugSb.Append("\nThreads: ");
+            programDebugSb.Append(process.Threads.Count);
+            programDebugSb.Append("\nHandles: ");
+            programDebugSb.Append(process.HandleCount);
+            programDebugSb.Append("\nUptime: ");
+            programDebugSb.AppendFormat("{0:hh\\:mm\\:ss}", DateTime.Now - process.StartTime);
+            programDebugSb.Append("\nGC Memory: ");
+            programDebugSb.AppendFormat("{0:0.0} MB", GC.GetTotalMemory(false) / 1024.0 / 1024.0);
+            programDebugSb.Append("\nGC Gen0: ");
+            programDebugSb.Append(GC.CollectionCount(0));
+            programDebugSb.Append("\nGC Gen1: ");
+            programDebugSb.Append(GC.CollectionCount(1));
+            programDebugSb.Append("\nGC Gen2: ");
+            programDebugSb.Append(GC.CollectionCount(2));
+
+            TimerManager.SetTimer("UpdateProgramInfo", 1f, null);
+        }
+
+        int height = programDebugSb.ToString().Split('\n').Length * 20;
+        FillRectangle(spriteBatch, new(0, Constants.NativeResolution.Y - height, 220, height), Color.Black * 0.8f);
+        spriteBatch.DrawString(Arial, programDebugSb.ToString(), new(5, Constants.NativeResolution.Y - height + 5), Color.White);
     }
     public void DrawTextInfo()
     {

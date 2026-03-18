@@ -153,10 +153,9 @@ public class Tile
 
     public virtual void OnPlayerEnter(GameManager game, PlayerManager player) { }
     public virtual void OnPlayerCollide(GameManager game, PlayerManager player) { }
-    public static Tile TileFromId(int id, Point location, string levelName)
+    public static Tile TileFromId(TileTypeID type, Point location, string levelName)
     {
         // Create a tile from an id
-        TileTypeID type = (TileTypeID)id;
         return type switch
         {
             TileTypeID.Water => new Water(location),
@@ -175,5 +174,4 @@ public class Tile
             _ => new(location, type)
         };
     }
-    public static Tile TileFromId(TileTypeID id, Point location, string levelName) => TileFromId((int)id, location, levelName);
 }
