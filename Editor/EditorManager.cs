@@ -490,13 +490,6 @@ public class EditorManager
             }
         }
     }
-    public void EditScripts()
-    {
-        if (InputManager.KeyDown(Keys.LeftShift)) // Delete
-            DeleteScript();
-        else // New
-            NewScript();
-    }
     public void DeleteScript()
     {
         var (success, values) = ShowInputForm("Delete Script", [new("Script Name", dropdownOptions: [.. LevelManager.Level.Scripts.Select(s => s.Name)])]);

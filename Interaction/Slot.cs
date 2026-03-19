@@ -51,7 +51,7 @@ public class Slot : UIElement
             State = ButtonState.Normal;
 
         // Dropping
-        if ((State == ButtonState.Hovered || State == ButtonState.Pressed) && InputManager.KeyPressed(Keys.D))
+        if ((State == ButtonState.Hovered || State == ButtonState.Pressed) && InputManager.BindDown(InputAction.DropItem))
             OnDropped?.Invoke();
 
     }

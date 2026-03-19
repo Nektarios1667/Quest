@@ -45,7 +45,7 @@ public class GameManager
         TotalTime += deltaTime;
 
         // Escape button
-        if (InputManager.KeyPressed(Keys.Escape))
+        if (InputManager.BindPressed(InputAction.Back))
         {
             // Pause/unpause
             if (StateManager.State == GameState.Game)

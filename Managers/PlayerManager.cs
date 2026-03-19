@@ -58,7 +58,7 @@ public class PlayerManager : IEntity
         UpdatePositions(gameManager);
 
         // Toggle inventory
-        if (InputManager.KeyPressed(Keys.I) && StateManager.OverlayState != OverlayState.Typing)
+        if (InputManager.BindPressed(InputAction.ToggleInventory) && StateManager.OverlayState != OverlayState.Typing)
         {
             if (InventoryOpen)
             {
@@ -67,7 +67,7 @@ public class PlayerManager : IEntity
             }
             else OpenInventory();
         }
-        if (InputManager.KeyPressed(Keys.Escape))
+        if (InputManager.BindPressed(InputAction.Back))
         {
             CloseInventory();
             CloseInterface();
@@ -84,10 +84,10 @@ public class PlayerManager : IEntity
             // Movement
             DebugManager.StartBenchmark("UpdateMovement");
             moveX = 0; moveY = 0;
-            moveX += InputManager.AnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : 0;
-            moveX += InputManager.AnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0;
-            moveY += InputManager.AnyKeyDown(Keys.W, Keys.Up) ? -Constants.PlayerSpeed : 0;
-            moveY += InputManager.AnyKeyDown(Keys.S, Keys.Down) ? Constants.PlayerSpeed : 0;
+            moveX += InputManager.BindDown(InputAction.MoveLeft) ? -Constants.PlayerSpeed : 0;
+            moveX += InputManager.BindDown(InputAction.MoveRight) ? Constants.PlayerSpeed : 0;
+            moveY += InputManager.BindDown(InputAction.MoveUp) ? -Constants.PlayerSpeed : 0;
+            moveY += InputManager.BindDown(InputAction.MoveDown) ? Constants.PlayerSpeed : 0;
             Move(gameManager, new(moveX, moveY));
             if (moveX > 0) PlayerDirection = Direction.Right;
             else if (moveX < 0) PlayerDirection = Direction.Left;
@@ -111,12 +111,12 @@ public class PlayerManager : IEntity
         // Change equipped item with hotkeys
         if (!InventoryOpen)
         {
-            if (InputManager.KeyPressed(Keys.D1)) EquippedSlot = 0;
-            if (InputManager.KeyPressed(Keys.D2)) EquippedSlot = 1;
-            if (InputManager.KeyPressed(Keys.D3)) EquippedSlot = 2;
-            if (InputManager.KeyPressed(Keys.D4)) EquippedSlot = 3;
-            if (InputManager.KeyPressed(Keys.D5)) EquippedSlot = 4;
-            if (InputManager.KeyPressed(Keys.D6)) EquippedSlot = 5;
+            if (InputManager.BindPressed(InputAction.Hotbar1)) EquippedSlot = 0;
+            if (InputManager.BindPressed(InputAction.Hotbar2)) EquippedSlot = 1;
+            if (InputManager.BindPressed(InputAction.Hotbar3)) EquippedSlot = 2;
+            if (InputManager.BindPressed(InputAction.Hotbar4)) EquippedSlot = 3;
+            if (InputManager.BindPressed(InputAction.Hotbar5)) EquippedSlot = 4;
+            if (InputManager.BindPressed(InputAction.Hotbar6)) EquippedSlot = 5;
             // Change equipped item with scroll
             if (InputManager.ScrolledUp) EquippedSlot = (EquippedSlot - 1 + Chest.Size.X) % Chest.Size.X;
             if (InputManager.ScrolledDown) EquippedSlot = (EquippedSlot + 1) % Chest.Size.X;

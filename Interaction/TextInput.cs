@@ -69,7 +69,7 @@ public class TextInput : UIElement
         {
             if (InputManager.LastKeysDown.Contains(key)) continue;
 
-            string character = KeyToString(key, InputManager.AnyKeyDown(Keys.LeftShift, Keys.RightShift));
+            string character = KeyToString(key, InputManager.KeyboardState.IsKeyDown(Keys.LeftShift) || InputManager.KeyboardState.IsKeyDown(Keys.RightShift));
             if (character == "\b" && Text.Length > 0)
                 Text = Text[..^1];
             else if (character != "\b")

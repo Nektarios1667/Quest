@@ -139,7 +139,7 @@ public class Window : Game
         DebugManager.Watch.Restart();
 
         // Exit
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.Escape)) Exit();
+        if (InputManager.BindPressed(InputAction.Quit)) Exit();
 
         // Delta
         delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -160,7 +160,7 @@ public class Window : Game
         overlayManager.Update(gameManager);
 
         // Console commands
-        if (Constants.COMMANDS && InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.OemTilde))
+        if (Constants.COMMANDS && InputManager.BindPressed(InputAction.OpenCommandWindow))
             CommandManager.OpenCommandPrompt();
 
         // Final
