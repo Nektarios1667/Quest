@@ -5,7 +5,8 @@ using System.Text;
 namespace Quest.Editor;
 public class LevelEditor : Game
 {
-    static readonly StringBuilder debugSb = new();
+    readonly StringBuilder debugSb = new();
+    readonly StringBuilder programDebugSb = new();
     // Devices and managers
     private readonly GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch = null!;
@@ -44,6 +45,7 @@ public class LevelEditor : Game
     // Render targets
     public LevelEditor()
     {
+        Constants.EDITOR = true;
         graphics = new GraphicsDeviceManager(this)
         {
             //PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
@@ -77,7 +79,7 @@ public class LevelEditor : Game
         // Managers
         levelGenerator = new(42, 1f / 64);
         levelManager = new();
-        uiManager = new(levelManager, null);
+        uiManager = new(null);
         gameManager = new(Content, spriteBatch, levelManager, uiManager);
         editorManager = new(GraphicsDevice, gameManager, levelManager, levelGenerator, spriteBatch, debugSb);
         StateManager.State = GameState.Editor;
@@ -141,7 +143,7 @@ public class LevelEditor : Game
         DebugManager.Watch.Restart();
 
         // Exit
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.Escape)) Exit();
+        if (InputManager.BindPressed(InputAction.Quit)) Exit();
 
         // Delta
         delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -154,12 +156,12 @@ public class LevelEditor : Game
 
         // Movement
         DebugManager.StartBenchmark("InputUpdate");
-        int speedup = InputManager.KeyDown(Keys.LeftControl) ? 0 : (InputManager.KeyDown(Keys.LeftAlt) ? 6 : 2);
+        int speedup = InputManager.BindDown(InputAction.FastMove) ? 6 : 2;
         moveX = 0; moveY = 0;
-        moveX += InputManager.AnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : 0;
-        moveX += InputManager.AnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0;
-        moveY += InputManager.AnyKeyDown(Keys.W, Keys.Up) ? -Constants.PlayerSpeed : 0;
-        moveY += InputManager.AnyKeyDown(Keys.S, Keys.Down) ? Constants.PlayerSpeed : 0;
+        moveX += InputManager.BindDown(InputAction.MoveLeft) ? -Constants.PlayerSpeed : 0;
+        moveX += InputManager.BindDown(InputAction.MoveRight) ? Constants.PlayerSpeed : 0;
+        moveY += InputManager.BindDown(InputAction.MoveUp) ? -Constants.PlayerSpeed : 0;
+        moveY += InputManager.BindDown(InputAction.MoveDown) ? Constants.PlayerSpeed : 0;
         CameraManager.CameraDest += new Vector2(moveX, moveY) * delta * speedup;
         DebugManager.EndBenchmark("InputUpdate");
 
@@ -167,13 +169,13 @@ public class LevelEditor : Game
         editorManager.Update(TileSelection, BiomeSelection, currentTool, delta, mouseTile, mouseCoord, mouseSelection, mouseSelectionCoord);
 
         // Change material
-        if (InputManager.ScrolledUp || InputManager.KeyPressed(Keys.OemOpenBrackets))
+        if (InputManager.ScrolledUp || InputManager.BindPressed(InputAction.CycleToolNext))
         {
             if (currentTool == EditorTool.Tile) NumberTools.CycleUp(ref TileSelection);
             else if (currentTool == EditorTool.Decal) NumberTools.CycleUp(ref DecalSelection);
             else if (currentTool == EditorTool.Biome) NumberTools.CycleUp(ref BiomeSelection);
         }
-        if (InputManager.ScrolledDown || InputManager.KeyPressed(Keys.OemCloseBrackets))
+        if (InputManager.ScrolledDown || InputManager.BindPressed(InputAction.CycleToolPrevious))
         {
             if (currentTool == EditorTool.Tile) NumberTools.CycleDown(ref TileSelection);
             else if (currentTool == EditorTool.Decal) NumberTools.CycleDown(ref DecalSelection);
@@ -190,7 +192,7 @@ public class LevelEditor : Game
                 if (TileSelection == TileTypeID.Stairs)
                     tile = new Stairs(mouseCoord, "", Constants.MiddleCoord);
                 else
-                    tile = LevelManager.TileFromId(TileSelection, mouseCoord);
+                    tile = Tile.TileFromId(TileSelection, mouseCoord, "NUL");
 
                 editorManager.SetTile(tile);
             }
@@ -198,13 +200,13 @@ public class LevelEditor : Game
             else if (currentTool == EditorTool.Decal && InputManager.LMouseClicked)
             {
                 // Check existing decal
-                Decal? current = levelManager.Level.Decals.FirstOrDefault(d => d.Location == mouseCoord);
+                Decal? current = levelManager.Level.Decals.TryGetValue(mouseCoord.ToByteCoord(), out var dec) ? dec : null;
                 bool alreadyThere = current != null && current.Type == DecalSelection;
-                if (current != null && current.Type != DecalSelection) levelManager.Level.Decals.Remove(current!); // Remove current one
+                if (current != null && current.Type != DecalSelection) levelManager.Level.Decals.Remove(mouseCoord.ToByteCoord()); // Remove current one
 
                 // Add
                 if (!alreadyThere && levelManager.Level.Decals.Count < 255)
-                    levelManager.Level.Decals.Add(LevelManager.DecalFromId(DecalSelection, mouseCoord));
+                    levelManager.Level.Decals[mouseCoord.ToByteCoord()] = LevelManager.DecalFromId(DecalSelection, mouseCoord);
             }
             // Set biome
             else if (currentTool == EditorTool.Biome)
@@ -215,7 +217,7 @@ public class LevelEditor : Game
         }
 
         // Edit options
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.M)) editorManager.EditTile();
+        if (InputManager.BindPressed(InputAction.EditTile)) editorManager.EditTile();
 
         // Erase (set to sky)
         if (InputManager.RMouseDown) MouseSelect();
@@ -223,35 +225,36 @@ public class LevelEditor : Game
         // Pick
         if (InputManager.MMouseClicked) PickTile();
         // Open file
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.O)) editorManager.OpenLevelDialog();
+        if (InputManager.BindPressed(InputAction.OpenLevel)) editorManager.OpenLevelDialog();
         // Fill
-        if (InputManager.KeyPressed(Keys.F)) editorManager.FloodFill();
+        if (InputManager.BindPressed(InputAction.FloodFill)) editorManager.FloodFill();
         // NPCs
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.N)) { MouseSelect(); editorManager.NewNPC(); }
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.N)) { MouseSelect(); editorManager.DeleteNPC(); }
+        if (InputManager.BindPressed(InputAction.NewNPC)) { MouseSelect(); editorManager.NewNPC(); }
+        if (InputManager.BindPressed(InputAction.DeleteNPC)) { MouseSelect(); editorManager.DeleteNPC(); }
         // Loot
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.L)) { MouseSelect(); editorManager.NewLoot(); }
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.L)) { MouseSelect(); editorManager.DeleteLoot(); }
+        if (InputManager.BindPressed(InputAction.NewLoot)) { MouseSelect(); editorManager.NewLoot(); }
+        if (InputManager.BindPressed(InputAction.DeleteLoot)) { MouseSelect(); editorManager.DeleteLoot(); }
         // Decals
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.D)) { MouseSelect(); editorManager.NewDecal(); }
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.D)) { MouseSelect(); editorManager.DeleteDecal(); }
+        if (InputManager.BindPressed(InputAction.NewDecal)) { MouseSelect(); editorManager.NewDecal(); }
+        if (InputManager.BindPressed(InputAction.DeleteDecal)) { MouseSelect(); editorManager.DeleteDecal(); }
         // Save
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.E)) editorManager.SaveLevelDialog();
+        if (InputManager.BindPressed(InputAction.ExportLevel)) editorManager.SaveLevelDialog();
         // Level info
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.S)) editorManager.SetSpawn();
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.T)) editorManager.SetTint();
+        if (InputManager.BindPressed(InputAction.SetSpawn)) editorManager.SetSpawn();
+        if (InputManager.BindPressed(InputAction.SetTint)) editorManager.SetTint();
         // Generate level
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.G)) editorManager.GenerateLevel();
+        if (InputManager.BindPressed(InputAction.GenerateLevel)) editorManager.GenerateLevel();
         // Resave level
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.R)) editorManager.ResaveLevel(levelManager.Level.LevelPath);
+        if (InputManager.BindPressed(InputAction.ResaveLevel)) editorManager.ResaveLevel(levelManager.Level.LevelPath);
         // Resave world
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.R)) editorManager.ResaveWorld(levelManager.Level.World);
+        if (InputManager.BindPressed(InputAction.ResaveWorld)) editorManager.ResaveWorld(levelManager.Level.World);
         // Tool select
-        if (InputManager.KeyPressed(Keys.D1)) currentTool = EditorTool.Tile;
-        if (InputManager.KeyPressed(Keys.D2)) currentTool = EditorTool.Decal;
-        if (InputManager.KeyPressed(Keys.D3)) currentTool = EditorTool.Biome;
+        if (InputManager.BindPressed(InputAction.SelectTileTool)) currentTool = EditorTool.Tile;
+        if (InputManager.BindPressed(InputAction.SelectDecalTool)) currentTool = EditorTool.Decal;
+        if (InputManager.BindPressed(InputAction.SelectBiomeTool)) currentTool = EditorTool.Biome;
         // Script
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.P)) editorManager.EditScripts();
+        if (InputManager.BindPressed(InputAction.NewScript)) editorManager.NewScript();
+        if (InputManager.BindPressed(InputAction.DeleteScript)) editorManager.DeleteScript();
 
         // Managers
         if (!PopupFactory.PopupOpen) InputManager.Update(this);
@@ -293,6 +296,10 @@ public class LevelEditor : Game
         if (DebugManager.TextInfo)
             editorManager.DrawTextInfo();
 
+        // Program info
+        if (DebugManager.ProgramInfo)
+            Quest.Window.DrawProgramInfo(programDebugSb, spriteBatch);
+
         // Frame info
         if (DebugManager.FrameInfo)
             editorManager.DrawFrameInfo();
@@ -305,7 +312,8 @@ public class LevelEditor : Game
         DebugManager.EndBenchmark("FrameBarDraw");
 
         // Minimap
-        editorManager.DrawMiniMap();
+        if (!DebugManager.ProgramInfo)
+            editorManager.DrawMiniMap();
 
         // Ghost tile
         if (currentTool == EditorTool.Tile)
@@ -330,9 +338,9 @@ public class LevelEditor : Game
         if (mouseTile is Stairs stair)
             DrawBottomInfo($"[Stairs] dest: '{stair.DestLevel}' @ {stair.Dest}");
         else if (mouseTile is Door door)
-            DrawBottomInfo($"[Door] key: {(door.Key == null ? "None" : $"'{door.Key.Name}' x{door.Key.Amount}")} consume: {door.ConsumeKey}");
+            DrawBottomInfo($"[Door] key: {(door.Key == null ? "NUL" : $"'{door.Key.Name}' x{door.Key.Amount}")} consume: {door.ConsumeKey}");
         else if (mouseTile is Chest chest)
-            DrawBottomInfo($"[Chest] gen: '{chest.LootGenerator.FileName}'");
+            DrawBottomInfo($"[Chest] gen: '{chest.LootGenerator.FileName}' key: {(chest.Key == null ? "NUL" : $"'{chest.Key.Name}' x{chest.Key.Amount}")} consume: {chest.ConsumeKey}");
         else if (mouseTile is Lamp lamp)
             DrawBottomInfo($"[Lamp] radius: {lamp.LightRadius}");
         else
@@ -353,7 +361,7 @@ public class LevelEditor : Game
         if (currentTool == EditorTool.Tile) TileSelection = mouseTile.Type.ID;
         else if (currentTool == EditorTool.Decal)
         {
-            Decal? picked = levelManager.Level.Decals.FirstOrDefault(d => d.Location == mouseCoord);
+            Decal? picked = levelManager.Level.Decals.TryGetValue(mouseCoord.ToByteCoord(), out var dec) ? dec : null;
             if (picked != null) DecalSelection = picked.Type;
         }
         else if (currentTool == EditorTool.Biome) BiomeSelection = levelManager.GetBiome(mouseCoord)!.Value;

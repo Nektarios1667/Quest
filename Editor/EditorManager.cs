@@ -27,6 +27,8 @@ public class EditorManager
     };
     // Settings
     public bool ShowBiomeMarkers = true;
+    // Helper
+    public string[] ItemsOptionsWNone = ["NONE", ..Constants.ItemTypeNames];
     // Private
     private GameManager GameManager { get; }
     private LevelManager LevelManager { get; }
@@ -167,7 +169,7 @@ public class EditorManager
         DebugSb.Append("\nLevel: ");
         DebugSb.Append(LevelManager.Level?.Name);
         DebugSb.Append("\nGUI: ");
-        DebugSb.Append(GameManager.UIManager.Gui.Widgets.Count);
+        DebugSb.Append(GameManager.OverlayManager.Gui.Widgets.Count);
 
         SpriteBatch.DrawString(Arial, DebugSb.ToString(), new Vector2(10, 10), Color.White);
     }
@@ -219,30 +221,38 @@ public class EditorManager
         // Door
         else if (tile is Door door)
         {
-            var (success, values) = ShowInputForm("Door Editor", [new("Key", null, Enum.GetNames(typeof(ItemTypeID))), new("Amount", IsByte), new("Consume Key", null, ["true", "false"])]);
+            var (success, values) = ShowInputForm("Door Editor", [new("Key", null, ItemsOptionsWNone), new("Amount", IsByte), new("Consume Key", null, ["true", "false"])]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Stair edit failed.");
                 return;
             }
-            door.Key = new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[0])], byte.Parse(values[1]));
+            door.Key = values[0].Equals("none", StringComparison.CurrentCultureIgnoreCase) ? null : new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[0])], byte.Parse(values[1]));
+            if (door.Key?.Amount <= 0)
+                door.Key = null;
             door.ConsumeKey = bool.Parse(values[2]);
         }
         // Chest
         else if (tile is Chest chest)
         {
-            var (success, values) = ShowInputForm("Chest Editor", [new("Loot File Name", null), new("Loot Type", null, ["Loot Preset", "Loot Table"])]);
+            var (success, values) = ShowInputForm("Chest Editor", [new("Loot File Name", null), new("Loot Type", null, ["Loot Preset", "Loot Table"]), new("Key", null, ItemsOptionsWNone), new("Amount", IsByte), new("Consume Key", null, ["true", "false"])]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Chest edit failed.");
                 return;
             }
+            // Loot
             if (values[1] == "Loot Table")
                 chest.RegenerateLoot(LootTable.ReadLootTable(world, $"{values[0]}.qlt"));
             else if (values[1] == "Loot Preset")
                 chest.RegenerateLoot(LootPreset.ReadLootPreset(world, $"{values[0]}.qlp"));
             else
-                Logger.Error("Chest edit failed.");
+                Logger.Error("Chest loot edit failed.");
+            // Key
+            chest.Key = values[2].Equals("none", StringComparison.CurrentCultureIgnoreCase) ? null : new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[2])], byte.Parse(values[3]));
+            if (chest.Key?.Amount <= 0)
+                chest.Key = null;
+            chest.ConsumeKey = bool.Parse(values[4]);
         }
         // Lamp
         else if (tile is Lamp lamp)
@@ -254,6 +264,17 @@ public class EditorManager
                 return;
             }
             lamp.LightRadius = byte.Parse(values[4]);
+        }
+        // Display case
+        else if (tile is DisplayCase displayCase)
+        {
+            var (success, values) = ShowInputForm("Lamp Editor", [new("Item", null, ItemsOptionsWNone), new("Amount", IsNonZeroByte)]);
+            if (!success)
+            {
+                if (!PopupOpen) Logger.Error("Display case edit failed.");
+                return;
+            }
+            displayCase.Container.Items[0] = new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[0])], byte.Parse(values[1]));
         }
     }
     public void FloodFill()
@@ -352,14 +373,14 @@ public class EditorManager
     public void NewNPC()
     {
         // Check
-        if (LevelManager.Level.NPCs.Count >= 255)
+        if (LevelManager.Level.NPCs.Count >= ushort.MaxValue)
         {
-            Logger.Error("Maximum number of NPCs reached (255).");
+            Logger.Error("Maximum number of NPCs reached (65,535).");
             return;
         }
 
         // Winforms
-        var (success, values) = ShowInputForm("NPC Editor", [new("Name", null), new("Dialog", null), new("Size [1-25.5]", IsScaleValue), new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())])]);
+        var (success, values) = ShowInputForm("NPC Editor", [new("Name", null), new("Dialog", null), new("Size [0.1-25.5]", IsScaleValue), new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())])]);
         if (!success)
         {
             if (!PopupOpen) Logger.Error("NPC creation failed.");
@@ -370,19 +391,19 @@ public class EditorManager
         string name = values[0];
         string dialog = values[1];
         float scale = float.Parse(values[2]);
-        if (scale <= 0 || scale > 25.5)
+        if (scale < 0.1 || scale > 25.5)
         {
-            Logger.Warning("Scale must be between 1 and 25.5. Scale defaulted to 1.");
+            Logger.Warning("Scale must be between 0.1 and 25.5. Scale defaulted to 1.");
             scale = 1;
         }
         TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), values[3]);
-        LevelManager.Level.NPCs.Add(new NPC(GameManager.UIManager, texture, MouseSelectionCoord, name, dialog, Color.White, scale));
+        LevelManager.Level.NPCs.Add(new NPC(texture, MouseSelectionCoord, name, dialog, Color.White, scale));
     }
     public void DeleteNPC()
     {
         foreach (NPC npc in LevelManager.Level.NPCs)
         {
-            if (npc.Location == MouseSelectionCoord)
+            if (npc.Position == MouseSelectionCoord)
             {
                 LevelManager.Level.NPCs.Remove(npc);
                 Logger.Log($"Deleted NPC '{npc.Name}' @ {MouseSelectionCoord.X}, {MouseSelectionCoord.Y}.");
@@ -393,9 +414,9 @@ public class EditorManager
     public void NewDecal()
     {
         // Check
-        if (LevelManager.Level.Decals.Count >= 255)
+        if (LevelManager.Level.Decals.Count >= ushort.MaxValue)
         {
-            Logger.Error("Maximum number of Decals reached (255).");
+            Logger.Error("Maximum number of Decals reached (65,535).");
             return;
         }
 
@@ -410,27 +431,27 @@ public class EditorManager
         string name = values[0];
         DecalType decal = Enum.TryParse<DecalType>(name, true, out var dec) ? dec : DecalType.Torch;
         PreviousDecal = decal;
-        LevelManager.Level.Decals.Add(LevelManager.DecalFromId(decal, MouseSelectionCoord));
+        LevelManager.Level.Decals[MouseSelectionCoord.ToByteCoord()] = (LevelManager.DecalFromId(decal, MouseSelectionCoord));
     }
     public void PasteDecal()
     {
         // Check
         if (PreviousDecal == null) return;
-        if (LevelManager.Level.Decals.Count >= 255)
+        if (LevelManager.Level.Decals.Count >= ushort.MaxValue)
         {
-            Logger.Error("Maximum number of Decals reached (255).");
+            Logger.Error("Maximum number of Decals reached (65,535).");
             return;
         }
 
-        LevelManager.Level.Decals.Add(LevelManager.DecalFromId(PreviousDecal.Value, MouseCoord));
+        LevelManager.Level.Decals[MouseCoord.ToByteCoord()] = LevelManager.DecalFromId(PreviousDecal.Value, MouseCoord);
     }
     public void DeleteDecal()
     {
-        foreach (Decal decal in LevelManager.Level.Decals)
+        foreach (Decal decal in LevelManager.Level.Decals.Values)
         {
             if (decal.Location == MouseSelectionCoord)
             {
-                LevelManager.Level.Decals.Remove(decal);
+                LevelManager.Level.Decals.Remove(decal.Location);
                 Logger.Log($"Deleted decal '{decal.Type}' @ {MouseSelectionCoord.X}, {MouseSelectionCoord.Y}.");
                 break;
             }
@@ -439,9 +460,9 @@ public class EditorManager
     public void NewLoot()
     {
         // Check
-        if (LevelManager.Level.Loot.Count >= 255)
+        if (LevelManager.Level.Loot.Count >= ushort.MaxValue)
         {
-            Logger.Error("Maximum number of Loot reached (255).");
+            Logger.Error("Maximum number of Loot reached (65,535).");
             return;
         }
 
@@ -461,20 +482,13 @@ public class EditorManager
     {
         foreach (Loot loot in LevelManager.Level.Loot)
         {
-            if (Vector2.DistanceSquared(loot.Location.ToVector2(), MouseSelection.ToVector2()) < 900)
+            if (Vector2.DistanceSquared(loot.Position.ToVector2(), MouseSelection.ToVector2()) < 900)
             {
                 LevelManager.Level.Loot.Remove(loot);
                 Logger.Log($"Deleted loot '{loot.Item}' @ {MouseCoord.X}, {MouseCoord.Y}.");
                 break;
             }
         }
-    }
-    public void EditScripts()
-    {
-        if (InputManager.KeyDown(Keys.LeftShift)) // Delete
-            DeleteScript();
-        else // New
-            NewScript();
     }
     public void DeleteScript()
     {
@@ -546,8 +560,8 @@ public class EditorManager
         // Parse
         if (world == "" || world == "NUL_WORLD")
         {
-            world = "new_world";
             name = name.Split('\\', '/')[0]; // Remove world
+            world = name;
         }
         else if (name.Contains('\\') || name.Contains('/'))
         {
@@ -593,15 +607,19 @@ public class EditorManager
             else if (tile is Door door)
             {
                 // Write door key
-                writer.Write(door.Key == null ? "" : door.Key.Name);
-                if (door.Key == null) continue;
-                writer.Write(door.Key.Amount);
+                StateManager.WriteItemData(writer, door.Key);
                 writer.Write(door.ConsumeKey);
             }
             else if (tile is Chest chest)
+            {
                 writer.Write(chest.LootGenerator);
+                StateManager.WriteItemData(writer, chest.Key);
+                writer.Write(chest.ConsumeKey);
+            }
             else if (tile is Lamp lamp)
                 writer.Write(lamp.LightRadius);
+            else if (tile is DisplayCase displayCase)
+                StateManager.WriteItemData(writer, displayCase.Container.Items[0]);
         }
 
         // Biome
@@ -610,19 +628,19 @@ public class EditorManager
                 writer.Write((byte)(int)LevelManager.Level.Biome[i]);
 
         // NPCs
-        writer.Write((byte)Math.Min(LevelManager.Level.NPCs.Count, 255));
-        for (int n = 0; n < Math.Min(LevelManager.Level.NPCs.Count, 255); n++)
+        writer.Write((ushort)Math.Min(LevelManager.Level.NPCs.Count, ushort.MaxValue));
+        for (int n = 0; n < Math.Min(LevelManager.Level.NPCs.Count, ushort.MaxValue); n++)
             writer.Write(LevelManager.Level.NPCs[n]);
 
         // Floor loot
-        writer.Write((byte)Math.Min(LevelManager.Level.Loot.Count, 255));
-        for (int n = 0; n < Math.Min(LevelManager.Level.Loot.Count, 255); n++)
+        writer.Write((ushort)Math.Min(LevelManager.Level.Loot.Count, ushort.MaxValue));
+        for (int n = 0; n < Math.Min(LevelManager.Level.Loot.Count, ushort.MaxValue); n++)
             writer.Write(LevelManager.Level.Loot[n]);
 
         // Decals
-        writer.Write((byte)Math.Min(LevelManager.Level.Decals.Count, 255));
-        for (int n = 0; n < Math.Min(LevelManager.Level.Decals.Count, 255); n++)
-            writer.Write(LevelManager.Level.Decals[n]);
+        writer.Write((ushort)Math.Min(LevelManager.Level.Decals.Count, ushort.MaxValue));
+        for (int n = 0; n < Math.Min(LevelManager.Level.Decals.Count, ushort.MaxValue); n++)
+            writer.Write(LevelManager.Level.Decals.Values.ToArray()[n]);
 
         // Scripts
         if (flags.HasFlag(LevelFeatures.QuillScripts))

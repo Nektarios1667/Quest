@@ -311,11 +311,11 @@ Some functions automatically evaluate expressions passed as parameters.
 ### Performance Modes
 Each script has a performance mode, which is set to Normal by default. Performance mode affects things like integrated delays, steps per frame, and update priority.  
 There are three modes: Low, Medium, and High.  
-- Low: high delays, lower steps per frame - used for background script.
+- Low: moderate delays, lower steps per frame - used for background scripts.
 - Normal: small delays, regular steps per frame - used for scripts needing updates often.
 - High: no delays, higher steps per frame - when highest priority and max updates are required.
 
-Low mode for any background scripts that do not need constant updates.  
+Low mode is for any background scripts that do not need constant updates.  
 Medium mode is used for active scripts that need low delays and frequent updates.  
 High mode is only used when the script needs highest priority and maximized updates.   
 **NOTE: High performance mode may severely affect frame rate if optimizations are not put into the script.**

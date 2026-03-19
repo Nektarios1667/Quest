@@ -14,6 +14,7 @@ public enum QuillOp {
 
     // Interpreter
     PerfMode,
+    Meta,
 
     // Control flow
     If,
@@ -48,17 +49,28 @@ public class QuillCommand
     public string? Label { get; set; }
     public string[] Args { get; set; }
     public bool HasVariables { get; }
+    public bool HasExternals { get; }
     public bool HasCurlyExpressions { get; }
     public override string ToString() => $"{Operation.ToString().ToUpper()} {string.Join(' ', Args)}";
     public QuillCommand(QuillOp op, string[] args)
     {
         Operation = op;
-        Args = args;
         Label = args.FirstOrDefault(a => a[0] == '.');
+        Args = [.. args.Where(a => a != Label)]; // Strip label
 
         string argsStr = string.Join("", args);
         HasVariables = argsStr.Contains('=');
         HasCurlyExpressions = argsStr.Contains('{') && argsStr.Contains('}');
+        HasExternals = argsStr.Contains('<') && argsStr.Contains('>');
+    }
+    public string Flags()
+    {
+        StringBuilder sb = new();
+        if (HasVariables) sb.Append('v');
+        if (HasCurlyExpressions) sb.Append('c');
+        if (HasExternals) sb.Append('e');
+        if (Label != null) sb.Append('L');
+        return sb.ToString();
     }
 }
 

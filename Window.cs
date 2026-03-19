@@ -1,11 +1,15 @@
 ﻿using Quest.Editor;
+using Quest.Interaction;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 
 namespace Quest;
 public class Window : Game
 {
-    static readonly StringBuilder debugSb = new();
+    readonly StringBuilder debugSb = new();
+    readonly StringBuilder programDebugSb = new();
     // Devices and managers
     private readonly GraphicsDeviceManager graphics = null!;
     private SpriteBatch spriteBatch = null!;
@@ -84,14 +88,17 @@ public class Window : Game
         SoundtrackManager.LoadSoundtracks(Content);
 
         // Managers
-        playerManager = new();
         levelManager = new();
-        overlayManager = new(levelManager, playerManager);
+        UserInterface.Init(spriteBatch, levelManager);
+        playerManager = new();
+        overlayManager = new(playerManager);
         gameManager = new(Content, spriteBatch, levelManager, overlayManager);
         menuManager = new(this, spriteBatch, Content, gameManager, playerManager);
-        levelManager.LevelLoaded += _ => playerManager.CloseContainer();
+        levelManager.LevelLoaded += _ => playerManager.CloseInterface();
         CommandManager.Init(this, gameManager, levelManager, playerManager);
-        Pathfinder.Init(gameManager);
+        _Pathfinder.Init(gameManager);
+        SoundtrackManager.SoundtrackChanged += (Soundtracks? st) =>{ if (st != null) overlayManager.Notification($"Now Playing: {st}", Color.Cyan); };
+
         Logger.System("Initialized managers.");
 
         // Levels
@@ -121,7 +128,7 @@ public class Window : Game
         CursorArrow = Content.Load<Texture2D>("Images/Gui/CursorArrow");
 
         // Timer
-        TimerManager.NewTimer("FrameTimeUpdate", 1, UpdateFrameTimes, int.MaxValue);
+        TimerManager.NewTimer("FrameTimeUpdate", 0.5f, UpdateFrameTimes, int.MaxValue);
 
         // Final
         Logger.System("Game finished initializing.");
@@ -132,7 +139,7 @@ public class Window : Game
         DebugManager.Watch.Restart();
 
         // Exit
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.Escape)) Exit();
+        if (InputManager.BindPressed(InputAction.Quit)) Exit();
 
         // Delta
         delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -153,7 +160,7 @@ public class Window : Game
         overlayManager.Update(gameManager);
 
         // Console commands
-        if (Constants.COMMANDS && InputManager.Hotkey(Keys.LeftControl, Keys.LeftShift, Keys.OemTilde))
+        if (Constants.COMMANDS && InputManager.BindPressed(InputAction.OpenCommandWindow))
             CommandManager.OpenCommandPrompt();
 
         // Final
@@ -178,6 +185,10 @@ public class Window : Game
         DebugManager.StartBenchmark("DebugTextDraw");
         if (DebugManager.TextInfo)
             DrawTextInfo();
+
+        // Program info
+        if (DebugManager.ProgramInfo)
+            DrawProgramInfo(programDebugSb, spriteBatch);
 
         // Frame info
         if (DebugManager.FrameInfo)
@@ -220,6 +231,37 @@ public class Window : Game
 
         spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.NativeResolution.X - 190, 0), Color.White);
     }
+    public static void DrawProgramInfo(StringBuilder programDebugSb, SpriteBatch spriteBatch)
+    {
+        if (TimerManager.IsCompleteOrMissing("UpdateProgramInfo"))
+        {
+            programDebugSb.Clear();
+            var process = Process.GetCurrentProcess();
+
+            programDebugSb.Append("Memory: ");
+            programDebugSb.AppendFormat("{0:0.0} MB", process.WorkingSet64 / 1024.0 / 1024.0);
+            programDebugSb.Append("\nThreads: ");
+            programDebugSb.Append(process.Threads.Count);
+            programDebugSb.Append("\nHandles: ");
+            programDebugSb.Append(process.HandleCount);
+            programDebugSb.Append("\nUptime: ");
+            programDebugSb.AppendFormat("{0:hh\\:mm\\:ss}", DateTime.Now - process.StartTime);
+            programDebugSb.Append("\nGC Memory: ");
+            programDebugSb.AppendFormat("{0:0.0} MB", GC.GetTotalMemory(false) / 1024.0 / 1024.0);
+            programDebugSb.Append("\nGC Gen0: ");
+            programDebugSb.Append(GC.CollectionCount(0));
+            programDebugSb.Append("\nGC Gen1: ");
+            programDebugSb.Append(GC.CollectionCount(1));
+            programDebugSb.Append("\nGC Gen2: ");
+            programDebugSb.Append(GC.CollectionCount(2));
+
+            TimerManager.SetTimer("UpdateProgramInfo", 1f, null);
+        }
+
+        int height = programDebugSb.ToString().Split('\n').Length * 20;
+        FillRectangle(spriteBatch, new(0, Constants.NativeResolution.Y - height, 220, height), Color.Black * 0.8f);
+        spriteBatch.DrawString(Arial, programDebugSb.ToString(), new(5, Constants.NativeResolution.Y - height + 5), Color.White);
+    }
     public void DrawTextInfo()
     {
 
@@ -227,11 +269,11 @@ public class Window : Game
         debugSb.Append("FPS: ");
         debugSb.AppendFormat("{0:0.0}", cacheDelta != 0 ? 1f / cacheDelta : 0);
         debugSb.Append("\nGameTime: ");
-        debugSb.AppendFormat("{0:0.00}", gameManager.GameTime);
+        debugSb.AppendFormat("{0:0.00}", GameManager.GameTime);
         debugSb.Append("\nDayTime: ");
         debugSb.AppendFormat("{0:0.00}", gameManager.DayTime);
         debugSb.Append("\nTotalTime: ");
-        debugSb.AppendFormat("{0:0.00}", gameManager.TotalTime);
+        debugSb.AppendFormat("{0:0.00}", GameManager.GameTime);
         debugSb.Append("\nCamera: ");
         debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.Camera.X, CameraManager.Camera.Y);
         debugSb.Append("\nTile Below: ");
@@ -241,26 +283,28 @@ public class Window : Game
         debugSb.Append("\nLevel: ");
         debugSb.Append(levelManager.Level?.Name);
         debugSb.Append("\nInventory: ");
-        debugSb.Append(playerManager.Inventory.Opened);
+        debugSb.Append(playerManager.InventoryOpen);
         debugSb.Append("\nGUI: ");
         debugSb.Append(overlayManager.Gui.Widgets.Count);
         debugSb.Append("\nMood: ");
         debugSb.Append(StateManager.Mood);
         debugSb.Append("\nMusic: ");
-        debugSb.Append(SoundtrackManager.Playing?.File ?? "none");
+        debugSb.Append(SoundtrackManager.Playing.ToString() ?? "none");
         debugSb.Append("\nDaylight: ");
         debugSb.AppendFormat("{0:0}%", ColorTools.GetDaylightPercent(gameManager.DayTime));
         debugSb.Append("\nLighting: ");
-        debugSb.AppendFormat("{0}/{1}", LightingManager.GetVisibleLights().Length, LightingManager.Lights.Count);
+        debugSb.AppendFormat("{0}", LightingManager.Lights.Count);
         debugSb.Append("\nWeather: ");
-        debugSb.Append(StateManager.WeatherIntensity(gameManager.GameTime));
-        debugSb.AppendFormat(" [{0:0.00}]", StateManager.WeatherNoiseValue(gameManager.GameTime));
+        debugSb.Append(StateManager.WeatherIntensity(GameManager.GameTime));
+        debugSb.AppendFormat(" [{0:0.00}]", StateManager.WeatherValue(GameManager.GameTime));
         debugSb.Append("\nUIDs: ");
         debugSb.AppendFormat("L:{0} E:{1} I:{2}", UIDManager.Available(UIDCategory.Loot), UIDManager.Available(UIDCategory.Enemies), UIDManager.Available(UIDCategory.Items));
         debugSb.Append("\nSave: ");
         debugSb.Append(StateManager.CurrentSave);
         debugSb.Append("\nCurrent Luxel: ");
         debugSb.Append(CameraManager.Camera.ToPoint() / Constants.TileSize.Scaled(0.5f));
+        debugSb.Append("\nSoundtrack: ");
+        debugSb.Append(SoundtrackManager.Playing);
         debugSb.Append("\nQuill: ");
         foreach (var inst in Quill.Interpreter.GetQuillInstances())
             debugSb.Append($"\n  {inst.Script.Name} | @{inst.L:000} | C:{inst.Callbacks.Count:0} | Sc:{(inst.Scopes.TryPeek(out string? sc) ? sc : "GLOBAL")}");
@@ -296,6 +340,6 @@ public class Window : Game
     {
         frameTimes.Clear();
         frameTimes = new(DebugManager.FrameTimes);
-        cacheDelta = gameManager.DeltaTime;
+        cacheDelta = GameManager.DeltaTime;
     }
 }

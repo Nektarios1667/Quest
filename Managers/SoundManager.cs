@@ -40,17 +40,30 @@ public static class SoundManager
 
     public static void PlaySoundInstance(string key, float volume = 1f, float pitch = 0f, float pan = 0f)
     {
-        var instance = getOrCreateInstance(key);
-        if (instance != null && instance.State != SoundState.Playing)
+        var instance = GetOrCreateInstance(key);
+        if (instance != null)
         {
             instance.Volume = MathHelper.Clamp(volume * SoundVolume, 0f, 1f);
             instance.Pitch = pitch;
             instance.Pan = pan;
-            instance.Play();
+            if (instance.State != SoundState.Playing)
+                instance.Play();
         }
     }
-
-    private static SoundEffectInstance? getOrCreateInstance(string key)
+    public static SoundEffectInstance? GetInstance(string key)
+    {
+        if (soundInstances.TryGetValue(key, out var instance))
+            return instance;
+        Logger.Error($"No sound instance '{key}'");
+        return null;
+    }
+    public static void SetInstanceVolume(string key, float volume)
+    {
+        var inst = GetInstance(key);
+        if (inst != null)
+            inst.Volume = volume;
+    }
+    private static SoundEffectInstance? GetOrCreateInstance(string key)
     {
         if (!soundEffects.TryGetValue(key, out var sfx))
             return null;
@@ -71,13 +84,16 @@ public static class SoundManager
             instance.Stop();
     }
 
-    public static void PlayMusic(string key, bool loop = true)
+    public static bool TryPlayMusic(string key, bool loop = false)
     {
         if (songs.TryGetValue(key, out var song))
         {
+            StopMusic();
             MediaPlayer.IsRepeating = loop;
             MediaPlayer.Play(song);
+            return true;
         }
+        return false;
     }
 
     public static void StopMusic()

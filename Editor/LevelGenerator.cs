@@ -84,7 +84,7 @@ public class LevelGenerator
                 // Generate tile type based on noise value
                 float value = GetNormNoise(x, y);
                 TileTypeID tileType = GetGeneratedTile(x, y, value);
-                level[y * width + x] = LevelManager.TileFromId(tileType, new(x, y));
+                level[y * width + x] = Tile.TileFromId(tileType, new(x, y), "NUL");
             }
         }
 
@@ -118,7 +118,7 @@ public class LevelGenerator
                 {
                     TileTypeID? tileType = structure.Tiles[y * structure.Size.X + x];
                     if (!tileType.HasValue) continue;
-                    level[(spawnPoint.Y + y) * width + spawnPoint.X + x] = LevelManager.TileFromId(tileType.Value, new(spawnPoint.X + x, spawnPoint.Y + y));
+                    level[(spawnPoint.Y + y) * width + spawnPoint.X + x] = Tile.TileFromId(tileType.Value, new(spawnPoint.X + x, spawnPoint.Y + y), "NUL");
                 }
             }
             // Add to generated structures

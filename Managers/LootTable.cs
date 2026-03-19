@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 
 namespace Quest.Managers;
 
@@ -20,7 +21,7 @@ public class LootTableEntry
 public interface ILootGenerator
 {
     public string FileName { get; }
-    public Item?[,] Generate(int width, int height, int seed = -1);
+    public Item?[] Generate(int slots, int seed = -1);
 }
 
 public class LootPreset : ILootGenerator
@@ -33,7 +34,7 @@ public class LootPreset : ILootGenerator
         Preset = items;
         FileName = filename;
     }
-    public Item?[,] Generate(int width, int height, int seed = -1) => ArrayTools.Resize2DArray(Preset, width, height);
+    public Item?[] Generate(int slots, int seed = -1) => [.. Preset.Cast<Item>()];
     public static LootPreset ReadLootPreset(string world, string file)
     {
         // Check
@@ -75,7 +76,7 @@ public class LootPreset : ILootGenerator
                     // Item
                     ItemTypeID item = (ItemTypeID)id;
                     byte amount = reader.ReadByte();
-                    items[x, y] = Item.ItemFromItemType(item!, 0);
+                    items[x, y] = Item.Create(item!, 0);
                 }
             }
         }
@@ -92,30 +93,29 @@ public class LootTable : ILootGenerator
         Entries = entries;
         FileName = fileName;
     }
-    public Item?[,] Generate(int width, int height, int seed = -1)
+    public Item?[] Generate(int slots, int seed = -1)
     {
         if (seed != -1)
             RandomManager.SetSeed(seed);
 
-        Item?[,] items = new Item?[width,height];
-        Point size = new(width, height);
+        Item?[] items = new Item?[slots];
         foreach (var table in Entries)
         {
             // Check full
-            if (!ArrayTools.Contains(items, null)) break;
+            if (!items.Contains(null)) break;
             // Chances
             if (RandomManager.RandomFloat() >= table.Chance) continue;
 
             // Get random empty slot
-            Point dest;
+            int dest;
             do
-                dest = RandomManager.RandomPoint(Point.Zero, size);
-            while (items[dest.X,dest.Y] != null);
+                dest = RandomManager.RandomIntRange(0, slots);
+            while (items[dest] != null);
 
             // Set item
             Item item = table.Item.ShallowCopy();
             item.Amount = (byte)Math.Clamp(RandomManager.RandomIntRange(table.MinAmount, table.MaxAmount + 1), 0, table.Item.MaxAmount);
-            items[dest.X, dest.Y] = item;
+            items[dest] = item;
         }
         return items;
     }
@@ -159,7 +159,7 @@ public class LootTable : ILootGenerator
                 float chance = reader.ReadByte() / 100f;
                 byte minAmount = reader.ReadByte();
                 byte maxAmount = reader.ReadByte();
-                entries.Add(new(Item.ItemFromItemType(item, 0), minAmount, maxAmount, chance));
+                entries.Add(new(Item.Create(item, 0), minAmount, maxAmount, chance));
             }
         }
         return new(entries, file);

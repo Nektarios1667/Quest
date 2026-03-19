@@ -6,9 +6,9 @@ using System.Linq;
 namespace Quest.Editor;
 public static class CodeGenerator
 {
-    private const string tileCodeTemplate = "namespace Quest.Tiles;\r\n\r\npublic class $name : Tile\r\n{\r\n    public $name(Point location) : base(location, TileTypes.$name) { }\r\n}\r\n";
+    private const string tileCodeTemplate = "namespace Quest.Tiles;\r\n\r\npublic class $name : Tile\r\n{\r\n    public $name(Point location) : base(location, TileTypeID.$name) { }\r\n}\r\n";
     private const string decalCodeTemplate = "namespace Quest.Decals;\r\npublic class $name(Point location) : Decal(location) {}\r\n";
-    private const string itemCodeTemplate = "namespace Quest.Items;\r\npublic class $name : Item\r\n{\r\n    public $name(int amount) : base(amount)\r\n    {\r\n        MaxAmount = $maxamount;\r\n        Description = \"$description\";\r\n    }\r\n}\r\n";
+    private const string itemCodeTemplate = "namespace Quest.Items;\r\npublic class $name : Item\r\n{\r\n    public $name(int amount) : base(ItemTypes.$name, amount)\r\n    {}\r\n}\r\n";
 
     private static string textureManagerSource = "";
     private static string levelManagerSource = "";
@@ -58,7 +58,7 @@ public static class CodeGenerator
         StateManager.SetWeatherPersistent(lastTimeValue: offset);
         for (int t = 0; t < seconds; t++)
         {
-            values[t] = StateManager.WeatherNoiseValue(t + offset);
+            values[t] = StateManager.WeatherValue(t + offset);
             times[t] = t;
             boost[t] = StateManager.WeatherBoost(t + offset);
             intensity[t] = StateManager.WeatherIntensity(t + offset);
@@ -145,6 +145,11 @@ public static class CodeGenerator
         // Minimap color
         string newConstantsSource = constantsSource.Replace("        // MINIMAPCOLORS", $"        {color}, // {name}\r\n        // MINIMAPCOLORS");
         File.WriteAllText($"{sourceDirectory}/Constants.cs", newConstantsSource);
+
+        // Placeholder
+        bool createPlaceholderTexture = Ask("Create placeholder texture [y/n]: ")?.ToLower() == "y";
+        if (createPlaceholderTexture)
+            File.Copy($"{sourceDirectory}/Content/Images/Tiles/Template.png", $"{sourceDirectory}/Content/Images/Tiles/{name}.png");
     }
     public static void WriteDecalCode()
     {
@@ -172,6 +177,12 @@ public static class CodeGenerator
         // DecalFromID in LevelManager.cs
         string newLevelManagerSource = levelManagerSource.Replace("            // DECALFROMID INSERT", $"            DecalType.{name} => new {name}(location),\r\n            // DECALFROMID INSERT");
         File.WriteAllText($"{sourceDirectory}/Managers/LevelManager.cs", newLevelManagerSource);
+
+        // Placeholder
+        bool createPlaceholderTexture = Ask("Create placeholder texture [y/n]: ")?.ToLower() == "y";
+        if (createPlaceholderTexture)
+            File.Copy($"{sourceDirectory}/Content/Images/Decals/Template.png", $"{sourceDirectory}/Content/Images/Decals/{name}.png");
+
     }
     public static void WriteItemCode()
     {
@@ -182,7 +193,7 @@ public static class CodeGenerator
         if (name == null || maxAmount == null || description == null) return;
 
         // Source code
-        string classSource = itemCodeTemplate.Replace("$name", name).Replace("$maxamount", maxAmount).Replace("$description", description);
+        string classSource = itemCodeTemplate.Replace("$name", name);
         File.WriteAllText($"{sourceDirectory}/Items/{name}.cs", classSource);
 
         // TextureManager TextureID enum
@@ -196,9 +207,14 @@ public static class CodeGenerator
         File.WriteAllText($"{sourceDirectory}/Managers/TextureManager.cs", newTextureManagerSource);
 
         // ItemType enum in item.cs
-        string newItemSource = itemSource.Replace("    // ITEMS", $"    {name},\r\n    // ITEMS");
+        string newItemSource = itemSource.Replace("    // ITEMS ENUM", $"    {name},\r\n    // ITEMS ENUM");
         newItemSource = newItemSource.Replace("    // ITEMS REGISTER", $"    public static readonly ItemType {name} = new(ItemTypeID.{name}, \"{description}\"{(maxAmount == "10" ? "" : $", {maxAmount}")});\r\n    // ITEMS REGISTER");
         File.WriteAllText($"{sourceDirectory}/Items/Item.cs", newItemSource);
+
+        // Placeholder
+        bool createPlaceholderTexture = Ask("Create placeholder texture [y/n]: ")?.ToLower() == "y";
+        if (createPlaceholderTexture)
+            File.Copy($"{sourceDirectory}/Content/Images/Items/Template.png", $"{sourceDirectory}/Content/Images/Items/{name}.png");
     }
     public static void WriteLootTable()
     {

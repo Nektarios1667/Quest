@@ -13,6 +13,7 @@ public class MenuManager
     public GUI LevelSelectMenu { get; private set; }
     public GUI PauseMenu { get; private set; }
     public GUI DebugMenu { get; private set; }
+
     private readonly GameManager gameManager;
     private readonly PlayerManager playerManager;
     // Widgets
@@ -115,10 +116,7 @@ public class MenuManager
         HorizontalSlider timeSlider = new(DebugMenu, new(Constants.Middle.X, 20), 200, Color.Black, Color.Gray);
         timeSlider.ValueChanged += (value) => gameManager.DayTime = value * 500;
         Label timeLabel = new(DebugMenu, new(Constants.Middle.X - 100, 0), Color.Black, "Daytime");
-        HorizontalSlider weatherSlider = new(DebugMenu, new(Constants.Middle.X, 40), 200, Color.Black, Color.Gray);
-        //weatherSlider.ValueChanged += (value) => StateManager.currentWeatherNoise = value;
-        Label weatherLabel = new(DebugMenu, new(Constants.Middle.X - 100, 20), Color.Black, "Weather");
-        DebugMenu.Widgets = [timeSlider, timeLabel, weatherLabel, weatherSlider];
+        DebugMenu.Widgets = [timeSlider, timeLabel];
     }
     public void ExitToMainMenu()
     {
@@ -219,22 +217,23 @@ public class MenuManager
     public void Update(GameManager gameManager)
     {
         DebugManager.StartBenchmark("MenuUpdate");
+
         switch (StateManager.State)
         {
             case GameState.MainMenu:
-                MainMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                MainMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
             case GameState.Settings:
-                SettingsMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                SettingsMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
             case GameState.Credits:
-                CreditsMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                CreditsMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
             case GameState.LevelSelect:
-                LevelSelectMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                LevelSelectMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
             case GameState.Game:
-                //DebugMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                //DebugMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
             case GameState.Loading:
                 DrawLoading();
@@ -244,7 +243,7 @@ public class MenuManager
         switch (StateManager.OverlayState)
         {
             case OverlayState.Pause:
-                PauseMenu.Update(gameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                PauseMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
         }
 
@@ -254,6 +253,7 @@ public class MenuManager
     public void Draw()
     {
         DebugManager.StartBenchmark("MenuDraw");
+
         switch (StateManager.State)
         {
             case GameState.MainMenu:

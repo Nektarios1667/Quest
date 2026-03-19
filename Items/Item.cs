@@ -1,5 +1,7 @@
 using System;
+using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.Runtime.CompilerServices;
 
 namespace Quest.Items;
 public enum ItemTypeID : byte
@@ -34,7 +36,35 @@ public enum ItemTypeID : byte
     BottledWater,
     BottledCloud,
     BottledStorm,
-    // ITEMS
+    Disc,
+    Cloth,
+    Coal,
+    RawIron,
+    Iron,
+    Ink,
+    RawCopper,
+    Copper,
+    RawGold,
+    Gold,
+    Diamond,
+    Emerald,
+    Ruby,
+    CopperMedal,
+    IronMedal,
+    GoldMedal,
+    DiamondMedal,
+    EmeraldMedal,
+    RubyMedal,
+    HeartRune,
+    LightningStaff,
+    TimeStaff,
+    Scroll,
+    Carrot,
+    RawFish,
+    CookedFish,
+    RawBeef,
+    CookedBeef,
+    // ITEMS ENUM
 }
 
 public class ItemType
@@ -94,6 +124,34 @@ public class ItemTypes
     public static readonly ItemType BottledWater = new(ItemTypeID.BottledWater, "A glass bottle of potable water.", 3);
     public static readonly ItemType BottledCloud = new(ItemTypeID.BottledCloud, "A cloud somehow trapped in a glass bottle...", 3);
     public static readonly ItemType BottledStorm = new(ItemTypeID.BottledStorm, "A storm somehow trapped in a glass bottle...", 3);
+    public static readonly ItemType Disc = new(ItemTypeID.Disc, "A music disc.");
+    public static readonly ItemType Cloth = new(ItemTypeID.Cloth, "A piece of fabric.");
+    public static readonly ItemType Coal = new(ItemTypeID.Coal, "A hard lump of coal.");
+    public static readonly ItemType RawIron = new(ItemTypeID.RawIron, "Unprocessed iron ore.");
+    public static readonly ItemType Iron = new(ItemTypeID.Iron, "Processed iron ore.");
+    public static readonly ItemType Ink = new(ItemTypeID.Ink, "Ink used for dyes and writing.");
+    public static readonly ItemType RawCopper = new(ItemTypeID.RawCopper, "Unprocessed copper ore.");
+    public static readonly ItemType Copper = new(ItemTypeID.Copper, "Processed copper ore.");
+    public static readonly ItemType RawGold = new(ItemTypeID.RawGold, "Unprocessed gold ore.");
+    public static readonly ItemType Gold = new(ItemTypeID.Gold, "Processed gold ore.");
+    public static readonly ItemType Diamond = new(ItemTypeID.Diamond, "Pure shiny diamond.");
+    public static readonly ItemType Emerald = new(ItemTypeID.Emerald, "Pure shiny emerald.");
+    public static readonly ItemType Ruby = new(ItemTypeID.Ruby, "Pure shiny ruby.");
+    public static readonly ItemType CopperMedal = new(ItemTypeID.CopperMedal, "Award medal made of copper.");
+    public static readonly ItemType IronMedal = new(ItemTypeID.IronMedal, "Award medal made of iron.");
+    public static readonly ItemType GoldMedal = new(ItemTypeID.GoldMedal, "Award medal made of gold.");
+    public static readonly ItemType DiamondMedal = new(ItemTypeID.DiamondMedal, "Award medal made of diamond.");
+    public static readonly ItemType EmeraldMedal = new(ItemTypeID.EmeraldMedal, "Award medal made of emerald.");
+    public static readonly ItemType RubyMedal = new(ItemTypeID.RubyMedal, "Award medal made of ruby.");
+    public static readonly ItemType HeartRune = new(ItemTypeID.HeartRune, "A mysterious rune in the shape of a heart.", 1);
+    public static readonly ItemType LightningStaff = new(ItemTypeID.LightningStaff, "A magical staff infused with lightning.", 1);
+    public static readonly ItemType TimeStaff = new(ItemTypeID.TimeStaff, "A magical staff able to control time.", 1);
+    public static readonly ItemType Scroll = new(ItemTypeID.Scroll, "An antique scroll with writings on it.", 1);
+    public static readonly ItemType Carrot = new(ItemTypeID.Carrot, "A hearty carrot from the ground.");
+    public static readonly ItemType RawFish = new(ItemTypeID.RawFish, "Uncooked fish from the sea.");
+    public static readonly ItemType CookedFish = new(ItemTypeID.CookedFish, "Cooked fish from the sea.");
+    public static readonly ItemType RawBeef = new(ItemTypeID.RawBeef, "Uncooked cow meat.");
+    public static readonly ItemType CookedBeef = new(ItemTypeID.CookedBeef, "Cooked cow meat.");
     // ITEMS REGISTER
     public static readonly ItemType[] All = [
     ActivePalantir,
@@ -126,69 +184,113 @@ public class ItemTypes
     BottledWater,
     BottledCloud,
     BottledStorm,
-    // ITEMS
+    Disc,
+    Cloth,
+    Coal,
+    RawIron,
+    Iron,
+    Ink,
+    RawCopper,
+    Copper,
+    RawGold,
+    Gold,
+    Diamond,
+    Emerald,
+    Ruby,
+    CopperMedal,
+    IronMedal,
+    GoldMedal,
+    DiamondMedal,
+    EmeraldMedal,
+    RubyMedal,
+    HeartRune,
+    LightningStaff,
+    TimeStaff,
+    Scroll,
+    Carrot,
+    RawFish,
+    CookedFish,
+    RawBeef,
+    CookedBeef,
+    // ITEMS ENUM
     ];
 }
 public class ItemRef
 {
     public byte Amount { get; set; }
     public ItemType Type { get; }
-    public string Name => Type.Name;
+    public string? CustomName { get; set; }
+    public string Name => CustomName ?? Type.Name;
     public string Description => Type.Description;
     public byte MaxAmount => Type.MaxAmount;
     public TextureID Texture => Type.Texture;
     public bool IsLight => Type.IsLight;
-    public ItemRef(ItemType type, byte amount)
+    public ItemRef(ItemType type, byte amount, string? name = null)
     {
         Type = type;
         Amount = amount;
+        CustomName = name;
     }
-    public ItemRef(ItemType type, int amount)
-    {
-        Type = type;
-        Amount = (byte)amount;
-    }
+    public ItemRef Copy() => new(Type, Amount, CustomName);
 }
 public class Item
 {
     public byte Amount { get; set; }
     public ItemType Type { get; protected set; }
     public ushort UID { get; protected set; }
-    public string Name => Type.Name;
+    public string? CustomName { get; set; }
+    public string Name => CustomName ?? Type.Name;
     public string Description => Type.Description;
     public byte MaxAmount => Type.MaxAmount;
     public TextureID Texture => Type.Texture;
     public bool IsLight => Type.IsLight;
-    public Item(ItemType itemType, int amount)
+    public Item(ItemType itemType, int amount, string? name = null)
     {
         Type = itemType;
         Amount = (byte)amount;
         UID = UIDManager.Get(UIDCategory.Items);
+        CustomName = name;
     }
-    public Item(ItemRef itemRef)
+    public Item(ItemTypeID itemTypeID, int amount, string? name = null)
+    {
+        Type = ItemTypes.All[(int)itemTypeID];
+        Amount = (byte)amount;
+        UID = UIDManager.Get(UIDCategory.Items);
+        CustomName = name;
+    }
+    public Item(ItemRef itemRef, string? name = null)
     {
         Type = itemRef.Type;
         Amount = itemRef.Amount;
         UID = UIDManager.Get(UIDCategory.Items);
+        CustomName = name;
+    }
+    public Item(Item item)
+    {
+        Type = item.Type;
+        Amount = item.Amount;
+        UID = UIDManager.Get(UIDCategory.Items);
+        CustomName = item.CustomName;
     }
     public virtual void PrimaryUse(PlayerManager player) { }
     public virtual void SecondaryUse(PlayerManager player) { }
-
-    public static Item ItemFromName(string name, int amount)
+    public static Item Create(ItemType type, int amount, string? customName = null)
     {
-        if (!Enum.TryParse<ItemTypeID>(name, out var typeID))
-            throw new ArgumentException($"Item {name} does not exist");
-
-        ItemType type = ItemTypes.All[(byte)typeID];
-        return new(type, amount);
+        return Create(type.TypeID, amount, customName);
     }
-    public static Item ItemFromItemType(ItemTypeID itemType, int amount)
+
+    public static Item Create(ItemTypeID itemType, int amount, string? customName = null)
     {
+        // Error check
+        if ((byte)itemType >= ItemTypes.All.Length)
+            Logger.Error($"Item Create failed - ItemTypeID {(byte)itemType} does not exist", exit: true);
+
+        // Create
         ItemType type = ItemTypes.All[(byte)itemType];
         return itemType switch
         {
-            ItemTypeID.Lantern => new Lantern(amount),
-            _ => new Item(type, amount),
+            ItemTypeID.Lantern => new Lantern(amount, customName),
+            _ => new Item(type, amount, customName),
         };
     }
     public Item ShallowCopy()
@@ -199,4 +301,25 @@ public class Item
     {
         UIDManager.Release(UIDCategory.Items, UID);
     }
+    public Item? Take(byte amount)
+    {
+        // Failed
+        if (amount > Amount)
+            return null;
+        else if (amount <= 0)
+            return null;
+
+        // Split
+        Amount -= amount;
+        return new Item(Type, amount, CustomName);
+    }
+    public bool Consume(byte amount) => Take(amount) != null;
+    private string Tags()
+    {
+        string tags = "";
+        if (this is Light) tags += "L";
+        return tags;
+    }
+    public ItemRef GetItemRef() => new(Type, Amount, CustomName);
+    public override string ToString() => $"{Name}{(CustomName != null ? $" [{CustomName}]" : "")} x{Amount} {Tags()}";
 }

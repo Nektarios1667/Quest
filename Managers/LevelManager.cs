@@ -1,11 +1,13 @@
+using Quest.Quill;
+using Quest.Tiles;
 using System.Diagnostics;
 using System.IO;
-using IO = System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using Quest.Quill;
+using System.Windows.Forms;
+using IO = System.IO;
 
 namespace Quest.Managers;
 public class LevelManager
@@ -28,10 +30,23 @@ public class LevelManager
         // Empty
         Levels = [];
         Level = EmptyLevel;
+        //TimerManager.SetTimer("UpdatePathfindingGrid", 0.1f, () =>
+        //    PathfindingManager.SetGrid(Level,
+        //        CameraManager.TopLeftTileCoord,
+        //        Constants.NativeResolutionTiles
+        //    ),
+        //    int.MaxValue
+        //);
     }
     public void Update(GameManager gameManager)
     {
         if (!StateManager.IsPlayingState) return;
+
+        // Pathfinding
+        PathfindingManager.SetGrid(Level,
+            CameraManager.TopLeftTileCoord,
+            Constants.NativeResolutionTiles
+        );
 
         // Entities
         foreach (NPC npc in Level.NPCs) npc.Update(gameManager);
@@ -47,9 +62,24 @@ public class LevelManager
         foreach (Loot loot in Level.Loot)
             if (loot.Item.Type == ItemTypes.Lantern)
             {
-                Point loc = loot.Location - CameraManager.Camera.ToPoint() + Constants.Middle + TextureManager.Metadata[loot.Texture].Size;
-                LightingManager.SetLight($"Loot_{loot.UID}", loc, 2, Color.Transparent);
+                Point loc = loot.Position - CameraManager.Camera.ToPoint() + Constants.Middle + TextureManager.Metadata[loot.Texture].Size;
+                LightingManager.SetLight($"Loot_{loot.UID}", loc, 2);
             }
+
+        // Weather sounds
+        float weatherIntensity = StateManager.WeatherIntensity(GameManager.GameTime);
+        if (!Constants.EDITOR && weatherIntensity > 0)
+        {
+            BiomeType currentBiome = Level.Biome[CameraManager.TileCoord.X + CameraManager.TileCoord.Y * Constants.MapSize.X];
+            switch (currentBiome)
+            {
+                case BiomeType.Temperate: SoundManager.PlaySoundInstance("Rain", volume: weatherIntensity * 0.5f); break;
+                case BiomeType.Ocean: SoundManager.PlaySoundInstance("Rain", volume: weatherIntensity * 0.5f); break;
+                case BiomeType.Indoors: break;
+                case BiomeType.Snowy: SoundManager.PlaySoundInstance("Sandstorm", volume: weatherIntensity * 0.1f); break;
+                case BiomeType.Desert: SoundManager.PlaySoundInstance("Sandstorm", volume: weatherIntensity * 0.25f); break;
+            }
+        }
     }
     public void UpdateSky(GameManager gameManager)
     {
@@ -65,7 +95,7 @@ public class LevelManager
     {
         // Calculate sky colors from weather, biome, and time
         BiomeType? currentBiome = GetBiome(loc);
-        blend ??= StateManager.WeatherIntensity(gameManager.GameTime);
+        blend ??= StateManager.WeatherIntensity(GameManager.GameTime);
 
         Color weatherColor = default;
         if (currentBiome == null || currentBiome == BiomeType.Indoors || blend == 0) weatherColor = Color.Transparent;
@@ -115,29 +145,16 @@ public class LevelManager
     {
         // Draw each decal
         DebugManager.StartBenchmark("DecalDraws");
-        foreach (Decal decal in Level.Decals)
+        foreach (Decal decal in Level.Decals.Values)
             decal.Draw(gameManager);
         DebugManager.EndBenchmark("DecalDraws");
     }
     public void DrawLoot(GameManager gameManager)
     {
         DebugManager.StartBenchmark("DrawLoot");
-        // Draw each
-        for (int l = 0; l < Level.Loot.Count; l++)
-        {
-            Loot loot = Level.Loot[l];
-            Point pos = loot.Location - CameraManager.Camera.ToPoint() + Constants.Middle;
-            pos.Y += (int)(Math.Sin((gameManager.GameTime - loot.Birth) * 2 % (Math.PI * 2)) * 6); // Bob up and down
-            DrawTexture(gameManager.Batch, loot.Texture, pos, scale: 2);
-            // Draw stacks if multiple
-            if (loot.Item.Amount > 1)
-                DrawTexture(gameManager.Batch, loot.Texture, pos + lootStackOffset, scale: 2);
-            if (loot.Item.Amount > 2)
-                DrawTexture(gameManager.Batch, loot.Texture, pos + lootStackOffset + lootStackOffset, scale: 2);
-            // Draw hitbox if enabled
-            if (DebugManager.DrawHitboxes)
-                FillRectangle(gameManager.Batch, new(pos, new(32)), Constants.DebugPinkTint);
-        }
+        // Draw each loot
+        foreach (Loot loot in Level.Loot)
+            loot.Draw(gameManager);
         DebugManager.EndBenchmark("DrawLoot");
     }
     public void DrawCharacters(GameManager gameManager)
@@ -176,7 +193,7 @@ public class LevelManager
         Level = Levels[levelIndex];
 
         // MiniMap
-        gameManager.UIManager.RefreshMiniMap();
+        gameManager.OverlayManager.RefreshMiniMap();
 
         // Close old QuillSciprs
         Interpreter.ClearScripts();
@@ -220,7 +237,7 @@ public class LevelManager
         Level = level;
 
         // MiniMap
-        gameManager.UIManager.RefreshMiniMap();
+        gameManager.OverlayManager.RefreshMiniMap();
 
         // Spawn
         CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
@@ -322,7 +339,7 @@ public class LevelManager
         BiomeType[] biomeBuffer = new BiomeType[totalTiles];
         List<NPC> npcBuffer = [];
         List<Loot> lootBuffer = [];
-        List<Decal> decalBuffer = [];
+        Dictionary<ByteCoord, Decal> decalBuffer = [];
         List<QuillScript> scriptBuffer = [];
 
         // Context
@@ -358,24 +375,27 @@ public class LevelManager
                 biomeBuffer = [];
 
             // NPCs
-            int npcCount = reader.ReadByte();
+            ushort npcCount = reader.ReadUInt16();
             for (int n = 0; n < npcCount; n++)
                 npcBuffer.Add(reader.ReadNPC(gameManager));
 
             // Loot
-            byte lootCount = reader.ReadByte();
+            ushort lootCount = reader.ReadUInt16();
             for (int n = 0; n < lootCount; n++)
                 lootBuffer.Add(reader.ReadLoot(gameManager));
 
             // Decals
-            byte decalCount = reader.ReadByte();
+            ushort decalCount = reader.ReadUInt16();
             for (int n = 0; n < decalCount; n++)
-                decalBuffer.Add(reader.ReadDecal());
+            {
+                Decal decal = reader.ReadDecal();
+                decalBuffer[decal.Location] = decal;
+            }
 
             // Scripts
             if (flags.HasFlag(LevelFeatures.QuillScripts))
             {
-                Directory.CreateDirectory("GameData/Worlds/{levelPath.WorldName}/scripts");
+                Directory.CreateDirectory($"GameData/Worlds/{levelPath.WorldName}/scripts");
                 byte scriptCount = reader.ReadByte();
                 for (int s = 0; s < scriptCount; s++)
                 {
@@ -402,20 +422,21 @@ public class LevelManager
     }
     private static Tile ReadTile(BinaryReader reader, LevelFeatures flags, LevelPath levelPath, int x, int y)
     {
-        // Helper
-        Door ReadDoor(Point loc)
-        {
-            string keyName = reader.ReadString();
-            return new Door(loc, keyName.IsNUL() ? null : new(ItemTypes.Get(keyName), reader.ReadByte()), keyName.IsNUL() || reader.ReadBoolean());
-        }
+        // Helpers
         Chest ReadChest(Point loc)
         {
             string lootGenFile = reader.ReadString();
             ILootGenerator lootGen = LootGeneratorHelper.Read(levelPath.WorldName, lootGenFile);
-            if (lootGen.FileName.IsNUL() || lootGen.FileName == "_")
-                return new Chest(loc, LootPreset.EmptyPreset, levelPath.LevelName);
-            else
-                return new Chest(loc, lootGen, levelPath.LevelName);
+            lootGen = (lootGen.FileName.IsNUL() || lootGen.FileName == "_") ? LootPreset.EmptyPreset : lootGen;
+
+            return new Chest(loc, lootGen, levelPath.LevelName, StateManager.ReadItemData(reader)?.GetItemRef(), reader.ReadBoolean());
+        }
+        DisplayCase ReadDisplayCase(Point loc)
+        {
+            Item? item = StateManager.ReadItemData(reader);
+            DisplayCase displayCase = new(loc, levelPath.LevelName);
+            displayCase.Container.Items[0] = item;
+            return displayCase;
         }
 
         // Read tile data
@@ -425,28 +446,13 @@ public class LevelManager
         return type switch
         {
             TileTypeID.Stairs => new Stairs(loc, $"{levelPath.WorldName}/{reader.ReadString()}", new(reader.ReadByte(), reader.ReadByte())),
-            TileTypeID.Door => ReadDoor(loc),
+            TileTypeID.Door => new Door(loc, StateManager.ReadItemData(reader)?.GetItemRef(), reader.ReadBoolean()),
             TileTypeID.Chest => ReadChest(loc),
             TileTypeID.Lamp => new Lamp(loc, reader.ReadByte()),
-            _ => new Tile(loc, type),
+            TileTypeID.DisplayCase => ReadDisplayCase(loc),
+            _ => Tile.TileFromId(type, loc, levelPath.LevelName),
         };
     }
-
-    public static Tile TileFromId(int id, ByteCoord location) => TileFromId(id, location);
-    public static Tile TileFromId(int id, Point location)
-    {
-        // Create a tile from an id
-        TileTypeID type = (TileTypeID)id;
-        return type switch
-        {
-            TileTypeID.Stairs => new Stairs(location, "", Constants.MiddleCoord),
-            TileTypeID.Door => new Door(location, null),
-            TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, "_"),
-            TileTypeID.Lamp => new Lamp(location),
-            _ => new(location, type)
-        };
-    }
-    public static Tile TileFromId(TileTypeID id, Point location) => TileFromId((int)id, location);
     public static Decal DecalFromId(DecalType id, Point location) => new(location, id);
     public int TileConnectionsMask(Tile tile)
     {
@@ -533,7 +539,7 @@ public class LevelManager
     public void DropLoot(GameManager gameManager, Loot loot)
     {
         Level.Loot.Add(loot);
-        gameManager.UIManager.LootNotifications.AddNotification($"-{loot.DisplayName}");
+        gameManager.OverlayManager.LootNotifications.AddNotification($"-{loot.DisplayName}");
     }
     public static Point TileCoord(Vector2 loc) => new((int)(loc.X / Constants.TileSize.X), (int)(loc.Y / Constants.TileSize.Y));
     public static Vector2 WorldCoord(Point tileCoord) => new(tileCoord.X * Constants.TileSize.X, tileCoord.Y * Constants.TileSize.Y);

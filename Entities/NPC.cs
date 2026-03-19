@@ -1,4 +1,5 @@
 ﻿using Quest.Gui;
+using Quest.Interaction;
 
 namespace Quest.Entities;
 
@@ -14,42 +15,33 @@ public class ShopOption
         Cost = cost;
         Stock = stock;
     }
-
-    public bool Buy(Inventory inventory)
-    {
-        if (Cost == null || inventory.Consume(Cost))
-            inventory.AddItem(new(Item));
-        else
-            return false;
-        return true;
-    }
 }
 
-public class NPC
+public class NPC : IEntity
 {
-    public static readonly NPC Null = new(null!, TextureID.Null, Point.Zero, "NUL_NAME", "NUL_DIALOG");
+    public static readonly NPC Null = new(TextureID.Null, Point.Zero, "NUL_NAME", "NUL_DIALOG");
     public static Dialog? DialogBox { get; set; }
     public static List<(NPC npc, float dist)> NPCsNearby { get; set; } = [];
     public List<ShopOption> ShopOptions { get; private set; } = [];
-    public Point Location { get; set; }
+    public Point Position { get; set; }
     public string Name { get; set; }
     public string Dialog { get; set; }
     public TextureID Texture { get; set; }
     public Color TextureColor { get; set; }
     public float Scale { get; set; }
+    public Point Size => spritesize.Scaled(Scale * Constants.NPCScale);
+    public RectangleF Bounds => new((Position * Constants.TileSize + Constants.TileHalfSize - Size.Scaled(0.5f, 1)).ToVector2(), Size);
     // Private
-    private Point tilemap;
-    private Point tilesize;
+    private Point spritesize;
 
-    public NPC(OverlayManager uiManager, TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1)
+    public NPC(TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1)
     {
         Texture = texture;
 
         // Private
-        tilemap = TextureManager.Metadata[Texture].TileMap;
-        tilesize = TextureManager.Metadata[Texture].Size / tilemap;
+        spritesize = TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap;
 
-        Location = location;
+        Position = location;
         Name = name;
         Dialog = dialog;
         TextureColor = textureColor == default ? Color.White : textureColor;
@@ -58,18 +50,17 @@ public class NPC
     public void Draw(GameManager gameManager)
     {
         // Npc
-        Vector2 origin = new(tilesize.X / 2, tilesize.Y);
-        Point pos = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle + tilesize / Constants.TwoPoint;
-        Rectangle source = GetAnimationSource(Texture, gameManager.GameTime);
+        Vector2 origin = new(spritesize.X / 2, spritesize.Y);
+        Point pos = Position * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle + Constants.TileHalfSize;
+        Rectangle source = GetAnimationSource(Texture, GameManager.GameTime);
         DrawTexture(gameManager.Batch, Texture, pos, color: TextureColor, scale: Scale * Constants.NPCScale, source: source, origin: origin);
         // Debug
-        if (DebugManager.DrawHitboxes)
-            FillRectangle(gameManager.Batch, new(pos - tilesize, (source.Size.ToVector2() * Scale).ToPoint()), Constants.DebugPinkTint);
+        DebugManager.DrawHitbox(gameManager.Batch, this);
     }
     public void Update(GameManager gameManager)
     {
         // Mark as dialogue possibility
-        float dist = Vector2.DistanceSquared(CameraManager.PlayerFoot.ToVector2() / Constants.TileSize.ToVector2(), Location.ToVector2() + Constants.HalfVec);
+        float dist = Vector2.DistanceSquared(CameraManager.PlayerFoot.ToVector2() / Constants.TileSize.ToVector2(), Position.ToVector2() + Constants.HalfVec);
         if (dist <= 4)
             NPCsNearby.Add((this, dist));
     }
@@ -105,19 +96,18 @@ public class NPC
 
         return dialog;
     }
-    public bool Buy(ShopOption option, Inventory inv, GameManager gameManager)
+    public bool Buy(ShopOption option, Container cont, GameManager gameManager)
     {
         // Check
         if (!ShopOptions.Contains(option)) return false;
 
         // Buy
-        if ((option.Cost == null || inv.Consume(option.Cost)) && option.Stock > 0)
+        if ((option.Cost == null || cont.Consume(option.Cost)) && option.Stock > 0)
         {
-            (bool success, Item leftover) = inv.AddItem(new(option.Item));
-            if (!success)
-                gameManager.LevelManager.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), Location, gameManager.GameTime));
-            if (leftover.Amount < option.Item.Amount)
-                SoundManager.PlaySound("Trinkets");
+            Item leftover = cont.AddItem(new(option.Item));
+            if (leftover.Amount > 0)
+                gameManager.LevelManager.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), Position, GameManager.GameTime));
+            SoundManager.PlaySound("Trinkets");
             option.Stock -= 1;
         }
 
@@ -126,9 +116,9 @@ public class NPC
 
         return true;
     }
-    public bool Buy(int option, Inventory inv, GameManager gameManager)
+    public bool Buy(int option, Container cont, GameManager gameManager)
     {
         if (option >= ShopOptions.Count) return false;
-        return Buy(ShopOptions[option], inv, gameManager);
+        return Buy(ShopOptions[option], cont, gameManager);
     }
 }

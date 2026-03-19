@@ -28,6 +28,8 @@ public enum DecalType : byte
     LightTint,
     MediumTint,
     DarkTint,
+    Finish,
+    Checkpoint,
     // DECALS
 }
 public class Decal
@@ -56,7 +58,19 @@ public class Decal
     {
         // Draw
         Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
-        Rectangle source = GetAnimationSource(Texture, gameManager.GameTime, duration: .75f);
+        Rectangle source = GetAnimationSource(Texture, GameManager.GameTime, duration: .75f);
         DrawTexture(gameManager.Batch, Texture, dest, source: source, scale: Constants.TileSizeScale);
+    }
+    public virtual void OnPlayerEnter(GameManager gameManager, PlayerManager playerManager) { }
+    public static Decal CreateDecal(DecalType type, Point location)
+    {
+        return type switch
+        {
+            DecalType.Torch => new Torch(location),
+            DecalType.BlueTorch => new BlueTorch(location),
+            DecalType.Finish => new Finish(location),
+            DecalType.Checkpoint => new Checkpoint(location),
+            _ => new Decal(location, type)
+        };
     }
 }

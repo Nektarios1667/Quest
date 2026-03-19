@@ -1,4 +1,6 @@
 ﻿using Quest.Gui;
+using Quest.Interaction;
+using System.Linq;
 namespace Quest.Managers;
 
 public class Attack(int damage, RectangleF hitbox)
@@ -6,26 +8,48 @@ public class Attack(int damage, RectangleF hitbox)
     public int Damage { get; } = damage;
     public RectangleF Hitbox { get; } = hitbox;
 }
-public class PlayerManager
+public class PlayerManager : IEntity
 {
-    public Inventory Inventory { get; }
-    public Inventory ContainerInventory { get; }
-    public IContainer? OpenedContainer { get; set; } = null;
-    public int SelectedSlot { get; set; }
-    public Inventory SelectedInventory { get; set; }
+    // Events
+    public event Action<Item?>? ItemSelected;
+    public event Action<int> EquippedSlotChanged;
+    // Properties
+    // Inventory and UI
+    public bool InventoryOpen { get; set; } = false;
+    public Container Inventory { get; }
+    public UserInterface InventoryUI { get; }
+    public UserInterface? OpenedInterface { get; set; } = null;
+    private int equippedSlot = 0;
+    public int EquippedSlot {
+        get => equippedSlot;
+        set { equippedSlot = value; EquippedSlotChanged?.Invoke(equippedSlot); }
+    }
+    public Item? HoveredItem { get; private set; }
+    public Item? EquippedItem => EquippedSlot >= 0 && EquippedSlot < Inventory.Items.Length ? Inventory.Items[EquippedSlot] : null;
+    public (UserInterface ui, int idx)? MouseSelection { get; set; } // Item being moved with mouse and its original inventory
+    // Position and collision
+    public RectangleF Bounds => GetHitbox();
+
     public Tile? TileBelow { get; private set; }
     public List<Tile> TileBumps { get; private set; } = [];
     public Direction PlayerDirection { get; private set; }
     public List<Attack> Attacks { get; private set; } = [];
     private float moveX, moveY;
+    private GameManager Game;
     public PlayerManager()
     {
-        Inventory = new(6, 4, isPlayer: true);
-        ContainerInventory = new(Chest.Size.X, Chest.Size.Y, isPlayer: false);
-        SelectedInventory = Inventory;
+        Inventory = new(new Item[6*4]);
+        InventoryUI = UserInterface.InventoryUI;
+        InventoryUI.BindContainer(Inventory);
+
+        InventoryUI.OnSlotClick += SlotClicked;
+        InventoryUI.OnSlotDrop += SlotDropped;
+        InventoryUI.OnSlotHover += SlotHovered;
     }
+
     public void Update(GameManager gameManager)
     {
+        Game = gameManager;
         if (StateManager.State != GameState.Game && StateManager.State != GameState.Editor) return;
         if (StateManager.OverlayState == OverlayState.Pause) return;
 
@@ -34,13 +58,20 @@ public class PlayerManager
         UpdatePositions(gameManager);
 
         // Toggle inventory
-        if (InputManager.KeyPressed(Keys.I))
+        if (InputManager.BindPressed(InputAction.ToggleInventory) && StateManager.OverlayState != OverlayState.Typing)
         {
-            if (Inventory.Opened) CloseContainer();
+            if (InventoryOpen)
+            {
+                CloseInventory();
+                CloseInterface();
+            }
             else OpenInventory();
         }
-        if (InputManager.KeyPressed(Keys.Escape))
-            CloseContainer();
+        if (InputManager.BindPressed(InputAction.Back))
+        {
+            CloseInventory();
+            CloseInterface();
+        }
 
         // Loot
         DebugManager.StartBenchmark("UpdateLoot");
@@ -48,15 +79,15 @@ public class PlayerManager
         DebugManager.EndBenchmark("UpdateLoot");
 
         // Movement
-        if (!Inventory.Opened)
+        if (!InventoryOpen)
         {
             // Movement
             DebugManager.StartBenchmark("UpdateMovement");
             moveX = 0; moveY = 0;
-            moveX += InputManager.AnyKeyDown(Keys.A, Keys.Left) ? -Constants.PlayerSpeed : 0;
-            moveX += InputManager.AnyKeyDown(Keys.D, Keys.Right) ? Constants.PlayerSpeed : 0;
-            moveY += InputManager.AnyKeyDown(Keys.W, Keys.Up) ? -Constants.PlayerSpeed : 0;
-            moveY += InputManager.AnyKeyDown(Keys.S, Keys.Down) ? Constants.PlayerSpeed : 0;
+            moveX += InputManager.BindDown(InputAction.MoveLeft) ? -Constants.PlayerSpeed : 0;
+            moveX += InputManager.BindDown(InputAction.MoveRight) ? Constants.PlayerSpeed : 0;
+            moveY += InputManager.BindDown(InputAction.MoveUp) ? -Constants.PlayerSpeed : 0;
+            moveY += InputManager.BindDown(InputAction.MoveDown) ? Constants.PlayerSpeed : 0;
             Move(gameManager, new(moveX, moveY));
             if (moveX > 0) PlayerDirection = Direction.Right;
             else if (moveX < 0) PlayerDirection = Direction.Left;
@@ -68,24 +99,45 @@ public class PlayerManager
             // Remove attacks
             DebugManager.StartBenchmark("UpdateAttacks");
             Attacks.Clear();
-            if (InputManager.LMouseClicked) Inventory.Equipped?.PrimaryUse(this);
-            else if (InputManager.RMouseClicked) Inventory.Equipped?.SecondaryUse(this);
+            if (InputManager.LMouseClicked) EquippedItem?.PrimaryUse(this);
+            else if (InputManager.RMouseClicked) EquippedItem?.SecondaryUse(this);
             DebugManager.EndBenchmark("UpdateAttacks");
         }
 
 
         // Inventory
         DebugManager.StartBenchmark("InventoryUpdate");
-        Inventory.Update(gameManager, this);
-        ContainerInventory.Update(gameManager, this);
+
+        // Change equipped item with hotkeys
+        if (!InventoryOpen)
+        {
+            if (InputManager.BindPressed(InputAction.Hotbar1)) EquippedSlot = 0;
+            if (InputManager.BindPressed(InputAction.Hotbar2)) EquippedSlot = 1;
+            if (InputManager.BindPressed(InputAction.Hotbar3)) EquippedSlot = 2;
+            if (InputManager.BindPressed(InputAction.Hotbar4)) EquippedSlot = 3;
+            if (InputManager.BindPressed(InputAction.Hotbar5)) EquippedSlot = 4;
+            if (InputManager.BindPressed(InputAction.Hotbar6)) EquippedSlot = 5;
+            // Change equipped item with scroll
+            if (InputManager.ScrolledUp) EquippedSlot = (EquippedSlot - 1 + Chest.Size.X) % Chest.Size.X;
+            if (InputManager.ScrolledDown) EquippedSlot = (EquippedSlot + 1) % Chest.Size.X;
+        }
+
+        // 
+        InventoryUI.GetSlot(EquippedSlot).Mark(Color.Salmon);
+        HoveredItem = null;
+
+        // Inventory updates
+        InventoryUI.Update(InventoryOpen ? null : "hotbar");
+        OpenedInterface?.Update();
+
         DebugManager.EndBenchmark("InventoryUpdate");
 
         // NPC
         UpdateNPCInteractions(gameManager);
 
         // Player lighting
-        if (Inventory.Equipped is Light light)
-            LightingManager.SetLight("PlayerLightItem", CameraManager.PlayerFoot - CameraManager.Camera.ToPoint() + Constants.Middle, light.LightStrength, light.LightColor);
+        if (EquippedItem is Light light)
+            LightingManager.SetLight("PlayerLightItem", CameraManager.PlayerFoot - CameraManager.Camera.ToPoint() + Constants.Middle, light.LightStrength);
         else
             LightingManager.RemoveLight("PlayerLightItem");
     }
@@ -94,8 +146,8 @@ public class PlayerManager
         // Process NPC dialogs
         if (NPC.DialogBox == null)
         {
-            NPC.DialogBox = new Dialog(gameManager.UIManager.Gui, new(Constants.Middle.X - 600, Constants.NativeResolution.Y - 300), new(1200, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false };
-            gameManager.UIManager.Gui.Widgets.Add(NPC.DialogBox);
+            NPC.DialogBox = new Dialog(gameManager.OverlayManager.Gui, new(Constants.Middle.X - 600, Constants.NativeResolution.Y - 300), new(1200, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false };
+            gameManager.OverlayManager.Gui.Widgets.Add(NPC.DialogBox);
         }
         (NPC npc, float dist) interacting = new(NPC.Null, float.MaxValue);
         if (NPC.NPCsNearby.Count > 0)
@@ -136,13 +188,14 @@ public class PlayerManager
         for (int l = 0; l < gameManager.LevelManager.Level.Loot.Count; l++)
         {
             Loot loot = gameManager.LevelManager.Level.Loot[l];
-            if (gameManager.GameTime - loot.Birth < 3) continue; // Prevent picking up things just dropped
+            if (GameManager.GameTime - loot.Birth < 3) continue; // Prevent picking up things just dropped
             // Pick up loot
-            if (PointTools.DistanceSquared(CameraManager.PlayerFoot, loot.Location + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
+            if (PointTools.DistanceSquared(CameraManager.PlayerFoot, loot.Position + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
             {
-                gameManager.UIManager.LootNotifications.AddNotification($"+{loot.DisplayName}");
-                (bool success, Item leftover) = Inventory.AddItem(new(loot.Item.Type, loot.Item.Amount));
-                if (success)
+                gameManager.OverlayManager.LootNotifications.AddNotification($"+{loot.DisplayName}");
+                Item adding = Item.Create(loot.Item.Type, loot.Item.Amount, loot.Item.CustomName);
+                Item leftover = Inventory.AddItem(adding);
+                if (leftover.Amount <= 0)
                 {
                     loot.Dispose();
                     gameManager.LevelManager.Level.Loot.Remove(loot);
@@ -165,7 +218,6 @@ public class PlayerManager
         DrawPlayer(gameManager);
         if (DebugManager.DrawHitboxes)
         {
-            DrawPlayerHitbox(gameManager);
             foreach (Attack attack in Attacks)
                 FillRectangle(gameManager.Batch, new(attack.Hitbox.Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, new Point((int)attack.Hitbox.Width, (int)attack.Hitbox.Height)), Constants.DebugPinkTint);
         }
@@ -187,37 +239,34 @@ public class PlayerManager
     public void DrawPlayer(GameManager gameManager)
     {
         // Get image source
-        int sourceRow = 0;
-        if (PlayerDirection == Direction.Forward) sourceRow = 0;
-        else if (PlayerDirection == Direction.Left) sourceRow = 1;
-        else if (PlayerDirection == Direction.Right) sourceRow = 3;
-        else if (PlayerDirection == Direction.Down) sourceRow = 2;
-        else if (PlayerDirection == Direction.Up) sourceRow = 4;
+        int sourceRow = (int)PlayerDirection;
         // Draw player
         Point pos = Constants.Middle - Constants.MageHalfSize + CameraManager.CameraOffset.ToPoint();
-        Rectangle source = GetAnimationSource(TextureID.BlueMage, gameManager.GameTime, duration: sourceRow == 0 ? .5f : .25f, row: sourceRow);
+        Rectangle source = GetAnimationSource(TextureID.BlueMage, GameManager.GameTime, duration: sourceRow == 0 ? .5f : .25f, row: sourceRow);
         DrawTexture(gameManager.Batch, TextureID.BlueMage, pos, scale: Constants.PlayerScale, source: source);
         // Draw equipped item
-        if (Inventory.Equipped != null)
+        if (EquippedItem != null)
         {
             bool left = PlayerDirection == Direction.Left;
-            var leftShift = left ? new(TextureManager.Metadata[Inventory.Equipped.Texture].Size.X * 2, 0) : Point.Zero;
+            var leftShift = left ? new(TextureManager.Metadata[EquippedItem.Texture].Size.X * 2, 0) : Point.Zero;
             Point itemPos = Constants.Middle + CameraManager.CameraOffset.ToPoint() - leftShift + Constants.MageItemShift.Scaled(left ? -1 : 1);
-            DrawTexture(gameManager.Batch, Inventory.Equipped.Texture, itemPos, scale: 2, effects: PlayerDirection == Direction.Left ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+            DrawTexture(gameManager.Batch, EquippedItem.Texture, itemPos, scale: 2, effects: PlayerDirection == Direction.Left ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
         }
+        // Hitbox
+        DebugManager.DrawHitbox(gameManager.Batch, this);
     }
-    public void DrawPlayerHitbox(GameManager gameManager)
+    public static RectangleF GetHitbox()
     {
         Point[] points = new Point[4];
         for (int c = 0; c < Constants.PlayerCorners.Length; c++)
-            points[c] = CameraManager.PlayerFoot + Constants.PlayerCorners[c] - CameraManager.Camera.ToPoint() + Constants.Middle;
-        FillRectangle(gameManager.Batch, new Rectangle(points[0].X, points[0].Y, points[1].X - points[0].X, points[2].Y - points[1].Y), Constants.DebugPinkTint);
+            points[c] = CameraManager.PlayerFoot + Constants.PlayerCorners[c];
+        return new RectangleF(points[0].X, points[0].Y, points[1].X - points[0].X, points[2].Y - points[1].Y);
     }
     public void Move(GameManager gameManager, Vector2 move)
     {
         // Move
         if (move == Vector2.Zero) return;
-        Vector2 finalMove = Vector2.Normalize(move) * gameManager.DeltaTime * Constants.PlayerSpeed;
+        Vector2 finalMove = Vector2.Normalize(move) * GameManager.DeltaTime * Constants.PlayerSpeed;
 
         // Stuck in block
         if (IsColliding(gameManager)) return;
@@ -237,6 +286,10 @@ public class PlayerManager
         UpdatePositions(gameManager);
         if (TileBelow == null) return;
         TileBelow.OnPlayerEnter(gameManager, this);
+
+        // Decal
+        if (gameManager.LevelManager.Level.Decals.TryGetValue(CameraManager.TileCoord.ToByteCoord(), out var dec))
+            dec.OnPlayerEnter(gameManager, this);
     }
     public bool IsColliding(GameManager gameManager)
     {
@@ -273,45 +326,69 @@ public class PlayerManager
             }
         }
     }
-    public void CommitContainerChanges(IContainer container)
-    {
-        if (container.Items == null) return;
-        for (int x = 0; x < ContainerInventory.Width; x++)
-            for (int y = 0; y < ContainerInventory.Height; y++)
-                container.Items[x, y] = ContainerInventory.Items[x, y];
-    }
     public void OpenInventory()
     {
-        Inventory.Opened = true;
+        InventoryOpen = true;
         StateManager.OverlayState = OverlayState.Container;
         SoundManager.PlaySound("Click");
     }
-
-    public void OpenContainer(IContainer container)
+    public void CloseInventory()
     {
-        if (container.Items == null) return;
-
-        Inventory.Opened = true;
-
-        OpenedContainer = container;
-        ContainerInventory.SetItems(container.Items);
-        ContainerInventory.Opened = true;
-
-        StateManager.OverlayState = OverlayState.Container;
-        SoundManager.PlaySound("Click");
-    }
-    public void CloseContainer()
-    {
-        if (Inventory.Opened)
-            SoundManager.PlaySound("Click");
-
-        if (OpenedContainer != null)
-            CommitContainerChanges(OpenedContainer);
-        OpenedContainer = null;
-        ContainerInventory.SetItems(null);
-        ContainerInventory.Opened = false;
-        Inventory.Opened = false;
+        InventoryOpen = false;
         StateManager.OverlayState = OverlayState.None;
+        SoundManager.PlaySound("Click");
+    }
+
+    public void OpenInterface(UserInterface ui)
+    {
+        CloseInterface();
+        InventoryOpen = true;
+
+        OpenedInterface = ui;
+        OpenedInterface.OnSlotClick += SlotClicked;
+        OpenedInterface.OnSlotDrop += SlotDropped;
+        OpenedInterface.OnSlotHover += SlotHovered;
+
+        StateManager.OverlayState = OverlayState.Container;
+        SoundManager.PlaySound("Click");
+    }
+    public void CloseInterface()
+    {
+        if (OpenedInterface == null) return;
+
+        OpenedInterface.OnSlotClick -= SlotClicked;
+        OpenedInterface.OnSlotDrop -= SlotDropped;
+        OpenedInterface.OnSlotHover -= SlotHovered;
+        OpenedInterface = null;
+    }
+    public void SlotClicked(int slot, UserInterface ui)
+    {
+        if (MouseSelection == null)
+        {
+            if (ui.BoundContainer?.Items[slot] == null) return;
+            MouseSelection = (ui, slot);
+        }
+        else if (MouseSelection.Value.ui.BoundContainer != null && ui.BoundContainer != null)
+        {
+            bool success = Container.MoveItemUI(MouseSelection.Value.ui, MouseSelection.Value.idx, ui, slot, split: InputManager.RMouseDown);
+            if (success)
+                MouseSelection = null;
+        }
+    }
+    public void SlotDropped(int slot, UserInterface ui)
+    {
+        if (ui.BoundContainer?.Items[slot] == null) return;
+        if (!InventoryOpen) return;
+        Item? item = ui.BoundContainer.Items[slot];
+        if (item == null) return;
+
+        Game.LevelManager.Level.Loot.Add(new Loot(new(item.Type, item.Amount, item.CustomName), CameraManager.PlayerFoot + new Point(0, 20), GameManager.GameTime));
+        ui.BoundContainer.SetSlot(slot, null);
+    }
+    public void SlotHovered(int slot, UserInterface ui)
+    {
+        Item? hovered = ui.BoundContainer?.Items[slot];
+        HoveredItem = hovered;
     }
     public void UpdatePositions(GameManager gameManager)
     {
@@ -319,10 +396,10 @@ public class PlayerManager
     }
     public void DamagePlayer(GameManager gameManager, int damage)
     {
-        gameManager.UIManager.HealthBar.CurrentValue -= damage;
-        if (gameManager.UIManager.HealthBar.CurrentValue <= 0)
+        gameManager.OverlayManager.HealthBar.CurrentValue -= damage;
+        if (gameManager.OverlayManager.HealthBar.CurrentValue <= 0)
         {
-            gameManager.UIManager.HealthBar.CurrentValue = 0;
+            gameManager.OverlayManager.HealthBar.CurrentValue = 0;
             StateManager.State = GameState.Death;
         }
     }

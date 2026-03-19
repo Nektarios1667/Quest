@@ -1,5 +1,6 @@
 ﻿using HarfBuzzSharp;
 using NCalc;
+using Quest.Interaction;
 using Quest.Quill.Functions;
 using SharpDX.Direct2D1;
 using System.Linq;
@@ -50,7 +51,7 @@ public class QuillInstance
             // Check sleeping
             if (IsSleeping)
             {
-                SleepTimer -= game.DeltaTime * 1000; // Convert to ms
+                SleepTimer -= GameManager.DeltaTime * 1000; // Convert to ms
                 if (IsSleeping)
                     return stepsUsed;
             }
@@ -121,8 +122,8 @@ public static partial class Interpreter
         ExternalSymbols["<playercoord_x>"] = CameraManager.TileCoord.X.ToString();
         ExternalSymbols["<playercoord_y>"] = CameraManager.TileCoord.Y.ToString();
         ExternalSymbols["<playercoord>"] = $"{CameraManager.TileCoord.X};{CameraManager.TileCoord.Y}";
-        ExternalSymbols["<playerhealth>"] = game.UIManager.HealthBar.CurrentValue.ToString();
-        ExternalSymbols["<playermaxhealth>"] = game.UIManager.HealthBar.MaxValue.ToString();
+        ExternalSymbols["<playerhealth>"] = game.OverlayManager.HealthBar.CurrentValue.ToString();
+        ExternalSymbols["<playermaxhealth>"] = game.OverlayManager.HealthBar.MaxValue.ToString();
         ExternalSymbols["<playerspeed>"] = Constants.PlayerSpeed.ToString();
         ExternalSymbols["<isstuck>"] = (!(player.TileBelow?.Type.IsWalkable ?? true)).ToString().ToLower();
         ExternalSymbols["<tilebelow>"] = player.TileBelow?.Type.Texture.ToString() ?? "NUL";
@@ -135,27 +136,27 @@ public static partial class Interpreter
         ExternalSymbols["<currentworld>"] = game.LevelManager.Level.World.WrapSingleQuotes();
         ExternalSymbols["<spawn>"] = game.LevelManager.Level.Spawn.CoordString();
         // Game
-        ExternalSymbols["<gametime>"] = game.GameTime.ToString();
+        ExternalSymbols["<gametime>"] = GameManager.GameTime.ToString();
         ExternalSymbols["<daytime>"] = game.DayTime.ToString();
-        ExternalSymbols["<totaltime>"] = game.TotalTime.ToString();
+        ExternalSymbols["<totaltime>"] = GameManager.GameTime.ToString();
         ExternalSymbols["<gamestate>"] = StateManager.State.ToString().WrapSingleQuotes();
         // Inventory
-        ExternalSymbols["<inventoryitems>"] = player.Inventory.GetItemsString().WrapSingleQuotes();
-        ExternalSymbols["<inventoryamounts>"] = player.Inventory.GetItemsAmountString().WrapSingleQuotes();
-        ExternalSymbols["<inventorysize_x>"] = player.Inventory.Width.ToString();
-        ExternalSymbols["<inventorysize_y>"] = player.Inventory.Height.ToString();
-        ExternalSymbols["<inventorysize>"] = $"{player.Inventory.Width};{player.Inventory.Height}";
-        ExternalSymbols["<isinventoryopen>"] = player.Inventory.Opened.ToString();
-        ExternalSymbols["<equippedslot>"] = player.Inventory.EquippedSlot.ToString();
-        ExternalSymbols["<equippeditem>"] = (player.Inventory.Equipped?.Name ?? "NUL").WrapSingleQuotes();
-        ExternalSymbols["<equippeditemuid>"] = player.Inventory.Equipped?.UID.ToString() ?? "-1";
-        ExternalSymbols["<equippeditemamount>"] = player.Inventory.Equipped?.Amount.ToString() ?? "0";
+        ExternalSymbols["<inventoryitems>"] = Utilities.ItemNamesQist(player.Inventory.Items, Chest.Size.X).WrapSingleQuotes();
+        ExternalSymbols["<inventoryamounts>"] = Utilities.ItemAmountsQist(player.Inventory.Items, Chest.Size.X).WrapSingleQuotes();
+        ExternalSymbols["<inventorysize_x>"] = Chest.Size.X.ToString();
+        ExternalSymbols["<inventorysize_y>"] = Chest.Size.Y.ToString();
+        ExternalSymbols["<inventorysize>"] = $"{Chest.Size.X};{Chest.Size.Y}";
+        ExternalSymbols["<isinventoryopen>"] = player.InventoryOpen.ToString();
+        ExternalSymbols["<equippedslot>"] = player.EquippedSlot.ToString();
+        ExternalSymbols["<equippeditem>"] = (player.EquippedItem?.Name ?? "NUL").WrapSingleQuotes();
+        ExternalSymbols["<equippeditemuid>"] = player.EquippedItem?.UID.ToString() ?? "-1";
+        ExternalSymbols["<equippeditemamount>"] = player.EquippedItem?.Amount.ToString() ?? "0";
         // Technical
         ExternalSymbols["<ready>"] = "true";
         ExternalSymbols["<time>"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
         ExternalSymbols["<datetime>"] = DateTime.Now.ToString("yyyy;MM;dd/HH;mm;ss");
-        ExternalSymbols["<fps>"] = (1f / game.DeltaTime).ToString();
-        ExternalSymbols["<deltatime>"] = game.DeltaTime.ToString();
+        ExternalSymbols["<fps>"] = (1f / GameManager.DeltaTime).ToString();
+        ExternalSymbols["<deltatime>"] = GameManager.DeltaTime.ToString();
         ExternalSymbols["<ispaused>"] = (StateManager.OverlayState == OverlayState.Pause).ToString();
         ExternalSymbols["<vsync>"] = Constants.VSYNC.ToString().ToLower();
         ExternalSymbols["<resolution_x>"] = Constants.ScreenResolution.X.ToString();
@@ -197,18 +198,25 @@ public static partial class Interpreter
                 args[i] = args[i].Replace("=" + kvp.Key, kvp.Value);
         }
     }
-    public static void EvaluateCurlyExpressions(string[] args)
+    public static void EvaluateCurlyExpressions(string[] args, QuillInstance instance)
     {
         for (int i = 0; i < args.Length; i++)
         {
             if (!(args[i].Contains('{') && args[i].Contains('}'))) continue;
             args[i] = CurlyExpressions().Replace(args[i], match =>
             {
-                string exprStr = match.Groups[1].Value.Trim();
-                Expression expr = new(exprStr);
-                var result = expr.Evaluate();
+                try
+                {
+                    string exprStr = match.Groups[1].Value.Trim();
+                    Expression expr = new(exprStr);
+                    var result = expr.Evaluate();
 
-                return result?.ToString()?.ToLower() ?? "";
+                    return result?.ToString()?.ToLower() ?? "";
+                } catch
+                {
+                    Logger.Error($"Quill | {instance.Script.Name} @{instance.L} | InvalidExpression - failed to parse '{match.Value}'");
+                    return match.Value;
+                }
             });
         }
     }
@@ -245,6 +253,7 @@ public static partial class Interpreter
         for (int s = Scripts.Count - 1; s >= 0 && budget > 0; s--)
         {
             var script = Scripts[s];
+            DebugManager.StartBenchmark($"QuillUpdate-{script.Script.Name.Split('.')[0]}");
 
             // Divy up budget
             int steps = stepsPerScript;
@@ -260,6 +269,8 @@ public static partial class Interpreter
             if (script.Done)
                 Scripts.RemoveAt(s);
             budget -= stepsUsed;
+
+            DebugManager.EndBenchmark($"QuillUpdate-{script.Script.Name.Split('.')[0]}");
         }
 
         DebugManager.EndBenchmark("QuillUpdate");
@@ -276,39 +287,40 @@ public static partial class Interpreter
         if (command.Operation == QuillOp.NoOp) return;
 
         // Fill variables and expressions
-        string[] args = [.. command.Args];
-
+        string[] args = command.Args;
         if (command.HasVariables)
         {
             ReplaceVariables(args, instance.Locals);
             ReplaceVariables(args, instance.Variables);
-            ReplaceVariables(args, ExternalSymbols);
         }
+        if (command.HasExternals)
+            ReplaceVariables(args, ExternalSymbols);
         if (command.HasCurlyExpressions)
-            EvaluateCurlyExpressions(args);
+            EvaluateCurlyExpressions(args, instance);
 
-        ExecuteCommand(command.Operation, args, instance);
+        ExecuteCommand(command.Operation, args, command.Label, instance);
     }
-    public static void ExecuteCommand(QuillOp op, string[] args, QuillInstance instance)
+    public static void ExecuteCommand(QuillOp op, string[] args, string? label, QuillInstance instance)
     {
         switch (op)
         {
-            case QuillOp.PerfMode: HandlePerfMode(instance, args); break;
-            case QuillOp.Num: HandleNum(instance, args); break;
-            case QuillOp.Str: HandleStr(instance, args); break;
-            case QuillOp.BreakWhile: HandleBreakWhile(instance, args); break;
-            case QuillOp.ContinueWhile: HandleContinueWhile(instance, args); break;
-            case QuillOp.If: HandleIf(instance, args); break;
+            case QuillOp.PerfMode: HandlePerfMode(instance, args, label); break;
+            case QuillOp.Meta: HandleMeta(instance, args, label); break;
+            case QuillOp.Num: HandleNum(instance, args, label); break;
+            case QuillOp.Str: HandleStr(instance, args, label); break;
+            case QuillOp.BreakWhile: HandleBreakWhile(instance, args, label); break;
+            case QuillOp.ContinueWhile: HandleContinueWhile(instance, args, label); break;
+            case QuillOp.If: HandleIf(instance, args, label); break;
             case QuillOp.EndIf: break;
-            case QuillOp.While: HandleWhile(instance, args); break;
-            case QuillOp.EndWhile: HandleEndWhile(instance, args); break;
-            case QuillOp.Func: HandleFunc(instance, args); break;
-            case QuillOp.EndFunc: HandleEndFunc(instance, args); break;
-            case QuillOp.Sleep: HandleSleep(instance, args); break;
-            case QuillOp.Wait: HandleWait(instance, args); break;
-            case QuillOp.Only: HandleOnly(instance, args); break;
+            case QuillOp.While: HandleWhile(instance, args, label); break;
+            case QuillOp.EndWhile: HandleEndWhile(instance, args, label); break;
+            case QuillOp.Func: HandleFunc(instance, args, label); break;
+            case QuillOp.EndFunc: HandleEndFunc(instance, args, label); break;
+            case QuillOp.Sleep: HandleSleep(instance, args, label); break;
+            case QuillOp.Wait: HandleWait(instance, args, label); break;
+            case QuillOp.Only: HandleOnly(instance, args, label); break;
             case QuillOp.EndOnly: break;
-            case QuillOp.Return: HandleReturn(instance, args); break;
+            case QuillOp.Return: HandleReturn(instance, args, label); break;
             case QuillOp.BuiltinFuncCall:
                 if (BuiltinFunctions.TryGetValue(args[0], out var builtinFunc))
                     HandleBuiltin(instance, builtinFunc, args);

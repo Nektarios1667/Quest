@@ -8,6 +8,7 @@ public class Door : Tile
     public bool ConsumeKey { get; set; }
     public bool IsOpened { get; private set; }
     public override bool IsWalkable => Type.IsWalkable || IsOpened;
+    public override float Weight => IsOpened ? 1 : float.MaxValue;
     public Door(Point location, ItemRef? key = null, bool consumeKey = true) : base(location, TileTypeID.Door)
     {
         Key = key;
@@ -26,10 +27,10 @@ public class Door : Tile
         {
             if (Key != null && ConsumeKey)
             {
-                player.Inventory.Consume(Key);
-                game.UIManager.Notification($"-{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
+                game.OverlayManager.Notification($"-{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
+                player.Inventory.Consume(Key, ignoreCheck: true);
             } else if (Key != null)
-                game.UIManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Gray, 2);
+                game.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Gray, 2);
 
             SoundManager.PlaySoundInstance("DoorUnlock");
             Open(game);
@@ -37,7 +38,7 @@ public class Door : Tile
         else
         {
             // Notif
-            game.UIManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)} needed to unlock", Color.Red, 5);
+            game.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)} needed to unlock", Color.Red, 5);
 
             // Sound fx
             string timerName = $"DoorLocked_{X + Y * Constants.MapSize.X}";

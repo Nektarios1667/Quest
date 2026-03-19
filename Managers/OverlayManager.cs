@@ -1,28 +1,20 @@
-﻿using Quest.Gui;
+﻿using Antlr.Runtime;
+using Quest.Gui;
+using LM = Quest.Managers.LightingManager;
 
 namespace Quest.Managers;
 
 public class OverlayManager
 {
-    public Gui.Gui Gui { get; private set; } // GUI handler
+    public Gui.Overlay Gui { get; private set; } // GUI handler
     public NotificationArea LootNotifications { get; private set; } // Loot pickup notifications
     public StatusBar HealthBar { get; private set; }
     public static readonly Point lootStackOffset = new(4, 4);
     private float deathTime = -1;
 
     private RenderTarget2D? minimap;
-
-    // Lighting
-    private FloodLightingGrid lightGrid = null!;
-    private bool[,] blocked = new bool[0, 0];
-    private Color[,] biomeColors = new Color[0, 0];
-    private Point luxelSize = Point.Zero;
-    private Point start;
-    public Point lastLuxel = Point.Zero;
-    private const int lightDivisions = 2;
-    private const float invLightDivisions = 1f / lightDivisions;
-    public bool UpdateLighting { private set; get; } = true;
-    public OverlayManager(LevelManager levelManager, PlayerManager? playerManager)
+    public bool UpdateLighting { get; set; } = true;
+    public OverlayManager(PlayerManager? playerManager)
     {
         Gui = new()
         {
@@ -34,27 +26,17 @@ public class OverlayManager
 
 
         // Trigger lighting updates
-        void CheckUpdateLighting(params Item?[] items)
-        {
-            foreach (var item in items)
-                if (item != null && (item is Light || item.IsLight))
-                {
-                    MarkUpdateLighting();
-                    return;
-                }
-        }
         if (playerManager != null)
         {
-            playerManager.Inventory.EquippedItemChanged += (oldItem, newItem) => CheckUpdateLighting(oldItem, newItem);
-            playerManager.Inventory.ItemDropped += (item) => CheckUpdateLighting(item);
-            playerManager.Inventory.ItemAdded += (item) => MarkUpdateLighting();
-
+            playerManager.EquippedSlotChanged += (_) => MarkUpdateLighting();
+            playerManager.InventoryUI.OnSlotDrop += (_, _) => MarkUpdateLighting();
+            playerManager.InventoryUI.OnSlotItemChange += (_, _) => MarkUpdateLighting();
         }
         TimerManager.SetTimer("LightingUpdate", 1f, MarkUpdateLighting, int.MaxValue);
         CameraManager.TileChange += (_, _) => MarkUpdateLighting();
         CameraManager.CameraMove += (_, newCam) =>
         {
-            if (newCam.ToPoint() / Constants.TileSize.Scaled(invLightDivisions) != lastLuxel)
+            if (newCam.ToPoint() / Constants.TileSize.Scaled(LM.InvLightDivisions) != LM.LastLuxel)
                 MarkUpdateLighting();
         };
     }
@@ -83,16 +65,42 @@ public class OverlayManager
         Gui.Draw(gameManager.Batch);
 
         // Minimap
-        if (StateManager.OverlayState == OverlayState.Container)
+        if (StateManager.OverlayState != OverlayState.None)
             DrawMiniMap(device, gameManager);
 
         // Inventories
-        DebugManager.StartBenchmark("InventoryGuiDraw");
         if (playerManager != null)
+            DrawUI(gameManager, playerManager);
+
+    }
+    public void DrawUI(GameManager gameManager, PlayerManager playerManager)
+    {
+        DebugManager.StartBenchmark("InventoryGuiDraw");
+        
+        // Draw interfaces
+        playerManager.OpenedInterface?.Draw();
+        playerManager.InventoryUI.Draw(playerManager.InventoryOpen ? null : "hotbar");
+
+        // Draw gui mouse item
+        if (playerManager.InventoryOpen && playerManager.MouseSelection != null)
         {
-            playerManager.ContainerInventory.Draw(gameManager, playerManager);
-            playerManager.Inventory.Draw(gameManager, playerManager);
+            Item? item = playerManager.MouseSelection.Value.ui.BoundContainer?.Items[playerManager.MouseSelection.Value.idx];
+            if (item != null)
+                DrawTexture(gameManager.Batch, item.Texture, InputManager.MousePosition - new Point(20, 20), scale: 2);
         }
+
+        // Draw hover label
+        if (playerManager.InventoryOpen && playerManager.HoveredItem != null)
+        {
+
+            string display = StringTools.FillCamelSpaces(playerManager.HoveredItem.Name);
+            Point textSize = PixelOperator.MeasureString(display).ToPoint();
+            Vector2 labelPos = InputManager.MousePosition.ToVector2() - new Vector2(0, 17);
+            FillRectangle(gameManager.Batch, labelPos.ToPoint() + new Point(4, -8), new Point(textSize.X + 4, 30), Color.Black * 0.7f);
+            gameManager.Batch.DrawRectangle(labelPos + new Vector2(2, -10), new Vector2(textSize.X + 8, 34), Color.Blue * 0.7f, 2);
+            gameManager.Batch.DrawString(PixelOperator, display, labelPos + new Vector2(8, -8), playerManager.HoveredItem.CustomName == null ? Color.White : Color.Cyan);
+        }
+
         DebugManager.EndBenchmark("InventoryGuiDraw");
     }
     public void DrawPostProcessing(GameManager gameManager, PlayerManager? playerManager)
@@ -102,21 +110,39 @@ public class OverlayManager
         // Hitboxes
         if (DebugManager.DrawHitboxes)
         {
-            gameManager.Batch.DrawPoint(Constants.Middle.ToVector2(), Constants.DebugPinkTint, 5);
-            gameManager.Batch.DrawPoint(Constants.Middle.ToVector2() - new Vector2(0, Constants.MageHalfSize.Y + 12), Constants.DebugPinkTint, 5);
-            gameManager.Batch.DrawPoint(Constants.Middle.ToVector2() + CameraManager.CameraOffset, Constants.DebugGreenTint, 5);
+            // 9 points on the screen
+            gameManager.Batch.DrawPoint(Vector2.Zero, Constants.DebugBlueTint, 10);
+            gameManager.Batch.DrawPoint(new(Constants.Middle.X, 0), Constants.DebugBlueTint, 10);
+            gameManager.Batch.DrawPoint(new(Constants.NativeResolution.X, 0), Constants.DebugBlueTint, 10);
+            gameManager.Batch.DrawPoint(new(0, Constants.Middle.Y), Constants.DebugBlueTint, 10);
+            gameManager.Batch.DrawPoint(Constants.Middle.ToVector2(), Constants.DebugBlueTint, 10);
+            gameManager.Batch.DrawPoint(new(Constants.NativeResolution.X, Constants.Middle.Y), Constants.DebugBlueTint, 10);
+            gameManager.Batch.DrawPoint(new(0, Constants.NativeResolution.Y), Constants.DebugBlueTint, 10);
+            gameManager.Batch.DrawPoint(new(Constants.Middle.X, Constants.NativeResolution.Y), Constants.DebugBlueTint, 10);
+            gameManager.Batch.DrawPoint(Constants.NativeResolution.ToVector2(), Constants.DebugBlueTint, 10);
         }
 
         // Guis
-        if (StateManager.OverlayState == OverlayState.Container || StateManager.OverlayState == OverlayState.Pause)
+        if (StateManager.OverlayState == OverlayState.Container || StateManager.OverlayState == OverlayState.Pause || StateManager.OverlayState == OverlayState.Typing)
             gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * 0.6f);
 
         // Death
         if (StateManager.State == GameState.Death)
         {
-            if (deathTime == -1) deathTime = gameManager.GameTime;
+            if (deathTime == -1) deathTime = GameManager.GameTime;
             gameManager.Batch.DrawString(PixelOperator, "YOU DIED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("You died!") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
             gameManager.Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
+        } else if (StateManager.OverlayState == OverlayState.Finished)
+        {
+            TimerManager.NewTimer("CompleteScreenFade", 2, null);
+            float fade = TimerManager.GetTimer("CompleteScreenFade").Progress * 0.5f;
+
+            gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * fade);
+            gameManager.Batch.DrawString(PixelOperator, "LEVEL FINISHED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("LEVEL FINISHED!") * 2, Color.White * fade, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
+            gameManager.Batch.DrawString(PixelOperator, "Press space to close", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to close") / 2 + new Vector2(0, 80), Color.White * fade);
+
+            if (InputManager.KeyPressed(Keys.Space))
+                StateManager.OverlayState = OverlayState.None;
         }
 
         DebugManager.EndBenchmark("PostProcessing");
@@ -129,101 +155,36 @@ public class OverlayManager
 
         DebugManager.StartBenchmark("Lighting");
         if (UpdateLighting)
-            RecalculateLighting(gameManager);
+            LightingManager.RecalculateLighting(gameManager);
         DebugManager.EndBenchmark("Lighting");
 
         DebugManager.StartBenchmark("DrawLighting");
         // Draw shadows
-        for (int y = 0; y < lightGrid.Height; y++)
+        for (int y = 0; y < LM.LightGrid.Height; y++)
         {
-            for (int x = 0; x < lightGrid.Width; x++)
+            for (int x = 0; x < LM.LightGrid.Width; x++)
             {
                 // Light
-                float light = lightGrid.Grid[x, y].LightLevel;
-                int intensityLookup = Math.Clamp((int)Math.Floor(light * 2), 0, LightingManager.LightScale * 2);
-                float intensity = LightingManager.LightToIntensityCache[intensityLookup];
+                float light = LM.LightGrid.Grid[x, y].LightLevel;
+                int intensityLookup = Math.Clamp((int)Math.Floor(light * LM.LightDivisions), 0, LM.LightMax * LM.LightDivisions);
+                float intensity = LM.LightToIntensityCache[intensityLookup];
 
                 // Skip full light
                 if (intensity >= 0.99f)
                     continue;
 
                 // Draw
-                Rectangle rect = new((new Point(x, y) + start.Scaled(lightDivisions)) * luxelSize + Constants.Middle - CameraManager.Camera.ToPoint(), luxelSize);
+                Rectangle rect = new((new Point(x, y) + LM.LightingStart.Scaled(LM.LightDivisions)) * LM.LuxelSize + Constants.Middle - CameraManager.Camera.ToPoint(), LM.LuxelSize);
                 gameManager.Batch.FillRectangle(rect, gameManager.LevelManager.SkyColor * (1 - intensity));
 
                 // Biome
-                gameManager.Batch.FillRectangle(rect, biomeColors[x / lightDivisions, y / lightDivisions] * (1 - intensity));
+                gameManager.Batch.FillRectangle(rect, LM.BiomeColors[x / LM.LightDivisions, y / LM.LightDivisions] * (1 - intensity));
             }
         }
 
         DebugManager.EndBenchmark("DrawLighting");
     }
-    public void RecalculateLighting(GameManager gameManager)
-    {
-        UpdateLighting = false;
 
-        // Precomputations
-        if (luxelSize.X == 0)
-            luxelSize = Constants.TileSize.Scaled(invLightDivisions);
-
-        // Flood fill lighting                                                          one tile buffer at top
-        start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize + PointTools.Up;
-        lastLuxel = CameraManager.Camera.ToPoint() / Constants.TileSize.Scaled(invLightDivisions);
-        Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
-        int tileWidth = end.X - start.X + 1;
-        int tileHeight = end.Y - start.Y + 3; // Extra row ontop and below for smoothness
-
-        int lightWidth = tileWidth * lightDivisions;
-        int lightHeight = tileHeight * lightDivisions;
-
-        // Blocked
-        if (blocked.GetLength(0) != lightWidth || blocked.GetLength(1) != lightHeight)
-            blocked = new bool[lightWidth, lightHeight];
-
-        // Set blocked luxels
-        for (int y = 0; y < tileHeight; y++)
-            for (int x = 0; x < tileWidth; x++)
-            {
-                Tile? tile = gameManager.LevelManager.GetTile(x + start.X, y + start.Y);
-                bool isBlocked = tile == null || (tile.IsWall && !tile.IsWalkable);
-                for (int dy = 0; dy < lightDivisions; dy++)
-                    for (int dx = 0; dx < lightDivisions; dx++)
-                        blocked[x * lightDivisions + dx, y * lightDivisions + dy] = isBlocked;
-            }
-
-        // Reset or make new grid
-        if (lightGrid == null || lightGrid.Width != lightWidth || lightGrid.Height != lightHeight)
-            lightGrid = new(lightWidth, lightHeight, blocked);
-        else
-            lightGrid.Reset(blocked: blocked);
-        // Set lights
-        foreach (var light in LightingManager.Lights.Values)
-        {
-            Point lightTile = ((light.Position + CameraManager.Camera.ToPoint() - Constants.Middle).ToVector2() / Constants.TileSize.ToVector2()).ToPoint() - start;
-            if (lightTile.X >= 0 && lightTile.Y >= 0 && lightTile.X < lightGrid.Width && lightTile.Y < lightGrid.Height)
-            {
-                // Set all luxels in the light tile area
-                for (int dy = 0; dy < lightDivisions; dy++)
-                    for (int dx = 0; dx < lightDivisions; dx++)
-                        lightGrid.SetLight(lightTile.Scaled(lightDivisions) + new Point(dx, dy), light.Size * lightDivisions / Constants.TileSize.X);
-            }
-        }
-        lightGrid.Run();
-
-        // Biome
-        if (biomeColors.GetLength(0) != tileWidth || biomeColors.GetLength(1) != tileHeight)
-            biomeColors = new Color[tileWidth, tileHeight];
-        float blend = StateManager.WeatherIntensity(gameManager.GameTime);
-        for (int y = 0; y < tileHeight; y++)
-        {
-            for (int x = 0; x < tileWidth; x++)
-            {
-                // Biome
-                Point worldLoc = (new Point(x, y) + start) * Constants.TileSize / Constants.TileSize;
-                biomeColors[x, y] = gameManager.LevelManager.GetWeatherColor(gameManager, worldLoc, blend);
-            }
-        }
-    }
     public void DrawMiniMap(GraphicsDevice device, GameManager gameManager)
     {
         DebugManager.StartBenchmark("DrawMinimap");
@@ -264,7 +225,7 @@ public class OverlayManager
 
         DebugManager.EndBenchmark("DrawMinimap");
     }
-    public void Notification(string text, Color? color = null, float duration = 4f)
+    public void Notification(string text, Color? color = null, float duration = 5f)
     {
         LootNotifications.AddNotification(text, color, duration);
     }

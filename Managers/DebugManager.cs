@@ -12,39 +12,45 @@ public static class DebugManager
     public static bool LogInfo { get; set; } = true;
     public static bool FrameBar { get; set; } = false;
     public static bool DrawHitboxes { get; set; } = false;
+    public static bool ProgramInfo { get; set; } = false;
 
     public static void Update()
     {
         // Debug
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.F1))
+        if (InputManager.BindPressed(InputAction.ToggleCollisionDebug))
         {
             CollisionDebug = !CollisionDebug;
             Logger.System($"CollisionDebug set to: {CollisionDebug}");
         }
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.F2))
+        if (InputManager.BindPressed(InputAction.ToggleTextInfo))
         {
             TextInfo = !TextInfo;
             Logger.System($"TextInfo set to: {TextInfo}");
         }
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.F3))
+        if (InputManager.BindPressed(InputAction.ToggleFrameInfo))
         {
             FrameInfo = !FrameInfo;
             Logger.System($"FrameInfo set to: {FrameInfo}");
         }
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.F4))
+        if (InputManager.BindPressed(InputAction.ToggleLogInfo))
         {
             LogInfo = !LogInfo;
             Logger.System($"LogInfo set to: {LogInfo}");
         }
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.F5))
+        if (InputManager.BindPressed(InputAction.ToggleFrameBar))
         {
             FrameBar = !FrameBar;
             Logger.System($"FrameBar set to: {FrameBar}");
         }
-        if (InputManager.Hotkey(Keys.LeftControl, Keys.F6))
+        if (InputManager.BindPressed(InputAction.ToggleHitboxes))
         {
             DrawHitboxes = !DrawHitboxes;
             Logger.System($"DrawHitboxes set to: {DrawHitboxes}");
+        }
+        if (InputManager.BindPressed(InputAction.ToggleProgramInfo))
+        {
+            ProgramInfo = !ProgramInfo;
+            Logger.System($"ProgramInfo set to: {ProgramInfo}");
         }
     }
     public static void StartBenchmark(string name)
@@ -60,5 +66,14 @@ public static class DebugManager
         }
         else
             Logger.Error($"Benchmark '{name}' not started.");
+    }
+    public static void DrawHitbox(SpriteBatch batch, IEntity entity)
+    {
+        if (!DrawHitboxes) return;
+
+        Vector2 screnPos = entity.Bounds.Position - CameraManager.Camera + Constants.Middle.ToVector2();
+        batch.DrawRectangle(screnPos, entity.Bounds.Size, Constants.DebugGreenTint, thickness: 2);
+        batch.DrawPoint(screnPos + entity.Bounds.Size.ToVector2() * 0.5f, Constants.DebugPinkTint, 3);
+        batch.DrawPoint(screnPos + entity.Bounds.Size.ToVector2() * new Vector2(0.5f, 1), Constants.DebugPinkTint, 3);
     }
 }

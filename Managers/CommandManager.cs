@@ -66,7 +66,7 @@ public static class CommandManager
         { "bool", value => bool.TryParse(value, out _) },
         { "coordinate", value => IsCoordinate(value) },
         { "modify", value => value == "set" || value == "change" },
-        { "item", value => Item.ItemFromName(value, 1).Amount != 0 },
+        { "item", value => ItemFromName(value, 1).Amount != 0 },
     };
     public static void Init(Game game, GameManager gameManager, LevelManager levelManager, PlayerManager playerManager)
     {
@@ -89,8 +89,9 @@ public static class CommandManager
             new("store * *", CStore, "Stored |2| to '|1|'", "Failed to store |2| to '|1|'"),
             new("gametime <modify> {-999999:999999}", CGameTime, "Game time |1| |2|", "Failed |1| gametime |2|"),
             new("macro *", CMacro, "Executed macro '|1|'.", "Failed to execute macro '|1|'."),
-            new("give <item> {1:255}", CGive, "Gave |2| |1| to player", "Failed to give |2| |1| to player"),
+            new("give <item> {1:255} *", CGive, "Gave |2| |1| (|3|) to player", "Failed to give |2| |1| (|3|) to player"),
             new("notif <int> <int> <int> <number> **", CNotif, "Notification |*| created.", "Failed to create notification |*|."),
+            new("enemy", CEnemy, "Spawned enemy.", "Failed to spawn enemy."),
         ];
     }
     public static (bool success, string output) Execute(string command)
@@ -105,18 +106,27 @@ public static class CommandManager
     public static (bool success, string output) OpenCommandPrompt()
     {
         string[]? result = null;
-        PopupFactory.ShowInputForm("Command", [new("Enter command")], false, values =>
+        (bool success, string[] values) = PopupFactory.ShowInputForm("Command", [new("Enter command")], false, values =>
         {
             string command = values[0].Trim();
-            var (success, output) = Execute(command);
+            var (commandSuccess, output) = Execute(command);
             if (output != "$noout")
-                PopupFactory.SetOutputLabel(output, success ? SysColor.Green : SysColor.Red);
+                PopupFactory.SetOutputLabel(output, commandSuccess ? SysColor.Green : SysColor.Red);
         });
 
         if (result == null)
             return (false, "No command entered.");
 
         return (true, result[0]);
+    }
+    // Helpers
+    private static Item ItemFromName(string name, int amount, string? customName = null)
+    {
+        if (!Enum.TryParse<ItemTypeID>(name, out var typeID))
+            throw new ArgumentException($"Item {name} does not exist");
+
+        ItemType type = ItemTypes.All[(byte)typeID];
+        return new(type, amount, customName);
     }
     // Custom type predicates
     static bool IsCoordinate(string val)
@@ -202,8 +212,8 @@ public static class CommandManager
     private static bool CHealth(string command)
     {
         string[] parts = command.Split(' ');
-        if (parts[1] == "set") { gameManager!.UIManager.HealthBar.CurrentValue = int.Parse(parts[2]); return true; }
-        if (parts[1] == "change") { gameManager!.UIManager.HealthBar.CurrentValue += int.Parse(parts[2]); return true; }
+        if (parts[1] == "set") { gameManager!.OverlayManager.HealthBar.CurrentValue = int.Parse(parts[2]); return true; }
+        if (parts[1] == "change") { gameManager!.OverlayManager.HealthBar.CurrentValue += int.Parse(parts[2]); return true; }
         return false;
     }
     private static bool CMoveSpeed(string command)
@@ -280,12 +290,12 @@ public static class CommandManager
         int daytime = int.Parse(parts[2]);
         if (parts[1] == "set")
         {
-            gameManager!.GameTime = daytime;
+            GameManager.GameTime = daytime;
             return true;
         }
         else if (parts[1] == "change")
         {
-            gameManager!.GameTime += daytime;
+            GameManager.GameTime += daytime;
             return true;
         }
         return false;
@@ -314,11 +324,11 @@ public static class CommandManager
         string[] parts = command.Split(' ');
         string itemName = parts[1];
         int quantity = int.Parse(parts[2]);
-        var item = Item.ItemFromName(itemName, quantity);
+        var item = ItemFromName(itemName, quantity, parts.Length > 3 ? parts[3] : null);
         if (item == null) return false;
-        (bool success, Item leftover) = playerManager!.Inventory.AddItem(item);
-        if (!success)
-            levelManager!.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), CameraManager.PlayerFoot, gameManager!.GameTime));
+        Item leftover = playerManager!.Inventory.AddItem(item);
+        if (leftover.Amount > 0)
+            levelManager!.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), CameraManager.PlayerFoot, GameManager.GameTime));
         return true;
     }
     private static bool CNotif(string command)
@@ -329,7 +339,12 @@ public static class CommandManager
         int b = int.Parse(parts[3]);
         decimal duration = decimal.Parse(parts[4]);
         string message = string.Join(' ', parts[5..]);
-        gameManager!.UIManager.LootNotifications.AddNotification(message, color:new(r, g, b), (float)duration);
+        gameManager!.OverlayManager.LootNotifications.AddNotification(message, color:new(r, g, b), (float)duration);
+        return true;
+    }
+    private static bool CEnemy(string command)
+    {
+        gameManager!.LevelManager.Level.Enemies.Add(new(CameraManager.PlayerFoot));
         return true;
     }
 }

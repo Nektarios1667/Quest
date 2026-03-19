@@ -11,7 +11,7 @@ public class Water : Tile
         Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
 
         // Draw tile
-        Color color = Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(gameManager.GameTime + X + Y));
+        Color color = Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(GameManager.GameTime + X + Y));
         DrawTexture(gameManager.Batch, TextureID.Water, dest, source: gameManager.LevelManager.TileTextureSource(this), color: color, scale: Constants.TileSizeScale);
     }
 }

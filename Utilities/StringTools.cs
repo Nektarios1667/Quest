@@ -29,9 +29,10 @@ public static class StringTools
     public static string FillCamelSpaces(string str)
     {
         string result = "";
-        foreach (char ch in str)
+        for (int c = 0; c < str.Length; c++)
         {
-            if (char.IsUpper(ch) && result.Length > 0)
+            char ch = str[c];
+            if (char.IsUpper(ch) && result.Length > 0 && (c == 0 || str[c - 1] != ' '))
                 result += " ";
             result += ch;
         }

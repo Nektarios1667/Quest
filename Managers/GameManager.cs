@@ -3,24 +3,31 @@
 namespace Quest.Managers;
 public class GameManager
 {
+    // Static times
+    public static float DeltaTime { get; private set; } = 0f;
+    public static float GameTime { get; set; } = 0f;
+    public static float TotalTime { get; private set; } = 0f;
+
     public LevelManager LevelManager { get; private set; }
-    public OverlayManager UIManager { get; private set; }
-    public float DeltaTime { get; private set; } = 0f;
-    public float GameTime { get; set; } = 0f;
-    public float TotalTime { get; private set; } = 0f;
+    public OverlayManager OverlayManager { get; private set; }
+    public MenuManager MenuManager { get; private set; }
     public float DayTime { get; set; } = 0f;
     public SpriteBatch Batch { get; private set; }
     public SpriteBatch MinimapBatch { get; private set; }
 
-    public GameManager(ContentManager content, SpriteBatch batch, LevelManager level, OverlayManager ui)
+    public GameManager(ContentManager content, SpriteBatch batch, LevelManager level, OverlayManager overlay)
     {
         Batch = batch;
         MinimapBatch = new SpriteBatch(batch.GraphicsDevice);
         LevelManager = level;
-        UIManager = ui;
+        OverlayManager = overlay;
 
         // Load sounds
         SoundManager.LoadSound(content, "Footstep", "Sounds/Effects/Footstep");
+        SoundManager.LoadSound(content, "Fire", "Sounds/Effects/Fire");
+        SoundManager.LoadSound(content, "Fire2", "Sounds/Effects/Fire2");
+        SoundManager.LoadSound(content, "Rain", "Sounds/Effects/Rain");
+        SoundManager.LoadSound(content, "Sandstorm", "Sounds/Effects/Sandstorm");
         SoundManager.LoadSound(content, "Trinkets", "Sounds/Effects/Trinkets");
         SoundManager.LoadSound(content, "Click", "Sounds/Effects/Click");
         SoundManager.LoadSound(content, "DoorLocked", "Sounds/Effects/DoorLocked");
@@ -30,18 +37,24 @@ public class GameManager
         SoundManager.LoadSound(content, "Whoosh", "Sounds/Effects/Whoosh");
         SoundManager.LoadSound(content, "Pickup", "Sounds/Effects/Pickup");
         SoundManager.LoadSound(content, "Swoosh", "Sounds/Effects/Swoosh");
+        SoundManager.LoadSound(content, "MetalScrape", "Sounds/Effects/MetalScrape");
+        SoundManager.LoadSound(content, "Scribble", "Sounds/Effects/Scribble");
     }
     public void Update(float deltaTime)
     {
         TotalTime += deltaTime;
 
-        // Pause
-        if (InputManager.KeyPressed(Keys.Escape) && StateManager.State == GameState.Game)
+        // Escape button
+        if (InputManager.BindPressed(InputAction.Back))
         {
-            if (StateManager.OverlayState == OverlayState.None)
-                StateManager.OverlayState = OverlayState.Pause;
-            else if (StateManager.OverlayState == OverlayState.Pause)
-                StateManager.OverlayState = OverlayState.None;
+            // Pause/unpause
+            if (StateManager.State == GameState.Game)
+            {
+                if (StateManager.OverlayState == OverlayState.None)
+                    StateManager.OverlayState = OverlayState.Pause;
+                else if (StateManager.OverlayState == OverlayState.Pause)
+                    StateManager.OverlayState = OverlayState.None;
+            }
         }
 
         // Time
@@ -62,7 +75,7 @@ public class GameManager
         LevelManager.ReadLevel(this, level, reload: true);
         LevelManager.LoadLevel(this, level);
 
-        UIManager.HealthBar.CurrentValue = UIManager.HealthBar.MaxValue;
+        OverlayManager.HealthBar.CurrentValue = OverlayManager.HealthBar.MaxValue;
         //PlayerManager.Inventory = new(6, 4);
 
         CameraManager.Camera = LevelManager.Level.Spawn.ToVector2();
