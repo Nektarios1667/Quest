@@ -23,13 +23,13 @@ public class Enemy : IEntity
     public RectangleF Bounds => new(Position, Size);
     public Point Size { get; set; }
     private List<Point>? Path { get; set; }
-    public Enemy(Point location)
+    public Enemy(Point pos)
     {
         Name = GetType().Name;
         Texture = TextureID.PurpleWizard; // DEBUG TODO remove this line when all enemies have textures
         UID = UIDManager.Get(UIDCategory.Enemies);
         Size = (TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap).Scaled(Scale);
-        Position = location.ToVector2();
+        Position = pos.ToVector2();
 
         // Stats
         Health = 100;
@@ -88,7 +88,7 @@ public class Enemy : IEntity
     public virtual void Draw(GameManager gameManager)
     {
         Rectangle source = GetAnimationSource(Texture, GameManager.GameTime, duration: 0.5f);
-        DrawTexture(gameManager.Batch, Texture, Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, source: source, scale: Constants.PlayerScale);
+        DrawTexture(gameManager.Batch, Texture, Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, source: source, scale: Scale);
         DebugManager.DrawHitbox(gameManager.Batch, this);
     }
     public virtual void Hurt(int damage)
