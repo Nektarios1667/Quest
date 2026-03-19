@@ -5,7 +5,8 @@ using System.Text;
 namespace Quest.Editor;
 public class LevelEditor : Game
 {
-    static readonly StringBuilder debugSb = new();
+    readonly StringBuilder debugSb = new();
+    readonly StringBuilder programDebugSb = new();
     // Devices and managers
     private readonly GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch = null!;
@@ -295,6 +296,10 @@ public class LevelEditor : Game
         if (DebugManager.TextInfo)
             editorManager.DrawTextInfo();
 
+        // Program info
+        if (DebugManager.ProgramInfo)
+            Quest.Window.DrawProgramInfo(programDebugSb, spriteBatch);
+
         // Frame info
         if (DebugManager.FrameInfo)
             editorManager.DrawFrameInfo();
@@ -307,7 +312,8 @@ public class LevelEditor : Game
         DebugManager.EndBenchmark("FrameBarDraw");
 
         // Minimap
-        editorManager.DrawMiniMap();
+        if (!DebugManager.ProgramInfo)
+            editorManager.DrawMiniMap();
 
         // Ghost tile
         if (currentTool == EditorTool.Tile)

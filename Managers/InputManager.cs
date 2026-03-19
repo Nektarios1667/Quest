@@ -148,7 +148,7 @@ public static class InputManager
 
         if (binds.TryGetValue(action, out var bind))
         {
-            if (bind.Key.HasValue && bind.Modifiers != null)
+            if (bind.Key.HasValue && bind.Modifiers != null && bind.Modifiers.Length > 0)
             {
                 if (bind.Modifiers.Length == 1)
                     return Hotkey(bind.Modifiers[0], bind.Key.Value, keystate.Value);
@@ -180,8 +180,8 @@ public static class InputManager
             _ => false
         };
     }
-    private static bool Hotkey(Keys modifier, Keys key, KeyboardState keystate) => keystate.IsKeyDown(modifier) && KeyPressed(key);
-    private static bool Hotkey(Keys modifier1, Keys modifier2, Keys key, KeyboardState keystate) => keystate.IsKeyDown(modifier1) && keystate.IsKeyDown(modifier2) && KeyPressed(key);
+    private static bool Hotkey(Keys modifier, Keys key, KeyboardState keystate) => keystate.IsKeyDown(modifier) && keystate.IsKeyDown(key);
+    private static bool Hotkey(Keys modifier1, Keys modifier2, Keys key, KeyboardState keystate) => keystate.IsKeyDown(modifier1) && keystate.IsKeyDown(modifier2) && keystate.IsKeyDown(key);
     public static bool LMouseClicked => MouseState.LeftButton == ButtonState.Pressed && LastMouseState.LeftButton == ButtonState.Released;
     public static bool RMouseClicked => MouseState.RightButton == ButtonState.Pressed && LastMouseState.RightButton == ButtonState.Released;
     public static bool MMouseClicked => MouseState.MiddleButton == ButtonState.Pressed && LastMouseState.MiddleButton == ButtonState.Released;

@@ -8,8 +8,8 @@ using System.Text;
 namespace Quest;
 public class Window : Game
 {
-    static readonly StringBuilder debugSb = new();
-    static readonly StringBuilder programDebugSb = new();
+    readonly StringBuilder debugSb = new();
+    readonly StringBuilder programDebugSb = new();
     // Devices and managers
     private readonly GraphicsDeviceManager graphics = null!;
     private SpriteBatch spriteBatch = null!;
@@ -188,7 +188,7 @@ public class Window : Game
 
         // Program info
         if (DebugManager.ProgramInfo)
-            DrawProgramInfo();
+            DrawProgramInfo(programDebugSb, spriteBatch);
 
         // Frame info
         if (DebugManager.FrameInfo)
@@ -231,7 +231,7 @@ public class Window : Game
 
         spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.NativeResolution.X - 190, 0), Color.White);
     }
-    public void DrawProgramInfo()
+    public static void DrawProgramInfo(StringBuilder programDebugSb, SpriteBatch spriteBatch)
     {
         if (TimerManager.IsCompleteOrMissing("UpdateProgramInfo"))
         {
