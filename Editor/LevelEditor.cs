@@ -1,11 +1,12 @@
 ﻿using MonoGUI;
+using Quest.Editor.Generator;
+using Quest.Editor.Managers;
 using System.Linq;
 using System.Text;
 
 namespace Quest.Editor;
 public class LevelEditor : Game
 {
-    readonly StringBuilder debugSb = new();
     readonly StringBuilder programDebugSb = new();
     // Devices and managers
     private readonly GraphicsDeviceManager graphics;
@@ -14,6 +15,8 @@ public class LevelEditor : Game
     private OverlayManager uiManager = null!;
     private LevelManager levelManager = null!;
     private EditorManager editorManager = null!;
+    private EditorLevelManager editorLevelManager = null!;
+    private EditorOverlayManager editorOverlayManager = null!;
     private GUI gui = null!;
     private Matrix scale = Matrix.CreateScale(Constants.ScreenScale.X, Constants.ScreenScale.Y, 1f);
 
@@ -81,7 +84,11 @@ public class LevelEditor : Game
         levelManager = new();
         uiManager = new(null);
         gameManager = new(Content, spriteBatch, levelManager, uiManager);
-        editorManager = new(GraphicsDevice, gameManager, levelManager, levelGenerator, spriteBatch, debugSb);
+        editorManager = new(gameManager);
+        editorLevelManager = new(gameManager, levelGenerator);
+        editorOverlayManager = new(gameManager, spriteBatch, GraphicsDevice);
+        TimerManager.SetTimer("UpdateMinimap", 2, editorOverlayManager.FlagRebuildMinimap, int.MaxValue);
+        
         StateManager.State = GameState.Editor;
         Logger.System("Initialized managers.");
 
@@ -89,7 +96,7 @@ public class LevelEditor : Game
         gui = new(this, spriteBatch, Arial);
         mouseMenu = new(gui, Point.Zero, new(100, 300), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         mouseMenu.AddItem("Pick", () => { TileSelection = mouseTile.Type.ID; Logger.Log($"Picked tile '{TileSelection}' @ {mouseCoord.X}, {mouseCoord.Y}."); }, []);
-        mouseMenu.AddItem("Open", editorManager.OpenLevelDialog, []);
+        mouseMenu.AddItem("Open", editorLevelManager.OpenLevelDialog, []);
         mouseMenu.AddItem("Fill", editorManager.FloodFill, []);
         mouseMenu.AddItem("Edit", editorManager.EditTile, []);
         mouseMenu.AddItem("Draw Biome", () => editorManager.ShowBiomeMarkers = !editorManager.ShowBiomeMarkers, []);
@@ -110,10 +117,10 @@ public class LevelEditor : Game
         mouseMenu.AddItem("Delete...", null, []);
         mouseMenu.AddSubMenu("Delete...", deleteMenu);
 
-        mouseMenu.AddItem("Save", editorManager.SaveLevelDialog, []);
+        mouseMenu.AddItem("Save", editorLevelManager.SaveLevelDialog, []);
         mouseMenu.AddItem("Spawn", editorManager.SetSpawn, []);
         mouseMenu.AddItem("Tint", editorManager.SetTint, []);
-        mouseMenu.AddItem("Generate", editorManager.GenerateLevel, []);
+        mouseMenu.AddItem("Generate", editorLevelManager.GenerateLevel, []);
         mouseMenu.AddItem("Exit", Exit, []);
         gui.AddWidget(mouseMenu);
 
@@ -132,7 +139,7 @@ public class LevelEditor : Game
         CursorArrow = Content.Load<Texture2D>("Images/Gui/CursorArrow");
 
         // Timer
-        TimerManager.NewTimer("FrameTimeUpdate", 1, editorManager.UpdateFrameTimes, int.MaxValue);
+        TimerManager.NewTimer("FrameTimeUpdate", 1, editorOverlayManager.UpdateFrameTimes, int.MaxValue);
 
         // Final
         Logger.System("Level editor finished initializing.");
@@ -225,7 +232,7 @@ public class LevelEditor : Game
         // Pick
         if (InputManager.MMouseClicked) PickTile();
         // Open file
-        if (InputManager.BindPressed(InputAction.OpenLevel)) editorManager.OpenLevelDialog();
+        if (InputManager.BindPressed(InputAction.OpenLevel)) editorLevelManager.OpenLevelDialog();
         // Fill
         if (InputManager.BindPressed(InputAction.FloodFill)) editorManager.FloodFill();
         // NPCs
@@ -238,16 +245,17 @@ public class LevelEditor : Game
         if (InputManager.BindPressed(InputAction.DeleteDecal)) { MouseSelect(); editorManager.DeleteDecal(); }
         if (InputManager.BindPressed(InputAction.NewDecal)) { MouseSelect(); editorManager.NewDecal(); }
         // Save
-        if (InputManager.BindPressed(InputAction.ExportLevel)) editorManager.SaveLevelDialog();
+        if (InputManager.BindPressed(InputAction.SaveLevelAs)) editorLevelManager.SaveLevelAs();
+        if (InputManager.BindPressed(InputAction.SaveLevel)) editorLevelManager.SaveLevelDialog();
         // Level info
         if (InputManager.BindPressed(InputAction.SetSpawn)) editorManager.SetSpawn();
         if (InputManager.BindPressed(InputAction.SetTint)) editorManager.SetTint();
         // Generate level
-        if (InputManager.BindPressed(InputAction.GenerateLevel)) editorManager.GenerateLevel();
+        if (InputManager.BindPressed(InputAction.GenerateLevel)) editorLevelManager.GenerateLevel();
         // Resave level
-        if (InputManager.BindPressed(InputAction.ResaveLevel)) editorManager.ResaveLevel(levelManager.Level.LevelPath);
+        if (InputManager.BindPressed(InputAction.ResaveLevel)) editorLevelManager.ResaveLevel(levelManager.Level.LevelPath);
         // Resave world
-        if (InputManager.BindPressed(InputAction.ResaveWorld)) editorManager.ResaveWorld(levelManager.Level.World);
+        if (InputManager.BindPressed(InputAction.ResaveWorld)) editorLevelManager.ResaveWorld(levelManager.Level.WorldName);
         // Tool select
         if (InputManager.BindPressed(InputAction.SelectTileTool)) currentTool = EditorTool.Tile;
         if (InputManager.BindPressed(InputAction.SelectDecalTool)) currentTool = EditorTool.Decal;
@@ -255,6 +263,8 @@ public class LevelEditor : Game
         // Script
         if (InputManager.BindPressed(InputAction.DeleteScript)) editorManager.DeleteScript();
         if (InputManager.BindPressed(InputAction.NewScript)) editorManager.NewScript();
+        // New Level
+        if (InputManager.BindPressed(InputAction.NewLevel)) editorLevelManager.NewLevel();
 
         // Managers
         if (!PopupFactory.PopupOpen) InputManager.Update(this);
@@ -268,6 +278,7 @@ public class LevelEditor : Game
         gameManager.Update(delta);
         levelManager.Update(gameManager);
         uiManager.Update(gameManager);
+        editorOverlayManager.Update();
 
         // Final
         base.Update(gameTime);
@@ -288,13 +299,13 @@ public class LevelEditor : Game
         // Render biome markers
         DebugManager.StartBenchmark("DrawBiomes");
         if (editorManager.ShowBiomeMarkers)
-            editorManager.DrawBiomes();
+            editorOverlayManager.DrawBiomes();
         DebugManager.EndBenchmark("DrawBiomes");
 
         // Text info
         DebugManager.StartBenchmark("DebugTextDraw");
         if (DebugManager.TextInfo)
-            editorManager.DrawTextInfo();
+            editorOverlayManager.DrawTextInfo();
 
         // Program info
         if (DebugManager.ProgramInfo)
@@ -302,18 +313,18 @@ public class LevelEditor : Game
 
         // Frame info
         if (DebugManager.FrameInfo)
-            editorManager.DrawFrameInfo();
+            editorOverlayManager.DrawFrameInfo();
         DebugManager.EndBenchmark("DebugTextDraw");
 
         // Frame bar
         DebugManager.StartBenchmark("FrameBarDraw");
         if (DebugManager.FrameBar)
-            editorManager.DrawFrameBar();
+            editorOverlayManager.DrawFrameBar();
         DebugManager.EndBenchmark("FrameBarDraw");
 
         // Minimap
         if (!DebugManager.ProgramInfo)
-            editorManager.DrawMiniMap();
+            editorOverlayManager.DrawMiniMap();
 
         // Ghost tile
         if (currentTool == EditorTool.Tile)

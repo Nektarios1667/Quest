@@ -122,7 +122,7 @@ public class MenuManager
     {
         StateManager.OverlayState = OverlayState.None;
         StateManager.State = GameState.MainMenu;
-        gameManager.LevelManager.UnloadWorld(gameManager.LevelManager.Level.World);
+        gameManager.LevelManager.UnloadWorld(gameManager.LevelManager.Level.WorldName);
     }
     public bool ContinueSave()
     {

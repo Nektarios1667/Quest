@@ -163,14 +163,14 @@ public static class StateManager
     public static void SaveGameState(GameManager gameManager, PlayerManager playerManager)
     {
         WriteKeyValueFile("continue", new() { { "save", CurrentSave.ToString() } });
-        string worldName = gameManager.LevelManager.Level.World;
+        string worldName = gameManager.LevelManager.Level.WorldName;
         byte[] data;
 
         using (var ms = new MemoryStream())
         using (var writer = new BinaryWriter(ms))
         {
             // Write GameManager data
-            writer.Write(gameManager.LevelManager.Level.Name);
+            writer.Write(gameManager.LevelManager.Level.Path);
             writer.Write(gameManager.DayTime);
             writer.Write(GameManager.GameTime);
             writer.Write(WeatherSeed);
@@ -186,7 +186,7 @@ public static class StateManager
             string[] levels = new[] {
                 chests.Keys,
                 openedDoors.Keys,
-                gameManager.LevelManager.Levels.Where(l => l.World == worldName && l.Loot.Count > 0).Select(l => l.LevelName)
+                gameManager.LevelManager.Levels.Where(l => l.WorldName == worldName && l.Loot.Count > 0).Select(l => l.LevelName)
             }.SelectMany(x => x).Distinct().Take(255).ToArray();
 
             writer.Write((byte)levels.Length);

@@ -17,8 +17,8 @@ public class Level
     public Dictionary<ByteCoord, Decal> Decals { get; private set; }
     public List<NPC> NPCs { get; private set; }
     public LevelPath LevelPath { get; private set; }
-    public string Name => LevelPath.Path;
-    public string World => LevelPath.WorldName;
+    public string Path => LevelPath.Path;
+    public string WorldName => LevelPath.WorldName;
     public string LevelName => LevelPath.LevelName;
     public List<Loot> Loot { get; private set; }
     public Tile[] Tiles { get; private set; }
@@ -47,4 +47,5 @@ public class Level
             Quill.Interpreter.RunScript(script);
         }
     }
+    public void Rename(LevelPath path) => LevelPath = path;
 }

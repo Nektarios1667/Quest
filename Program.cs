@@ -12,6 +12,7 @@ global using System;
 global using System.Collections.Generic;
 global using static Quest.Managers.TextureManager;
 using Quest.Editor;
+using Quest.Editor.Generator;
 using System.Linq;
 
 static class Program

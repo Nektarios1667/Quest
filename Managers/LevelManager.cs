@@ -167,7 +167,7 @@ public class LevelManager
     public Level GetLevel(string name)
     {
         foreach (Level level in Levels)
-            if (level.Name == name)
+            if (level.Path == name)
                 return level;
         Logger.Error($"Level '{name}' not found in stored levels.");
         return new("", [], [], new Point(128, 128), [], [], [], [], []);
@@ -199,7 +199,7 @@ public class LevelManager
         Interpreter.ClearScripts();
 
         // Run
-        LevelLoaded?.Invoke(Level.Name);
+        LevelLoaded?.Invoke(Level.Path);
         Level.RunScripts();
 
         // Spawn
@@ -214,7 +214,7 @@ public class LevelManager
         name = name.Replace('\\', '/');
         for (int l = 0; l < Levels.Count; l++)
         {
-            if (Levels[l].Name == name)
+            if (Levels[l].Path == name)
             {
                 LoadLevel(gameManager, l);
                 return true;
@@ -242,7 +242,7 @@ public class LevelManager
         // Spawn
         CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
         CameraManager.Camera = CameraManager.CameraDest;
-        Logger.System($"Loaded level '{level.Name}'.");
+        Logger.System($"Loaded level '{level.Path}'.");
         return true;
     }
     public bool UnloadLevel(int levelIndex)
@@ -254,7 +254,7 @@ public class LevelManager
             return false;
         }
 
-        string name = Levels[levelIndex].Name;
+        string name = Levels[levelIndex].Path;
         if (Level == Levels[levelIndex]) Level = EmptyLevel;
 
         // Dispose
@@ -275,7 +275,7 @@ public class LevelManager
         levelName = levelName.Replace('\\', '/');
         for (int l = 0; l < Levels.Count; l++)
         {
-            if (Levels[l].Name != levelName) continue;
+            if (Levels[l].Path != levelName) continue;
             UnloadLevel(l);
             return true;
         }
@@ -310,7 +310,7 @@ public class LevelManager
     public bool UnloadWorld(string folder)
     {
         for (int l = Levels.Count - 1; l >= 0; l--)
-            if (Levels[l].World == folder)
+            if (Levels[l].WorldName == folder)
                 UnloadLevel(l);
         return true;
     }
@@ -331,7 +331,7 @@ public class LevelManager
         if (!File.Exists(path)) return Error($"Level file '{filename}' does not exist.");
 
         // Check if already read
-        if (!reload && Levels.Any(l => l.Name == filename)) return true;
+        if (!reload && Levels.Any(l => l.Path == filename)) return true;
 
         // Make buffers
         int totalTiles = Constants.MapSize.X * Constants.MapSize.Y;
@@ -408,7 +408,7 @@ public class LevelManager
 
             // Make and add the level
             Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, [], scriptBuffer, tint);
-            if (reload) Levels.RemoveAll(l => l.Name == filename);
+            if (reload) Levels.RemoveAll(l => l.Path == filename);
             Levels.Add(created);
             sw.Stop();
             Logger.System($"Successfully read level '{filename}' in {sw.ElapsedMilliseconds:F2}s.");

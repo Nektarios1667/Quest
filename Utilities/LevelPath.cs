@@ -9,8 +9,8 @@ public struct LevelPath
         var parts = path.Split('\\', '/');
         if (parts.Length != 2)
         {
-            WorldName = "NUL_WORLD";
-            LevelName = "NUL_LEVEL";
+            WorldName = "NUL";
+            LevelName = "NUL";
             return;
         }
         WorldName = parts[0];
@@ -21,6 +21,6 @@ public struct LevelPath
         WorldName = worldName;
         LevelName = levelName;
     }
-    public readonly bool IsNull() => WorldName == "NUL_WORLD" && LevelName == "NUL_LEVEL";
+    public readonly bool IsNull() => WorldName == "NUL" || LevelName == "NUL";
     public override readonly string ToString() => $"{WorldName}/{LevelName}";
 }

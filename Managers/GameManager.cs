@@ -71,7 +71,7 @@ public class GameManager
     }
     public void Respawn()
     {
-        string level = LevelManager.Level.Name;
+        string level = LevelManager.Level.Path;
         LevelManager.ReadLevel(this, level, reload: true);
         LevelManager.LoadLevel(this, level);
 

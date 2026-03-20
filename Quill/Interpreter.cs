@@ -131,9 +131,9 @@ public static partial class Interpreter
         ExternalSymbols["<camera_y>"] = CameraManager.Camera.Y.ToString();
         ExternalSymbols["<camera>"] = $"{CameraManager.Camera.X};{CameraManager.Camera.Y}";
         // Level
-        ExternalSymbols["<currentlevel>"] = game.LevelManager.Level.Name.WrapSingleQuotes();
+        ExternalSymbols["<currentlevel>"] = game.LevelManager.Level.Path.WrapSingleQuotes();
         ExternalSymbols["<currentlevelname>"] = game.LevelManager.Level.LevelName.WrapSingleQuotes();
-        ExternalSymbols["<currentworld>"] = game.LevelManager.Level.World.WrapSingleQuotes();
+        ExternalSymbols["<currentworld>"] = game.LevelManager.Level.WorldName.WrapSingleQuotes();
         ExternalSymbols["<spawn>"] = game.LevelManager.Level.Spawn.CoordString();
         // Game
         ExternalSymbols["<gametime>"] = GameManager.GameTime.ToString();

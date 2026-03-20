@@ -3,7 +3,7 @@ using ScottPlot.TickGenerators;
 using System.IO;
 using System.Linq;
 
-namespace Quest.Editor;
+namespace Quest.Editor.Generator;
 public static class CodeGenerator
 {
     private const string tileCodeTemplate = "namespace Quest.Tiles;\r\n\r\npublic class $name : Tile\r\n{\r\n    public $name(Point location) : base(location, TileTypeID.$name) { }\r\n}\r\n";

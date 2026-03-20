@@ -281,7 +281,7 @@ public class Window : Game
         debugSb.Append("\nCoord: ");
         debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.TileCoord.X, CameraManager.TileCoord.Y);
         debugSb.Append("\nLevel: ");
-        debugSb.Append(levelManager.Level?.Name);
+        debugSb.Append(levelManager.Level?.Path);
         debugSb.Append("\nInventory: ");
         debugSb.Append(playerManager.InventoryOpen);
         debugSb.Append("\nGUI: ");

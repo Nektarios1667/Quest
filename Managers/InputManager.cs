@@ -39,7 +39,8 @@ public enum InputAction
     DeleteLoot,
     NewDecal,
     DeleteDecal,
-    ExportLevel,
+    SaveLevel,
+    SaveLevelAs,
     SetSpawn,
     SetTint,
     GenerateLevel,
@@ -53,6 +54,7 @@ public enum InputAction
     CycleToolNext,
     CycleToolPrevious,
     FloodFill,
+    NewLevel,
 }
 public struct InputBinding(Keys? key = null, Keys[]? modifiers = null, MouseButton? mouse = null)
 {
@@ -84,9 +86,9 @@ public static class InputManager
         { InputAction.Hotbar4,              new(Keys.D4) },
         { InputAction.Hotbar5,              new(Keys.D5) },
         { InputAction.Hotbar6,              new(Keys.D6) },
-        { InputAction.DropItem,                 new(Keys.D) },
+        { InputAction.DropItem,             new(Keys.D) },
         { InputAction.Back,                 new(Keys.Escape) },
-        { InputAction.Quit,                 new(Keys.Escape, [Keys.LeftControl]) },
+        { InputAction.Quit,                 new(Keys.Escape, [Keys.LeftAlt]) },
         { InputAction.ToggleCollisionDebug, new(Keys.F1, [Keys.LeftControl]) },
         { InputAction.ToggleTextInfo,       new(Keys.F2, [Keys.LeftControl]) },
         { InputAction.ToggleFrameInfo,      new(Keys.F3, [Keys.LeftControl]) },
@@ -100,14 +102,15 @@ public static class InputManager
         { InputAction.FastMove,             new(Keys.LeftAlt) },
         { InputAction.EditTile,             new(Keys.M, [Keys.LeftControl]) },
         { InputAction.OpenLevel,            new(Keys.O, [Keys.LeftControl]) },
-        { InputAction.NewNPC,               new(Keys.N, [Keys.LeftControl]) },
-        { InputAction.DeleteNPC,            new(Keys.N, [Keys.LeftControl, Keys.LeftShift]) },
+        { InputAction.NewNPC,               new(Keys.C, [Keys.LeftControl]) },
+        { InputAction.DeleteNPC,            new(Keys.C, [Keys.LeftControl, Keys.LeftShift]) },
         { InputAction.NewLoot,              new(Keys.L, [Keys.LeftControl]) },
         { InputAction.DeleteLoot,           new(Keys.L, [Keys.LeftControl, Keys.LeftShift]) },
         { InputAction.NewDecal,             new(Keys.D, [Keys.LeftControl]) },
         { InputAction.DeleteDecal,          new(Keys.D, [Keys.LeftControl, Keys.LeftShift]) },
-        { InputAction.ExportLevel,          new(Keys.E, [Keys.LeftControl]) },
-        { InputAction.SetSpawn,             new(Keys.S, [Keys.LeftControl]) },
+        { InputAction.SaveLevel,            new(Keys.S, [Keys.LeftControl]) },
+        { InputAction.SaveLevelAs,          new(Keys.S, [Keys.LeftControl, Keys.LeftShift]) },
+        { InputAction.SetSpawn,             new(Keys.W, [Keys.LeftControl]) },
         { InputAction.SetTint,              new(Keys.T, [Keys.LeftControl]) },
         { InputAction.GenerateLevel,        new(Keys.G, [Keys.LeftControl]) },
         { InputAction.ResaveLevel,          new(Keys.R, [Keys.LeftControl]) },
@@ -120,6 +123,7 @@ public static class InputManager
         { InputAction.CycleToolNext,        new(Keys.OemCloseBrackets) },
         { InputAction.CycleToolPrevious,    new(Keys.OemOpenBrackets) },
         { InputAction.FloodFill,            new(Keys.F) },
+        { InputAction.NewLevel,             new(Keys.N, [Keys.LeftControl]) },
     };
 
     // Devices
