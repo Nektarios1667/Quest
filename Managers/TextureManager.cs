@@ -175,6 +175,7 @@ public static class TextureManager
         DarkTint,
         Finish,
         Checkpoint,
+        Glass,
         // DECALS ENUM INSERT
         Glow,
         Slash,
@@ -364,6 +365,7 @@ public static class TextureManager
         Textures[TextureID.DarkTint] = content.Load<Texture2D>("Images/Decals/DarkTint");
         Textures[TextureID.Finish] = content.Load<Texture2D>("Images/Decals/Finish");
         Textures[TextureID.Checkpoint] = content.Load<Texture2D>("Images/Decals/Checkpoint");
+        Textures[TextureID.Glass] = content.Load<Texture2D>("Images/Decals/Glass");
         // DECALS INSERT
         Textures[TextureID.Glow] = content.Load<Texture2D>("Images/Effects/Glow");
         Textures[TextureID.Slash] = content.Load<Texture2D>("Images/Effects/Slash");
@@ -541,6 +543,7 @@ public static class TextureManager
         Metadata[TextureID.DarkTint] = new(Textures[TextureID.DarkTint].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.Finish] = new(Textures[TextureID.Finish].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.Checkpoint] = new(Textures[TextureID.Checkpoint].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Glass] = new(Textures[TextureID.Glass].Bounds.Size, new(1, 1), "decal");
         // DECALS METADATA INSERT
         Metadata[TextureID.Glow] = new(Textures[TextureID.Glow].Bounds.Size, new(1, 1), "effect");
         Metadata[TextureID.Slash] = new(Textures[TextureID.Slash].Bounds.Size, new(1, 1), "effect");

@@ -424,6 +424,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Decals/Footprint.png
 
+#begin Images/Decals/Glass.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Decals/Glass.png
+
 #begin Images/Decals/LightTint.png
 /importer:TextureImporter
 /processor:TextureProcessor

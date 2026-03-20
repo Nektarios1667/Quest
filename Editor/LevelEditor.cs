@@ -229,14 +229,14 @@ public class LevelEditor : Game
         // Fill
         if (InputManager.BindPressed(InputAction.FloodFill)) editorManager.FloodFill();
         // NPCs
-        if (InputManager.BindPressed(InputAction.NewNPC)) { MouseSelect(); editorManager.NewNPC(); }
         if (InputManager.BindPressed(InputAction.DeleteNPC)) { MouseSelect(); editorManager.DeleteNPC(); }
+        if (InputManager.BindPressed(InputAction.NewNPC)) { MouseSelect(); editorManager.NewNPC(); }
         // Loot
-        if (InputManager.BindPressed(InputAction.NewLoot)) { MouseSelect(); editorManager.NewLoot(); }
         if (InputManager.BindPressed(InputAction.DeleteLoot)) { MouseSelect(); editorManager.DeleteLoot(); }
+        if (InputManager.BindPressed(InputAction.NewLoot)) { MouseSelect(); editorManager.NewLoot(); }
         // Decals
-        if (InputManager.BindPressed(InputAction.NewDecal)) { MouseSelect(); editorManager.NewDecal(); }
         if (InputManager.BindPressed(InputAction.DeleteDecal)) { MouseSelect(); editorManager.DeleteDecal(); }
+        if (InputManager.BindPressed(InputAction.NewDecal)) { MouseSelect(); editorManager.NewDecal(); }
         // Save
         if (InputManager.BindPressed(InputAction.ExportLevel)) editorManager.SaveLevelDialog();
         // Level info
@@ -253,8 +253,8 @@ public class LevelEditor : Game
         if (InputManager.BindPressed(InputAction.SelectDecalTool)) currentTool = EditorTool.Decal;
         if (InputManager.BindPressed(InputAction.SelectBiomeTool)) currentTool = EditorTool.Biome;
         // Script
-        if (InputManager.BindPressed(InputAction.NewScript)) editorManager.NewScript();
         if (InputManager.BindPressed(InputAction.DeleteScript)) editorManager.DeleteScript();
+        if (InputManager.BindPressed(InputAction.NewScript)) editorManager.NewScript();
 
         // Managers
         if (!PopupFactory.PopupOpen) InputManager.Update(this);

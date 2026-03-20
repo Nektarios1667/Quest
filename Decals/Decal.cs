@@ -30,6 +30,7 @@ public enum DecalType : byte
     DarkTint,
     Finish,
     Checkpoint,
+    Glass,
     // DECALS
 }
 public class Decal
