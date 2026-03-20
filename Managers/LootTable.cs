@@ -38,23 +38,23 @@ public class LootPreset : ILootGenerator
     public static LootPreset ReadLootPreset(string world, string file)
     {
         // Check
-        file = $"GameData/Worlds/{world}/loot/{file}";
+        string path = $"GameData/Worlds/{world}/loot/{file}";
         if (!file.EndsWith(".qlp"))
         {
             if (file != "" && file != "_") // Check discard
                 Logger.Error($"Failed to read preset '{file}'. Expected .qlp file.");
             return EmptyPreset;
         }
-        if (!File.Exists(file))
+        if (!File.Exists(path))
         {
             if (file != "" && file != "_") // Check discard
-                Logger.Error($"File {file} not found.");
+                Logger.Error($"File {path} not found.");
             return EmptyPreset;
         }
 
         // Read
         Item?[,] items;
-        using (FileStream stream = File.Open(file, FileMode.Open))
+        using (FileStream stream = File.Open(path, FileMode.Open))
         using (BinaryReader reader = new(stream))
         {
             // Header
@@ -131,23 +131,23 @@ public class LootTable : ILootGenerator
     public static LootTable ReadLootTable(string world, string file)
     {
         // Check
-        file = $"GameData/Worlds/{world}/loot/{file}";
+        string path = $"GameData/Worlds/{world}/loot/{file}";
         if (!file.EndsWith(".qlt"))
         {
             if (file != "" && file != "_") // Check discard
                 Logger.Error($"Failed to read preset '{file}'. Expected .qlt file.");
             return new([], "");
         }
-        if (!File.Exists(file))
+        if (!File.Exists(path))
         {
             if (file != "" && file != "_") // Check discard
-                Logger.Error($"File {file} not found.");
+                Logger.Error($"File {path} not found.");
             return new([], "");
         }
 
         // Read
-        List<LootTableEntry> entries = new();
-        using (FileStream stream = File.Open(file, FileMode.Open))
+        List<LootTableEntry> entries = [];
+        using (FileStream stream = File.Open(path, FileMode.Open))
         using (BinaryReader reader = new(stream))
         {
             // Header

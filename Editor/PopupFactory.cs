@@ -50,6 +50,7 @@ public static class PopupFactory
                 combo.Items.AddRange(field.DropdownOptions!);
                 if (combo.Items.Count > 0)
                     combo.SelectedIndex = 0;
+                combo.SelectedIndex = combo.Items.IndexOf(field.Placeholder);
                 inputControl = combo;
             }
             // Input textbox

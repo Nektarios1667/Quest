@@ -1,5 +1,6 @@
 ﻿using Quest.Editor.Generator;
 using Quest.Managers;
+using Quest.Tiles;
 using Quest.Utilities;
 using SharpDX.Direct3D9;
 using System.Diagnostics;
@@ -59,7 +60,10 @@ public class EditorManager
         // Stair
         if (tile is Stairs stairs)
         {
-            var (success, values) = ShowInputForm("Stair Editor", [new("Level", null), new("Spawn X", IsByte), new("Spawn Y", IsByte)]);
+            var (success, values) = ShowInputForm("Stair Editor", [
+                new("Level", null, placeholder: stairs.DestLevel),
+                new("Spawn X", IsByte, placeholder: stairs.Dest.X.ToString()),
+                new("Spawn Y", IsByte, placeholder: stairs.Dest.Y.ToString())]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Stair edit failed.");
@@ -78,7 +82,10 @@ public class EditorManager
         // Door
         else if (tile is Door door)
         {
-            var (success, values) = ShowInputForm("Door Editor", [new("Key", null, ItemsOptionsWNone), new("Amount", IsByte), new("Consume Key", null, ["true", "false"])]);
+            var (success, values) = ShowInputForm("Door Editor", [
+                new("Key", null, ItemsOptionsWNone, door.Key == null ? "NONE" : door.Key.Name.ToString()),
+                new("Amount", IsByte, placeholder: door.Key == null ? "0" : door.Key.Amount.ToString()),
+                new("Consume Key", null, ["True", "False"], door.ConsumeKey.ToString())]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Stair edit failed.");
@@ -92,7 +99,12 @@ public class EditorManager
         // Chest
         else if (tile is Chest chest)
         {
-            var (success, values) = ShowInputForm("Chest Editor", [new("Loot File Name", null), new("Loot Type", null, ["Loot Preset", "Loot Table"]), new("Key", null, ItemsOptionsWNone), new("Amount", IsByte), new("Consume Key", null, ["true", "false"])]);
+            var (success, values) = ShowInputForm("Chest Editor", [
+                new("Loot File Name", null, placeholder: chest.LootGenerator.FileName.Split('.')[0]),
+                new("Loot Type", null, ["Loot Preset", "Loot Table"], chest.LootGenerator.FileName.Split('.')[1] == "qlt" ? "Loot Table" : "Loot Preset"),
+                new("Key", null, ItemsOptionsWNone, chest.Key == null ? "NONE" : chest.Key.Name.ToString()),
+                new("Amount", IsByte, placeholder: chest.Key == null ? "0" : chest.Key.Amount.ToString()),
+                new("Consume Key", null, ["True", "False"], chest.ConsumeKey.ToString())]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Chest edit failed.");
@@ -114,7 +126,7 @@ public class EditorManager
         // Lamp
         else if (tile is Lamp lamp)
         {
-            var (success, values) = ShowInputForm("Lamp Editor", [new("Light Radius", IsByte)]);
+            var (success, values) = ShowInputForm("Lamp Editor", [new("Light Radius", IsByte, placeholder: lamp.LightRadius.ToString())]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Lamp edit failed.");
@@ -125,7 +137,9 @@ public class EditorManager
         // Display case
         else if (tile is DisplayCase displayCase)
         {
-            var (success, values) = ShowInputForm("Lamp Editor", [new("Item", null, ItemsOptionsWNone), new("Amount", IsNonZeroByte)]);
+            var (success, values) = ShowInputForm("Lamp Editor", [
+                new("Item", null, ItemsOptionsWNone, displayCase.Container.Items[0] == null ? "NONE" : displayCase.Container.Items[0]!.Name.ToString()),
+                new("Amount", IsNonZeroByte, placeholder: displayCase.Container.Items[0]?.Amount.ToString())]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Display case edit failed.");
