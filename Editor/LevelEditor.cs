@@ -87,7 +87,7 @@ public class LevelEditor : Game
         editorManager = new(gameManager);
         editorLevelManager = new(gameManager, levelGenerator);
         editorOverlayManager = new(gameManager, spriteBatch, GraphicsDevice);
-        TimerManager.SetTimer("UpdateMinimap", 2, editorOverlayManager.FlagRebuildMinimap, int.MaxValue);
+        TimerManager.SetTimer("UpdateMinimap", 1, editorOverlayManager.FlagRebuildMinimap, int.MaxValue);
         
         StateManager.State = GameState.Editor;
         Logger.System("Initialized managers.");
