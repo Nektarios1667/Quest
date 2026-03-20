@@ -46,6 +46,9 @@ public class NPC : IEntity
         Dialog = dialog;
         TextureColor = textureColor == default ? Color.White : textureColor;
         Scale = scale;
+        // DEBUG TODO
+        //for (int i = 0; i < 8; i++)
+        //    ShopOptions.Add(new(new(ItemTypes.Apple, 1, $"Apple-{i}"), null, i));
     }
     public void Draw(GameManager gameManager)
     {

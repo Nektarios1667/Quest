@@ -27,7 +27,7 @@ public class Dialog : Widget
     public const float CharDelay = .03f;
     public float charWait { get; set; } = 0;
     // Private
-    public Dialog(Overlay gui, Point location, Vector2 dimensions, Color color, Color foreground, string text, SpriteFont font, int border = 6, Color? borderColor = null) : base(location)
+    public Dialog(Overlay gui, Vector2 dimensions, Color color, Color foreground, string text, SpriteFont font, int border = 6, Color? borderColor = null) : base(Point.Zero)
     {
         Gui = gui;
         Dimensions = dimensions;
@@ -38,9 +38,7 @@ public class Dialog : Widget
         Font = font;
         Foreground = foreground;
 
-        // Other variables
-        Inside = new(Dimensions.X - Border * 2 - 2, Dimensions.Y - Border * 2 - 2);
-        Rect = new(Location.X, Location.Y, (int)Dimensions.X, (int)Dimensions.Y);
+        UpdateSize();
     }
     public override void Update(float deltaTime)
     {
@@ -57,6 +55,13 @@ public class Dialog : Widget
                 charWait = CharDelay;
             }
         }
+    }
+    public void UpdateSize()
+    {
+        Dimensions = new(Dimensions.X, Font.MeasureString(LimitLines(SoftwrapWords(Text, Font, Dimensions), Font, 200)).Y + 20);
+        Location = new((int)(Constants.Middle.X - Dimensions.X / 2), (int)(Constants.NativeResolution.Y - Dimensions.Y - TextureManager.Metadata[TextureID.Slot].Size.Y - Border - 5));
+        Inside = new(Dimensions.X - Border * 2 - 2, Dimensions.Y - Border * 2 - 2);
+        Rect = new(Location.X, Location.Y, (int)Dimensions.X, (int)Dimensions.Y);
     }
     public override void Draw(SpriteBatch batch)
     {
@@ -82,6 +87,7 @@ public class Dialog : Widget
             Text = text;
             Displayed = SoftwrapWords(text, Font, Inside);
         }
+        UpdateSize();
     }
     public static string SoftwrapWords(string text, SpriteFont font, Xna.Vector2 dimensions)
     {

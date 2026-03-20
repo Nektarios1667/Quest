@@ -343,6 +343,8 @@ public class LevelEditor : Game
             DrawBottomInfo($"[Chest] gen: '{chest.LootGenerator.FileName}' key: {(chest.Key == null ? "NUL" : $"'{chest.Key.Name}' x{chest.Key.Amount}")} consume: {chest.ConsumeKey}");
         else if (mouseTile is Lamp lamp)
             DrawBottomInfo($"[Lamp] radius: {lamp.LightRadius}");
+        else if (mouseTile is DisplayCase displayCase)
+            DrawBottomInfo($"[Display Case] item: {displayCase.Container.Items[0]?.Name} x{displayCase.Container.Items[0]?.Amount}");
         else
             DrawBottomInfo($"[{mouseTile?.Type.Texture}]");
 

@@ -146,7 +146,7 @@ public class PlayerManager : IEntity
         // Process NPC dialogs
         if (NPC.DialogBox == null)
         {
-            NPC.DialogBox = new Dialog(gameManager.OverlayManager.Gui, new(Constants.Middle.X - 600, Constants.NativeResolution.Y - 300), new(1200, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false };
+            NPC.DialogBox = new Dialog(gameManager.OverlayManager.Gui, new(1200, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false };
             gameManager.OverlayManager.Gui.Widgets.Add(NPC.DialogBox);
         }
         (NPC npc, float dist) interacting = new(NPC.Null, float.MaxValue);
