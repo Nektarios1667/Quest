@@ -322,6 +322,7 @@ public class LevelManager
     public bool ReadLevel(GameManager gameManager, string filename, bool reload = false)
     {
         var sw = new Stopwatch();
+        sw.Start();
         // File checks
         filename = filename.Replace('\\', '/');
         LevelPath levelPath = new(filename);
@@ -337,14 +338,10 @@ public class LevelManager
         int totalTiles = Constants.MapSize.X * Constants.MapSize.Y;
         Tile[] tilesBuffer = new Tile[totalTiles];
         BiomeType[] biomeBuffer = new BiomeType[totalTiles];
-        List<NPC> npcBuffer = [];
-        List<Loot> lootBuffer = [];
-        Dictionary<ByteCoord, Decal> decalBuffer = [];
-        List<QuillScript> scriptBuffer = [];
 
         // Context
         using FileStream fileStream = File.OpenRead(path);
-        using BufferedStream buffer = new(fileStream, 8192);
+        using BufferedStream buffer = new(fileStream, 128 * 1024);
         using GZipStream gzipStream = new(buffer, CompressionMode.Decompress);
         using BinaryReader reader = new(gzipStream);
         try
@@ -363,7 +360,7 @@ public class LevelManager
             // Tiles
             for (int y = 0; y < Constants.MapSize.Y; y++)
                 for (int x = 0; x < Constants.MapSize.X; x++)
-                    tilesBuffer[x + y * Constants.MapSize.X] = ReadTile(reader, flags, levelPath, x, y);
+                    tilesBuffer[x + y * Constants.MapSize.X] = ReadTile(reader, levelPath, x, y);
 
             // Biomes
             if (flags.HasFlag(LevelFeatures.Biomes))
@@ -376,16 +373,19 @@ public class LevelManager
 
             // NPCs
             ushort npcCount = reader.ReadUInt16();
+            List<NPC> npcBuffer = new(npcCount);
             for (int n = 0; n < npcCount; n++)
                 npcBuffer.Add(reader.ReadNPC(gameManager));
 
             // Loot
             ushort lootCount = reader.ReadUInt16();
+            List<Loot> lootBuffer = new(lootCount);
             for (int n = 0; n < lootCount; n++)
                 lootBuffer.Add(reader.ReadLoot(gameManager));
 
             // Decals
             ushort decalCount = reader.ReadUInt16();
+            Dictionary<ByteCoord, Decal> decalBuffer = new(decalCount);
             for (int n = 0; n < decalCount; n++)
             {
                 Decal decal = reader.ReadDecal();
@@ -393,10 +393,12 @@ public class LevelManager
             }
 
             // Scripts
+            List<QuillScript> scriptBuffer = [];
             if (flags.HasFlag(LevelFeatures.QuillScripts))
             {
                 Directory.CreateDirectory($"GameData/Worlds/{levelPath.WorldName}/scripts");
                 byte scriptCount = reader.ReadByte();
+                scriptBuffer = new(scriptCount);
                 for (int s = 0; s < scriptCount; s++)
                 {
                     string name = reader.ReadString();
@@ -411,7 +413,7 @@ public class LevelManager
             if (reload) Levels.RemoveAll(l => l.Path == filename);
             Levels.Add(created);
             sw.Stop();
-            Logger.System($"Successfully read level '{filename}' in {sw.ElapsedMilliseconds:F2}s.");
+            Logger.System($"Successfully read level '{filename}' in {sw.ElapsedMilliseconds:F0}ms.");
             return true;
         }
         catch (Exception ex)
@@ -420,7 +422,7 @@ public class LevelManager
             return false;
         }
     }
-    private static Tile ReadTile(BinaryReader reader, LevelFeatures flags, LevelPath levelPath, int x, int y)
+    private static Tile ReadTile(BinaryReader reader, LevelPath levelPath, int x, int y)
     {
         // Helpers
         Chest ReadChest(Point loc)
