@@ -264,6 +264,44 @@ public class EditorManager
             }
         }
     }
+    public void EditNPC()
+    {
+        // Grab NPC
+        NPC? editing = null;
+        foreach (NPC npc in LevelManager.Level.NPCs)
+        {
+            if (npc.Position == MouseSelectionCoord)
+            {
+                editing = npc;
+                break;
+            }
+        }
+        if (editing == null) return;
+
+        // Remake
+        var (success, values) = ShowInputForm("NPC Editor", [
+            new("Name", null, placeholder: editing.Name),
+            new("Dialog", null, placeholder: editing.Dialog),
+            new("Size [0.1-25.5]", IsScaleValue, placeholder: editing.Scale.ToString()),
+            new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())], placeholder: editing.Texture.ToString())]);
+        if (!success)
+        {
+            if (!PopupOpen) Logger.Error("NPC creation failed.");
+            return;
+        }
+
+        // Create
+        editing.Name = values[0];
+        editing.Dialog = values[1];
+        float scale = float.Parse(values[2]);
+        if (scale < 0.1 || scale > 25.5)
+        {
+            Logger.Warning("Scale must be between 0.1 and 25.5. Scale defaulted to 1.");
+            scale = 1;
+        }
+        editing.Scale = scale;
+        editing.Texture = (TextureID)Enum.Parse(typeof(TextureID), values[3]);
+    }
     public void NewDecal()
     {
         // Check

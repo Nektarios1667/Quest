@@ -98,8 +98,13 @@ public class LevelEditor : Game
         mouseMenu.AddItem("Pick", () => { TileSelection = mouseTile.Type.ID; Logger.Log($"Picked tile '{TileSelection}' @ {mouseCoord.X}, {mouseCoord.Y}."); }, []);
         mouseMenu.AddItem("Open", editorLevelManager.OpenLevelDialog, []);
         mouseMenu.AddItem("Fill", editorManager.FloodFill, []);
-        mouseMenu.AddItem("Edit", editorManager.EditTile, []);
         mouseMenu.AddItem("Draw Biome", () => editorManager.ShowBiomeMarkers = !editorManager.ShowBiomeMarkers, []);
+
+        MouseMenu editMenu = new(gui, Point.Zero, new(100, 50), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
+        editMenu.AddItem("Edit NPC", editorManager.EditNPC, []);
+        editMenu.AddItem("Edit Tile", editorManager.EditTile, []);
+        mouseMenu.AddItem("Edit...", null, []);
+        mouseMenu.AddSubMenu("Edit...", editMenu);
 
         MouseMenu newMenu = new(gui, Point.Zero, new(100, 80), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         newMenu.AddItem("New NPC", editorManager.NewNPC, []);
@@ -237,6 +242,7 @@ public class LevelEditor : Game
         if (InputManager.BindPressed(InputAction.FloodFill)) editorManager.FloodFill();
         // NPCs
         if (InputManager.BindPressed(InputAction.DeleteNPC)) { MouseSelect(); editorManager.DeleteNPC(); }
+        if (InputManager.BindPressed(InputAction.EditNPC)) { MouseSelect(); editorManager.EditNPC(); }
         if (InputManager.BindPressed(InputAction.NewNPC)) { MouseSelect(); editorManager.NewNPC(); }
         // Loot
         if (InputManager.BindPressed(InputAction.DeleteLoot)) { MouseSelect(); editorManager.DeleteLoot(); }

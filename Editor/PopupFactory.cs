@@ -60,7 +60,7 @@ public static class PopupFactory
                     Left = 165,
                     Top = 10 + i * 35,
                     Width = 200,
-                    PlaceholderText = field.Placeholder,
+                    Text = field.Placeholder,
                 };
                 inputControl = textBox;
             }
