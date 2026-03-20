@@ -198,7 +198,10 @@ public class EditorLevelManager
         // Check save to continue
         if (!WarnSave()) return;
 
-        LevelManager.LoadLevelObject(GameManager, LevelManager.EmptyLevel);
+        // Make blank level
+        Tile[] grassTiles = new Tile[256 * 256];
+        for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) grassTiles[t] = new Grass(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
+        LevelManager.LoadLevelObject(GameManager, new("NUL/NUL", grassTiles, [], new(128, 128), [], [], [], [], []));
     }
     public bool WarnSave()
     {
