@@ -506,7 +506,6 @@ public class LevelManager
     }
     public Rectangle BiomeTextureSource(Point loc)
     {
-
         int mask = BiomeConnectionsMask(loc);
 
         int srcX = mask % Constants.TileMapDim.X * Constants.TilePixelSize.X;

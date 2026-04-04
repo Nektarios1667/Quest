@@ -279,12 +279,12 @@ public static partial class Interpreter
     {
         QuillCommand command = instance.CompiledLines[instance.L];
 
+        // Check noop
+        if (command.Operation == QuillOp.NoOp) return;
+
         // Handle errors
         if (instance.Errors.Count > 0)
             OutputErrors(instance);
-
-        // Check noop
-        if (command.Operation == QuillOp.NoOp) return;
 
         // Fill variables and expressions
         string[] args = command.Args;

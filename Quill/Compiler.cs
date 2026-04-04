@@ -104,7 +104,7 @@ public static class Compiler
                 if (args.Length == 0)
                 {
                     inst.Errors.Add(new(l + 1, QuillErrorType.ParameterMismatch, "func command expects at least 1 argument, received 0"));
-                    commands.Add(new QuillCommand(QuillOp.Func, []));
+                    commands.Add(new(QuillOp.Func, []));
                     continue;
                 }
 
