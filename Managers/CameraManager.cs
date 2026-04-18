@@ -1,6 +1,7 @@
 ﻿namespace Quest.Managers;
 public static class CameraManager
 {
+    public static bool FreeCam { get; set; } = false;
     public static Vector2 Camera { get; set; } = (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2();
     private static Vector2 _cameraDest { get; set; } = Camera;
     public static Vector2 CameraDest
@@ -32,12 +33,25 @@ public static class CameraManager
         if (StateManager.OverlayState == OverlayState.Pause) return;
 
         DebugManager.StartBenchmark("CameraUpdate");
-        Vector2 beforeCamera = Camera;
 
+        // Freecam
+        if (FreeCam)
+        {
+            if (InputManager.BindDown(InputAction.FreecamUp))
+                Camera += new Vector2(0, -Constants.PlayerSpeed * 1.5f) * deltaTime;
+            else if (InputManager.BindDown(InputAction.FreecamDown))
+                Camera += new Vector2(0, Constants.PlayerSpeed * 1.5f) * deltaTime;
+            if (InputManager.BindDown(InputAction.FreecamLeft))
+                Camera += new Vector2(-Constants.PlayerSpeed * 1.5f, 0) * deltaTime;
+            else if (InputManager.BindDown(InputAction.FreecamRight))
+                Camera += new Vector2(Constants.PlayerSpeed * 1.5f, 0) * deltaTime;
+        }
+
+        Vector2 beforeCamera = Camera;
 
         // Lerp camera
         if (Vector2.DistanceSquared(Camera, CameraDest) < 4f) Camera = CameraDest; // If close enough snap to destination
-        else if (deltaTime > 0)
+        else if (deltaTime > 0 && !FreeCam)
         {
             Camera = Vector2.Lerp(Camera, CameraDest, 1f - MathF.Pow(1f - Constants.CameraRigidity, deltaTime * 60f));
             Camera = Vector2.Clamp(Camera, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());

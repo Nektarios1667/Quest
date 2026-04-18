@@ -92,6 +92,7 @@ public static class CommandManager
             new("give <item> {1:255} *", CGive, "Gave |2| |1| (|3|) to player", "Failed to give |2| |1| (|3|) to player"),
             new("notif <int> <int> <int> <number> **", CNotif, "Notification |*| created.", "Failed to create notification |*|."),
             new("enemy", CEnemy, "Spawned enemy.", "Failed to spawn enemy."),
+            new("freecam <bool>", CFreecam, "Set freecam to |1|", "Failed to set freecam to |1|"),
         ];
     }
     public static (bool success, string output) Execute(string command)
@@ -346,5 +347,12 @@ public static class CommandManager
     {
         gameManager!.LevelManager.Level.Enemies.Add(new(CameraManager.PlayerFoot));
         return true;
+    }
+    private static bool CFreecam(string command)
+    {
+        string value = command.Split(' ')[1];
+        if (value == "true") { CameraManager.FreeCam = true; return true; }
+        else if (value == "false") { CameraManager.FreeCam = false; return true; }
+        return false;
     }
 }

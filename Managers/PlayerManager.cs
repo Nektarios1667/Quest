@@ -82,19 +82,8 @@ public class PlayerManager : IEntity
         if (!InventoryOpen)
         {
             // Movement
-            DebugManager.StartBenchmark("UpdateMovement");
-            moveX = 0; moveY = 0;
-            moveX += InputManager.BindDown(InputAction.MoveLeft) ? -Constants.PlayerSpeed : 0;
-            moveX += InputManager.BindDown(InputAction.MoveRight) ? Constants.PlayerSpeed : 0;
-            moveY += InputManager.BindDown(InputAction.MoveUp) ? -Constants.PlayerSpeed : 0;
-            moveY += InputManager.BindDown(InputAction.MoveDown) ? Constants.PlayerSpeed : 0;
-            Move(gameManager, new(moveX, moveY));
-            if (moveX > 0) PlayerDirection = Direction.Right;
-            else if (moveX < 0) PlayerDirection = Direction.Left;
-            else if (moveY > 0) PlayerDirection = Direction.Down;
-            else if (moveY < 0) PlayerDirection = Direction.Up;
-            else PlayerDirection = Direction.Forward;
-            DebugManager.EndBenchmark("UpdateMovement");
+            if (!CameraManager.FreeCam)
+                UpdateMovements(gameManager);
 
             // Remove attacks
             DebugManager.StartBenchmark("UpdateAttacks");
@@ -140,6 +129,22 @@ public class PlayerManager : IEntity
             LightingManager.SetLight("PlayerLightItem", CameraManager.PlayerFoot - CameraManager.Camera.ToPoint() + Constants.Middle, light.LightStrength);
         else
             LightingManager.RemoveLight("PlayerLightItem");
+    }
+    public void UpdateMovements(GameManager gameManager)
+    {
+        DebugManager.StartBenchmark("UpdateMovement");
+        moveX = 0; moveY = 0;
+        moveX += InputManager.BindDown(InputAction.MoveLeft) ? -Constants.PlayerSpeed : 0;
+        moveX += InputManager.BindDown(InputAction.MoveRight) ? Constants.PlayerSpeed : 0;
+        moveY += InputManager.BindDown(InputAction.MoveUp) ? -Constants.PlayerSpeed : 0;
+        moveY += InputManager.BindDown(InputAction.MoveDown) ? Constants.PlayerSpeed : 0;
+        Move(gameManager, new(moveX, moveY));
+        if (moveX > 0) PlayerDirection = Direction.Right;
+        else if (moveX < 0) PlayerDirection = Direction.Left;
+        else if (moveY > 0) PlayerDirection = Direction.Down;
+        else if (moveY < 0) PlayerDirection = Direction.Up;
+        else PlayerDirection = Direction.Forward;
+        DebugManager.EndBenchmark("UpdateMovement");
     }
     public void UpdateNPCInteractions(GameManager gameManager)
     {
