@@ -166,7 +166,7 @@ public class EditorLevelManager
         Tile[] tiles = LevelGenerator.GenerateLevel(Constants.MapSize, int.Parse(values[2]));
 
         Level current = LevelManager.Level;
-        Level level = new(current.Path, tiles, [], current.Spawn, current.NPCs, current.Loot, current.Decals, current.Enemies, [], current.Tint);
+        Level level = new(current.Path, tiles, [], current.Spawn, current.NPCs, current.Loot, current.Decals, current.Enemies, current.Projectiles, [], current.Tint);
 
         LevelManager.LoadLevelObject(GameManager, level);
     }
@@ -201,7 +201,7 @@ public class EditorLevelManager
         // Make blank level
         Tile[] grassTiles = new Tile[256 * 256];
         for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) grassTiles[t] = new Grass(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
-        LevelManager.LoadLevelObject(GameManager, new("NUL/NUL", grassTiles, [], new(128, 128), [], [], [], [], []));
+        LevelManager.LoadLevelObject(GameManager, new("NUL/NUL", grassTiles, [], new(128, 128), [], [], [], [], [], []));
     }
     public bool WarnSave()
     {

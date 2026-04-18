@@ -282,7 +282,7 @@ public class LevelEditor : Game
         TimerManager.Update(gameManager);
         gameManager.Update(delta);
         levelManager.Update(gameManager);
-        uiManager.Update(gameManager);
+        uiManager.Update(gameManager, null);
         editorOverlayManager.Update();
 
         // Final

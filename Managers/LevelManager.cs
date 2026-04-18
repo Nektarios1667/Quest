@@ -23,7 +23,7 @@ public class LevelManager
     {
         Tile[] grassTiles = new Tile[256 * 256];
         for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) grassTiles[t] = new Grass(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
-        EmptyLevel = new("NUL/NUL", grassTiles, [], new(128, 128), [], [], [], [], []);
+        EmptyLevel = new("NUL/NUL", grassTiles, [], new(128, 128), [], [], [], [], [], []);
     }
     public LevelManager()
     {
@@ -51,8 +51,13 @@ public class LevelManager
         // Entities
         foreach (NPC npc in Level.NPCs) npc.Update(gameManager);
         foreach (Enemy enemy in Level.Enemies) enemy.Update(gameManager);
-        if (Level.Loot.Count > 255)
-            Level.Loot.RemoveRange(0, Level.Loot.Count - 255);
+        for (int p = Level.Projectiles.Count -1; p >= 0; p--)
+        {
+            Level.Projectiles[p].Update(gameManager);
+            if (!Level.Projectiles[p].IsAlive) Level.Projectiles.RemoveAt(p);
+        }
+        if (Level.Loot.Count >= ushort.MaxValue)
+            Level.Loot.RemoveRange(0, Level.Loot.Count - ushort.MaxValue);
 
         // SkyTint
         UpdateSky(gameManager);
@@ -162,6 +167,7 @@ public class LevelManager
         DebugManager.StartBenchmark("CharacterDraws");
         foreach (NPC npc in Level.NPCs) npc.Draw(gameManager);
         foreach (Enemy enemy in Level.Enemies) enemy.Draw(gameManager);
+        foreach (Projectile projectile in Level.Projectiles) projectile.Draw(gameManager);
         DebugManager.EndBenchmark("CharacterDraws");
     }
     public Level GetLevel(string name)
@@ -170,7 +176,7 @@ public class LevelManager
             if (level.Path == name)
                 return level;
         Logger.Error($"Level '{name}' not found in stored levels.");
-        return new("", [], [], new Point(128, 128), [], [], [], [], []);
+        return new("", [], [], new Point(128, 128), [], [], [], [], [], []);
     }
     public bool LoadLevel(GameManager gameManager, int levelIndex)
     {
@@ -409,7 +415,7 @@ public class LevelManager
             }
 
             // Make and add the level
-            Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, [], scriptBuffer, tint);
+            Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, [], [], scriptBuffer, tint);
             if (reload) Levels.RemoveAll(l => l.Path == filename);
             Levels.Add(created);
             sw.Stop();

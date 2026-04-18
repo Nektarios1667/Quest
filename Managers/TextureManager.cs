@@ -177,9 +177,12 @@ public static class TextureManager
         Checkpoint,
         Glass,
         // DECALS ENUM INSERT
+        Fireball,
+        // PROJECTILES ENUM INSERT
         Glow,
         Slash,
         // EFFECTS ENUM INSERT
+        
     }
     private static readonly List<string> errors = [];
     public static Dictionary<TextureID, Texture2D> Textures { get; private set; } = [];
@@ -367,6 +370,8 @@ public static class TextureManager
         Textures[TextureID.Checkpoint] = content.Load<Texture2D>("Images/Decals/Checkpoint");
         Textures[TextureID.Glass] = content.Load<Texture2D>("Images/Decals/Glass");
         // DECALS INSERT
+        Textures[TextureID.Fireball] = content.Load<Texture2D>("Images/Projectiles/Fireball");
+        // PROJECTILES INSERT
         Textures[TextureID.Glow] = content.Load<Texture2D>("Images/Effects/Glow");
         Textures[TextureID.Slash] = content.Load<Texture2D>("Images/Effects/Slash");
         // EFFECTS INSERT
@@ -545,10 +550,11 @@ public static class TextureManager
         Metadata[TextureID.Checkpoint] = new(Textures[TextureID.Checkpoint].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.Glass] = new(Textures[TextureID.Glass].Bounds.Size, new(1, 1), "decal");
         // DECALS METADATA INSERT
+        Metadata[TextureID.Fireball] = new(Textures[TextureID.Fireball].Bounds.Size, new(1, 1), "projectile");
+        // PROJECTILES METADATA INSERT
         Metadata[TextureID.Glow] = new(Textures[TextureID.Glow].Bounds.Size, new(1, 1), "effect");
         Metadata[TextureID.Slash] = new(Textures[TextureID.Slash].Bounds.Size, new(1, 1), "effect");
         // EFFECTS METADATA INSERT
-
         foreach (var kv in Metadata)
             if (kv.Value == null)
                 Logger.Error($"Metadata for texture '{kv.Key}' failed to load.");
@@ -588,12 +594,12 @@ public static class TextureManager
         }
         return tex;
     }
-    public static void DrawTexture(SpriteBatch batch, TextureID id, Point pos, Rectangle? source = null, Color color = default, float rotation = 0f, Vector2 origin = default, float scale = 1, SpriteEffects effects = SpriteEffects.None)
+    public static void DrawTexture(SpriteBatch batch, TextureID id, Point pos, Rectangle? source = null, Color? color = null, float rotation = 0f, Vector2? origin = null, float scale = 1, SpriteEffects effects = SpriteEffects.None)
     {
         Texture2D tex = GetTexture(id);
-        if (color == default) color = Color.White;
-        if (origin == default) origin = Vector2.Zero;
-        batch.Draw(tex, pos.ToVector2(), source, color, rotation, origin, scale, effects, 0);
+        if (color == null) color = Color.White;
+        if (origin == null) origin = Vector2.Zero;
+        batch.Draw(tex, pos.ToVector2(), source, color.Value, rotation, origin.Value, scale, effects, 0);
     }
     public static void FillRectangle(SpriteBatch batch, Point pos, Point size, Color color)
     {

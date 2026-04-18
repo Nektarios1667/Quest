@@ -58,7 +58,7 @@ public class GameManager
         }
 
         // Time
-        if (StateManager.OverlayState != OverlayState.Pause)
+        if (StateManager.OverlayState != OverlayState.Pause && StateManager.OverlayState != OverlayState.Death)
         {
             DeltaTime = deltaTime;
             GameTime += deltaTime;
@@ -69,16 +69,9 @@ public class GameManager
         else
             DeltaTime = 0f;
     }
-    public void Respawn()
+    public void Respawn(PlayerManager playerManager)
     {
-        string level = LevelManager.Level.Path;
-        LevelManager.ReadLevel(this, level, reload: true);
-        LevelManager.LoadLevel(this, level);
-
-        OverlayManager.HealthBar.CurrentValue = OverlayManager.HealthBar.MaxValue;
-        //PlayerManager.Inventory = new(6, 4);
-
-        CameraManager.Camera = LevelManager.Level.Spawn.ToVector2();
-        CameraManager.Camera = LevelManager.Level.Spawn.ToVector2();
+        StateManager.ReadGameState(this, playerManager, StateManager.CurrentSave.ToString());
+        StateManager.OverlayState = OverlayState.None;
     }
 }

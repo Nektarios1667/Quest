@@ -399,13 +399,13 @@ public class PlayerManager : IEntity
     {
         TileBelow = gameManager.LevelManager.GetTile(CameraManager.TileCoord);
     }
-    public void DamagePlayer(GameManager gameManager, int damage)
+    public static void DamagePlayer(GameManager gameManager, int damage)
     {
         gameManager.OverlayManager.HealthBar.CurrentValue -= damage;
         if (gameManager.OverlayManager.HealthBar.CurrentValue <= 0)
         {
             gameManager.OverlayManager.HealthBar.CurrentValue = 0;
-            StateManager.State = GameState.Death;
+            StateManager.OverlayState = OverlayState.Death;
         }
     }
     public void AddAttack(Attack attack)

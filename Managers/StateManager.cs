@@ -25,7 +25,6 @@ public enum GameState
     Loading,
     Game,
     Editor,
-    Death,
 }
 public enum OverlayState
 {
@@ -34,6 +33,7 @@ public enum OverlayState
     Pause,
     Typing,
     Finished,
+    Death,
 }
 public enum Mood
 {

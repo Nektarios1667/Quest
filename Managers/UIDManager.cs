@@ -5,6 +5,7 @@ public enum UIDCategory
     Items,
     Loot,
     Enemies,
+    Projectiles,
 }
 
 public static class UIDManager

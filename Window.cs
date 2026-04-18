@@ -157,7 +157,7 @@ public class Window : Game
         playerManager.Update(gameManager);
         levelManager.Update(gameManager);
         menuManager.Update(gameManager);
-        overlayManager.Update(gameManager);
+        overlayManager.Update(gameManager, playerManager);
 
         // Console commands
         if (Constants.COMMANDS && InputManager.BindPressed(InputAction.OpenCommandWindow))

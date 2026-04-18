@@ -10,8 +10,6 @@ public class OverlayManager
     public NotificationArea LootNotifications { get; private set; } // Loot pickup notifications
     public StatusBar HealthBar { get; private set; }
     public static readonly Point lootStackOffset = new(4, 4);
-    private float deathTime = -1;
-
     private RenderTarget2D? minimap;
     public bool UpdateLighting { get; set; } = true;
     public OverlayManager(PlayerManager? playerManager)
@@ -40,7 +38,7 @@ public class OverlayManager
                 MarkUpdateLighting();
         };
     }
-    public void Update(GameManager gameManager)
+    public void Update(GameManager gameManager, PlayerManager? playerManager)
     {
         // Gui
         DebugManager.StartBenchmark("GuiUpdate");
@@ -48,17 +46,17 @@ public class OverlayManager
         DebugManager.EndBenchmark("GuiUpdate");
 
         // Respawn
-        if (StateManager.State == GameState.Death && InputManager.KeyPressed(Keys.Space))
-            gameManager.Respawn();
+        if (playerManager != null && StateManager.OverlayState == OverlayState.Death && InputManager.KeyPressed(Keys.Space))
+            gameManager.Respawn(playerManager);
     }
     public void Draw(GraphicsDevice device, GameManager gameManager, PlayerManager? playerManager)
     {
-        // Darkening
-        DrawPostProcessing(gameManager, playerManager);
-
         // Lighting
         if (StateManager.State == GameState.Game)
             DrawLighting(gameManager);
+
+        // Darkening
+        DrawPostProcessing(gameManager, playerManager);
 
         // Widgets
         LootNotifications.Offset = (CameraManager.CameraDest - CameraManager.Camera).ToPoint();
@@ -127,15 +125,15 @@ public class OverlayManager
             gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * 0.6f);
 
         // Death
-        if (StateManager.State == GameState.Death)
+        if (StateManager.OverlayState == OverlayState.Death)
         {
-            if (deathTime == -1) deathTime = GameManager.GameTime;
+            gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black);
             gameManager.Batch.DrawString(PixelOperator, "YOU DIED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("You died!") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
             gameManager.Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
         } else if (StateManager.OverlayState == OverlayState.Finished)
         {
-            TimerManager.NewTimer("CompleteScreenFade", 2, null);
-            float fade = TimerManager.GetTimer("CompleteScreenFade").Progress * 0.5f;
+            TimerManager.NewTimer("FinishedFade", 2, null);
+            float fade = TimerManager.GetTimer("FinishedFade").Progress * 0.5f;
 
             gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * fade);
             gameManager.Batch.DrawString(PixelOperator, "LEVEL FINISHED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("LEVEL FINISHED!") * 2, Color.White * fade, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);

@@ -14,6 +14,7 @@ public class QuillScript
 public class Level
 {
     public List<Enemy> Enemies { get; private set; }
+    public List<Projectile> Projectiles { get; private set; }
     public Dictionary<ByteCoord, Decal> Decals { get; private set; }
     public List<NPC> NPCs { get; private set; }
     public LevelPath LevelPath { get; private set; }
@@ -26,7 +27,7 @@ public class Level
     public Point Spawn { get; set; }
     public Color Tint { get; set; }
     public List<QuillScript> Scripts { get; private set; }
-    public Level(string name, Tile[] tiles, BiomeType[] biome, Point spawn, List<NPC> npcs, List<Loot> loot, Dictionary<ByteCoord, Decal> decals, List<Enemy> enemies, List<QuillScript> scripts, Color? tint = null)
+    public Level(string name, Tile[] tiles, BiomeType[] biome, Point spawn, List<NPC> npcs, List<Loot> loot, Dictionary<ByteCoord, Decal> decals, List<Enemy> enemies, List<Projectile> projectiles, List<QuillScript> scripts, Color? tint = null)
     {
         // Initialize the level
         LevelPath = new(name);
@@ -37,6 +38,7 @@ public class Level
         Loot = [.. loot];
         Decals = decals;
         Enemies = [.. enemies];
+        Projectiles = [.. projectiles];
         Scripts = [.. scripts];
         Tint = tint ?? Color.Transparent;
     }
