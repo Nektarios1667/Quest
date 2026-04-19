@@ -6,29 +6,31 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Quest.Entities;
+public interface IProjectileOwner
+{
+    public TextureID ProjectileTexture { get; }
+    public ushort Damage { get; }
+    public ushort ProjectileSpeed { get; }
+}
 public class Projectile : IEntity
 {
-    public IEntity? Owner { get; protected set; }
+    public IProjectileOwner Owner { get; protected set; }
     public Vector2 Position { get; protected set; }
     public float Direction { get; protected set; } // Radians, 0 = right, positive counterclockwise
     public Point Size { get; protected set; }
     public RectangleF Bounds => new(Position, Size);
     public ushort UID { get; }
-    public TextureID Texture { get; protected set; }
-    public int Damage { get; protected set; }
-    public int Speed { get; protected set; }
-    public Color? Tint { get; protected set; }
+    public TextureID Texture => Owner.ProjectileTexture;
+    public ushort Damage => Owner.Damage; 
+    public ushort Speed => Owner.ProjectileSpeed; 
     public bool IsAlive { get; protected set; } = true;
-    public Projectile(GameManager gameManager, PlayerManager? playerManager, IEntity? owner, TextureID texture, Vector2 position, float direction, int damage, int speed, Color? tint = null)
+    public Projectile(GameManager gameManager, PlayerManager? playerManager, IProjectileOwner owner, TextureID texture, Vector2 position, float direction, ushort damage, ushort speed)
     {
+        Owner = owner;
         Position = position;
         Direction = direction;
-        Damage = damage;
-        Speed = speed;
-        Texture = texture;
         Size = (TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap).Scaled(Constants.ProjectileScale);
         UID = UIDManager.Get(UIDCategory.Projectiles);
-        Tint = tint ?? Color.White;
 
         // Update collision 60/s
         TimerManager.SetTimer($"ProjectileCollision_{UID}", 0.017f, () => UpdateCollision(gameManager, playerManager), int.MaxValue);
@@ -44,7 +46,7 @@ public class Projectile : IEntity
     {
         Rectangle source = GetAnimationSource(Texture, GameManager.GameTime, duration: 0.5f);
         Vector2 texMiddle = Size.ToVector2() / Constants.ProjectileScale / 2; // Since the origin is the center (for rotation), we need to offset the position by half the size of the texture (times the scale)
-        DrawTexture(gameManager.Batch, Texture, Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle + (texMiddle * Constants.ProjectileScale).ToPoint(), source: source, color: Tint, origin: texMiddle, rotation: Direction, scale: Constants.ProjectileScale);
+        DrawTexture(gameManager.Batch, Texture, Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle + (texMiddle * Constants.ProjectileScale).ToPoint(), source: source, origin: texMiddle, rotation: Direction, scale: Constants.ProjectileScale);
         // Debug
         DebugManager.DrawHitbox(gameManager.Batch, this);
     }

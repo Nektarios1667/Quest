@@ -4,19 +4,18 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Quest.Entities;
-public class Enemy : IEntity
+public class Enemy : IEntity, IProjectileOwner
 {
     public ushort UID { get; }
     public bool IsAlive => Health >= 0;
-    public string Name { get; protected set; }
-    public int Health { get; protected set; }
-    public int Damage { get; protected set; }
+    public ushort Health { get; protected set; }
+    public ushort Damage { get; protected set; }
     public float AttackSpeed { get; protected set; } // Attacks per second
-    public float Defense { get; protected set; } // If damage <= Defense, damage /= 2
-    public int Speed { get; protected set; } // Pixels per second
-    public int ProjectileSpeed { get; protected set; } // Pixels per second
-    public int ViewRange { get; protected set; } // Pixels
-    public int AttackRange { get; protected set; } // Pixels
+    public ushort Defense { get; protected set; } // If damage <= Defense, damage /= 2
+    public ushort Speed { get; protected set; } // Pixels per second
+    public ushort ProjectileSpeed { get; protected set; } // Pixels per second
+    public ushort ViewRange { get; protected set; } // Pixels
+    public ushort AttackRange { get; protected set; } // Pixels
     public TextureID Texture { get; protected set; }
     public TextureID ProjectileTexture { get; protected set; }
     public Vector2 Position { get; protected set; }
@@ -28,7 +27,6 @@ public class Enemy : IEntity
     protected PlayerManager? PlayerManager { get; set; }
     public Enemy(Point pos, PlayerManager? playerManager = null)
     {
-        Name = GetType().Name;
         Texture = TextureID.PurpleWizard; // DEBUG TODO remove this line when all enemies have textures
         ProjectileTexture = TextureID.Fireball; // DEBUG TODO remove this line when all enemies have textures
         UID = UIDManager.Get(UIDCategory.Enemies);
@@ -103,9 +101,9 @@ public class Enemy : IEntity
         
         DebugManager.DrawHitbox(gameManager.Batch, this);
     }
-    public virtual void Hurt(int damage)
+    public virtual void Hurt(ushort damage)
     {
-        if (damage <= Defense) Health -= damage / 2;
+        if (damage <= Defense) Health -= (ushort)(damage / 2);
         else Health -= damage;
     }
     public virtual void Attack(GameManager gameManager, float direction)
