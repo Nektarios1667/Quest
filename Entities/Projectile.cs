@@ -11,12 +11,13 @@ public interface IProjectileOwner
     public TextureID ProjectileTexture { get; }
     public ushort Damage { get; }
     public ushort ProjectileSpeed { get; }
+    public ushort UID { get; }
 }
 public class Projectile : IEntity
 {
     public IProjectileOwner Owner { get; protected set; }
-    public Vector2 Position { get; protected set; }
-    public float Direction { get; protected set; } // Radians, 0 = right, positive counterclockwise
+    public Vector2 Position { get; set; }
+    public float Direction { get; set; } // Radians, 0 = right, positive counterclockwise
     public Point Size { get; protected set; }
     public RectangleF Bounds => new(Position, Size);
     public ushort UID { get; }
@@ -24,7 +25,7 @@ public class Projectile : IEntity
     public ushort Damage => Owner.Damage; 
     public ushort Speed => Owner.ProjectileSpeed; 
     public bool IsAlive { get; protected set; } = true;
-    public Projectile(GameManager gameManager, IProjectileOwner owner, TextureID texture, Vector2 position, float direction, ushort damage, ushort speed)
+    public Projectile(GameManager gameManager, IProjectileOwner owner, Vector2 position, float direction)
     {
         Owner = owner;
         Position = position;

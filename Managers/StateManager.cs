@@ -186,7 +186,9 @@ public static class StateManager
             string[] levels = new[] {
                 chests.Keys,
                 openedDoors.Keys,
-                gameManager.LevelManager.Levels.Where(l => l.WorldName == worldName && l.Loot.Count > 0).Select(l => l.LevelName)
+                gameManager.LevelManager.Levels.Where(l => l.WorldName == worldName &&
+                (l.Loot.Count > 0 || l.Enemies.Count > 0 || l.Projectiles.Count > 0))
+            .Select(l => l.LevelName),
             }.SelectMany(x => x).Distinct().Take(255).ToArray();
 
             writer.Write((byte)levels.Length);
@@ -230,6 +232,15 @@ public static class StateManager
                 }
                 else
                     writer.Write((ushort)0);
+                // Enemies
+                writer.Write((ushort)levelObj.Enemies.Count);
+                foreach (var enemy in levelObj.Enemies.Values)
+                    WriteEnemyData(writer, enemy);
+
+                // Projectiles
+                writer.Write((ushort)levelObj.Projectiles.Count);
+                foreach (var proj in levelObj.Projectiles)
+                    WriteProjectileData(writer, proj);
             }
 
             // Write Inventory data
@@ -312,6 +323,14 @@ public static class StateManager
                 ushort containerCount = reader.ReadUInt16();
                 for (int o = 0; o < containerCount; o++)
                     ReadContainerData(reader, current);
+                // Enemies
+                ushort enemyCount = reader.ReadUInt16();
+                for (int e = 0; e < enemyCount; e++)
+                    ReadEnemyData(reader, current);
+                // Projectiles
+                ushort projectileCount = reader.ReadUInt16();
+                for (int p = 0; p < projectileCount; p++)
+                    ReadProjectileData(gameManager, reader, current);
             }
 
             // Read Inventory data
@@ -358,6 +377,45 @@ public static class StateManager
         // Write items
         for (int i = 0; i < amount; i++)
             WriteItemData(writer, container.Container.Items[i]);
+    }
+    public static void WriteEnemyData(BinaryWriter writer, Enemy enemy)
+    {
+        writer.Write(enemy.UID);
+        writer.Write(enemy.Health);
+        writer.Write((ushort)enemy.Position.X);
+        writer.Write((ushort)enemy.Position.Y);
+        writer.Write((float)TimerManager.TryTimeLeft($"EnemyAttack_{enemy.UID}"));
+    }
+    public static void WriteProjectileData(BinaryWriter writer, Projectile proj)
+    {
+        writer.Write(proj.Owner.UID);
+        writer.Write((ushort)proj.Position.X);
+        writer.Write((ushort)proj.Position.Y);
+        writer.Write(proj.Direction);
+    }
+    public static void WriteItemData(BinaryWriter writer, ItemRef? itemRef)
+    {
+        Item? item = itemRef == null ? null : new(itemRef);
+        WriteItemData(writer, item);
+        item?.Dispose();
+    }
+    public static void WriteItemData(BinaryWriter writer, Item? item)
+    {
+        writer.Write((byte)(item == null ? 0 : item.Type.TypeID + 1));
+        if (item != null)
+        {
+            writer.Write(item.Amount);
+            writer.Write(item.CustomName ?? "");
+        }
+    }
+    public static Item? ReadItemData(BinaryReader reader)
+    {
+        int id = reader.ReadByte();
+        if (id == 0) return null;
+        ItemTypeID itemType = (ItemTypeID)(id - 1);
+        byte amount = reader.ReadByte();
+        string customName = reader.ReadString();
+        return Item.Create(itemType, amount, customName == "" ? null : customName);
     }
     public static void ReadContainerData(BinaryReader reader, Level current)
     {
@@ -410,29 +468,38 @@ public static class StateManager
             }
         }
     }
-    public static void WriteItemData(BinaryWriter writer, ItemRef? itemRef)
+    public static void ReadEnemyData(BinaryReader reader, Level current)
     {
-        Item? item = itemRef == null ? null : new(itemRef);
-        WriteItemData(writer, item);
-        item?.Dispose();
-    }
-    public static void WriteItemData(BinaryWriter writer, Item? item)
-    {
-        writer.Write((byte)(item == null ? 0 : item.Type.TypeID + 1));
-        if (item != null)
+        ushort uid = reader.ReadUInt16();
+        ushort health = reader.ReadUInt16();
+        Vector2 position = new(reader.ReadUInt16(), reader.ReadUInt16());
+        float attackTimer = reader.ReadSingle();
+        Enemy? enemy = current.Enemies.TryGetValue(uid, out var e) ? e : null;
+        if (enemy != null)
         {
-            writer.Write(item.Amount);
-            writer.Write(item.CustomName ?? "");
+            enemy.Health = health;
+            enemy.Position = position;
+            TimerManager.GetTimer($"EnemyAttack_{enemy.UID}").Left = attackTimer;
         }
+        else
+            Logger.Error($"Enemy with UID {uid} not found in level.");
     }
-    public static Item? ReadItemData(BinaryReader reader)
+    public static void ReadProjectileData(GameManager gameManager, BinaryReader reader, Level current)
     {
-        int id = reader.ReadByte();
-        if (id == 0) return null;
-        ItemTypeID itemType = (ItemTypeID)(id - 1);
-        byte amount = reader.ReadByte();
-        string customName = reader.ReadString();
-        return Item.Create(itemType, amount, customName == "" ? null : customName);
+        ushort ownerUID = reader.ReadUInt16();
+        Vector2 position = new(reader.ReadUInt16(), reader.ReadUInt16());
+        float direction = reader.ReadSingle();
+
+        // Get owner
+        Enemy? owner = current.Enemies.TryGetValue(ownerUID, out var e) ? e : null;
+        if (owner == null)
+        {
+            Logger.Error($"Owner with UID {ownerUID} not found.");
+            return;
+        }
+
+        Projectile proj = new(gameManager, owner, position, direction);
+        gameManager.LevelManager.Level.Projectiles.Add(proj);
     }
     public static Dictionary<string, string> ReadKeyValueFile(string name)
     {

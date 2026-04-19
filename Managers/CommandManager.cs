@@ -60,6 +60,7 @@ public static class CommandManager
     private readonly static Dictionary<string, Func<string, bool>> predicateMap = new()
     {
         { "int", value => int.TryParse(value, out _)  },
+        { "ushort", value => ushort.TryParse(value, out _) },
         { "decimal", value => decimal.TryParse(value, out _) && !int.TryParse(value, out _) },
         { "number", value => decimal.TryParse(value, out _) }, // Any numeric value
         { "string", value => true },
@@ -93,6 +94,7 @@ public static class CommandManager
             new("notif <int> <int> <int> <number> **", CNotif, "Notification |*| created.", "Failed to create notification |*|."),
             new("enemy", CEnemy, "Spawned enemy.", "Failed to spawn enemy."),
             new("freecam <bool>", CFreecam, "Set freecam to |1|", "Failed to set freecam to |1|"),
+            new("kill [enemy|projectile] <ushort>", CKill, "Killed |1| with UID |2|", "Failed to kill |1| with UID |2|")
         ];
     }
     public static (bool success, string output) Execute(string command)
@@ -340,12 +342,12 @@ public static class CommandManager
         int b = int.Parse(parts[3]);
         decimal duration = decimal.Parse(parts[4]);
         string message = string.Join(' ', parts[5..]);
-        gameManager!.OverlayManager.LootNotifications.AddNotification(message, color:new(r, g, b), (float)duration);
+        gameManager!.OverlayManager.LootNotifications.AddNotification(message, color: new(r, g, b), (float)duration);
         return true;
     }
     private static bool CEnemy(string command)
     {
-        Enemy enemy = new(CameraManager.PlayerFoot.ToVector2(), 200, 30, 0.1f, 25, 100, 200, 1000, 750, TextureID.WhiteWizard, TextureID.Fireball);
+        Enemy enemy = new(CameraManager.PlayerFoot.ToVector2(), 200, 30, 2f, 25, 100, 200, 1000, 750, TextureID.WhiteWizard, TextureID.Fireball);
         gameManager!.LevelManager.Level.Enemies[enemy.UID] = enemy;
         return true;
     }
@@ -354,6 +356,32 @@ public static class CommandManager
         string value = command.Split(' ')[1];
         if (value == "true") { CameraManager.FreeCam = true; return true; }
         else if (value == "false") { CameraManager.FreeCam = false; return true; }
+        return false;
+    }
+    private static bool CKill(string command)
+    {
+        string[] parts = command.Split(' ');
+        string type = parts[1];
+        ushort uid = ushort.Parse(parts[2]);
+        if (type == "enemy")
+        {
+            if (gameManager!.LevelManager.Level.Enemies.TryGetValue(uid, out var enemy))
+            {
+                // 2x max health so that if defense is max then it'll still die
+                enemy.Hurt(ushort.MaxValue);
+                enemy.Hurt(ushort.MaxValue);
+                return true;
+            }
+        }
+        else if (type == "projectile")
+        {
+            Projectile? projectile = gameManager!.LevelManager.Level.Projectiles.FirstOrDefault(p => p.UID == uid);
+            if (projectile != null)
+            {
+                projectile.Destroy();
+                return true;
+            }
+        }
         return false;
     }
 }

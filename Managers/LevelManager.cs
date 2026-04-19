@@ -51,6 +51,12 @@ public class LevelManager
         // Entities
         foreach (NPC npc in Level.NPCs) npc.Update(gameManager);
         foreach (Enemy enemy in Level.Enemies.Values) enemy.Update(gameManager);
+        var enemyList = Level.Enemies.Values.ToArray();
+        for (int p = enemyList.Length - 1; p >= 0; p--)
+        {
+            enemyList[p].Update(gameManager);
+            if (!enemyList[p].IsAlive) Level.Enemies.Remove(enemyList[p].UID);
+        }
         for (int p = Level.Projectiles.Count -1; p >= 0; p--)
         {
             Level.Projectiles[p].Update(gameManager);

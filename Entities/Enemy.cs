@@ -7,8 +7,8 @@ namespace Quest.Entities;
 public class Enemy : IEntity, IProjectileOwner
 {
     public ushort UID { get; set; }
-    public bool IsAlive => Health >= 0;
-    public ushort Health { get; set; }
+    public bool IsAlive => Health > 0;
+    public int Health { get; set; }
     public ushort Damage { get; set; }
     public float AttackSpeed { get; set; } // Attacks per second
     public ushort Defense { get; set; } // If damage <= Defense, damage /= 2
@@ -54,6 +54,7 @@ public class Enemy : IEntity, IProjectileOwner
         AttackRange = attackRange;
         Scale = Constants.PlayerScale;
 
+        TimerManager.SetTimer($"EnemyAttack_{UID}", AttackSpeed, null);
         Size = (TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap).Scaled(Scale);
     }
     public virtual void Update(GameManager gameManager)
@@ -113,12 +114,12 @@ public class Enemy : IEntity, IProjectileOwner
     }
     public virtual void Hurt(ushort damage)
     {
-        if (damage <= Defense) Health -= (ushort)(damage / 2);
+        if (damage <= Defense) Health -= damage / 2;
         else Health -= damage;
     }
     public virtual void Attack(GameManager gameManager, float direction)
     {
-        Projectile proj = new(gameManager, this, ProjectileTexture, Bounds.Center, direction, Damage, ProjectileSpeed);
+        Projectile proj = new(gameManager, this, Bounds.Center, direction);
         gameManager.LevelManager.Level.Projectiles.Add(proj);
         SoundManager.PlaySound("Fire");
     }
