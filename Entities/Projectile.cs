@@ -24,7 +24,7 @@ public class Projectile : IEntity
     public ushort Damage => Owner.Damage; 
     public ushort Speed => Owner.ProjectileSpeed; 
     public bool IsAlive { get; protected set; } = true;
-    public Projectile(GameManager gameManager, PlayerManager? playerManager, IProjectileOwner owner, TextureID texture, Vector2 position, float direction, ushort damage, ushort speed)
+    public Projectile(GameManager gameManager, IProjectileOwner owner, TextureID texture, Vector2 position, float direction, ushort damage, ushort speed)
     {
         Owner = owner;
         Position = position;
@@ -33,7 +33,7 @@ public class Projectile : IEntity
         UID = UIDManager.Get(UIDCategory.Projectiles);
 
         // Update collision 60/s
-        TimerManager.SetTimer($"ProjectileCollision_{UID}", 0.017f, () => UpdateCollision(gameManager, playerManager), int.MaxValue);
+        TimerManager.SetTimer($"ProjectileCollision_{UID}", 0.017f, () => UpdateCollision(gameManager), int.MaxValue);
     }
     public void Update(GameManager gameManager)
     {
@@ -58,18 +58,12 @@ public class Projectile : IEntity
         TimerManager.Remove($"ProjectileCollision_{UID}");
     }
 
-    private void UpdateCollision(GameManager gameManager, PlayerManager? playerManager)
+    private void UpdateCollision(GameManager gameManager)
     {
         // Check collisions with walls
         Point tileCoord = CameraManager.PositionToWorldCoord(Position + Size.ToVector2() / 2);
-        if (gameManager.LevelManager.Level.Tiles[tileCoord.Y * Constants.MapSize.X + tileCoord.X].IsWall)
+        if (tileCoord.X < 0 || tileCoord.X >= Constants.MapSize.X || tileCoord.Y < 0 || tileCoord.Y >= Constants.MapSize.Y ||
+            gameManager.LevelManager.Level.Tiles[tileCoord.Y * Constants.MapSize.X + tileCoord.X].IsWall)
             Destroy();
-
-        // Check collisions with enemies
-        if (playerManager != null && Bounds.Intersects(playerManager.Bounds))
-        {
-            PlayerManager.DamagePlayer(gameManager, Damage);
-            Destroy();
-        }
     }
 }

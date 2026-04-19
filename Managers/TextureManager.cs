@@ -188,6 +188,7 @@ public static class TextureManager
     public static Dictionary<TextureID, Texture2D> Textures { get; private set; } = [];
     public static Dictionary<TextureID, Metadata> Metadata { get; private set; } = [];
     public static TextureID[] CharacterTextures { get; private set; } = [];
+    public static TextureID[] ProjectileTextures { get; private set; } = [];
     private static Texture2D Pixel { get; set; } = null!;
     // Fonts
     public static SpriteFont PixelOperator { get; private set; } = null!;
@@ -563,7 +564,8 @@ public static class TextureManager
         Logger.System($"Successfully loaded {Metadata.Count}/{Textures.Count} texture Metadata.");
 
         // Generate characters
-        CharacterTextures = Textures.Where(kv => Metadata[kv.Key].Type == "character").Select(kv => kv.Key).ToArray();
+        CharacterTextures = [.. Textures.Where(kv => Metadata[kv.Key].Type == "character").Select(kv => kv.Key)];
+        ProjectileTextures = [.. Textures.Where(kv => Metadata[kv.Key].Type == "projectile").Select(kv => kv.Key)];
 
         // Fonts
         PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");

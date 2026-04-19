@@ -316,6 +316,111 @@ public class EditorManager
         editing.Scale = scale;
         editing.Texture = (TextureID)Enum.Parse(typeof(TextureID), values[3]);
     }
+    public void NewEnemy()
+    {
+        // Check
+        if (LevelManager.Level.Enemies.Count >= ushort.MaxValue)
+        {
+            Logger.Error("Maximum number of Enemies reached (65,535).");
+            return;
+        }
+
+        // Winforms
+        var (success, values) = ShowInputForm("Enemy Editor", [
+            new("Health", IsUInt16),
+            new("Damage", IsUInt16),
+            new("Attack Speed", IsPositiveFloat),
+            new("Defense", IsUInt16),
+            new("Speed", IsUInt16),
+            new("Projectile Speed", IsUInt16),
+            new("View Range", IsUInt16),
+            new("Attack Range", IsUInt16),
+            new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())]),
+            new("Projectile Texture", null, [.. ProjectileTextures.Select(t => t.ToString())])
+        ]);
+        if (!success)
+        {
+            if (!PopupOpen) Logger.Error("NPC creation failed.");
+            return;
+        }
+
+        // Create
+        TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), values[8]);
+        TextureID projTexture = (TextureID)Enum.Parse(typeof(TextureID), values[9]);
+        Enemy enemy = new Enemy(
+            MouseSelection.ToVector2(),
+            ushort.Parse(values[0]),
+            ushort.Parse(values[1]),
+            float.Parse(values[2]),
+            ushort.Parse(values[3]),
+            ushort.Parse(values[4]),
+            ushort.Parse(values[5]),
+            ushort.Parse(values[6]),
+            ushort.Parse(values[7]),
+            texture,
+            projTexture
+        );
+        LevelManager.Level.Enemies.Add(enemy);
+    }
+    public void DeleteEnemy()
+    {
+        foreach (Enemy enemy in LevelManager.Level.Enemies)
+        {
+            if (Vector2.DistanceSquared(enemy.Position, MouseSelection.ToVector2()) < 50 * 50)
+            {
+                LevelManager.Level.Enemies.Remove(enemy);
+                Logger.Log($"Deleted Enemy @ {MouseSelection.X}, {MouseSelection.Y}.");
+                break;
+            }
+        }
+    }
+    public void EditEnemy()
+    {
+        // Grab NPC
+        Enemy? editing = null;
+        foreach (Enemy enemy in LevelManager.Level.Enemies)
+        {
+            if (Vector2.DistanceSquared(enemy.Position, MouseSelection.ToVector2()) < 50 * 50)
+            {
+                editing = enemy;
+                break;
+            }
+        }
+        if (editing == null) return;
+
+        // Remake
+        var (success, values) = ShowInputForm("Enemy Editor", [
+            new("Health", IsUInt16, placeholder: editing.Health.ToString()),
+            new("Damage", IsUInt16, placeholder: editing.Damage.ToString()),
+            new("Attack Speed", IsPositiveFloat, placeholder: editing.AttackSpeed.ToString()),
+            new("Defense", IsUInt16, placeholder: editing.Defense.ToString()),
+            new("Speed", IsUInt16, placeholder: editing.Speed.ToString()),
+            new("Projectile Speed", IsUInt16, placeholder: editing.ProjectileSpeed.ToString()),
+            new("View Range", IsUInt16, placeholder: editing.ViewRange.ToString()),
+            new("Attack Range", IsUInt16, placeholder: editing.AttackRange.ToString()),
+            new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())], placeholder: editing.Texture.ToString()),
+            new("Projectile Texture", null, [.. ProjectileTextures.Select(t => t.ToString())], placeholder: editing.ProjectileTexture.ToString())
+        ]);
+        if (!success)
+        {
+            if (!PopupOpen) Logger.Error("NPC creation failed.");
+            return;
+        }
+
+        // Create
+        TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), values[8]);
+        TextureID projTexture = (TextureID)Enum.Parse(typeof(TextureID), values[9]);
+        editing.Health = ushort.Parse(values[0]);
+        editing.Damage = ushort.Parse(values[1]);
+        editing.AttackSpeed = float.Parse(values[2]);
+        editing.Defense = ushort.Parse(values[3]);
+        editing.Speed = ushort.Parse(values[4]);
+        editing.ProjectileSpeed = ushort.Parse(values[5]);
+        editing.ViewRange = ushort.Parse(values[6]);
+        editing.AttackRange = ushort.Parse(values[7]);
+        editing.Texture = texture;
+        editing.ProjectileTexture = projTexture;
+    }
     public void NewDecal()
     {
         // Check

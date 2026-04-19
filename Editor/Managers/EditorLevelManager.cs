@@ -136,6 +136,11 @@ public class EditorLevelManager
         for (int n = 0; n < Math.Min(LevelManager.Level.Decals.Count, ushort.MaxValue); n++)
             writer.Write(LevelManager.Level.Decals.Values.ToArray()[n]);
 
+        // Enemies
+        writer.Write((ushort)Math.Min(LevelManager.Level.Enemies.Count, ushort.MaxValue));
+        for (int n = 0; n < Math.Min(LevelManager.Level.Enemies.Count, ushort.MaxValue); n++)
+            writer.Write(LevelManager.Level.Enemies[n]);
+
         // Scripts
         if (flags.HasFlag(LevelFeatures.QuillScripts))
         {

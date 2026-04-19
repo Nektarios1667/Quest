@@ -186,6 +186,23 @@ public static class PopupFactory
         if (!int.TryParse(value, out int result)) return false;
         return result >= 0;
     }
+    public static bool IsFloat(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        return float.TryParse(value, out _);
+    }
+    public static bool IsPositiveFloat(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        if (!float.TryParse(value, out float result)) return false;
+        return result > 0;
+    }
+    public static bool IsPositiveFloatOrZero(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        if (!float.TryParse(value, out float result)) return false;
+        return result >= 0;
+    }
     public static bool IsByte(string value)
     {
         if (string.IsNullOrWhiteSpace(value)) return false;

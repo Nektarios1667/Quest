@@ -57,6 +57,9 @@ public class PlayerManager : IEntity
         TileBumps.Clear();
         UpdatePositions(gameManager);
 
+        // Check projectiles
+        CheckProjectiles(gameManager);
+
         // Toggle inventory
         if (InputManager.BindPressed(InputAction.ToggleInventory) && StateManager.OverlayState != OverlayState.Typing)
         {
@@ -145,6 +148,20 @@ public class PlayerManager : IEntity
         else if (moveY < 0) PlayerDirection = Direction.Up;
         else PlayerDirection = Direction.Forward;
         DebugManager.EndBenchmark("UpdateMovement");
+    }
+    public void CheckProjectiles(GameManager gameManager)
+    {
+        for (int p = gameManager.LevelManager.Level.Projectiles.Count - 1; p >= 0; p--)
+        {
+            Projectile proj = gameManager.LevelManager.Level.Projectiles[p];
+            if (proj.Bounds.Intersects(Bounds))
+            {
+                DamagePlayer(gameManager, proj.Damage);
+                proj.Destroy();
+            }
+            if (!proj.IsAlive)
+                gameManager.LevelManager.Level.Projectiles.RemoveAt(p);
+        }
     }
     public void UpdateNPCInteractions(GameManager gameManager)
     {

@@ -102,12 +102,14 @@ public class LevelEditor : Game
 
         MouseMenu editMenu = new(gui, Point.Zero, new(100, 50), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         editMenu.AddItem("Edit NPC", editorManager.EditNPC, []);
+        editMenu.AddItem("Edit Enemy", editorManager.EditEnemy, []);
         editMenu.AddItem("Edit Tile", editorManager.EditTile, []);
         mouseMenu.AddItem("Edit...", null, []);
         mouseMenu.AddSubMenu("Edit...", editMenu);
 
         MouseMenu newMenu = new(gui, Point.Zero, new(100, 80), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         newMenu.AddItem("New NPC", editorManager.NewNPC, []);
+        newMenu.AddItem("New Enemy", editorManager.NewEnemy, []);
         newMenu.AddItem("New Loot", editorManager.NewLoot, []);
         newMenu.AddItem("New Decal", editorManager.NewDecal, []);
         newMenu.AddItem("New Script", editorManager.NewScript, []);
@@ -116,6 +118,7 @@ public class LevelEditor : Game
 
         MouseMenu deleteMenu = new(gui, Point.Zero, new(150, 100), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         deleteMenu.AddItem("Delete NPC", editorManager.DeleteNPC, []);
+        deleteMenu.AddItem("Delete Enemy", editorManager.DeleteEnemy, []);
         deleteMenu.AddItem("Delete Loot", editorManager.DeleteLoot, []);
         deleteMenu.AddItem("Delete Decal", editorManager.DeleteDecal, []);
         deleteMenu.AddItem("Delete Script", editorManager.DeleteScript, []);

@@ -1,4 +1,6 @@
 ﻿using Quest.Editor;
+using Quest.Entities;
+using Quest.Tiles;
 using System.IO;
 using System.Linq;
 namespace Quest.Utilities;
@@ -45,6 +47,22 @@ public static class BinaryWriterExtensions
         writer.Write((byte)decal.Type);
         writer.Write(decal.Location);
     }
+    public static void Write(this BinaryWriter writer, Enemy enemy)
+    {
+        writer.Write(enemy.Health);
+        writer.Write(enemy.Damage);
+        writer.Write(enemy.AttackSpeed);
+        writer.Write(enemy.Defense);
+        writer.Write(enemy.Speed);
+        writer.Write(enemy.ProjectileSpeed);
+        writer.Write(enemy.ViewRange);
+        writer.Write(enemy.AttackRange);
+        writer.Write((ushort)enemy.Texture);
+        writer.Write((ushort)enemy.ProjectileTexture);
+        writer.Write((ushort)Math.Round(enemy.Position.X));
+        writer.Write((ushort)Math.Round(enemy.Position.Y));
+        writer.Write(enemy.UID);
+    }
     public static void Write(this BinaryWriter writer, ILootGenerator generator)
     {
         string file = generator.FileName.Split('/', '\\').Last();
@@ -69,7 +87,7 @@ public static class BinaryReaderExtensions
     {
         return new ByteCoord(reader.ReadByte(), reader.ReadByte());
     }
-    public static NPC ReadNPC(this BinaryReader reader, GameManager gameManager)
+    public static NPC ReadNPC(this BinaryReader reader)
     {
         string name = reader.ReadString();
         string dialog = reader.ReadString();
@@ -83,6 +101,50 @@ public static class BinaryReaderExtensions
         }
         TextureID texture = (TextureID)texID;
         return new NPC(texture, location, name, dialog, Color.White, scale);
+    }
+    public static Enemy ReadEnemy(this BinaryReader reader)
+    {
+        ushort health = reader.ReadUInt16();
+        ushort damage = reader.ReadUInt16();
+        float attackSpeed = reader.ReadSingle();
+        ushort defense = reader.ReadUInt16();
+        ushort speed = reader.ReadUInt16();
+        ushort projectileSpeed = reader.ReadUInt16();
+        ushort viewRange = reader.ReadUInt16();
+        ushort attackRange = reader.ReadUInt16();
+
+        ushort texID = reader.ReadUInt16();
+        if (!Enum.IsDefined(typeof(TextureID), texID))
+        {
+            Logger.Error("Failed to read Enemy. Invalid texture ID.");
+            texID = (ushort)TextureID.Null;
+        }
+
+        ushort projTexID = reader.ReadUInt16();
+        if (!Enum.IsDefined(typeof(TextureID), projTexID))
+        {
+            Logger.Error("Failed to read Enemy. Invalid projectile texture ID.");
+            projTexID = (ushort)TextureID.Null;
+        }
+
+        Vector2 position = new(reader.ReadUInt16(), reader.ReadUInt16());
+        ushort uid = reader.ReadUInt16();
+
+        Enemy enemy = new Enemy(
+            position,
+            health,
+            damage,
+            attackSpeed,
+            defense,
+            speed,
+            projectileSpeed,
+            viewRange,
+            attackRange,
+            (TextureID)texID,
+            (TextureID)projTexID,
+            uid
+        );
+        return enemy;
     }
     public static float ReadByteFloat(this BinaryReader reader)
     {

@@ -6,42 +6,52 @@ using System.Linq;
 namespace Quest.Entities;
 public class Enemy : IEntity, IProjectileOwner
 {
-    public ushort UID { get; }
+    public ushort UID { get; set; }
     public bool IsAlive => Health >= 0;
-    public ushort Health { get; protected set; }
-    public ushort Damage { get; protected set; }
-    public float AttackSpeed { get; protected set; } // Attacks per second
-    public ushort Defense { get; protected set; } // If damage <= Defense, damage /= 2
-    public ushort Speed { get; protected set; } // Pixels per second
-    public ushort ProjectileSpeed { get; protected set; } // Pixels per second
-    public ushort ViewRange { get; protected set; } // Pixels
-    public ushort AttackRange { get; protected set; } // Pixels
-    public TextureID Texture { get; protected set; }
-    public TextureID ProjectileTexture { get; protected set; }
-    public Vector2 Position { get; protected set; }
+    public ushort Health { get; set; }
+    public ushort Damage { get; set; }
+    public float AttackSpeed { get; set; } // Attacks per second
+    public ushort Defense { get; set; } // If damage <= Defense, damage /= 2
+    public ushort Speed { get; set; } // Pixels per second
+    public ushort ProjectileSpeed { get; set; } // Pixels per second
+    public ushort ViewRange { get; set; } // Pixels
+    public ushort AttackRange { get; set; } // Pixels
+    public TextureID Texture { get; set; }
+    public TextureID ProjectileTexture { get; set; }
+    public Vector2 Position { get; set; }
     public float Scale { get; protected set; }
     public RectangleF Bounds => new(Position, Size);
     public Vector2 FootPosition => Position + new Vector2(Size.X / 2, Size.Y);
     public Point Size { get; set; }
     protected List<Point>? Path { get; set; }
-    protected PlayerManager? PlayerManager { get; set; }
-    public Enemy(Point pos, PlayerManager? playerManager = null)
+    public Enemy(
+        Vector2 pos,
+        ushort health,
+        ushort damage,
+        float attackSpeed,
+        ushort defense,
+        ushort speed,
+        ushort projectileSpeed,
+        ushort viewRange,
+        ushort attackRange,
+        TextureID texture,
+        TextureID projectileTexture,
+        ushort? uid = null)
     {
-        Texture = TextureID.PurpleWizard; // DEBUG TODO remove this line when all enemies have textures
-        ProjectileTexture = TextureID.Fireball; // DEBUG TODO remove this line when all enemies have textures
-        UID = UIDManager.Get(UIDCategory.Enemies);
-        Position = pos.ToVector2();
-        PlayerManager = playerManager;
+        Texture = texture; // DEBUG TODO remove this line when all enemies have textures
+        ProjectileTexture = projectileTexture; // DEBUG TODO remove this line when all enemies have textures
+        UID = uid ?? UIDManager.Get(UIDCategory.Enemies);
+        Position = pos;
 
         // Stats
-        Health = 100;
-        Damage = 25;
-        AttackSpeed = 2;
-        Defense = 20;
-        Speed = 80;
-        ProjectileSpeed = 120;
-        ViewRange = 1000;
-        AttackRange = 500;
+        Health = health;
+        Damage = damage;
+        AttackSpeed = attackSpeed;
+        Defense = defense;
+        Speed = speed;
+        ProjectileSpeed = projectileSpeed;
+        ViewRange = viewRange;
+        AttackRange = attackRange;
         Scale = Constants.PlayerScale;
 
         Size = (TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap).Scaled(Scale);
@@ -108,7 +118,7 @@ public class Enemy : IEntity, IProjectileOwner
     }
     public virtual void Attack(GameManager gameManager, float direction)
     {
-        Projectile proj = new(gameManager, PlayerManager, this, ProjectileTexture, Bounds.Center, direction, Damage, ProjectileSpeed);
+        Projectile proj = new(gameManager, this, ProjectileTexture, Bounds.Center, direction, Damage, ProjectileSpeed);
         gameManager.LevelManager.Level.Projectiles.Add(proj);
         SoundManager.PlaySound("Fire");
     }

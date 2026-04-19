@@ -381,7 +381,7 @@ public class LevelManager
             ushort npcCount = reader.ReadUInt16();
             List<NPC> npcBuffer = new(npcCount);
             for (int n = 0; n < npcCount; n++)
-                npcBuffer.Add(reader.ReadNPC(gameManager));
+                npcBuffer.Add(reader.ReadNPC());
 
             // Loot
             ushort lootCount = reader.ReadUInt16();
@@ -397,6 +397,12 @@ public class LevelManager
                 Decal decal = reader.ReadDecal();
                 decalBuffer[decal.Location] = decal;
             }
+
+            // Enemies
+            ushort enemyCount = reader.ReadUInt16();
+            List<Enemy> enemyBuffer = new(enemyCount);
+            for (int e = 0; e < enemyCount; e++)
+                enemyBuffer.Add(reader.ReadEnemy());
 
             // Scripts
             List<QuillScript> scriptBuffer = [];
@@ -415,7 +421,7 @@ public class LevelManager
             }
 
             // Make and add the level
-            Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, [], [], scriptBuffer, tint);
+            Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, enemyBuffer, [], scriptBuffer, tint);
             if (reload) Levels.RemoveAll(l => l.Path == filename);
             Levels.Add(created);
             sw.Stop();
