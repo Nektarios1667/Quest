@@ -298,7 +298,7 @@ public class Window : Game
         debugSb.Append(StateManager.WeatherIntensity(GameManager.GameTime));
         debugSb.AppendFormat(" [{0:0.00}]", StateManager.WeatherValue(GameManager.GameTime));
         debugSb.Append("\nUIDs: ");
-        debugSb.AppendFormat("L:{0} E:{1} I:{2}", UIDManager.Available(UIDCategory.Loot), UIDManager.Available(UIDCategory.Enemies), UIDManager.Available(UIDCategory.Items));
+        debugSb.AppendFormat("L:{0}/{1} E:{2}/{3} I:{4}/{5} P:{6}/{7}", UIDManager.InUse(UIDCategory.Loot), UIDManager.Counter(UIDCategory.Loot), UIDManager.InUse(UIDCategory.Enemies), UIDManager.Counter(UIDCategory.Enemies), UIDManager.InUse(UIDCategory.Items), UIDManager.Counter(UIDCategory.Items), UIDManager.InUse(UIDCategory.Projectiles), UIDManager.Counter(UIDCategory.Projectiles));
         debugSb.Append("\nSave: ");
         debugSb.Append(StateManager.CurrentSave);
         debugSb.Append("\nCurrent Luxel: ");

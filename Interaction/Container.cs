@@ -196,7 +196,10 @@ public class Container
         {
             Item? item = Items[i];
             if (item != null && item.Amount <= 0)
+            {
                 Items[i] = null;
+                item.Dispose();
+            }
         }
     }
     public static bool SameItem(Item? item1, Item? item2) => item1 != null && item2 != null && item1.Type == item2.Type && item1.CustomName == item2.CustomName;

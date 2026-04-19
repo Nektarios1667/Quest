@@ -360,15 +360,15 @@ public class EditorManager
             texture,
             projTexture
         );
-        LevelManager.Level.Enemies.Add(enemy);
+        LevelManager.Level.Enemies[enemy.UID] = enemy;
     }
     public void DeleteEnemy()
     {
-        foreach (Enemy enemy in LevelManager.Level.Enemies)
+        foreach (Enemy enemy in LevelManager.Level.Enemies.Values)
         {
             if (Vector2.DistanceSquared(enemy.Position, MouseSelection.ToVector2()) < 50 * 50)
             {
-                LevelManager.Level.Enemies.Remove(enemy);
+                LevelManager.Level.Enemies.Remove(enemy.UID);
                 Logger.Log($"Deleted Enemy @ {MouseSelection.X}, {MouseSelection.Y}.");
                 break;
             }
@@ -378,7 +378,7 @@ public class EditorManager
     {
         // Grab NPC
         Enemy? editing = null;
-        foreach (Enemy enemy in LevelManager.Level.Enemies)
+        foreach (Enemy enemy in LevelManager.Level.Enemies.Values)
         {
             if (Vector2.DistanceSquared(enemy.Position, MouseSelection.ToVector2()) < 50 * 50)
             {

@@ -39,7 +39,11 @@ public static class UIDManager
         else
             return uidCounters[c];
     }
-    public static int Available(UIDCategory category)
+    public static ushort Counter(UIDCategory category)
+    {
+        return uidCounters[(int)category];
+    }
+    public static int InUse(UIDCategory category)
     {
         int c = (int)category;
         return uidCounters[c] - uids[c].Count;

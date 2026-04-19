@@ -50,7 +50,7 @@ public class LevelManager
 
         // Entities
         foreach (NPC npc in Level.NPCs) npc.Update(gameManager);
-        foreach (Enemy enemy in Level.Enemies) enemy.Update(gameManager);
+        foreach (Enemy enemy in Level.Enemies.Values) enemy.Update(gameManager);
         for (int p = Level.Projectiles.Count -1; p >= 0; p--)
         {
             Level.Projectiles[p].Update(gameManager);
@@ -166,7 +166,7 @@ public class LevelManager
     {
         DebugManager.StartBenchmark("CharacterDraws");
         foreach (NPC npc in Level.NPCs) npc.Draw(gameManager);
-        foreach (Enemy enemy in Level.Enemies) enemy.Draw(gameManager);
+        foreach (Enemy enemy in Level.Enemies.Values) enemy.Draw(gameManager);
         foreach (Projectile projectile in Level.Projectiles) projectile.Draw(gameManager);
         DebugManager.EndBenchmark("CharacterDraws");
     }
@@ -265,10 +265,10 @@ public class LevelManager
 
         // Dispose
         Level level = Levels[levelIndex];
-        for (int l = 0; l < level.Loot.Count; l++)
-            level.Loot[l].Dispose();
-        for (int e = 0; e < level.Enemies.Count; e++)
-            level.Enemies[e].Dispose();
+        foreach (Loot loot in level.Loot)
+            loot.Dispose();
+        foreach (Enemy enemy in level.Enemies.Values)
+            enemy.Dispose();
         UIDManager.ReleaseAll(UIDCategory.Items);
 
         // Remove
@@ -400,9 +400,12 @@ public class LevelManager
 
             // Enemies
             ushort enemyCount = reader.ReadUInt16();
-            List<Enemy> enemyBuffer = new(enemyCount);
+            Dictionary<ushort, Enemy> enemyBuffer = new(enemyCount);
             for (int e = 0; e < enemyCount; e++)
-                enemyBuffer.Add(reader.ReadEnemy());
+            {
+                Enemy enemy = reader.ReadEnemy();
+                enemyBuffer[enemy.UID] = enemy;
+            }
 
             // Scripts
             List<QuillScript> scriptBuffer = [];

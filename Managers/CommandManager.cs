@@ -345,7 +345,8 @@ public static class CommandManager
     }
     private static bool CEnemy(string command)
     {
-        gameManager!.LevelManager.Level.Enemies.Add(new(CameraManager.PlayerFoot.ToVector2(), 200, 30, 2, 25, 100, 200, 1000, 750, TextureID.WhiteWizard, TextureID.Fireball));
+        Enemy enemy = new(CameraManager.PlayerFoot.ToVector2(), 200, 30, 0.1f, 25, 100, 200, 1000, 750, TextureID.WhiteWizard, TextureID.Fireball);
+        gameManager!.LevelManager.Level.Enemies[enemy.UID] = enemy;
         return true;
     }
     private static bool CFreecam(string command)
