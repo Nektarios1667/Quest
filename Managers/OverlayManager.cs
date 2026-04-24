@@ -38,6 +38,8 @@ public class OverlayManager
                 MarkUpdateLighting();
         };
     }
+
+
     public void Update(GameManager gameManager, PlayerManager? playerManager)
     {
         // Gui
@@ -51,6 +53,8 @@ public class OverlayManager
     }
     public void Draw(GraphicsDevice device, GameManager gameManager, PlayerManager? playerManager)
     {
+        if (!StateManager.IsPlayingState) return;
+
         // Lighting
         if (StateManager.State == GameState.Game)
             DrawLighting(gameManager);

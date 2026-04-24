@@ -63,8 +63,10 @@ public class Projectile : IEntity
     {
         // Check collisions with walls
         Point tileCoord = CameraManager.PositionToWorldCoord(Position + Size.ToVector2() / 2);
+        // Either OOB, or non-walkable wall
         if (tileCoord.X < 0 || tileCoord.X >= Constants.MapSize.X || tileCoord.Y < 0 || tileCoord.Y >= Constants.MapSize.Y ||
-            gameManager.LevelManager.Level.Tiles[tileCoord.Y * Constants.MapSize.X + tileCoord.X].IsWall)
+            (gameManager.LevelManager.Level.Tiles[tileCoord.Y * Constants.MapSize.X + tileCoord.X].IsWall &&
+            !gameManager.LevelManager.Level.Tiles[tileCoord.Y * Constants.MapSize.X + tileCoord.X].IsWalkable))
             Destroy();
     }
 }

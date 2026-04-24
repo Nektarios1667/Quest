@@ -1,12 +1,12 @@
 namespace Quest.Items;
 public class DiamondSword : MeleeWeapon
 {
-    public DiamondSword(int amount) : base(ItemTypes.DiamondSword, amount, .8f, 60, 40)
+    public DiamondSword(byte amount, string? customName = null) : base(ItemTypes.DiamondSword, amount, 1.2f, 60, 40, customName)
     {
     }
-    public override void PrimaryUse(PlayerManager player)
+    public override void PrimaryUse(GameManager gameManager, PlayerManager player)
     {
-        base.PrimaryUse(player);
+        base.PrimaryUse(gameManager, player);
         SoundManager.PlaySound("Swoosh", pitch: RandomManager.RandomFloat() / 2 - .25f);
     }
 }

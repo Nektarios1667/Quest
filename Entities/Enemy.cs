@@ -38,8 +38,8 @@ public class Enemy : IEntity, IProjectileOwner
         TextureID projectileTexture,
         ushort? uid = null)
     {
-        Texture = texture; // DEBUG TODO remove this line when all enemies have textures
-        ProjectileTexture = projectileTexture; // DEBUG TODO remove this line when all enemies have textures
+        Texture = texture;
+        ProjectileTexture = projectileTexture;
         UID = uid ?? UIDManager.Get(UIDCategory.Enemies);
         Position = pos;
 

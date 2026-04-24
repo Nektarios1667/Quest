@@ -151,7 +151,7 @@ public class EditorManager
     public void FloodFill()
     {
         if (CurrentTool == EditorTool.Tile) FloodFillTiles();
-        else if (CurrentTool == EditorTool.Decal) { } // TODO
+        else if (CurrentTool == EditorTool.Decal) { }
         else if (CurrentTool == EditorTool.Biome) FloodFillBiome();
     }
     public void FloodFillTiles()

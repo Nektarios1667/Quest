@@ -20,7 +20,7 @@ public static class UIDManager
         for (int i = 0; i < categories; i++)
         {
             uids[i] = new Queue<ushort>();
-            uidCounters[i] = 0;
+            uidCounters[i] = 1;
         }
     }
     public static ushort Get(UIDCategory category)

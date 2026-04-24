@@ -330,7 +330,7 @@ public static class StateManager
                 // Projectiles
                 ushort projectileCount = reader.ReadUInt16();
                 for (int p = 0; p < projectileCount; p++)
-                    ReadProjectileData(gameManager, reader, current);
+                    ReadProjectileData(gameManager, playerManager, reader, current);
             }
 
             // Read Inventory data
@@ -381,7 +381,7 @@ public static class StateManager
     public static void WriteEnemyData(BinaryWriter writer, Enemy enemy)
     {
         writer.Write(enemy.UID);
-        writer.Write(enemy.Health);
+        writer.Write((ushort)Math.Clamp(enemy.Health, ushort.MinValue, ushort.MaxValue));
         writer.Write((ushort)enemy.Position.X);
         writer.Write((ushort)enemy.Position.Y);
         writer.Write((float)TimerManager.TryTimeLeft($"EnemyAttack_{enemy.UID}"));
@@ -484,14 +484,14 @@ public static class StateManager
         else
             Logger.Error($"Enemy with UID {uid} not found in level.");
     }
-    public static void ReadProjectileData(GameManager gameManager, BinaryReader reader, Level current)
+    public static void ReadProjectileData(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Level current)
     {
         ushort ownerUID = reader.ReadUInt16();
         Vector2 position = new(reader.ReadUInt16(), reader.ReadUInt16());
         float direction = reader.ReadSingle();
 
         // Get owner
-        Enemy? owner = current.Enemies.TryGetValue(ownerUID, out var e) ? e : null;
+        IProjectileOwner? owner = ownerUID == 0 ? playerManager : (current.Enemies.TryGetValue(ownerUID, out var e) ? e : null);
         if (owner == null)
         {
             Logger.Error($"Owner with UID {ownerUID} not found.");

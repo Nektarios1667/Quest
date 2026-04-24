@@ -49,6 +49,7 @@ public class LevelManager
         );
 
         // Entities
+        DebugManager.StartBenchmark("LevelEntityUpdates");
         foreach (NPC npc in Level.NPCs) npc.Update(gameManager);
         foreach (Enemy enemy in Level.Enemies.Values) enemy.Update(gameManager);
         var enemyList = Level.Enemies.Values.ToArray();
@@ -64,20 +65,24 @@ public class LevelManager
         }
         if (Level.Loot.Count >= ushort.MaxValue)
             Level.Loot.RemoveRange(0, Level.Loot.Count - ushort.MaxValue);
+        DebugManager.EndBenchmark("LevelEntityUpdates");
 
         // SkyTint
         UpdateSky(gameManager);
 
 
         // Dynamic lighting
+        DebugManager.StartBenchmark("LootLighting");
         foreach (Loot loot in Level.Loot)
             if (loot.Item.Type == ItemTypes.Lantern)
             {
                 Point loc = loot.Position - CameraManager.Camera.ToPoint() + Constants.Middle + TextureManager.Metadata[loot.Texture].Size;
                 LightingManager.SetLight($"Loot_{loot.UID}", loc, 2);
             }
+        DebugManager.EndBenchmark("LootLighting");
 
         // Weather sounds
+        DebugManager.StartBenchmark("WeatherSounds");
         float weatherIntensity = StateManager.WeatherIntensity(GameManager.GameTime);
         if (!Constants.EDITOR && weatherIntensity > 0)
         {
@@ -91,6 +96,7 @@ public class LevelManager
                 case BiomeType.Desert: SoundManager.PlaySoundInstance("Sandstorm", volume: weatherIntensity * 0.25f); break;
             }
         }
+        DebugManager.EndBenchmark("WeatherSounds");
     }
     public void UpdateSky(GameManager gameManager)
     {
@@ -218,6 +224,8 @@ public class LevelManager
         CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
         CameraManager.Camera = CameraManager.CameraDest;
         CameraManager.Update(0); // Ensure in bounds
+
+        gameManager.OverlayManager.MarkUpdateLighting();
 
         return true;
     }

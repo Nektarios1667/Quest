@@ -8,8 +8,13 @@ public class Attack(int damage, RectangleF hitbox)
     public int Damage { get; } = damage;
     public RectangleF Hitbox { get; } = hitbox;
 }
-public class PlayerManager : IEntity
+public class PlayerManager : IEntity, IProjectileOwner
 {
+    // Projectiles
+    public ushort UID => 0;
+    public ushort Damage => EquippedItem is RangedWeapon weapon ? weapon.Damage : (ushort)0;
+    public ushort ProjectileSpeed => EquippedItem is RangedWeapon weapon ? weapon.Speed : (ushort)0;
+    public TextureID ProjectileTexture => EquippedItem is RangedWeapon weapon ? weapon.ProjectileTexture : TextureID.Null;
     // Events
     public event Action<Item?>? ItemSelected;
     public event Action<int> EquippedSlotChanged;
@@ -91,8 +96,8 @@ public class PlayerManager : IEntity
             // Remove attacks
             DebugManager.StartBenchmark("UpdateAttacks");
             Attacks.Clear();
-            if (InputManager.LMouseClicked) EquippedItem?.PrimaryUse(this);
-            else if (InputManager.RMouseClicked) EquippedItem?.SecondaryUse(this);
+            if (InputManager.LMouseClicked) EquippedItem?.PrimaryUse(gameManager, this);
+            else if (InputManager.RMouseClicked) EquippedItem?.SecondaryUse(gameManager, this);
             DebugManager.EndBenchmark("UpdateAttacks");
         }
 
@@ -151,17 +156,38 @@ public class PlayerManager : IEntity
     }
     public void CheckProjectiles(GameManager gameManager)
     {
+        DebugManager.StartBenchmark("ProjectileCollisions");
+
+        // Iterate projectiles
+        IEntity[] entities = [..gameManager.LevelManager.Level.Enemies.Values, this];
         for (int p = gameManager.LevelManager.Level.Projectiles.Count - 1; p >= 0; p--)
         {
             Projectile proj = gameManager.LevelManager.Level.Projectiles[p];
-            if (proj.Bounds.Intersects(Bounds))
+            // Iterate entities
+            foreach (IEntity entity in entities)
             {
-                DamagePlayer(gameManager, proj.Damage);
-                proj.Destroy();
+                // Checks
+                if (entity == proj.Owner) continue;
+                if (proj.Bounds.Intersects(entity.Bounds))
+                {
+                    // Damage enemy / player
+                    if (entity is Enemy enemy)
+                        enemy.Health -= proj.Damage;
+                    else if (entity is PlayerManager player)
+                        DamagePlayer(gameManager, proj.Damage);
+
+                    // Destroy
+                    proj.Destroy();
+                    break;
+                }
             }
+
+            // Clean up dead projectiles
             if (!proj.IsAlive)
                 gameManager.LevelManager.Level.Projectiles.RemoveAt(p);
         }
+
+        DebugManager.EndBenchmark("ProjectileCollisions");
     }
     public void UpdateNPCInteractions(GameManager gameManager)
     {

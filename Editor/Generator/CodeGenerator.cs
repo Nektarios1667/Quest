@@ -8,7 +8,7 @@ public static class CodeGenerator
 {
     private const string tileCodeTemplate = "namespace Quest.Tiles;\r\n\r\npublic class $name : Tile\r\n{\r\n    public $name(Point location) : base(location, TileTypeID.$name) { }\r\n}\r\n";
     private const string decalCodeTemplate = "namespace Quest.Decals;\r\npublic class $name(Point location) : Decal(location) {}\r\n";
-    private const string itemCodeTemplate = "namespace Quest.Items;\r\npublic class $name : Item\r\n{\r\n    public $name(int amount) : base(ItemTypes.$name, amount)\r\n    {}\r\n}\r\n";
+    private const string itemCodeTemplate = "namespace Quest.Items;\r\npublic class $name : Item\r\n{\r\n    public $name(byte amount) : base(ItemTypes.$name, amount)\r\n    {}\r\n}\r\n";
 
     private static string textureManagerSource = "";
     private static string levelManagerSource = "";

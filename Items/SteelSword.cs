@@ -1,12 +1,12 @@
 namespace Quest.Items;
 public class SteelSword : MeleeWeapon
 {
-    public SteelSword(int amount) : base(ItemTypes.SteelSword, amount, 1f, 45, 20)
+    public SteelSword(byte amount, string? customName = null) : base(ItemTypes.SteelSword, amount, 1.4f, 45, 20, customName)
     {
     }
-    public override void PrimaryUse(PlayerManager player)
+    public override void PrimaryUse(GameManager gameManager, PlayerManager player)
     {
-        base.PrimaryUse(player);
+        base.PrimaryUse(gameManager, player);
         SoundManager.PlaySound("Swoosh", pitch: RandomManager.RandomFloat() / 2 - .25f);
     }
 }

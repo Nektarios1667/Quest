@@ -64,6 +64,7 @@ public enum ItemTypeID : byte
     CookedFish,
     RawBeef,
     CookedBeef,
+    Crossbow,
     // ITEMS ENUM
 }
 
@@ -152,6 +153,7 @@ public class ItemTypes
     public static readonly ItemType CookedFish = new(ItemTypeID.CookedFish, "Cooked fish from the sea.");
     public static readonly ItemType RawBeef = new(ItemTypeID.RawBeef, "Uncooked cow meat.");
     public static readonly ItemType CookedBeef = new(ItemTypeID.CookedBeef, "Cooked cow meat.");
+    public static readonly ItemType Crossbow = new(ItemTypeID.Crossbow, "A wooden crossbow capable of shooting arrows.", 1);
     // ITEMS REGISTER
     public static readonly ItemType[] All = [
     ActivePalantir,
@@ -212,6 +214,7 @@ public class ItemTypes
     CookedFish,
     RawBeef,
     CookedBeef,
+    Crossbow,
     // ITEMS ENUM
     ];
 }
@@ -272,14 +275,14 @@ public class Item
         UID = UIDManager.Get(UIDCategory.Items);
         CustomName = item.CustomName;
     }
-    public virtual void PrimaryUse(PlayerManager player) { }
-    public virtual void SecondaryUse(PlayerManager player) { }
-    public static Item Create(ItemType type, int amount, string? customName = null)
+    public virtual void PrimaryUse(GameManager gameManager, PlayerManager player) { }
+    public virtual void SecondaryUse(GameManager gameManager, PlayerManager player) { }
+    public static Item Create(ItemType type, byte amount, string? customName = null)
     {
         return Create(type.TypeID, amount, customName);
     }
 
-    public static Item Create(ItemTypeID itemType, int amount, string? customName = null)
+    public static Item Create(ItemTypeID itemType, byte amount, string? customName = null)
     {
         // Error check
         if ((byte)itemType >= ItemTypes.All.Length)
@@ -290,6 +293,9 @@ public class Item
         return itemType switch
         {
             ItemTypeID.Lantern => new Lantern(amount, customName),
+            ItemTypeID.SteelSword => new SteelSword(amount, customName),
+            ItemTypeID.DiamondSword => new DiamondSword(amount, customName),
+            ItemTypeID.Crossbow => new Crossbow(amount, customName),
             _ => new Item(type, amount, customName),
         };
     }
