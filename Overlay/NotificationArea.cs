@@ -42,7 +42,7 @@ public class NotificationArea(Point location, int height, SpriteFont font, Color
         {
             Notification notif = Notifications[n];
             Point textSize = Font.MeasureString(notif.Text).ToPoint() / Constants.TwoPoint;
-            Point dest = Location + Offset - new Point(textSize.X / 2, (textSize.Y + 5) * n / 2);
+            Point dest = Position + Offset - new Point(textSize.X / 2, (textSize.Y + 5) * n / 2);
             batch.DrawString(Font, notif.Text, dest.ToVector2(), notif.Color, 0f, Vector2.Zero, .5f, SpriteEffects.None, 0f);
         }
     }

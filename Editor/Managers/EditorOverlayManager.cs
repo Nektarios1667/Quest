@@ -21,7 +21,6 @@ public class EditorOverlayManager
     private LevelManager LevelManager => GameManager.LevelManager;
     // 
     private StringBuilder DebugSb;
-    private float Delta;
     private float CacheDelta;
     private Dictionary<string, double> FrameTimes = [];
     private RenderTarget2D Minimap = null!;

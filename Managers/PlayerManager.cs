@@ -3,21 +3,15 @@ using Quest.Interaction;
 using System.Linq;
 namespace Quest.Managers;
 
-public class Attack(int damage, RectangleF hitbox)
-{
-    public int Damage { get; } = damage;
-    public RectangleF Hitbox { get; } = hitbox;
-}
 public class PlayerManager : IEntity, IProjectileOwner
 {
     // Projectiles
     public ushort UID => 0;
-    public ushort Damage => EquippedItem is RangedWeapon weapon ? weapon.Damage : (ushort)0;
-    public ushort ProjectileSpeed => EquippedItem is RangedWeapon weapon ? weapon.Speed : (ushort)0;
-    public TextureID ProjectileTexture => EquippedItem is RangedWeapon weapon ? weapon.ProjectileTexture : TextureID.Null;
+    public ushort Damage => EquippedItem is IProjectileOwner weapon ? weapon.Damage : (ushort)0;
+    public ushort ProjectileSpeed => EquippedItem is IProjectileOwner weapon ? weapon.ProjectileSpeed : (ushort)0;
+    public TextureID ProjectileTexture => EquippedItem is IProjectileOwner weapon ? weapon.ProjectileTexture : TextureID.Null;
     // Events
-    public event Action<Item?>? ItemSelected;
-    public event Action<int> EquippedSlotChanged;
+    public event Action<int>? EquippedSlotChanged;
     // Properties
     // Inventory and UI
     public bool InventoryOpen { get; set; } = false;
@@ -38,9 +32,8 @@ public class PlayerManager : IEntity, IProjectileOwner
     public Tile? TileBelow { get; private set; }
     public List<Tile> TileBumps { get; private set; } = [];
     public Direction PlayerDirection { get; private set; }
-    public List<Attack> Attacks { get; private set; } = [];
     private float moveX, moveY;
-    private GameManager Game;
+    private GameManager Game = null!;
     public PlayerManager()
     {
         Inventory = new(new Item[6*4]);
@@ -93,9 +86,8 @@ public class PlayerManager : IEntity, IProjectileOwner
             if (!CameraManager.FreeCam)
                 UpdateMovements(gameManager);
 
-            // Remove attacks
+            // Item use
             DebugManager.StartBenchmark("UpdateAttacks");
-            Attacks.Clear();
             if (InputManager.LMouseClicked) EquippedItem?.PrimaryUse(gameManager, this);
             else if (InputManager.RMouseClicked) EquippedItem?.SecondaryUse(gameManager, this);
             DebugManager.EndBenchmark("UpdateAttacks");
@@ -264,11 +256,6 @@ public class PlayerManager : IEntity, IProjectileOwner
 
         // Draw player
         DrawPlayer(gameManager);
-        if (DebugManager.DrawHitboxes)
-        {
-            foreach (Attack attack in Attacks)
-                FillRectangle(gameManager.Batch, new(attack.Hitbox.Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, new Point((int)attack.Hitbox.Width, (int)attack.Hitbox.Height)), Constants.DebugPinkTint);
-        }
 
         // Draw marked tile
         if (TileBelow != null && DebugManager.CollisionDebug)
@@ -450,9 +437,5 @@ public class PlayerManager : IEntity, IProjectileOwner
             gameManager.OverlayManager.HealthBar.CurrentValue = 0;
             StateManager.OverlayState = OverlayState.Death;
         }
-    }
-    public void AddAttack(Attack attack)
-    {
-        Attacks.Add(attack);
     }
 }

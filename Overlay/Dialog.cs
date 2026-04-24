@@ -59,9 +59,9 @@ public class Dialog : Widget
     public void UpdateSize()
     {
         Dimensions = new(Dimensions.X, Font.MeasureString(LimitLines(SoftwrapWords(Text, Font, Dimensions), Font, 200)).Y + 20);
-        Location = new((int)(Constants.Middle.X - Dimensions.X / 2), (int)(Constants.NativeResolution.Y - Dimensions.Y - TextureManager.Metadata[TextureID.Slot].Size.Y - Border - 5));
+        Position = new((int)(Constants.Middle.X - Dimensions.X / 2), (int)(Constants.NativeResolution.Y - Dimensions.Y - TextureManager.Metadata[TextureID.Slot].Size.Y - Border - 5));
         Inside = new(Dimensions.X - Border * 2 - 2, Dimensions.Y - Border * 2 - 2);
-        Rect = new(Location.X, Location.Y, (int)Dimensions.X, (int)Dimensions.Y);
+        Rect = new(Position.X, Position.Y, (int)Dimensions.X, (int)Dimensions.Y);
     }
     public override void Draw(SpriteBatch batch)
     {
@@ -71,7 +71,7 @@ public class Dialog : Widget
         // Background
         FillRectangle(batch, Rect, Color);
         // Text
-        batch.DrawString(Font, LimitLines(Displayed, Font, Inside.Y), new(Location.X + Border + 2, Location.Y + Border + 2), Foreground);
+        batch.DrawString(Font, LimitLines(Displayed, Font, Inside.Y), new(Position.X + Border + 2, Position.Y + Border + 2), Foreground);
         // Outline
         batch.DrawRectangle(Rect, BorderColor, Border);
     }

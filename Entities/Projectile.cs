@@ -25,12 +25,12 @@ public class Projectile : IEntity
     public ushort Damage => Owner.Damage; 
     public ushort Speed => Owner.ProjectileSpeed; 
     public bool IsAlive { get; protected set; } = true;
-    public Projectile(GameManager gameManager, IProjectileOwner owner, Vector2 position, float direction)
+    public Projectile(GameManager gameManager, IProjectileOwner owner, Vector2 position, float direction, Point? size = null)
     {
         Owner = owner;
         Position = position;
         Direction = direction;
-        Size = (TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap).Scaled(Constants.ProjectileScale);
+        Size = size ?? (TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap).Scaled(Constants.ProjectileScale);
         UID = UIDManager.Get(UIDCategory.Projectiles);
 
         // Update collision 60/s
@@ -56,7 +56,7 @@ public class Projectile : IEntity
         // Cleanup
         UIDManager.Release(UIDCategory.Projectiles, UID);
         IsAlive = false;
-        TimerManager.Remove($"ProjectileCollision_{UID}");
+        TimerManager.TryRemove($"ProjectileCollision_{UID}");
     }
 
     private void UpdateCollision(GameManager gameManager)

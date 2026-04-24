@@ -1,4 +1,5 @@
 ﻿using Migs.MPath.Core.Data;
+using Quest.Gui;
 using SharpDX.Direct2D1.Effects;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -23,6 +24,7 @@ public class Enemy : IEntity, IProjectileOwner
     public RectangleF Bounds => new(Position, Size);
     public Vector2 FootPosition => Position + new Vector2(Size.X / 2, Size.Y);
     public Point Size { get; set; }
+    public StatusBar HealthBar { get; protected set; }
     protected List<Point>? Path { get; set; }
     public Enemy(
         Vector2 pos,
@@ -56,6 +58,8 @@ public class Enemy : IEntity, IProjectileOwner
 
         TimerManager.SetTimer($"EnemyAttack_{UID}", AttackSpeed, null);
         Size = (TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap).Scaled(Scale);
+
+        HealthBar = new(Point.Zero, new(Size.X, 10), Color.Green * 0.7f, Color.Red * 0.7f, Health, Health);
     }
     public virtual void Update(GameManager gameManager)
     {
@@ -104,6 +108,11 @@ public class Enemy : IEntity, IProjectileOwner
                     Position += Vector2.Normalize(move) * Speed * GameManager.DeltaTime;
             }
         }
+
+        // Healthbar
+        HealthBar.Position = Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle + new Point(0, Size.Y + 10);
+        HealthBar.CurrentValue = Health;
+        HealthBar.Update(GameManager.DeltaTime);
     }
     public virtual void Draw(GameManager gameManager)
     {
@@ -111,6 +120,7 @@ public class Enemy : IEntity, IProjectileOwner
         DrawTexture(gameManager.Batch, Texture, Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, source: source, scale: Scale); //, origin: new(Size.X / Scale, Size.Y / Scale));
         
         DebugManager.DrawHitbox(gameManager.Batch, this);
+        HealthBar.Draw(gameManager.Batch);
     }
     public virtual void Hurt(ushort damage)
     {
