@@ -12,6 +12,7 @@ public static class Constants
     public static int PlayerSpeed = 300; // normal is 300
     public const int MaxStack = 10;
     public const int DayLength = 600; // Length of a day in seconds
+    public const int PlayerHealth = 100;
 
     // Tile and map
     public static readonly Point TileSize = new(64, 64); // In-game tile size

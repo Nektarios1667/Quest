@@ -14,15 +14,25 @@ public class PlayerManager : IEntity, IProjectileOwner
     public event Action<int>? EquippedSlotChanged;
     // Properties
     // Inventory and UI
+    private int _health = Constants.PlayerHealth;
     public int Health
     {
-        get => Game.OverlayManager.HealthBar.CurrentValue;
-        set => Game.OverlayManager.HealthBar.CurrentValue = value;
+        get => _health;
+        set
+        {
+            _health = value;
+            Game.OverlayManager.HealthBar.CurrentValue = value;
+        }
     }
+    private int _maxHealth = Constants.PlayerHealth;
     public int MaxHealth
     {
-        get => Game.OverlayManager.HealthBar.MaxValue;
-        set => Game.OverlayManager.HealthBar.MaxValue = value;
+        get => _maxHealth;
+        set
+        {
+            _maxHealth = value;
+            Game.OverlayManager.HealthBar.MaxValue = value;
+        }
     }
     public bool InventoryOpen { get; set; } = false;
     public Container Inventory { get; }
