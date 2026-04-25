@@ -121,7 +121,7 @@ public static partial class Interpreter
         ExternalSymbols["<playercoord>"] = $"{CameraManager.TileCoord.X};{CameraManager.TileCoord.Y}";
         ExternalSymbols["<playerhealth>"] = player.Health.ToString();
         ExternalSymbols["<playermaxhealth>"] = player.MaxHealth.ToString();
-        ExternalSymbols["<playerspeed>"] = Constants.PlayerSpeed.ToString();
+        ExternalSymbols["<playerspeed>"] = Constants.PlayerBaseSpeed.ToString();
         ExternalSymbols["<isstuck>"] = (!(player.TileBelow?.Type.IsWalkable ?? true)).ToString().ToLower();
         ExternalSymbols["<tilebelow>"] = player.TileBelow?.Type.Texture.ToString() ?? "NUL";
         ExternalSymbols["<camera_x>"] = CameraManager.Camera.X.ToString();

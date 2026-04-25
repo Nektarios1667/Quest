@@ -125,7 +125,7 @@ public class Enemy : IEntity
         HealthBar.Draw(gameManager.Batch);
         DamageNotifs.Draw(gameManager.Batch);
     }
-    public virtual void Hurt(ushort damage)
+    public virtual void Hurt(int damage)
     {
 
         if (damage <= Defense) damage /= 2;

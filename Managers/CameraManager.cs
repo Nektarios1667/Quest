@@ -38,13 +38,13 @@ public static class CameraManager
         if (FreeCam)
         {
             if (InputManager.BindDown(InputAction.FreecamUp))
-                Camera += new Vector2(0, -Constants.PlayerSpeed * 1.5f) * deltaTime;
+                Camera += new Vector2(0, -Constants.PlayerBaseSpeed * 1.5f) * deltaTime;
             else if (InputManager.BindDown(InputAction.FreecamDown))
-                Camera += new Vector2(0, Constants.PlayerSpeed * 1.5f) * deltaTime;
+                Camera += new Vector2(0, Constants.PlayerBaseSpeed * 1.5f) * deltaTime;
             if (InputManager.BindDown(InputAction.FreecamLeft))
-                Camera += new Vector2(-Constants.PlayerSpeed * 1.5f, 0) * deltaTime;
+                Camera += new Vector2(-Constants.PlayerBaseSpeed * 1.5f, 0) * deltaTime;
             else if (InputManager.BindDown(InputAction.FreecamRight))
-                Camera += new Vector2(Constants.PlayerSpeed * 1.5f, 0) * deltaTime;
+                Camera += new Vector2(Constants.PlayerBaseSpeed * 1.5f, 0) * deltaTime;
         }
 
         Vector2 beforeCamera = Camera;

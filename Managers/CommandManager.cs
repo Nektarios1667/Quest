@@ -68,6 +68,7 @@ public static class CommandManager
         { "coordinate", value => IsCoordinate(value) },
         { "modify", value => value == "set" || value == "change" },
         { "item", value => ItemFromName(value, 1).Amount != 0 },
+        { "effect", value => Enum.TryParse<StatusEffect>(value, out _) }
     };
     public static void Init(Game game, GameManager gameManager, LevelManager levelManager, PlayerManager playerManager)
     {
@@ -94,7 +95,8 @@ public static class CommandManager
             new("notif <int> <int> <int> <number> **", CNotif, "Notification |*| created.", "Failed to create notification |*|."),
             new("enemy", CEnemy, "Spawned enemy.", "Failed to spawn enemy."),
             new("freecam <bool>", CFreecam, "Set freecam to |1|", "Failed to set freecam to |1|"),
-            new("kill [enemy|projectile] <ushort>", CKill, "Killed |1| with UID |2|", "Failed to kill |1| with UID |2|")
+            new("kill [enemy|projectile] <ushort>", CKill, "Killed |1| with UID |2|", "Failed to kill |1| with UID |2|"),
+            new("effect <effect> {1:999}", CEffect, "Applied effect '|1|' for |2| seconds.", "Failed to apply effect '|1|' for |2| seconds.")
         ];
     }
     public static (bool success, string output) Execute(string command)
@@ -221,7 +223,7 @@ public static class CommandManager
     }
     private static bool CMoveSpeed(string command)
     {
-        Constants.PlayerSpeed = int.Parse(command.Split(' ')[1]);
+        Constants.PlayerBaseSpeed = int.Parse(command.Split(' ')[1]);
         return true;
     }
     private static bool CForceQuit(string command) { throw new Exception("Force quit"); }
@@ -383,5 +385,13 @@ public static class CommandManager
             }
         }
         return false;
+    }
+    private static bool CEffect(string command)
+    {
+        string effectName = command.Split(' ')[1];
+        int effectLength = int.Parse(command.Split(' ')[2]);
+        if (!Enum.TryParse<StatusEffect>(effectName, out var effect)) return false;
+        PlayerManager!.StatusManager.AddStatusEffect(effect, effectLength);
+        return true;
     }
 }

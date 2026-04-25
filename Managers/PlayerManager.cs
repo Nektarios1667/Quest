@@ -8,8 +8,9 @@ public class PlayerManager : IEntity
     // Events
     public event Action<int>? EquippedSlotChanged;
     // Properties
-    // Inventory and UI
-    private int _health = Constants.PlayerHealth;
+    // Player stats
+    public StatusManager StatusManager { get; } = new();
+    private int _health = Constants.PlayerBaseHealth;
     public int Health
     {
         get => _health;
@@ -19,7 +20,7 @@ public class PlayerManager : IEntity
             Game.OverlayManager.HealthBar.CurrentValue = value;
         }
     }
-    private int _maxHealth = Constants.PlayerHealth;
+    private int _maxHealth = Constants.PlayerBaseHealth;
     public int MaxHealth
     {
         get => _maxHealth;
@@ -29,6 +30,9 @@ public class PlayerManager : IEntity
             Game.OverlayManager.HealthBar.MaxValue = value;
         }
     }
+    public int Speed => (int)(Constants.PlayerBaseSpeed * StatusManager.GetSpeedMult());
+    // Inventory and UI
+
     public bool InventoryOpen { get; set; } = false;
     public Container Inventory { get; }
     public UserInterface InventoryUI { get; }
@@ -66,6 +70,9 @@ public class PlayerManager : IEntity
         Game = gameManager;
         if (StateManager.State != GameState.Game && StateManager.State != GameState.Editor) return;
         if (StateManager.OverlayState == OverlayState.Pause) return;
+
+        // Potions
+        StatusManager.Update(gameManager, this);
 
         // Update player position
         TileBumps.Clear();
@@ -150,10 +157,10 @@ public class PlayerManager : IEntity
     {
         DebugManager.StartBenchmark("UpdateMovement");
         moveX = 0; moveY = 0;
-        moveX += InputManager.BindDown(InputAction.MoveLeft) ? -Constants.PlayerSpeed : 0;
-        moveX += InputManager.BindDown(InputAction.MoveRight) ? Constants.PlayerSpeed : 0;
-        moveY += InputManager.BindDown(InputAction.MoveUp) ? -Constants.PlayerSpeed : 0;
-        moveY += InputManager.BindDown(InputAction.MoveDown) ? Constants.PlayerSpeed : 0;
+        moveX += InputManager.BindDown(InputAction.MoveLeft) ? -Speed : 0;
+        moveX += InputManager.BindDown(InputAction.MoveRight) ? Speed : 0;
+        moveY += InputManager.BindDown(InputAction.MoveUp) ? -Speed : 0;
+        moveY += InputManager.BindDown(InputAction.MoveDown) ? Speed : 0;
         Move(gameManager, new(moveX, moveY));
         if (moveX > 0) PlayerDirection = Direction.Right;
         else if (moveX < 0) PlayerDirection = Direction.Left;
@@ -180,9 +187,12 @@ public class PlayerManager : IEntity
                 {
                     // Damage enemy / player
                     if (entity is Enemy enemy)
-                        enemy.Hurt(proj.Damage);
-                    else if (entity is PlayerManager player)
-                        player.Hurt(gameManager, proj.Damage);
+                    {
+                        enemy.Hurt((int)(proj.Damage * StatusManager.GetDamageMult()));
+                        Heal(gameManager, (int)(proj.Damage * StatusManager.GetLifestealMult()));
+                    }
+                    else if (entity is PlayerManager)
+                        Hurt(gameManager, (int)(proj.Damage * StatusManager.GetDefenseMult()));
 
                     // Destroy
                     proj.Destroy();
@@ -318,7 +328,7 @@ public class PlayerManager : IEntity
     {
         // Move
         if (move == Vector2.Zero) return;
-        Vector2 finalMove = Vector2.Normalize(move) * GameManager.DeltaTime * Constants.PlayerSpeed;
+        Vector2 finalMove = Vector2.Normalize(move) * GameManager.DeltaTime * Speed;
 
         // Stuck in block
         if (IsColliding(gameManager)) return;

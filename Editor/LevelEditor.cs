@@ -41,9 +41,6 @@ public class LevelEditor : Game
     // Movements
     public int moveX = 0;
     public int moveY = 0;
-    // Shaders
-    public Effect Grayscale { get; private set; } = null!;
-    public Effect Light { get; private set; } = null!;
     // Render targets
     public LevelEditor()
     {
@@ -82,7 +79,7 @@ public class LevelEditor : Game
         levelGenerator = new(42, 1f / 64);
         levelManager = new();
         uiManager = new(null);
-        gameManager = new(Content, spriteBatch, levelManager, uiManager);
+        gameManager = new(Content, spriteBatch, levelManager, uiManager, null);
         editorManager = new(gameManager);
         editorLevelManager = new(gameManager, levelGenerator);
         editorOverlayManager = new(gameManager, spriteBatch, GraphicsDevice);
@@ -139,9 +136,6 @@ public class LevelEditor : Game
         gui.LoadContent(Content, "Images/Gui");
         Logger.System("Initialized GUI.");
 
-        // Shaders
-        Grayscale = Content.Load<Effect>("Shaders/Grayscale");
-
         // Other
         CursorArrow = Content.Load<Texture2D>("Images/Gui/CursorArrow");
 
@@ -172,10 +166,10 @@ public class LevelEditor : Game
         DebugManager.StartBenchmark("InputUpdate");
         int speedup = InputManager.BindDown(InputAction.FastMove) ? 6 : 2;
         moveX = 0; moveY = 0;
-        moveX += InputManager.BindDown(InputAction.MoveLeft) ? -Constants.PlayerSpeed : 0;
-        moveX += InputManager.BindDown(InputAction.MoveRight) ? Constants.PlayerSpeed : 0;
-        moveY += InputManager.BindDown(InputAction.MoveUp) ? -Constants.PlayerSpeed : 0;
-        moveY += InputManager.BindDown(InputAction.MoveDown) ? Constants.PlayerSpeed : 0;
+        moveX += InputManager.BindDown(InputAction.MoveLeft) ? -Constants.PlayerBaseSpeed : 0;
+        moveX += InputManager.BindDown(InputAction.MoveRight) ? Constants.PlayerBaseSpeed : 0;
+        moveY += InputManager.BindDown(InputAction.MoveUp) ? -Constants.PlayerBaseSpeed : 0;
+        moveY += InputManager.BindDown(InputAction.MoveDown) ? Constants.PlayerBaseSpeed : 0;
         CameraManager.CameraDest += new Vector2(moveX, moveY) * delta * speedup;
         DebugManager.EndBenchmark("InputUpdate");
 

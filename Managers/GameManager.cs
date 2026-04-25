@@ -10,13 +10,14 @@ public class GameManager
 
     public LevelManager LevelManager { get; private set; }
     public OverlayManager OverlayManager { get; private set; }
-    public MenuManager MenuManager { get; private set; }
     public float DayTime { get; set; } = 0f;
     public SpriteBatch Batch { get; private set; }
     public SpriteBatch MinimapBatch { get; private set; }
+    public Effect? GradingEffect { get; private set; }
 
-    public GameManager(ContentManager content, SpriteBatch batch, LevelManager level, OverlayManager overlay)
+    public GameManager(ContentManager content, SpriteBatch batch, LevelManager level, OverlayManager overlay, Effect? gradingEffect)
     {
+        GradingEffect = gradingEffect;
         Batch = batch;
         MinimapBatch = new SpriteBatch(batch.GraphicsDevice);
         LevelManager = level;

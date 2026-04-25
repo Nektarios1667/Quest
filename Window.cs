@@ -26,7 +26,6 @@ public class Window : Game
     public Texture2D CursorArrow { get; private set; } = null!;
     // Shaders
     public Effect Grading = null!;
-    public Effect Grayscale = null!;
 
     // Movements
     public int moveX;
@@ -75,6 +74,12 @@ public class Window : Game
     {
         spriteBatch = new(GraphicsDevice);
 
+        // Shaders
+        Grading = Content.Load<Effect>("Shaders/Grading");
+        Grading.Parameters["Saturation"].SetValue(1f);
+        Grading.Parameters["Contrast"].SetValue(1f);
+        Grading.Parameters["Tint"].SetValue(new Vector3(1, 1, 1));
+
         // State Manager
         StateManager.Mood = Mood.Calm;
 
@@ -90,7 +95,7 @@ public class Window : Game
         UserInterface.Init(spriteBatch, levelManager);
         playerManager = new();
         overlayManager = new(playerManager);
-        gameManager = new(Content, spriteBatch, levelManager, overlayManager);
+        gameManager = new(Content, spriteBatch, levelManager, overlayManager, Grading);
         menuManager = new(this, spriteBatch, Content, gameManager, playerManager);
         CommandManager.Init(this, gameManager, levelManager, playerManager);
 
@@ -99,14 +104,6 @@ public class Window : Game
         // Levels
         menuManager.RefreshWorldList();
         Logger.System("Loaded levels.");
-
-        // Shaders
-        Grading = Content.Load<Effect>("Shaders/Grading");
-        Grading.Parameters["Saturation"].SetValue(1f);
-        Grading.Parameters["Contrast"].SetValue(1f);
-        Grading.Parameters["Tint"].SetValue(new Vector3(1, 1, 1));
-
-        Grayscale = Content.Load<Effect>("Shaders/Grayscale");
 
         // Render Targets
         Render = new RenderTarget2D(
