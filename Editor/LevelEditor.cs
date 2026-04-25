@@ -1,7 +1,6 @@
 ﻿using MonoGUI;
 using Quest.Editor.Generator;
 using Quest.Editor.Managers;
-using System.Linq;
 using System.Text;
 
 namespace Quest.Editor;
@@ -88,7 +87,7 @@ public class LevelEditor : Game
         editorLevelManager = new(gameManager, levelGenerator);
         editorOverlayManager = new(gameManager, spriteBatch, GraphicsDevice);
         TimerManager.SetTimer("UpdateMinimap", 1, editorOverlayManager.FlagRebuildMinimap, int.MaxValue);
-        
+
         StateManager.State = GameState.Editor;
         Logger.System("Initialized managers.");
 

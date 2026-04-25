@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Quest.Interaction;
+﻿namespace Quest.Interaction;
 public class Group : UIElement
 {
     public List<string> Elements { get; private set; }

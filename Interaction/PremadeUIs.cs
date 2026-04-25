@@ -1,11 +1,4 @@
-﻿using MonoGUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Quest.Interaction;
+﻿namespace Quest.Interaction;
 public partial class UserInterface
 {
     public static UserInterface ChestUI { get; private set; } = null!;

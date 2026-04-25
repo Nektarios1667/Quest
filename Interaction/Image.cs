@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Quest.Interaction;
+﻿namespace Quest.Interaction;
 public class Image : UIElement
 {
     public Rectangle Bounds => Texture.Bounds.Inflated(BorderThickness, BorderThickness);
@@ -17,7 +11,7 @@ public class Image : UIElement
         BorderThickness = borderThickness;
         Texture = tex;
     }
-    public override void Update(UserInterface ui) {}
+    public override void Update(UserInterface ui) { }
     public override void Draw(UserInterface ui)
     {
         // Border

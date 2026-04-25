@@ -55,7 +55,7 @@ public static class CameraManager
         {
             Camera = Vector2.Lerp(Camera, CameraDest, 1f - MathF.Pow(1f - Constants.CameraRigidity, deltaTime * 60f));
             Camera = Vector2.Clamp(Camera, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
-        } 
+        }
         Camera = Vector2.Clamp(Camera, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
 
         // Events

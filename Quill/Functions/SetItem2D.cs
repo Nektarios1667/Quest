@@ -1,6 +1,4 @@
-﻿using System.Drawing.Text;
-
-namespace Quest.Quill.Functions;
+﻿namespace Quest.Quill.Functions;
 public class SetItem2D : IBuiltinFunction
 {
     public FunctionResponse Run(Dictionary<string, string> vars, string[] args)

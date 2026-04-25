@@ -1,14 +1,10 @@
-﻿using Quest.Quill.Functions;
-using ScottPlot.TickGenerators;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Quest.Quill;
 
-public enum QuillOp {
+public enum QuillOp
+{
     // Noop
     NoOp,
 
@@ -116,7 +112,7 @@ public static class Compiler
 
             // Parse line
             if (inst.Functions.ContainsKey(command)) // Custom func
-                commands.Add(new(QuillOp.CustomFuncCall, [command, ..args]));
+                commands.Add(new(QuillOp.CustomFuncCall, [command, .. args]));
             else if (Interpreter.GetBuiltinFunctions().ContainsKey(command)) // Builtin func
                 commands.Add(new(QuillOp.BuiltinFuncCall, [command, .. args]));
             else if (Enum.TryParse<QuillOp>(command, true, out var op))

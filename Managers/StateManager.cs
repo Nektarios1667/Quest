@@ -1,12 +1,5 @@
-﻿using Quest.Items;
-using Quest.Tiles;
-using Quest.Utilities;
-using ScottPlot.Colormaps;
-using SharpDX.Direct3D9;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using System.Net.Http.Json;
-using System.Security.Policy;
 
 namespace Quest.Managers;
 [Flags]
@@ -247,7 +240,7 @@ public static class StateManager
             var inventory = playerManager.Inventory;
             writer.Write((byte)inventory.Items.Length);
             for (int i = 0; i < inventory.Items.Length; i++)
-                    WriteItemData(writer, inventory.Items[i]);
+                WriteItemData(writer, inventory.Items[i]);
             writer.Flush();
             data = ms.ToArray();
         }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Quest.Interaction;
+﻿namespace Quest.Interaction;
 public class Label : UIElement
 {
     public Rectangle Bounds { get; private set; }
@@ -24,7 +18,7 @@ public class Label : UIElement
         BorderThickness = borderThickness;
         Bounds = new Rectangle(Location, Font.MeasureString(Text).ToPoint()).Inflated(BorderThickness, BorderThickness);
     }
-    public override void Update(UserInterface ui) {}
+    public override void Update(UserInterface ui) { }
     public override void Draw(UserInterface ui)
     {
         // Background

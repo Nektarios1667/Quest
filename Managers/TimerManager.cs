@@ -1,6 +1,4 @@
-﻿using ScottPlot.AxisPanels;
-
-namespace Quest.Managers;
+﻿namespace Quest.Managers;
 public class Timer
 {
     public float Left { get; set; }
@@ -75,7 +73,7 @@ public static class TimerManager
             return timer.Left;
         throw new KeyNotFoundException($"No timer with name '{name}' found");
     }
-    public static Timer GetTimer(string  name)
+    public static Timer GetTimer(string name)
     {
         if (timers.TryGetValue(name, out var timer))
             return timer;

@@ -1,5 +1,4 @@
-﻿using System.CodeDom;
-using System.Linq;
+﻿using System.Linq;
 
 namespace Quest.Quill.Functions;
 public class Remove : IBuiltinFunction
@@ -20,7 +19,7 @@ public class Remove : IBuiltinFunction
         string[] items = args[0].Split(';');
         if (idx < 0 || idx >= items.Length)
             return new(false, QuillErrorType.OutOfBounds, $"Index {idx} is out of range for items of length {items.Length}");
-        
+
         string result;
         if (idx == items.Length - 1)
             result = string.Join(";", items[..^1]);

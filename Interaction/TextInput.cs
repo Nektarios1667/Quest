@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Quest.Interaction;
 
@@ -14,7 +11,7 @@ public class TextInput : UIElement
     public const string AlphaChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public const string DigitChars = "0123456789";
     public const string NumChars = "0123456789.,";
-    
+
     public event Action? Clicked;
     public Point Size { get; private set; }
     public Rectangle Bounds { get; private set; }
@@ -55,7 +52,8 @@ public class TextInput : UIElement
                 State = ButtonState.Pressed;
                 StateManager.OverlayState = OverlayState.Typing;
                 Clicked?.Invoke();
-            } else if (State != ButtonState.Normal)
+            }
+            else if (State != ButtonState.Normal)
             {
                 StateManager.RevertOverlayState();
                 State = ButtonState.Normal;
@@ -90,7 +88,8 @@ public class TextInput : UIElement
         Vector2 textPos = Location.ToVector2() + new Vector2(BorderThickness + 3, BorderThickness + 1);
         ui.Batch.DrawString(Font, Text, textPos, Foreground);
         // Cursor
-        if (State == ButtonState.Pressed && GameManager.GameTime % 1 < 0.5f) {
+        if (State == ButtonState.Pressed && GameManager.GameTime % 1 < 0.5f)
+        {
             if (Text == "")
                 ui.Batch.DrawLine(textPos, textPos + new Vector2(0, Font.MeasureString("|").Y), Foreground, 3);
             else

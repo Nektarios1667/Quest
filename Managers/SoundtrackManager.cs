@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
-using System.Linq;
 
 namespace Quest.Managers;
 public enum Soundtracks
@@ -30,7 +29,7 @@ public static class SoundtrackManager
     //
     public static Soundtracks? Playing { get; private set; }
     private static Dictionary<Mood, Soundtracks[]> Tracks { get; set; } = [];
-    private static readonly Timer PlayNextSong = TimerManager.SetTimer("PlayNextSong", RandomManager.RandomIntRange(30, 60), EndSong, repetitions:int.MaxValue);
+    private static readonly Timer PlayNextSong = TimerManager.SetTimer("PlayNextSong", RandomManager.RandomIntRange(30, 60), EndSong, repetitions: int.MaxValue);
     private static bool QueueNextSong = false;
     public static void LoadSoundtracks(ContentManager content)
     {

@@ -1,6 +1,5 @@
 
 using Quest.Interaction;
-using SharpDX.XInput;
 
 namespace Quest.Tiles;
 

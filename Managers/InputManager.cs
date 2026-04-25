@@ -1,5 +1,4 @@
 ﻿using MonoGame.Extended.Input;
-using System.Linq;
 
 namespace Quest.Managers;
 
@@ -71,13 +70,14 @@ public static class InputManager
 {
     static InputManager()
     {
-        foreach (InputAction action in Enum.GetValues(typeof(InputAction))) {
+        foreach (InputAction action in Enum.GetValues(typeof(InputAction)))
+        {
             if (!binds.TryGetValue(action, out var _))
                 Logger.Warning($"Missing bind for action '{action}'");
         }
     }
     // Bindings
-    private static Dictionary<InputAction, InputBinding> binds = new()
+    private static readonly Dictionary<InputAction, InputBinding> binds = new()
     {
         // Game
         { InputAction.MoveUp,               new(Keys.W) },
@@ -168,10 +168,12 @@ public static class InputManager
                     return Hotkey(bind.Modifiers[0], bind.Key.Value, keystate.Value);
                 else if (bind.Modifiers.Length == 2)
                     return Hotkey(bind.Modifiers[0], bind.Modifiers[1], bind.Key.Value, keystate.Value);
-            } else if (bind.Key.HasValue)
+            }
+            else if (bind.Key.HasValue)
             {
                 return keystate.Value.IsKeyDown(bind.Key.Value);
-            } else if (bind.Mouse.HasValue)
+            }
+            else if (bind.Mouse.HasValue)
             {
                 return IsMouseDown(bind.Mouse.Value, mousestate);
             }

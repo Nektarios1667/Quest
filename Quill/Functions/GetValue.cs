@@ -1,6 +1,4 @@
-﻿using System.Drawing.Drawing2D;
-
-namespace Quest.Quill.Functions;
+﻿namespace Quest.Quill.Functions;
 // (dict var) (key)
 public class GetValue : IBuiltinFunction
 {

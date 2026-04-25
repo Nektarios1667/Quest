@@ -114,7 +114,7 @@ public static class LightingManager
         LightToIntensityCache = new float[LightMax * LightDivisions + 1];
         for (float i = 0; i <= LightMax; i += InvLightDivisions)
         {
-            float intensity = MathF.Exp((i * LightMult) / LightMax) - 1;
+            float intensity = MathF.Exp(i * LightMult / LightMax) - 1;
             intensity = Math.Clamp(intensity, 0f, 1f);
             LightToIntensityCache[(int)Math.Round(i * LightDivisions)] = intensity;
         }

@@ -1,16 +1,10 @@
-﻿using Quest.Managers;
-using ScottPlot.Colormaps;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 namespace Quest.Interaction;
 
 public partial class UserInterface
 {
-    public event Action<int ,UserInterface>? OnSlotClick;
+    public event Action<int, UserInterface>? OnSlotClick;
     public event Action<int, UserInterface>? OnSlotDrop;
     public event Action<int, UserInterface>? OnSlotHover;
     public event Action<int, UserInterface>? OnSlotItemChange;

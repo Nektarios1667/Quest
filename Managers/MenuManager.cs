@@ -187,7 +187,8 @@ public class MenuManager
             gameManager.LevelManager.ReadWorld(gameManager, worlds.Selected, reload: true);
             if (!gameManager.LevelManager.LoadLevel(gameManager, $"{worlds.Selected}/{worlds.Selected}"))
                 gameManager.LevelManager.LoadLevel(gameManager, 0);
-        } else 
+        }
+        else
             StateManager.ReadGameState(gameManager, playerManager, $"{worlds.Selected}/{saves.Selected}");
 
         StateManager.State = GameState.Game;

@@ -1,6 +1,5 @@
 ﻿using Quest.Gui;
 using Quest.Interaction;
-using System.Linq;
 namespace Quest.Managers;
 
 public class PlayerManager : IEntity
@@ -35,7 +34,8 @@ public class PlayerManager : IEntity
     public UserInterface InventoryUI { get; }
     public UserInterface? OpenedInterface { get; set; } = null;
     private int equippedSlot = 0;
-    public int EquippedSlot {
+    public int EquippedSlot
+    {
         get => equippedSlot;
         set { equippedSlot = value; EquippedSlotChanged?.Invoke(equippedSlot); }
     }
@@ -52,7 +52,7 @@ public class PlayerManager : IEntity
     private GameManager Game = null!;
     public PlayerManager()
     {
-        Inventory = new(new Item[6*4]);
+        Inventory = new(new Item[6 * 4]);
         InventoryUI = UserInterface.InventoryUI;
         InventoryUI.BindContainer(Inventory);
 
@@ -167,7 +167,7 @@ public class PlayerManager : IEntity
         DebugManager.StartBenchmark("ProjectileCollisions");
 
         // Iterate projectiles
-        IEntity[] entities = [..gameManager.LevelManager.Level.Enemies.Values, this];
+        IEntity[] entities = [.. gameManager.LevelManager.Level.Enemies.Values, this];
         for (int p = gameManager.LevelManager.Level.Projectiles.Count - 1; p >= 0; p--)
         {
             Projectile proj = gameManager.LevelManager.Level.Projectiles[p];
@@ -279,7 +279,8 @@ public class PlayerManager : IEntity
             Point belowDest = TileBelow.Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
             gameManager.Batch.FillRectangle(new(belowDest.ToVector2(), Constants.TileSize), Color.Red * 0.5f);
         }
-        if (TileBumps != null && DebugManager.CollisionDebug) {
+        if (TileBumps != null && DebugManager.CollisionDebug)
+        {
             foreach (Tile tile in TileBumps)
             {
                 Point bumpDest = tile.Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
@@ -370,7 +371,7 @@ public class PlayerManager : IEntity
                 // Check
                 Tile? tile = gameManager.LevelManager.GetTile(new Point(x, y));
                 if (tile == null || tile.IsWalkable) continue;
-                
+
                 // Bump
                 tile.OnPlayerCollide(gameManager, this);
                 TileBumps.Add(tile);

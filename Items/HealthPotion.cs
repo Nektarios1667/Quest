@@ -2,7 +2,7 @@ namespace Quest.Items;
 public class HealthPotion : Item
 {
     public HealthPotion(byte amount, string? customName = null) : base(ItemTypes.HealthPotion, amount, customName)
-    {}
+    { }
     public override void PrimaryUse(GameManager gameManager, PlayerManager player)
     {
         if (player.Health >= player.MaxHealth) return;

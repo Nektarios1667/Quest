@@ -133,7 +133,8 @@ public static class PopupFactory
         {
             string[] values = GetValues(inputs);
             return (true, values);
-        } else
+        }
+        else
             return (false, Array.Empty<string>());
     }
     public static void ShowMessage(string title, string message)

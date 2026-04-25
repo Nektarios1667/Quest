@@ -1,12 +1,6 @@
-﻿using HarfBuzzSharp;
-using NCalc;
-using Quest.Interaction;
+﻿using NCalc;
 using Quest.Quill.Functions;
-using SharpDX.Direct2D1;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace Quest.Quill;
 
@@ -67,7 +61,8 @@ public class QuillInstance
 
                 L++;
             }
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             Errors.Add(new(L, QuillErrorType.RuntimeError, e.Message));
             L++;
@@ -84,7 +79,7 @@ public static partial class Interpreter
 {
     private static readonly List<QuillInstance> Scripts = [];
 
-    private static readonly Dictionary<string, IBuiltinFunction> BuiltinFunctions  = new() {
+    private static readonly Dictionary<string, IBuiltinFunction> BuiltinFunctions = new() {
         { "readfile", new ReadFile() },
         { "execute", new Execute() },
         { "log", new Log() },
@@ -177,7 +172,7 @@ public static partial class Interpreter
             if (instance.CompiledLines[i].Operation == op && (label == null || instance.CompiledLines[i].Label == label))
                 return i;
 
-        instance.Errors.Add(new(instance.L, QuillErrorType.BlockMismatch, $"Failed to find line '{op}{(label != null ? $" {label}" : "")}'", fatal:true));
+        instance.Errors.Add(new(instance.L, QuillErrorType.BlockMismatch, $"Failed to find line '{op}{(label != null ? $" {label}" : "")}'", fatal: true));
         return instance.L;
     }
     private static int FindLineBackwards(QuillInstance instance, QuillOp op, string? label = null, int start = -1)
@@ -214,7 +209,8 @@ public static partial class Interpreter
                     var result = expr.Evaluate();
 
                     return result?.ToString()?.ToLower() ?? "";
-                } catch
+                }
+                catch
                 {
                     Logger.Error($"Quill | {instance.Script.Name} @{instance.L} | InvalidExpression - failed to parse '{match.Value}'");
                     return match.Value;

@@ -1,5 +1,4 @@
-﻿using Antlr.Runtime;
-using Quest.Gui;
+﻿using Quest.Gui;
 using LM = Quest.Managers.LightingManager;
 
 namespace Quest.Managers;
@@ -78,7 +77,7 @@ public class OverlayManager
     public void DrawUI(GameManager gameManager, PlayerManager playerManager)
     {
         DebugManager.StartBenchmark("InventoryGuiDraw");
-        
+
         // Draw interfaces
         playerManager.OpenedInterface?.Draw();
         playerManager.InventoryUI.Draw(playerManager.InventoryOpen ? null : "hotbar");
@@ -134,7 +133,8 @@ public class OverlayManager
             gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black);
             gameManager.Batch.DrawString(PixelOperator, "YOU DIED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("You died!") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
             gameManager.Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
-        } else if (StateManager.OverlayState == OverlayState.Finished)
+        }
+        else if (StateManager.OverlayState == OverlayState.Finished)
         {
             TimerManager.NewTimer("FinishedFade", 2, null);
             float fade = TimerManager.GetTimer("FinishedFade").Progress * 0.5f;
@@ -149,7 +149,8 @@ public class OverlayManager
 
         DebugManager.EndBenchmark("PostProcessing");
     }
-    public void MarkUpdateLighting() {
+    public void MarkUpdateLighting()
+    {
         UpdateLighting = true;
     }
     public void DrawLighting(GameManager gameManager)

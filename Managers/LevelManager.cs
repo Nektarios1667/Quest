@@ -1,12 +1,10 @@
 using Quest.Quill;
-using Quest.Tiles;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows.Forms;
 using IO = System.IO;
 
 namespace Quest.Managers;
@@ -58,7 +56,7 @@ public class LevelManager
             enemyList[p].Update(gameManager);
             if (!enemyList[p].IsAlive) Level.Enemies.Remove(enemyList[p].UID);
         }
-        for (int p = Level.Projectiles.Count -1; p >= 0; p--)
+        for (int p = Level.Projectiles.Count - 1; p >= 0; p--)
         {
             Level.Projectiles[p].Update(gameManager);
             if (!Level.Projectiles[p].IsAlive) Level.Projectiles.RemoveAt(p);

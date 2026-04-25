@@ -1,8 +1,3 @@
-using System;
-using System.ComponentModel;
-using System.ComponentModel.Design;
-using System.Runtime.CompilerServices;
-
 namespace Quest.Items;
 public enum ItemTypeID : byte
 {
@@ -91,7 +86,8 @@ public class ItemType
 public class ItemTypes
 {
     public static ItemType Get(ItemTypeID typeID) => All[(byte)typeID];
-    public static ItemType Get(string typeID) {
+    public static ItemType Get(string typeID)
+    {
         if (!Enum.TryParse<ItemTypeID>(typeID, out var parsedTypeID))
             throw new ArgumentException($"ItemType {typeID} does not exist");
         return All[(byte)Enum.Parse(typeof(ItemTypeID), typeID)];

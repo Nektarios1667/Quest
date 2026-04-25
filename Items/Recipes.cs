@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics.Eventing.Reader;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Quest.Items;
+﻿namespace Quest.Items;
 public enum RecipeType
 {
     Stove,
@@ -90,7 +82,7 @@ public static class RecipeRegistry
                 return new(recipe.Output);
             }
         }
-        
+
         // Failed
         return null;
     }

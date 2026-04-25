@@ -1,5 +1,3 @@
-using Microsoft.Xna.Framework;
-
 namespace Quest.Tiles;
 
 public class Door : Tile
@@ -29,7 +27,8 @@ public class Door : Tile
             {
                 game.OverlayManager.Notification($"-{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
                 player.Inventory.Consume(Key, ignoreCheck: true);
-            } else if (Key != null)
+            }
+            else if (Key != null)
                 game.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Gray, 2);
 
             SoundManager.PlaySoundInstance("DoorUnlock");

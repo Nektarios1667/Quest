@@ -1,7 +1,4 @@
-﻿using Migs.MPath.Core.Data;
-using Quest.Gui;
-using SharpDX.Direct2D1.Effects;
-using System.Diagnostics.CodeAnalysis;
+﻿using Quest.Gui;
 using System.Linq;
 
 namespace Quest.Entities;
@@ -123,7 +120,7 @@ public class Enemy : IEntity
     {
         Rectangle source = GetAnimationSource(Texture, GameManager.GameTime, duration: 0.5f);
         DrawTexture(gameManager.Batch, Texture, Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, source: source, scale: Scale); //, origin: new(Size.X / Scale, Size.Y / Scale));
-        
+
         DebugManager.DrawHitbox(gameManager.Batch, this);
         HealthBar.Draw(gameManager.Batch);
         DamageNotifs.Draw(gameManager.Batch);

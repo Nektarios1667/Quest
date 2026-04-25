@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace Quest.Editor.Managers;
 public class EditorOverlayManager
@@ -20,7 +15,7 @@ public class EditorOverlayManager
     public GraphicsDevice Graphics { get; private set; }
     private LevelManager LevelManager => GameManager.LevelManager;
     // 
-    private StringBuilder DebugSb;
+    private readonly StringBuilder DebugSb;
     private float CacheDelta;
     private Dictionary<string, double> FrameTimes = [];
     private RenderTarget2D Minimap = null!;

@@ -49,11 +49,11 @@ public static class CommandManager
         }
     }
     // Fields
-    private static List<Command> commands { get; set; } = [];
-    private static Game? game { get; set; }
-    private static GameManager? gameManager { get; set; }
-    private static LevelManager? levelManager { get; set; }
-    private static PlayerManager? playerManager { get; set; }
+    private static List<Command> Commands { get; set; } = [];
+    private static Game? Game { get; set; }
+    private static GameManager? GameManager { get; set; }
+    private static LevelManager? LevelManager { get; set; }
+    private static PlayerManager? PlayerManager { get; set; }
     // Public
     public static Dictionary<string, string> Variables { get; private set; } = [];
     // Type dict
@@ -71,13 +71,13 @@ public static class CommandManager
     };
     public static void Init(Game game, GameManager gameManager, LevelManager levelManager, PlayerManager playerManager)
     {
-        CommandManager.game = game;
-        CommandManager.gameManager = gameManager;
-        CommandManager.levelManager = levelManager;
-        CommandManager.playerManager = playerManager;
+        CommandManager.Game = game;
+        CommandManager.GameManager = gameManager;
+        CommandManager.LevelManager = levelManager;
+        CommandManager.PlayerManager = playerManager;
 
         // Commands creation
-        commands = [
+        Commands = [
             new("teleport <coordinate>", CTeleport, "Teleported player to |1|.", "Failed to teleport player to |1|."),
             new("health <modify> {0:999}", CHealth, "Player health |1| [|2|].", "Failed to |1| player health [|2|]."),
             new("move_speed {0:999}", CMoveSpeed, "Set player speed to |1|.", "Failed to set player speed to |1|."),
@@ -99,10 +99,10 @@ public static class CommandManager
     }
     public static (bool success, string output) Execute(string command)
     {
-        if (game == null || gameManager == null || levelManager == null || playerManager == null)
+        if (Game == null || GameManager == null || LevelManager == null || PlayerManager == null)
             throw new Exception("CommandManager is not initialized");
 
-        foreach (Command commandObj in commands)
+        foreach (Command commandObj in Commands)
             if (commandObj.IsCommand(command)) { return commandObj.TryExecute(command); }
         return (false, $"Unknown command '{command}'");
     }
@@ -215,8 +215,8 @@ public static class CommandManager
     private static bool CHealth(string command)
     {
         string[] parts = command.Split(' ');
-        if (parts[1] == "set") { playerManager!.Health = int.Parse(parts[2]); return true; }
-        if (parts[1] == "change") { playerManager!.Health += int.Parse(parts[2]); return true; }
+        if (parts[1] == "set") { PlayerManager!.Health = int.Parse(parts[2]); return true; }
+        if (parts[1] == "change") { PlayerManager!.Health += int.Parse(parts[2]); return true; }
         return false;
     }
     private static bool CMoveSpeed(string command)
@@ -225,7 +225,7 @@ public static class CommandManager
         return true;
     }
     private static bool CForceQuit(string command) { throw new Exception("Force quit"); }
-    private static bool CQuit(string command) { game?.Exit(); return true; }
+    private static bool CQuit(string command) { Game?.Exit(); return true; }
     private static bool CSay(string command) => true;
     private static bool CLevel(string command)
     {
@@ -234,23 +234,23 @@ public static class CommandManager
         {
             if (parts[1] == "load")
             {
-                levelManager!.LoadLevel(gameManager!, parts[2]);
+                LevelManager!.LoadLevel(GameManager!, parts[2]);
                 return true;
             }
             else if (parts[1] == "read")
             {
-                levelManager!.ReadLevel(gameManager!, parts[2], reload: true);
+                LevelManager!.ReadLevel(GameManager!, parts[2], reload: true);
                 return true;
             }
             else if (parts[1] == "open")
             {
-                levelManager!.ReadLevel(gameManager!, parts[2]);
-                levelManager!.LoadLevel(gameManager!, parts[2]);
+                LevelManager!.ReadLevel(GameManager!, parts[2]);
+                LevelManager!.LoadLevel(GameManager!, parts[2]);
                 return true;
             }
             else if (parts[1] == "unload")
             {
-                levelManager!.UnloadLevel(parts[2]);
+                LevelManager!.UnloadLevel(parts[2]);
                 return true;
             }
         }
@@ -269,9 +269,9 @@ public static class CommandManager
     {
         string[] parts = command.Split(' ');
         if (parts[1] == "set")
-            gameManager!.DayTime = int.Parse(parts[2]);
+            GameManager!.DayTime = int.Parse(parts[2]);
         else if (parts[1] == "change")
-            gameManager!.DayTime += int.Parse(parts[2]);
+            GameManager!.DayTime += int.Parse(parts[2]);
         else
             return false;
         return true;
@@ -329,9 +329,9 @@ public static class CommandManager
         int quantity = int.Parse(parts[2]);
         var item = ItemFromName(itemName, quantity, parts.Length > 3 ? parts[3] : null);
         if (item == null) return false;
-        Item leftover = playerManager!.Inventory.AddItem(item);
+        Item leftover = PlayerManager!.Inventory.AddItem(item);
         if (leftover.Amount > 0)
-            levelManager!.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), CameraManager.PlayerFoot, GameManager.GameTime));
+            LevelManager!.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), CameraManager.PlayerFoot, GameManager.GameTime));
         return true;
     }
     private static bool CNotif(string command)
@@ -342,13 +342,13 @@ public static class CommandManager
         int b = int.Parse(parts[3]);
         decimal duration = decimal.Parse(parts[4]);
         string message = string.Join(' ', parts[5..]);
-        gameManager!.OverlayManager.LootNotifications.AddNotification(message, color: new(r, g, b), (float)duration);
+        GameManager!.OverlayManager.LootNotifications.AddNotification(message, color: new(r, g, b), (float)duration);
         return true;
     }
     private static bool CEnemy(string command)
     {
         Enemy enemy = new(CameraManager.PlayerFoot.ToVector2(), 200, 30, 2f, 25, 100, 200, 1000, 750, TextureID.WhiteWizard, TextureID.Fireball);
-        gameManager!.LevelManager.Level.Enemies[enemy.UID] = enemy;
+        GameManager!.LevelManager.Level.Enemies[enemy.UID] = enemy;
         return true;
     }
     private static bool CFreecam(string command)
@@ -365,7 +365,7 @@ public static class CommandManager
         ushort uid = ushort.Parse(parts[2]);
         if (type == "enemy")
         {
-            if (gameManager!.LevelManager.Level.Enemies.TryGetValue(uid, out var enemy))
+            if (GameManager!.LevelManager.Level.Enemies.TryGetValue(uid, out var enemy))
             {
                 // 2x max health so that if defense is max then it'll still die
                 enemy.Hurt(ushort.MaxValue);
@@ -375,7 +375,7 @@ public static class CommandManager
         }
         else if (type == "projectile")
         {
-            Projectile? projectile = gameManager!.LevelManager.Level.Projectiles.FirstOrDefault(p => p.UID == uid);
+            Projectile? projectile = GameManager!.LevelManager.Level.Projectiles.FirstOrDefault(p => p.UID == uid);
             if (projectile != null)
             {
                 projectile.Destroy();

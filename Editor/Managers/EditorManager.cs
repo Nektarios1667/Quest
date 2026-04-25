@@ -1,15 +1,7 @@
-﻿using Quest.Editor.Generator;
-using Quest.Managers;
-using Quest.Tiles;
-using Quest.Utilities;
-using SharpDX.Direct3D9;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using static Quest.Editor.PopupFactory;
-using IO = System.IO;
 
 namespace Quest.Editor.Managers;
 public enum EditorTool : byte
@@ -26,7 +18,7 @@ public class EditorManager
     // Settings
     public bool ShowBiomeMarkers = true;
     // Helper
-    public string[] ItemsOptionsWNone = ["NONE", ..Constants.ItemTypeNames];
+    public string[] ItemsOptionsWNone = ["NONE", .. Constants.ItemTypeNames];
     // Public
     public GameManager GameManager { get; private set; }
     public LevelManager LevelManager => GameManager.LevelManager;
@@ -53,7 +45,7 @@ public class EditorManager
         TileSelection = material;
         BiomeSelection = biome;
     }
-    
+
     public void EditTile()
     {
         Tile? tile = LevelManager.GetTile(MouseSelectionCoord);
@@ -166,7 +158,7 @@ public class EditorManager
             HashSet<ByteCoord> visited = []; // Track visited tiles
             queue.Enqueue(tileBelow);
             count++;
-            
+
             while (queue.Count > 0)
             {
                 Tile current = queue.Dequeue();
@@ -347,7 +339,7 @@ public class EditorManager
         // Create
         TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), values[8]);
         TextureID projTexture = (TextureID)Enum.Parse(typeof(TextureID), values[9]);
-        Enemy enemy = new Enemy(
+        Enemy enemy = new(
             MouseSelection.ToVector2(),
             ushort.Parse(values[0]),
             ushort.Parse(values[1]),

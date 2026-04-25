@@ -1,6 +1,4 @@
 ﻿using Quest.Editor;
-using Quest.Entities;
-using Quest.Tiles;
 using System.IO;
 using System.Linq;
 namespace Quest.Utilities;
@@ -130,7 +128,7 @@ public static class BinaryReaderExtensions
         Vector2 position = new(reader.ReadUInt16(), reader.ReadUInt16());
         ushort uid = reader.ReadUInt16();
 
-        Enemy enemy = new Enemy(
+        Enemy enemy = new(
             position,
             health,
             damage,

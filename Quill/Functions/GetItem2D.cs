@@ -1,6 +1,4 @@
-﻿using System.CodeDom;
-
-namespace Quest.Quill.Functions;
+﻿namespace Quest.Quill.Functions;
 // (list var) (x) (y)
 public class GetItem2D : IBuiltinFunction
 {

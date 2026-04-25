@@ -185,7 +185,7 @@ public static class TextureManager
         Glow,
         Slash,
         // EFFECTS ENUM INSERT
-        
+
     }
     private static readonly List<string> errors = [];
     public static Dictionary<TextureID, Texture2D> Textures { get; private set; } = [];

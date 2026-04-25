@@ -1,10 +1,4 @@
-﻿using SharpDX.Direct3D9;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 namespace Quest.Interaction;
 
@@ -57,7 +51,8 @@ public class Container
             MergeItems(from, fromIdx, to, toIdx);
         }
         // Swap
-        else {
+        else
+        {
             Swap(from, fromIdx, to, toIdx);
         }
 
@@ -105,7 +100,7 @@ public class Container
         to.RemoveEmptyItems();
     }
     public Item AddItem(Item adding)
-    {        
+    {
         for (int i = 0; i < Items.Length; i++)
         {
             Item? item = Items[i];
