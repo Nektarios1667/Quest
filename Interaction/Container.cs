@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using Quest.Items;
+using System.Linq;
 
 namespace Quest.Interaction;
 
@@ -134,10 +135,22 @@ public class Container
 
         return count;
     }
+    public bool Has(ItemRef target)
+    {
+        int count = 0;
+        foreach (Item? item in Items)
+        {
+            if (SameItem(target, item)) count += item?.Amount ?? 0;
+            if (count >= target.Amount) return true;
+        }
+
+        return false;
+    }
     public bool Consume(ItemRef consume, bool ignoreCheck = false)
     {
         // Not enough
         if (!ignoreCheck && Count(consume.Type) < consume.Amount) return false;
+        consume = consume.Copy(); // Create a copy to modify
 
         // Consume
         for (int i = 0; i < Items.Length; i++)
@@ -198,4 +211,7 @@ public class Container
         }
     }
     public static bool SameItem(Item? item1, Item? item2) => item1 != null && item2 != null && item1.Type == item2.Type && item1.CustomName == item2.CustomName;
+    public static bool SameItem(ItemRef? item1, Item? item2) => item1 != null && item2 != null && item1.Type == item2.Type && item1.CustomName == item2.CustomName;
+    public static bool SameItem(Item? item1, ItemRef? item2) => item1 != null && item2 != null && item1.Type == item2.Type && item1.CustomName == item2.CustomName;
+    public static bool SameItem(ItemRef? item1, ItemRef? item2) => item1 != null && item2 != null && item1.Type == item2.Type && item1.CustomName == item2.CustomName;
 }

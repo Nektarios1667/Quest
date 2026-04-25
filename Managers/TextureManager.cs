@@ -104,6 +104,7 @@ public static class TextureManager
         CookedBeef,
         Crossbow,
         HealthPotion,
+        Arrow,
         // ITEMS ENUM INSERT
         Dirt,
         Flooring,
@@ -180,7 +181,7 @@ public static class TextureManager
         Glass,
         // DECALS ENUM INSERT
         Fireball,
-        Arrow,
+        ArrowProjectile,
         // PROJECTILES ENUM INSERT
         Glow,
         Slash,
@@ -300,6 +301,7 @@ public static class TextureManager
         Textures[TextureID.CookedBeef] = content.Load<Texture2D>("Images/Items/CookedBeef");
         Textures[TextureID.Crossbow] = content.Load<Texture2D>("Images/Items/Crossbow");
         Textures[TextureID.HealthPotion] = content.Load<Texture2D>("Images/Items/HealthPotion");
+        Textures[TextureID.Arrow] = content.Load<Texture2D>("Images/Items/Arrow");
         // ITEMS INSERT
         Textures[TextureID.Dirt] = content.Load<Texture2D>("Images/Tiles/Dirt");
         Textures[TextureID.Flooring] = content.Load<Texture2D>("Images/Tiles/Flooring");
@@ -377,7 +379,7 @@ public static class TextureManager
         Textures[TextureID.Glass] = content.Load<Texture2D>("Images/Decals/Glass");
         // DECALS INSERT
         Textures[TextureID.Fireball] = content.Load<Texture2D>("Images/Projectiles/Fireball");
-        Textures[TextureID.Arrow] = content.Load<Texture2D>("Images/Projectiles/Arrow");
+        Textures[TextureID.ArrowProjectile] = content.Load<Texture2D>("Images/Projectiles/Arrow");
         // PROJECTILES INSERT
         Textures[TextureID.Glow] = content.Load<Texture2D>("Images/Effects/Glow");
         Textures[TextureID.Slash] = content.Load<Texture2D>("Images/Effects/Slash");
@@ -483,6 +485,7 @@ public static class TextureManager
         Metadata[TextureID.CookedBeef] = new(Textures[TextureID.CookedBeef].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Crossbow] = new(Textures[TextureID.Crossbow].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.HealthPotion] = new(Textures[TextureID.HealthPotion].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Arrow] = new(Textures[TextureID.Arrow].Bounds.Size, new(1, 1), "item");
         // ITEMS METADATA INSERT
         Metadata[TextureID.Dirt] = new(Textures[TextureID.Dirt].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Flooring] = new(Textures[TextureID.Flooring].Bounds.Size, new(4, 4), "tile");
@@ -560,7 +563,7 @@ public static class TextureManager
         Metadata[TextureID.Glass] = new(Textures[TextureID.Glass].Bounds.Size, new(1, 1), "decal");
         // DECALS METADATA INSERT
         Metadata[TextureID.Fireball] = new(Textures[TextureID.Fireball].Bounds.Size, new(1, 1), "projectile");
-        Metadata[TextureID.Arrow] = new(Textures[TextureID.Arrow].Bounds.Size, new(1, 1), "projectile");
+        Metadata[TextureID.ArrowProjectile] = new(Textures[TextureID.ArrowProjectile].Bounds.Size, new(1, 1), "projectile");
         // PROJECTILES METADATA INSERT
         Metadata[TextureID.Glow] = new(Textures[TextureID.Glow].Bounds.Size, new(1, 1), "effect");
         Metadata[TextureID.Slash] = new(Textures[TextureID.Slash].Bounds.Size, new(1, 1), "effect");
