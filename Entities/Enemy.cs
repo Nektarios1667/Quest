@@ -25,6 +25,7 @@ public class Enemy : IEntity, IProjectileOwner
     public Vector2 FootPosition => Position + new Vector2(Size.X / 2, Size.Y);
     public Point Size { get; set; }
     public StatusBar HealthBar { get; protected set; }
+    public NotificationArea DamageNotifs { get; protected set; }
     protected List<Point>? Path { get; set; }
     public Enemy(
         Vector2 pos,
@@ -60,6 +61,7 @@ public class Enemy : IEntity, IProjectileOwner
         Size = (TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap).Scaled(Scale);
 
         HealthBar = new(Point.Zero, new(Size.X, 10), Color.Green * 0.7f, Color.Red * 0.7f, Health, Health);
+        DamageNotifs = new(Point.Zero, 50, PixelOperatorSubtitle, Color.Orange);
     }
     public virtual void Update(GameManager gameManager)
     {
@@ -113,6 +115,9 @@ public class Enemy : IEntity, IProjectileOwner
         HealthBar.Position = Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle + new Point(0, Size.Y + 10);
         HealthBar.CurrentValue = Health;
         HealthBar.Update(GameManager.DeltaTime);
+        // Damage notifs
+        DamageNotifs.Position = Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle;
+        DamageNotifs.Update(GameManager.DeltaTime);
     }
     public virtual void Draw(GameManager gameManager)
     {
@@ -121,11 +126,14 @@ public class Enemy : IEntity, IProjectileOwner
         
         DebugManager.DrawHitbox(gameManager.Batch, this);
         HealthBar.Draw(gameManager.Batch);
+        DamageNotifs.Draw(gameManager.Batch);
     }
     public virtual void Hurt(ushort damage)
     {
-        if (damage <= Defense) Health -= damage / 2;
-        else Health -= damage;
+
+        if (damage <= Defense) damage /= 2;
+        Health -= damage;
+        DamageNotifs.AddNotification($"-{damage}", duration: 2);
     }
     public virtual void Attack(GameManager gameManager, float direction)
     {

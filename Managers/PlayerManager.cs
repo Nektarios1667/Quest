@@ -164,7 +164,7 @@ public class PlayerManager : IEntity, IProjectileOwner
                 {
                     // Damage enemy / player
                     if (entity is Enemy enemy)
-                        enemy.Health -= proj.Damage;
+                        enemy.Hurt(proj.Damage);
                     else if (entity is PlayerManager player)
                         DamagePlayer(gameManager, proj.Damage);
 
@@ -432,6 +432,7 @@ public class PlayerManager : IEntity, IProjectileOwner
     public static void DamagePlayer(GameManager gameManager, int damage)
     {
         gameManager.OverlayManager.HealthBar.CurrentValue -= damage;
+        gameManager.OverlayManager.LootNotifications.AddNotification($"-{damage}", Color.Orange, duration: 2);
         if (gameManager.OverlayManager.HealthBar.CurrentValue <= 0)
         {
             gameManager.OverlayManager.HealthBar.CurrentValue = 0;
