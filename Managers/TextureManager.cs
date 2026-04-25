@@ -103,6 +103,7 @@ public static class TextureManager
         RawBeef,
         CookedBeef,
         Crossbow,
+        HealthPotion,
         // ITEMS ENUM INSERT
         Dirt,
         Flooring,
@@ -298,6 +299,7 @@ public static class TextureManager
         Textures[TextureID.RawBeef] = content.Load<Texture2D>("Images/Items/RawBeef");
         Textures[TextureID.CookedBeef] = content.Load<Texture2D>("Images/Items/CookedBeef");
         Textures[TextureID.Crossbow] = content.Load<Texture2D>("Images/Items/Crossbow");
+        Textures[TextureID.HealthPotion] = content.Load<Texture2D>("Images/Items/HealthPotion");
         // ITEMS INSERT
         Textures[TextureID.Dirt] = content.Load<Texture2D>("Images/Tiles/Dirt");
         Textures[TextureID.Flooring] = content.Load<Texture2D>("Images/Tiles/Flooring");
@@ -480,6 +482,7 @@ public static class TextureManager
         Metadata[TextureID.RawBeef] = new(Textures[TextureID.RawBeef].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.CookedBeef] = new(Textures[TextureID.CookedBeef].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Crossbow] = new(Textures[TextureID.Crossbow].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.HealthPotion] = new(Textures[TextureID.HealthPotion].Bounds.Size, new(1, 1), "item");
         // ITEMS METADATA INSERT
         Metadata[TextureID.Dirt] = new(Textures[TextureID.Dirt].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Flooring] = new(Textures[TextureID.Flooring].Bounds.Size, new(4, 4), "tile");

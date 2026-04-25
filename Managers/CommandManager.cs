@@ -215,8 +215,8 @@ public static class CommandManager
     private static bool CHealth(string command)
     {
         string[] parts = command.Split(' ');
-        if (parts[1] == "set") { gameManager!.OverlayManager.HealthBar.CurrentValue = int.Parse(parts[2]); return true; }
-        if (parts[1] == "change") { gameManager!.OverlayManager.HealthBar.CurrentValue += int.Parse(parts[2]); return true; }
+        if (parts[1] == "set") { playerManager!.Health = int.Parse(parts[2]); return true; }
+        if (parts[1] == "change") { playerManager!.Health += int.Parse(parts[2]); return true; }
         return false;
     }
     private static bool CMoveSpeed(string command)

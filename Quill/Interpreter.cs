@@ -118,12 +118,14 @@ public static partial class Interpreter
     {
         DebugManager.StartBenchmark("QuillSymbolsUpdate");
 
+        if (!StateManager.IsPlayingState) return;
+
         // Player
         ExternalSymbols["<playercoord_x>"] = CameraManager.TileCoord.X.ToString();
         ExternalSymbols["<playercoord_y>"] = CameraManager.TileCoord.Y.ToString();
         ExternalSymbols["<playercoord>"] = $"{CameraManager.TileCoord.X};{CameraManager.TileCoord.Y}";
-        ExternalSymbols["<playerhealth>"] = game.OverlayManager.HealthBar.CurrentValue.ToString();
-        ExternalSymbols["<playermaxhealth>"] = game.OverlayManager.HealthBar.MaxValue.ToString();
+        ExternalSymbols["<playerhealth>"] = player.Health.ToString();
+        ExternalSymbols["<playermaxhealth>"] = player.MaxHealth.ToString();
         ExternalSymbols["<playerspeed>"] = Constants.PlayerSpeed.ToString();
         ExternalSymbols["<isstuck>"] = (!(player.TileBelow?.Type.IsWalkable ?? true)).ToString().ToLower();
         ExternalSymbols["<tilebelow>"] = player.TileBelow?.Type.Texture.ToString() ?? "NUL";

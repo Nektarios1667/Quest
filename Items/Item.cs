@@ -65,6 +65,7 @@ public enum ItemTypeID : byte
     RawBeef,
     CookedBeef,
     Crossbow,
+    HealthPotion,
     // ITEMS ENUM
 }
 
@@ -154,6 +155,7 @@ public class ItemTypes
     public static readonly ItemType RawBeef = new(ItemTypeID.RawBeef, "Uncooked cow meat.");
     public static readonly ItemType CookedBeef = new(ItemTypeID.CookedBeef, "Cooked cow meat.");
     public static readonly ItemType Crossbow = new(ItemTypeID.Crossbow, "A wooden crossbow capable of shooting arrows.", 1);
+    public static readonly ItemType HealthPotion = new(ItemTypeID.HealthPotion, "A drink used to instantly heal.", 1);
     // ITEMS REGISTER
     public static readonly ItemType[] All = [
     ActivePalantir,
@@ -215,6 +217,7 @@ public class ItemTypes
     RawBeef,
     CookedBeef,
     Crossbow,
+    HealthPotion,
     // ITEMS ENUM
     ];
 }
@@ -296,6 +299,7 @@ public class Item
             ItemTypeID.SteelSword => new SteelSword(amount, customName),
             ItemTypeID.DiamondSword => new DiamondSword(amount, customName),
             ItemTypeID.Crossbow => new Crossbow(amount, customName),
+            ItemTypeID.HealthPotion => new HealthPotion(amount, customName),
             _ => new Item(type, amount, customName),
         };
     }

@@ -14,6 +14,16 @@ public class PlayerManager : IEntity, IProjectileOwner
     public event Action<int>? EquippedSlotChanged;
     // Properties
     // Inventory and UI
+    public int Health
+    {
+        get => Game.OverlayManager.HealthBar.CurrentValue;
+        set => Game.OverlayManager.HealthBar.CurrentValue = value;
+    }
+    public int MaxHealth
+    {
+        get => Game.OverlayManager.HealthBar.MaxValue;
+        set => Game.OverlayManager.HealthBar.MaxValue = value;
+    }
     public bool InventoryOpen { get; set; } = false;
     public Container Inventory { get; }
     public UserInterface InventoryUI { get; }
@@ -166,7 +176,7 @@ public class PlayerManager : IEntity, IProjectileOwner
                     if (entity is Enemy enemy)
                         enemy.Hurt(proj.Damage);
                     else if (entity is PlayerManager player)
-                        DamagePlayer(gameManager, proj.Damage);
+                        player.Hurt(gameManager, proj.Damage);
 
                     // Destroy
                     proj.Destroy();
@@ -429,14 +439,21 @@ public class PlayerManager : IEntity, IProjectileOwner
     {
         TileBelow = gameManager.LevelManager.GetTile(CameraManager.TileCoord);
     }
-    public static void DamagePlayer(GameManager gameManager, int damage)
+    public void Hurt(GameManager gameManager, int damage)
     {
-        gameManager.OverlayManager.HealthBar.CurrentValue -= damage;
+        Health -= damage;
         gameManager.OverlayManager.LootNotifications.AddNotification($"-{damage}", Color.Orange, duration: 2);
-        if (gameManager.OverlayManager.HealthBar.CurrentValue <= 0)
+        if (Health <= 0)
         {
-            gameManager.OverlayManager.HealthBar.CurrentValue = 0;
+            Health = 0;
             StateManager.OverlayState = OverlayState.Death;
         }
+    }
+    public void Heal(GameManager gameManager, int health)
+    {
+        health = Math.Min(health, MaxHealth - Health);
+        Health += health;
+        if (health > 0)
+            gameManager.OverlayManager.LootNotifications.AddNotification($"+{health}", Color.Green, duration: 2);
     }
 }

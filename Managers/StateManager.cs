@@ -179,8 +179,8 @@ public static class StateManager
             writer.Write(CameraManager.CameraDest.X);
             writer.Write(CameraManager.CameraDest.Y);
             // Write PlayerManager data
-            writer.Write((byte)gameManager.OverlayManager.HealthBar.CurrentValue);
-            writer.Write((byte)gameManager.OverlayManager.HealthBar.MaxValue);
+            writer.Write((byte)playerManager.Health);
+            writer.Write((byte)playerManager.MaxHealth);
             // Level specific data
             // All of the levels with extra data
             string[] levels = new[] {
@@ -292,8 +292,8 @@ public static class StateManager
             CameraManager.Camera = CameraManager.CameraDest;
             CameraManager.Update(0); // In bounds check
             // Read PlayerManager data
-            gameManager.OverlayManager.HealthBar.CurrentValue = reader.ReadByte();
-            gameManager.OverlayManager.HealthBar.MaxValue = reader.ReadByte();
+            playerManager.Health = reader.ReadByte();
+            playerManager.MaxHealth = reader.ReadByte();
             // Read LevelManager data
             // Levels
             byte levelCount = reader.ReadByte();
