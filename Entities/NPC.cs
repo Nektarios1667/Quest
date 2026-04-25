@@ -22,6 +22,7 @@ public class NPC : IEntity
     public static readonly NPC Null = new(TextureID.Null, Point.Zero, "NUL_NAME", "NUL_DIALOG");
     public static Dialog? DialogBox { get; set; }
     public static List<(NPC npc, float dist)> NPCsNearby { get; set; } = [];
+    public ushort UID { get; } = UIDManager.Get(UIDCategory.NPCs);
     public List<ShopOption> ShopOptions { get; private set; } = [];
     public Point Position { get; set; }
     public string Name { get; set; }

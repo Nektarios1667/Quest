@@ -3,13 +3,9 @@ using Quest.Interaction;
 using System.Linq;
 namespace Quest.Managers;
 
-public class PlayerManager : IEntity, IProjectileOwner
+public class PlayerManager : IEntity
 {
-    // Projectiles
     public ushort UID => 0;
-    public ushort Damage => EquippedItem is IProjectileOwner weapon ? weapon.Damage : (ushort)0;
-    public ushort ProjectileSpeed => EquippedItem is IProjectileOwner weapon ? weapon.ProjectileSpeed : (ushort)0;
-    public TextureID ProjectileTexture => EquippedItem is IProjectileOwner weapon ? weapon.ProjectileTexture : TextureID.Null;
     // Events
     public event Action<int>? EquippedSlotChanged;
     // Properties
@@ -179,7 +175,7 @@ public class PlayerManager : IEntity, IProjectileOwner
             foreach (IEntity entity in entities)
             {
                 // Checks
-                if (entity == proj.Owner) continue;
+                if (entity.UID == proj.OwnerUID) continue;
                 if (proj.Bounds.Intersects(entity.Bounds))
                 {
                     // Damage enemy / player

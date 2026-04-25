@@ -1,5 +1,5 @@
 namespace Quest.Items;
-public class RangedWeapon : Item, IProjectileOwner
+public class RangedWeapon : Item
 {
     public float FireRate { get; } // Seconds between shots
     public ushort ProjectileSpeed { get; } // Pixels
@@ -18,7 +18,8 @@ public class RangedWeapon : Item, IProjectileOwner
         if (TimerManager.IsCompleteOrMissing($"RangedAttack_{UID}"))
         {
             Vector2 dir = InputManager.MousePosition.ToVector2() - Constants.Middle.ToVector2() - CameraManager.CameraOffset;
-            Projectile projectile = new Projectile(gameManager, this, CameraManager.CameraDest, (float)Math.Atan2(dir.Y, dir.X));
+            // Player-owned projectiles have UID of 0
+            Projectile projectile = new Projectile(gameManager, 0, CameraManager.CameraDest, (float)Math.Atan2(dir.Y, dir.X), ProjectileTexture, Damage, ProjectileSpeed);
             projectile.Position -= projectile.Size.ToVector2() / 2;
             gameManager.LevelManager.Level.Projectiles.Add(projectile);
 

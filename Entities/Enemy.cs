@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Quest.Entities;
-public class Enemy : IEntity, IProjectileOwner
+public class Enemy : IEntity
 {
     public ushort UID { get; set; }
     public bool IsAlive => Health > 0;
@@ -137,7 +137,7 @@ public class Enemy : IEntity, IProjectileOwner
     }
     public virtual void Attack(GameManager gameManager, float direction)
     {
-        Projectile proj = new(gameManager, this, Bounds.Center, direction);
+        Projectile proj = new(gameManager, UID, Bounds.Center, direction, ProjectileTexture, Damage, ProjectileSpeed);
         gameManager.LevelManager.Level.Projectiles.Add(proj);
         SoundManager.PlaySound("Fire", pitchVariation: 0.25f);
     }

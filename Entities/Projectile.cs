@@ -6,31 +6,27 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Quest.Entities;
-public interface IProjectileOwner
-{
-    public TextureID ProjectileTexture { get; }
-    public ushort Damage { get; }
-    public ushort ProjectileSpeed { get; }
-    public ushort UID { get; }
-}
 
 public class Projectile : IEntity
 {
-    public IProjectileOwner Owner { get; protected set; }
+    public ushort OwnerUID { get; private set; }
     public Vector2 Position { get; set; }
     public float Direction { get; set; } // Radians, 0 = right, positive counterclockwise
-    public Point Size { get; protected set; }
+    public Point Size { get; private set; }
     public RectangleF Bounds => new(Position, Size);
     public ushort UID { get; }
-    public TextureID Texture => Owner.ProjectileTexture;
-    public ushort Damage => Owner.Damage; 
-    public ushort Speed => Owner.ProjectileSpeed; 
-    public bool IsAlive { get; protected set; } = true;
-    public Projectile(GameManager gameManager, IProjectileOwner owner, Vector2 position, float direction, Point? size = null)
+    public TextureID Texture { get; private set; }
+    public ushort Damage { get; private set; }
+    public ushort Speed { get; private set; }
+    public bool IsAlive { get; private set; } = true;
+    public Projectile(GameManager gameManager, ushort ownerUID, Vector2 position, float direction, TextureID tex, ushort damage, ushort speed, Point? size = null)
     {
-        Owner = owner;
+        OwnerUID = ownerUID;
         Position = position;
         Direction = direction;
+        Texture = tex;
+        Damage = damage;
+        Speed = speed;
         Size = size ?? (TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap).Scaled(Constants.ProjectileScale);
         UID = UIDManager.Get(UIDCategory.Projectiles);
 

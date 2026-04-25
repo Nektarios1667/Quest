@@ -1,12 +1,10 @@
 namespace Quest.Items;
-public class MeleeWeapon : Item, IProjectileOwner
+public class MeleeWeapon : Item
 {
-    public TextureID ProjectileTexture => TextureID.Slash;
-    public ushort ProjectileSpeed => 0; // Unused since melee weapons don't have actual projectiles, but required by IProjectileOwner
     public float FireRate { get; } // Seconds between swings
-    public int Range { get; } // Pixels
+    public byte Range { get; } // Pixels
     public ushort Damage { get; } // Damage dealt per hit
-    public MeleeWeapon(ItemType itemType, byte amount, float firerate, int range, ushort damage, string? customName = null) : base(itemType, amount, customName)
+    public MeleeWeapon(ItemType itemType, byte amount, float firerate, byte range, ushort damage, string? customName = null) : base(itemType, amount, customName)
     {
         Amount = amount;
         FireRate = firerate;
@@ -19,7 +17,8 @@ public class MeleeWeapon : Item, IProjectileOwner
         {
             // Positioning and aiming
             Vector2 dir = InputManager.MousePosition.ToVector2() - Constants.Middle.ToVector2() - CameraManager.CameraOffset;
-            Projectile projectile = new Projectile(gameManager, this, CameraManager.CameraDest, (float)Math.Atan2(dir.Y, dir.X), size: new(Range));
+            // Player-owned projectiles have UID of 0
+            Projectile projectile = new Projectile(gameManager, 0, CameraManager.CameraDest, (float)Math.Atan2(dir.Y, dir.X), TextureID.Slash, Damage, 0, size: new(Range));
             projectile.Position -= projectile.Size.ToVector2() / 2;
             projectile.Position += dir.NormalizedCopy() * (Range / 2);
 

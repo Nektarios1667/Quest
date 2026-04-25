@@ -388,10 +388,15 @@ public static class StateManager
     }
     public static void WriteProjectileData(BinaryWriter writer, Projectile proj)
     {
-        writer.Write(proj.Owner.UID);
+        writer.Write(proj.OwnerUID);
         writer.Write((ushort)proj.Position.X);
         writer.Write((ushort)proj.Position.Y);
         writer.Write(proj.Direction);
+        writer.Write((ushort)proj.Texture);
+        writer.Write(proj.Damage);
+        writer.Write(proj.Speed);
+        writer.Write((byte)proj.Size.X);
+        writer.Write((byte)proj.Size.Y);
     }
     public static void WriteItemData(BinaryWriter writer, ItemRef? itemRef)
     {
@@ -486,19 +491,16 @@ public static class StateManager
     }
     public static void ReadProjectileData(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Level current)
     {
+        // Data
         ushort ownerUID = reader.ReadUInt16();
         Vector2 position = new(reader.ReadUInt16(), reader.ReadUInt16());
         float direction = reader.ReadSingle();
+        TextureID tex = (TextureID)reader.ReadUInt16();
+        ushort damage = reader.ReadUInt16();
+        ushort speed = reader.ReadUInt16();
+        Point size = new(reader.ReadByte(), reader.ReadByte());
 
-        // Get owner
-        IProjectileOwner? owner = ownerUID == 0 ? playerManager : (current.Enemies.TryGetValue(ownerUID, out var e) ? e : null);
-        if (owner == null)
-        {
-            Logger.Error($"Owner with UID {ownerUID} not found.");
-            return;
-        }
-
-        Projectile proj = new(gameManager, owner, position, direction);
+        Projectile proj = new(gameManager, ownerUID, position, direction, tex, damage, speed, size);
         gameManager.LevelManager.Level.Projectiles.Add(proj);
     }
     public static Dictionary<string, string> ReadKeyValueFile(string name)
