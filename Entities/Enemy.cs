@@ -139,7 +139,7 @@ public class Enemy : IEntity, IProjectileOwner
     {
         Projectile proj = new(gameManager, this, Bounds.Center, direction);
         gameManager.LevelManager.Level.Projectiles.Add(proj);
-        SoundManager.PlaySound("Fire");
+        SoundManager.PlaySound("Fire", pitchVariation: 0.25f);
     }
     public virtual void Dispose()
     {

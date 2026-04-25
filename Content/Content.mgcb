@@ -2116,6 +2116,12 @@
 /processorParam:DebugMode=Auto
 /build:Shaders/Grayscale.fx
 
+#begin Sounds/Effects/Bow.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Bow.wav
+
 #begin Sounds/Effects/Click.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor

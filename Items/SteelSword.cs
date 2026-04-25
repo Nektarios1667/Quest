@@ -7,6 +7,6 @@ public class SteelSword : MeleeWeapon
     public override void PrimaryUse(GameManager gameManager, PlayerManager player)
     {
         base.PrimaryUse(gameManager, player);
-        SoundManager.PlaySound("Swoosh", pitch: RandomManager.RandomFloat() / 2 - .25f);
+        SoundManager.PlaySound("Swoosh", pitchVariation: 0.25f);
     }
 }

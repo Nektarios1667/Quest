@@ -6,10 +6,31 @@ namespace Quest.Managers;
 
 public static class SoundManager
 {
+    public static readonly float? RandomPitch = null;
     private static readonly Dictionary<string, SoundEffect> soundEffects = [];
     private static readonly Dictionary<string, SoundEffectInstance> soundInstances = [];
     private static readonly Dictionary<string, Song> songs = [];
-
+    public static void Init(ContentManager content)
+    {
+        // Load sounds
+        LoadSound(content, "Footstep", "Sounds/Effects/Footstep");
+        LoadSound(content, "Fire", "Sounds/Effects/Fire");
+        LoadSound(content, "Fire2", "Sounds/Effects/Fire2");
+        LoadSound(content, "Rain", "Sounds/Effects/Rain");
+        LoadSound(content, "Sandstorm", "Sounds/Effects/Sandstorm");
+        LoadSound(content, "Trinkets", "Sounds/Effects/Trinkets");
+        LoadSound(content, "Click", "Sounds/Effects/Click");
+        LoadSound(content, "DoorLocked", "Sounds/Effects/DoorLocked");
+        LoadSound(content, "DoorUnlock", "Sounds/Effects/DoorUnlock");
+        LoadSound(content, "Spook", "Sounds/Effects/Spook");
+        LoadSound(content, "Typing", "Sounds/Effects/Typing");
+        LoadSound(content, "Whoosh", "Sounds/Effects/Whoosh");
+        LoadSound(content, "Pickup", "Sounds/Effects/Pickup");
+        LoadSound(content, "Swoosh", "Sounds/Effects/Swoosh");
+        LoadSound(content, "MetalScrape", "Sounds/Effects/MetalScrape");
+        LoadSound(content, "Scribble", "Sounds/Effects/Scribble");
+        LoadSound(content, "Bow", "Sounds/Effects/Bow");
+    }
     public static float SoundVolume { get; set; } = 1f;
 
     public static float MusicVolume
@@ -32,10 +53,10 @@ public static class SoundManager
             songs[key] = content.Load<Song>(path);
     }
 
-    public static void PlaySound(string key, float volume = 1f, float pitch = 0f, float pan = 0f)
+    public static void PlaySound(string key, float volume = 1f, float pitch = 0f, float pitchVariation = 0f, float pan = 0f)
     {
         if (soundEffects.TryGetValue(key, out var sfx))
-            sfx.Play(MathHelper.Clamp(volume * SoundVolume, 0f, 1f), pitch, pan);
+            sfx.Play(MathHelper.Clamp(volume * SoundVolume, 0f, 1f), pitch + RandomManager.RandomFloatRange(-pitchVariation, pitchVariation), pan);
     }
 
     public static void PlaySoundInstance(string key, float volume = 1f, float pitch = 0f, float pan = 0f)

@@ -266,7 +266,7 @@ public class PlayerManager : IEntity, IProjectileOwner
                     continue;
                 // 
                 LightingManager.RemoveLight($"Loot_{loot.UID}");
-                SoundManager.PlaySound("Pickup", pitch: RandomManager.RandomFloat() / 2 - .25f);
+                SoundManager.PlaySound("Pickup", pitchVariation: 0.25f);
             }
         }
     }

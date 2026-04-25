@@ -19,7 +19,7 @@ public class MeleeWeapon : Item, IProjectileOwner
         {
             // Positioning and aiming
             Vector2 dir = InputManager.MousePosition.ToVector2() - Constants.Middle.ToVector2() - CameraManager.CameraOffset;
-            Projectile projectile = new Projectile(gameManager, player, CameraManager.CameraDest, (float)Math.Atan2(dir.Y, dir.X), size: new(Range));
+            Projectile projectile = new Projectile(gameManager, this, CameraManager.CameraDest, (float)Math.Atan2(dir.Y, dir.X), size: new(Range));
             projectile.Position -= projectile.Size.ToVector2() / 2;
             projectile.Position += dir.NormalizedCopy() * (Range / 2);
 

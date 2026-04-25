@@ -18,7 +18,7 @@ public class RangedWeapon : Item, IProjectileOwner
         if (TimerManager.IsCompleteOrMissing($"RangedAttack_{UID}"))
         {
             Vector2 dir = InputManager.MousePosition.ToVector2() - Constants.Middle.ToVector2() - CameraManager.CameraOffset;
-            Projectile projectile = new Projectile(gameManager, player, CameraManager.CameraDest, (float)Math.Atan2(dir.Y, dir.X));
+            Projectile projectile = new Projectile(gameManager, this, CameraManager.CameraDest, (float)Math.Atan2(dir.Y, dir.X));
             projectile.Position -= projectile.Size.ToVector2() / 2;
             gameManager.LevelManager.Level.Projectiles.Add(projectile);
 

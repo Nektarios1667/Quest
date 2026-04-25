@@ -110,7 +110,7 @@ public class NPC : IEntity
             Item leftover = cont.AddItem(new(option.Item));
             if (leftover.Amount > 0)
                 gameManager.LevelManager.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), Position, GameManager.GameTime));
-            SoundManager.PlaySound("Trinkets");
+            SoundManager.PlaySound("Trinkets", pitchVariation: 0.25f);
             option.Stock -= 1;
         }
 

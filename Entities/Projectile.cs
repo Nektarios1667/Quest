@@ -13,6 +13,7 @@ public interface IProjectileOwner
     public ushort ProjectileSpeed { get; }
     public ushort UID { get; }
 }
+
 public class Projectile : IEntity
 {
     public IProjectileOwner Owner { get; protected set; }

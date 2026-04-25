@@ -21,24 +21,6 @@ public class GameManager
         MinimapBatch = new SpriteBatch(batch.GraphicsDevice);
         LevelManager = level;
         OverlayManager = overlay;
-
-        // Load sounds
-        SoundManager.LoadSound(content, "Footstep", "Sounds/Effects/Footstep");
-        SoundManager.LoadSound(content, "Fire", "Sounds/Effects/Fire");
-        SoundManager.LoadSound(content, "Fire2", "Sounds/Effects/Fire2");
-        SoundManager.LoadSound(content, "Rain", "Sounds/Effects/Rain");
-        SoundManager.LoadSound(content, "Sandstorm", "Sounds/Effects/Sandstorm");
-        SoundManager.LoadSound(content, "Trinkets", "Sounds/Effects/Trinkets");
-        SoundManager.LoadSound(content, "Click", "Sounds/Effects/Click");
-        SoundManager.LoadSound(content, "DoorLocked", "Sounds/Effects/DoorLocked");
-        SoundManager.LoadSound(content, "DoorUnlock", "Sounds/Effects/DoorUnlock");
-        SoundManager.LoadSound(content, "Spook", "Sounds/Effects/Spook");
-        SoundManager.LoadSound(content, "Typing", "Sounds/Effects/Typing");
-        SoundManager.LoadSound(content, "Whoosh", "Sounds/Effects/Whoosh");
-        SoundManager.LoadSound(content, "Pickup", "Sounds/Effects/Pickup");
-        SoundManager.LoadSound(content, "Swoosh", "Sounds/Effects/Swoosh");
-        SoundManager.LoadSound(content, "MetalScrape", "Sounds/Effects/MetalScrape");
-        SoundManager.LoadSound(content, "Scribble", "Sounds/Effects/Scribble");
     }
     public void Update(float deltaTime)
     {

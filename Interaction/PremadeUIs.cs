@@ -104,7 +104,7 @@ public partial class UserInterface
             if (input.Item != null && discName.Text != "")
             {
                 input.Item.CustomName = discName.Text.Replace(" ", "");
-                SoundManager.PlaySound("MetalScrape");
+                SoundManager.PlaySound("MetalScrape", pitchVariation: 0.25f);
             }
         };
         DiscWriterUI.AddElement("rename", rename);
@@ -204,7 +204,7 @@ public partial class UserInterface
             if (itemInput.Item != null)
                 itemInput.Item.CustomName = null;
             itemName.SetText("");
-            SoundManager.PlaySound("Scribble");
+            SoundManager.PlaySound("Scribble", pitchVariation: 0.25f);
         };
         InscriberUI.AddElement("clear", clear);
     }

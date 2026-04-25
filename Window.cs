@@ -88,16 +88,14 @@ public class Window : Game
         SoundtrackManager.LoadSoundtracks(Content);
 
         // Managers
+        SoundManager.Init(Content);
         levelManager = new();
         UserInterface.Init(spriteBatch, levelManager);
         playerManager = new();
         overlayManager = new(playerManager);
         gameManager = new(Content, spriteBatch, levelManager, overlayManager);
         menuManager = new(this, spriteBatch, Content, gameManager, playerManager);
-        levelManager.LevelLoaded += _ => playerManager.CloseInterface();
         CommandManager.Init(this, gameManager, levelManager, playerManager);
-        _Pathfinder.Init(gameManager);
-        SoundtrackManager.SoundtrackChanged += (Soundtracks? st) =>{ if (st != null) overlayManager.Notification($"Now Playing: {st}", Color.Cyan); };
 
         Logger.System("Initialized managers.");
 
