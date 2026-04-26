@@ -988,6 +988,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/Crossbow.png
 
+#begin Images/Items/DeleriumPotion.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/DeleriumPotion.png
+
 #begin Images/Items/DeltaCoin.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1252,6 +1264,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/Lantern.png
 
+#begin Images/Items/LifestealPotion.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/LifestealPotion.png
+
 #begin Images/Items/LightningStaff.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1312,6 +1336,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/Pickaxe.png
 
+#begin Images/Items/PoisonPotion.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/PoisonPotion.png
+
 #begin Images/Items/Potato.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1323,6 +1359,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Items/Potato.png
+
+#begin Images/Items/ProtectionPotion.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/ProtectionPotion.png
 
 #begin Images/Items/RawBeef.png
 /importer:TextureImporter
@@ -1383,6 +1431,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Items/RawIron.png
+
+#begin Images/Items/RegenerationPotion.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/RegenerationPotion.png
 
 #begin Images/Items/Rock.png
 /importer:TextureImporter
@@ -1456,6 +1516,30 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/Skull.png
 
+#begin Images/Items/SlownessPotion.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/SlownessPotion.png
+
+#begin Images/Items/SpeedPotion.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/SpeedPotion.png
+
 #begin Images/Items/SteelSword.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1467,6 +1551,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Items/SteelSword.png
+
+#begin Images/Items/StrengthPotion.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/StrengthPotion.png
 
 #begin Images/Items/Template.png
 /importer:TextureImporter
@@ -1491,6 +1587,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Items/TimeStaff.png
+
+#begin Images/Items/VulnerabilityPotion.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/VulnerabilityPotion.png
+
+#begin Images/Items/WeaknessPotion.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/WeaknessPotion.png
 
 #begin Images/Items/WoodKey.png
 /importer:TextureImporter
@@ -2169,6 +2289,12 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Sounds/Effects/Footstep.wav
+
+#begin Sounds/Effects/Gulp.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Gulp.wav
 
 #begin Sounds/Effects/MetalScrape.wav
 /importer:WavImporter

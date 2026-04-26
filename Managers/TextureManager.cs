@@ -105,6 +105,16 @@ public static class TextureManager
         Crossbow,
         HealthPotion,
         Arrow,
+        SpeedPotion,
+        SlownessPotion,
+        RegenerationPotion,
+        PoisonPotion,
+        StrengthPotion,
+        WeaknessPotion,
+        ProtectionPotion,
+        VulnerabilityPotion,
+        DeleriumPotion,
+        LifestealPotion,
         // ITEMS ENUM INSERT
         Dirt,
         Flooring,
@@ -302,6 +312,16 @@ public static class TextureManager
         Textures[TextureID.Crossbow] = content.Load<Texture2D>("Images/Items/Crossbow");
         Textures[TextureID.HealthPotion] = content.Load<Texture2D>("Images/Items/HealthPotion");
         Textures[TextureID.Arrow] = content.Load<Texture2D>("Images/Items/Arrow");
+        Textures[TextureID.SpeedPotion] = content.Load<Texture2D>("Images/Items/SpeedPotion");
+        Textures[TextureID.SlownessPotion] = content.Load<Texture2D>("Images/Items/SlownessPotion");
+        Textures[TextureID.RegenerationPotion] = content.Load<Texture2D>("Images/Items/RegenerationPotion");
+        Textures[TextureID.PoisonPotion] = content.Load<Texture2D>("Images/Items/PoisonPotion");
+        Textures[TextureID.StrengthPotion] = content.Load<Texture2D>("Images/Items/StrengthPotion");
+        Textures[TextureID.WeaknessPotion] = content.Load<Texture2D>("Images/Items/WeaknessPotion");
+        Textures[TextureID.ProtectionPotion] = content.Load<Texture2D>("Images/Items/ProtectionPotion");
+        Textures[TextureID.VulnerabilityPotion] = content.Load<Texture2D>("Images/Items/VulnerabilityPotion");
+        Textures[TextureID.DeleriumPotion] = content.Load<Texture2D>("Images/Items/DeleriumPotion");
+        Textures[TextureID.LifestealPotion] = content.Load<Texture2D>("Images/Items/LifestealPotion");
         // ITEMS INSERT
         Textures[TextureID.Dirt] = content.Load<Texture2D>("Images/Tiles/Dirt");
         Textures[TextureID.Flooring] = content.Load<Texture2D>("Images/Tiles/Flooring");
@@ -486,6 +506,16 @@ public static class TextureManager
         Metadata[TextureID.Crossbow] = new(Textures[TextureID.Crossbow].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.HealthPotion] = new(Textures[TextureID.HealthPotion].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Arrow] = new(Textures[TextureID.Arrow].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.SpeedPotion] = new(Textures[TextureID.SpeedPotion].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.SlownessPotion] = new(Textures[TextureID.SlownessPotion].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.RegenerationPotion] = new(Textures[TextureID.RegenerationPotion].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.PoisonPotion] = new(Textures[TextureID.PoisonPotion].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.StrengthPotion] = new(Textures[TextureID.StrengthPotion].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.WeaknessPotion] = new(Textures[TextureID.WeaknessPotion].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.ProtectionPotion] = new(Textures[TextureID.ProtectionPotion].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.VulnerabilityPotion] = new(Textures[TextureID.VulnerabilityPotion].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.DeleriumPotion] = new(Textures[TextureID.DeleriumPotion].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.LifestealPotion] = new(Textures[TextureID.LifestealPotion].Bounds.Size, new(1, 1), "item");
         // ITEMS METADATA INSERT
         Metadata[TextureID.Dirt] = new(Textures[TextureID.Dirt].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Flooring] = new(Textures[TextureID.Flooring].Bounds.Size, new(4, 4), "tile");

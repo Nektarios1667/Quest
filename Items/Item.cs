@@ -62,6 +62,16 @@ public enum ItemTypeID : byte
     Crossbow,
     HealthPotion,
     Arrow,
+    SpeedPotion,
+    SlownessPotion,
+    RegenerationPotion,
+    PoisonPotion,
+    StrengthPotion,
+    WeaknessPotion,
+    ProtectionPotion,
+    VulnerabilityPotion,
+    DeleriumPotion,
+    LifestealPotion,
     // ITEMS ENUM
 }
 
@@ -93,12 +103,12 @@ public class ItemTypes
             throw new ArgumentException($"ItemType {typeID} does not exist");
         return All[(byte)Enum.Parse(typeof(ItemTypeID), typeID)];
     }
-    public static readonly ItemType ActivePalantir = new(ItemTypeID.ActivePalantir, "A seeing stone used to communicate with sauron.", 1);
+    public static readonly ItemType ActivePalantir = new(ItemTypeID.ActivePalantir, "A seeing stone used to communicate with Sauron.", 1);
     public static readonly ItemType SteelSword = new(ItemTypeID.SteelSword, "A sturdy steel sword.", 1);
     public static readonly ItemType DeltaCoin = new(ItemTypeID.DeltaCoin, "A gold coin.");
     public static readonly ItemType DiamondSword = new(ItemTypeID.DiamondSword, "A razor sharp sword made with pure diamonds.", 1);
     public static readonly ItemType GammaCoin = new(ItemTypeID.GammaCoin, "A diamond coin.");
-    public static readonly ItemType InactivePalantir = new(ItemTypeID.InactivePalantir, "A seeing stone used to communicate with sauron.", 1);
+    public static readonly ItemType InactivePalantir = new(ItemTypeID.InactivePalantir, "A seeing stone used to communicate with Sauron.", 1);
     public static readonly ItemType GoldKey = new(ItemTypeID.GoldKey, "A fancy golden key.", 1);
     public static readonly ItemType PhiCoin = new(ItemTypeID.PhiCoin, "A bronze coin.");
     public static readonly ItemType Pickaxe = new(ItemTypeID.Pickaxe, "A sturdy metal pickaxe used for mining.", 1);
@@ -154,6 +164,16 @@ public class ItemTypes
     public static readonly ItemType Crossbow = new(ItemTypeID.Crossbow, "A wooden crossbow capable of shooting arrows.", 1);
     public static readonly ItemType HealthPotion = new(ItemTypeID.HealthPotion, "A drink used to instantly heal.", 1);
     public static readonly ItemType Arrow = new(ItemTypeID.Arrow, "Used with a bow to shoot enemies.");
+    public static readonly ItemType SpeedPotion = new(ItemTypeID.SpeedPotion, "A special brew that temporarily boosts walk speed.", 1);
+    public static readonly ItemType SlownessPotion = new(ItemTypeID.SlownessPotion, "A special brew that temporarily slows walk speed.", 1);
+    public static readonly ItemType RegenerationPotion = new(ItemTypeID.RegenerationPotion, "A special brew that gives a heal over time effect.", 1);
+    public static readonly ItemType PoisonPotion = new(ItemTypeID.PoisonPotion, "A special brew that deals damage over time.", 1);
+    public static readonly ItemType StrengthPotion = new(ItemTypeID.StrengthPotion, "A special brew that temporarily boosts player damage.", 1);
+    public static readonly ItemType WeaknessPotion = new(ItemTypeID.WeaknessPotion, "A special brew that temporarily decreases player damage.", 1);
+    public static readonly ItemType ProtectionPotion = new(ItemTypeID.ProtectionPotion, "A special brew that temporarily decrease damage taken by the player.", 1);
+    public static readonly ItemType VulnerabilityPotion = new(ItemTypeID.VulnerabilityPotion, "A special brew that temporarily increases damage taken by the player.", 1);
+    public static readonly ItemType DeleriumPotion = new(ItemTypeID.DeleriumPotion, "A special brew that temporarily causes delerious vision.", 1);
+    public static readonly ItemType LifestealPotion = new(ItemTypeID.LifestealPotion, "A special brew that temporarily causes the player to steal health from enemies.", 1);
     // ITEMS REGISTER
     public static readonly ItemType[] All = [
     ActivePalantir,
@@ -217,6 +237,16 @@ public class ItemTypes
     Crossbow,
     HealthPotion,
     Arrow,
+    SpeedPotion,
+    SlownessPotion,
+    RegenerationPotion,
+    PoisonPotion,
+    StrengthPotion,
+    WeaknessPotion,
+    ProtectionPotion,
+    VulnerabilityPotion,
+    DeleriumPotion,
+    LifestealPotion,
     // ITEMS ENUM
     ];
 }
@@ -299,6 +329,16 @@ public class Item
             ItemTypeID.DiamondSword => new DiamondSword(amount, customName),
             ItemTypeID.Crossbow => new Crossbow(amount, customName),
             ItemTypeID.HealthPotion => new HealthPotion(amount, customName),
+            ItemTypeID.DeleriumPotion => new DeleriumPotion(amount, customName),
+            ItemTypeID.LifestealPotion => new LifestealPotion(amount, customName),
+            ItemTypeID.PoisonPotion => new PoisonPotion(amount, customName),
+            ItemTypeID.ProtectionPotion => new ProtectionPotion(amount, customName),
+            ItemTypeID.RegenerationPotion => new RegenerationPotion(amount, customName),
+            ItemTypeID.SlownessPotion => new SlownessPotion(amount, customName),
+            ItemTypeID.SpeedPotion => new SpeedPotion(amount, customName),
+            ItemTypeID.StrengthPotion => new StrengthPotion(amount, customName),
+            ItemTypeID.VulnerabilityPotion => new VulnerabilityPotion(amount, customName),
+            ItemTypeID.WeaknessPotion => new WeaknessPotion(amount, customName),
             _ => new Item(type, amount, customName),
         };
     }

@@ -30,6 +30,7 @@ public static class SoundManager
         LoadSound(content, "MetalScrape", "Sounds/Effects/MetalScrape");
         LoadSound(content, "Scribble", "Sounds/Effects/Scribble");
         LoadSound(content, "Bow", "Sounds/Effects/Bow");
+        LoadSound(content, "Gulp", "Sounds/Effects/Gulp");
     }
     public static float SoundVolume { get; set; } = 1f;
 

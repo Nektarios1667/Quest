@@ -120,7 +120,7 @@ public class StatusManager
         if (HasStatusEffect(StatusEffect.Delerium))
         {
             gameManager.GradingEffect?.Parameters["Saturation"].SetValue(0.1f + (0.9f / (0.4f * GetStatusEffectDuration(StatusEffect.Delerium) + 1)));
-            CameraManager.Camera += RandomManager.RandomUnitVec2() * Math.Clamp(0.1f * GetStatusEffectDuration(StatusEffect.Delerium), 0, 5);
+            CameraManager.Camera += RandomManager.RandomUnitVec2() * Math.Clamp(0.1f * GetStatusEffectDuration(StatusEffect.Delerium), 0, 4);
         }
     }
 }
