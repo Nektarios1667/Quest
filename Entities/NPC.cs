@@ -7,9 +7,9 @@ public class ShopOption
 {
     public ItemRef Item;
     public ItemRef? Cost;
-    public int Stock;
+    public byte Stock;
 
-    public ShopOption(ItemRef item, ItemRef? cost, int stock)
+    public ShopOption(ItemRef item, ItemRef? cost, byte stock)
     {
         Item = item;
         Cost = cost;
@@ -55,7 +55,7 @@ public class ShopOption
             cost = new ItemRef(ItemTypes.All[(int)Enum.Parse<ItemTypeID>(costName, true)], costAmount);
         }
         // Stock
-        int stock = int.Parse(costStockParts[1].Trim());
+        byte stock = byte.Parse(costStockParts[1].Trim());
         return new ShopOption(new ItemRef(ItemTypes.All[(int)Enum.Parse<ItemTypeID>(itemName, true)], (byte)itemAmount), cost, stock);
     }
 }
@@ -120,7 +120,7 @@ public class NPC : IEntity
         }
         ShopOptions.Add(option);
     }
-    public void AddShopOption(ItemRef bought, ItemRef? cost, int stock)
+    public void AddShopOption(ItemRef bought, ItemRef? cost, byte stock)
     {
         AddShopOption(new(bought, cost, stock));
     }

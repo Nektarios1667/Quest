@@ -28,6 +28,26 @@ public static class BinaryWriterExtensions
         writer.Write(new ByteCoord(npc.Position));
         writer.WriteByteFloat(npc.Scale);
         writer.Write((ushort)npc.Texture);
+
+        writer.Write((byte)npc.ShopOptions.Count);
+        foreach (var option in npc.ShopOptions)
+            writer.Write(option);
+    }
+    public static void Write(this BinaryWriter writer, ShopOption shopOption)
+    {
+        writer.Write((byte)shopOption.Item.Type.TypeID); // byte
+        writer.Write(shopOption.Item.Amount); // byte
+        if (shopOption.Cost is not null)
+        {
+            writer.Write(true); // bool
+            writer.Write((byte)shopOption.Cost.Type.TypeID); // byte
+            writer.Write(shopOption.Cost.Amount); // byte
+            writer.Write(shopOption.Stock); // byte
+        }
+        else
+        {
+            writer.Write(false);
+        }
     }
     public static void WriteByteFloat(this BinaryWriter writer, float value)
     {
@@ -47,14 +67,14 @@ public static class BinaryWriterExtensions
     }
     public static void Write(this BinaryWriter writer, Enemy enemy)
     {
-        writer.Write(enemy.Health);
-        writer.Write(enemy.Damage);
-        writer.Write(enemy.AttackSpeed);
-        writer.Write(enemy.Defense);
-        writer.Write(enemy.Speed);
-        writer.Write(enemy.ProjectileSpeed);
-        writer.Write(enemy.ViewRange);
-        writer.Write(enemy.AttackRange);
+        writer.Write((ushort)enemy.Health); // ushort
+        writer.Write(enemy.Damage); // ushort
+        writer.Write(enemy.AttackSpeed); // float
+        writer.Write(enemy.Defense); // ushort
+        writer.Write(enemy.Speed); // ushort
+        writer.Write(enemy.ProjectileSpeed); // ushort
+        writer.Write(enemy.ViewRange); // ushort
+        writer.Write(enemy.AttackRange); // ushort
         writer.Write((ushort)enemy.Texture);
         writer.Write((ushort)enemy.ProjectileTexture);
         writer.Write((ushort)Math.Round(enemy.Position.X));
@@ -92,13 +112,18 @@ public static class BinaryReaderExtensions
         Point location = reader.ReadByteCoord().ToPoint();
         float scale = reader.ReadByteFloat();
         ushort texID = reader.ReadUInt16();
-        if (!Enum.IsDefined(typeof(TextureID), texID))
+        if (!Enum.TryParse(texID.ToString(), out TextureID texture))
         {
-            Logger.Error("Failed to read NPC. Invalid texture ID.");
-            texID = (ushort)TextureID.Null;
+            Logger.Error($"Failed to read NPC. Invalid texture ID {texID}.");
+            texture = TextureID.Null;
         }
-        TextureID texture = (TextureID)texID;
-        return new NPC(texture, location, name, dialog, Color.White, scale);
+        NPC npc = new NPC(texture, location, name, dialog, Color.White, scale);
+        byte shopOptionCount = reader.ReadByte();
+        for (int i = 0; i < shopOptionCount; i++)
+        {
+            npc.AddShopOption(reader.ReadShopOption());
+        }
+        return npc;
     }
     public static Enemy ReadEnemy(this BinaryReader reader)
     {
@@ -114,14 +139,14 @@ public static class BinaryReaderExtensions
         ushort texID = reader.ReadUInt16();
         if (!Enum.IsDefined(typeof(TextureID), texID))
         {
-            Logger.Error("Failed to read Enemy. Invalid texture ID.");
+            Logger.Error($"Failed to read Enemy. Invalid texture ID {texID}.");
             texID = (ushort)TextureID.Null;
         }
 
         ushort projTexID = reader.ReadUInt16();
         if (!Enum.IsDefined(typeof(TextureID), projTexID))
         {
-            Logger.Error("Failed to read Enemy. Invalid projectile texture ID.");
+            Logger.Error($"Failed to read Enemy. Invalid projectile texture ID {projTexID}.");
             projTexID = (ushort)TextureID.Null;
         }
 
@@ -143,6 +168,21 @@ public static class BinaryReaderExtensions
             uid
         );
         return enemy;
+    }
+    public static ShopOption ReadShopOption(this BinaryReader reader)
+    {
+        ItemType type = ItemTypes.All[reader.ReadByte()];
+        byte amount = reader.ReadByte();
+        bool hasCost = reader.ReadBoolean();
+        ItemRef? cost = null;
+        if (hasCost)
+        {
+            ItemType costType = ItemTypes.All[reader.ReadByte()];
+            byte costAmount = reader.ReadByte();
+            cost = new ItemRef(costType, costAmount);
+        }
+        byte stock = reader.ReadByte();
+        return new ShopOption(new ItemRef(type, amount), cost, stock);
     }
     public static float ReadByteFloat(this BinaryReader reader)
     {
