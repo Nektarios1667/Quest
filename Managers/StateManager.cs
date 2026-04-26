@@ -180,7 +180,7 @@ public static class StateManager
                 chests.Keys,
                 openedDoors.Keys,
                 gameManager.LevelManager.Levels.Where(l => l.WorldName == worldName &&
-                (l.Loot.Count > 0 || l.Enemies.Count > 0 || l.Projectiles.Count > 0))
+                (l.Loot.Count > 0 || l.Enemies.Count > 0 || l.Projectiles.Count > 0 || l.NPCs.Count > 0))
             .Select(l => l.LevelName),
             }.SelectMany(x => x).Distinct().Take(255).ToArray();
 
@@ -234,6 +234,16 @@ public static class StateManager
                 writer.Write((ushort)levelObj.Projectiles.Count);
                 foreach (var proj in levelObj.Projectiles)
                     WriteProjectileData(writer, proj);
+
+                // NPCs
+                writer.Write((ushort)levelObj.NPCs.Count);
+                foreach (var npc in levelObj.NPCs.Values)
+                {
+                    writer.Write(npc.UID);
+                    writer.Write((byte)npc.ShopOptions.Count);
+                    foreach (var item in npc.ShopOptions)
+                        writer.Write(item.Stock);
+                }
             }
 
             // Write Inventory data
@@ -313,27 +323,56 @@ public static class StateManager
                     Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
                     current.Loot.Add(new Loot(new(ItemTypes.All[typeID], amount), location, 0f));
                 }
+
                 // Doors
                 ushort doorsCount = reader.ReadUInt16();
                 for (int d = 0; d < doorsCount; d++)
                     if (current.Tiles[reader.ReadUInt16()] is Door door)
                         door.Open(gameManager);
+
                 // Chests
                 ushort chestCount = reader.ReadUInt16();
                 for (int c = 0; c < chestCount; c++)
                     ReadChestData(reader, current, levelPath);
+
                 // Containers
                 ushort containerCount = reader.ReadUInt16();
                 for (int o = 0; o < containerCount; o++)
                     ReadContainerData(reader, current);
+
                 // Enemies
                 ushort enemyCount = reader.ReadUInt16();
                 for (int e = 0; e < enemyCount; e++)
                     ReadEnemyData(reader, current);
+
                 // Projectiles
                 ushort projectileCount = reader.ReadUInt16();
                 for (int p = 0; p < projectileCount; p++)
                     ReadProjectileData(gameManager, playerManager, reader, current);
+
+                // NPCs
+                ushort npcCount = reader.ReadUInt16();
+                for (int n = 0; n < npcCount; n++)
+                {
+                    ushort uid = reader.ReadUInt16();
+                    // Read stock amounts
+                    if (current.NPCs.TryGetValue(uid, out var npc))
+                    {
+                        byte shopCount = reader.ReadByte();
+                        for (int s = 0; s < shopCount; s++)
+                        {
+                            byte stock = reader.ReadByte();
+                            npc.ShopOptions[s].Stock = stock;
+                        }
+                    }
+                    // Read and discard stock amounts if NPC not found
+                    else
+                    {
+                        byte shopCount = reader.ReadByte();
+                        reader.ReadBytes(shopCount);
+                        Logger.Error($"NPC with UID {uid} not found in level.");
+                    }
+                }
             }
 
             // Read Inventory data

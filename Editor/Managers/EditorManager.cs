@@ -286,15 +286,15 @@ public class EditorManager
         NPC npc = new NPC(texture, MouseSelectionCoord, name, dialog, Color.White, scale);
         foreach (ShopOption option in shopOptions)
             npc.AddShopOption(option);
-        LevelManager.Level.NPCs.Add(npc);
+        LevelManager.Level.NPCs[npc.UID] = npc;
     }
     public void DeleteNPC()
     {
-        foreach (NPC npc in LevelManager.Level.NPCs)
+        foreach (NPC npc in LevelManager.Level.NPCs.Values)
         {
             if (npc.Position == MouseSelectionCoord)
             {
-                LevelManager.Level.NPCs.Remove(npc);
+                LevelManager.Level.NPCs.Remove(npc.UID);
                 Logger.Log($"Deleted NPC '{npc.Name}' @ {MouseSelectionCoord.X}, {MouseSelectionCoord.Y}.");
                 break;
             }
@@ -304,7 +304,7 @@ public class EditorManager
     {
         // Grab NPC
         NPC? editing = null;
-        foreach (NPC npc in LevelManager.Level.NPCs)
+        foreach (NPC npc in LevelManager.Level.NPCs.Values)
         {
             if (npc.Position == MouseSelectionCoord)
             {

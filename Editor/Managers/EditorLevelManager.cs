@@ -119,8 +119,9 @@ public class EditorLevelManager
 
         // NPCs
         writer.Write((ushort)Math.Min(LevelManager.Level.NPCs.Count, ushort.MaxValue));
-        for (int n = 0; n < Math.Min(LevelManager.Level.NPCs.Count, ushort.MaxValue); n++)
-            writer.Write(LevelManager.Level.NPCs[n]);
+        NPC[] npcs = [.. LevelManager.Level.NPCs.Values];
+        for (int n = 0; n < Math.Min(npcs.Length, ushort.MaxValue); n++)
+            writer.Write(npcs[n]);
 
         // Floor loot
         writer.Write((ushort)Math.Min(LevelManager.Level.Loot.Count, ushort.MaxValue));
@@ -169,7 +170,7 @@ public class EditorLevelManager
         Tile[] tiles = LevelGenerator.GenerateLevel(Constants.MapSize, int.Parse(values[2]));
 
         Level current = LevelManager.Level;
-        Level level = new(current.Path, tiles, [], current.Spawn, current.NPCs, current.Loot, current.Decals, current.Enemies, current.Projectiles, [], current.Tint);
+        Level level = new(current.Path, tiles, [], current.Spawn, [.. current.NPCs.Values], current.Loot, current.Decals, [.. current.Enemies.Values], current.Projectiles, [], current.Tint);
 
         LevelManager.LoadLevelObject(GameManager, level);
     }

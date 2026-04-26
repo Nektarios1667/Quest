@@ -65,7 +65,7 @@ public class NPC : IEntity
     public static readonly NPC Null = new(TextureID.Null, Point.Zero, "NUL_NAME", "NUL_DIALOG");
     public static Dialog? DialogBox { get; set; }
     public static List<(NPC npc, float dist)> NPCsNearby { get; set; } = [];
-    public ushort UID { get; } = UIDManager.Get(UIDCategory.NPCs);
+    public ushort UID { get; }
     public List<ShopOption> ShopOptions { get; private set; } = [];
     public Point Position { get; set; }
     public string Name { get; set; }
@@ -78,9 +78,10 @@ public class NPC : IEntity
     // Private
     private Point spritesize;
 
-    public NPC(TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1)
+    public NPC(TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1, ushort? uid = null)
     {
         Texture = texture;
+        UID = uid ?? UIDManager.Get(UIDCategory.NPCs); ;
 
         // Private
         spritesize = TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap;

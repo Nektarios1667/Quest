@@ -23,6 +23,7 @@ public static class BinaryWriterExtensions
     }
     public static void Write(this BinaryWriter writer, NPC npc)
     {
+        writer.Write(npc.UID);
         writer.Write(npc.Name);
         writer.Write(npc.Dialog);
         writer.Write(new ByteCoord(npc.Position));
@@ -107,6 +108,7 @@ public static class BinaryReaderExtensions
     }
     public static NPC ReadNPC(this BinaryReader reader)
     {
+        ushort uid = reader.ReadUInt16();
         string name = reader.ReadString();
         string dialog = reader.ReadString();
         Point location = reader.ReadByteCoord().ToPoint();
@@ -117,7 +119,7 @@ public static class BinaryReaderExtensions
             Logger.Error($"Failed to read NPC. Invalid texture ID {texID}.");
             texture = TextureID.Null;
         }
-        NPC npc = new NPC(texture, location, name, dialog, Color.White, scale);
+        NPC npc = new NPC(texture, location, name, dialog, Color.White, scale, uid);
         byte shopOptionCount = reader.ReadByte();
         for (int i = 0; i < shopOptionCount; i++)
         {

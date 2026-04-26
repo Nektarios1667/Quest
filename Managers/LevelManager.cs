@@ -48,7 +48,7 @@ public class LevelManager
 
         // Entities
         DebugManager.StartBenchmark("LevelEntityUpdates");
-        foreach (NPC npc in Level.NPCs) npc.Update(gameManager);
+        foreach (NPC npc in Level.NPCs.Values) npc.Update(gameManager);
         foreach (Enemy enemy in Level.Enemies.Values) enemy.Update(gameManager);
         var enemyList = Level.Enemies.Values.ToArray();
         for (int p = enemyList.Length - 1; p >= 0; p--)
@@ -175,7 +175,7 @@ public class LevelManager
     public void DrawCharacters(GameManager gameManager)
     {
         DebugManager.StartBenchmark("CharacterDraws");
-        foreach (NPC npc in Level.NPCs) npc.Draw(gameManager);
+        foreach (NPC npc in Level.NPCs.Values) npc.Draw(gameManager);
         foreach (Enemy enemy in Level.Enemies.Values) enemy.Draw(gameManager);
         foreach (Projectile projectile in Level.Projectiles) projectile.Draw(gameManager);
         DebugManager.EndBenchmark("CharacterDraws");
@@ -412,12 +412,9 @@ public class LevelManager
 
             // Enemies
             ushort enemyCount = reader.ReadUInt16();
-            Dictionary<ushort, Enemy> enemyBuffer = new(enemyCount);
+            List<Enemy> enemyBuffer = new(enemyCount);
             for (int e = 0; e < enemyCount; e++)
-            {
-                Enemy enemy = reader.ReadEnemy();
-                enemyBuffer[enemy.UID] = enemy;
-            }
+                enemyBuffer.Add(reader.ReadEnemy());
 
             // Scripts
             List<QuillScript> scriptBuffer = [];
