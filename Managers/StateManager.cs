@@ -241,6 +241,16 @@ public static class StateManager
             writer.Write((byte)inventory.Items.Length);
             for (int i = 0; i < inventory.Items.Length; i++)
                 WriteItemData(writer, inventory.Items[i]);
+
+            // Write effects
+            byte effectsCount = (byte)Math.Clamp(playerManager.StatusManager.GetStatusEffectsCount(), 0, 255);
+            writer.Write(effectsCount);
+            foreach (var kv in playerManager.StatusManager.GetStatusEffects().Take(effectsCount))
+            {
+                writer.Write((byte)kv.Key); // effect type - byte
+                writer.Write(kv.Value);     // effect timer - float
+            }
+
             writer.Flush();
             data = ms.ToArray();
         }
@@ -332,6 +342,15 @@ public static class StateManager
             {
                 var item = ReadItemData(reader);
                 playerManager.Inventory.SetSlot(i, item);
+            }
+
+            // Read Status Effects
+            byte effectsCount = reader.ReadByte();
+            for (int i = 0; i < effectsCount; i++)
+            {
+                StatusEffect effect = (StatusEffect)reader.ReadByte();
+                float duration = reader.ReadSingle();
+                playerManager.StatusManager.AddStatusEffect(playerManager, effect, duration);
             }
         }
 

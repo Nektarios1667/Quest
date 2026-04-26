@@ -1,5 +1,15 @@
 ﻿namespace Quest.Gui;
-
+public enum HorizontalAlignment
+{
+    Left,
+    Center,
+    Right,
+}
+public enum VerticalAlignment
+{
+    Top,
+    Bottom,
+}
 public abstract class Widget
 {
     public bool Expired { get; protected set; } = false;

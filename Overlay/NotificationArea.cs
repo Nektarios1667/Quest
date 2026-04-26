@@ -1,16 +1,17 @@
 ﻿namespace Quest.Gui;
 
-
-public class NotificationArea(Point location, int height, SpriteFont font, Color? color = null) : Widget(location)
+public class Notification(string text, Color color, float duration = 2f)
 {
-    private class Notification(string text, Color color, float duration = 2f)
-    {
-        public string Text { get; set; } = text;
-        public float Duration { get; set; } = duration;
-        public float Timer { get; set; } = 0f;
-        public Color Color { get; set; } = color;
-        public Color BaseColor { get; set; } = color;
-    }
+    public string Text { get; set; } = text;
+    public float Duration { get; set; } = duration;
+    public float Timer { get; set; } = 0f;
+    public Color Color { get; set; } = color;
+    public Color BaseColor { get; set; } = color;
+}
+public class NotificationArea(Point location, int height, SpriteFont font, Color? color = null, HorizontalAlignment hAlign = HorizontalAlignment.Center, VerticalAlignment vAlign = VerticalAlignment.Bottom) : Widget(location)
+{
+    public HorizontalAlignment HAlign { get; set; } = hAlign;
+    public VerticalAlignment VAlign { get; set; } = vAlign;
     public SpriteFont Font { get; set; } = font;
     private List<Notification> Notifications { get; set; } = [];
     public int Height { get; set; } = height;
@@ -41,24 +42,29 @@ public class NotificationArea(Point location, int height, SpriteFont font, Color
         for (int n = 0; n < Notifications.Count; n++)
         {
             Notification notif = Notifications[n];
+
+            // Alignment
             Point textSize = Font.MeasureString(notif.Text).ToPoint() / Constants.TwoPoint;
-            Point dest = Position + Offset - new Point(textSize.X / 2, (textSize.Y + 5) * n / 2);
+            int x = HAlign == HorizontalAlignment.Left ? 0 : HAlign == HorizontalAlignment.Center ? textSize.X / 2 : -textSize.X / 2;
+            int y = VAlign == VerticalAlignment.Top ? -(textSize.Y + 5) * n / 2 : (textSize.Y + 5) * n / 2;
+            Point dest = Position + Offset - new Point(x, y);
+
             batch.DrawString(Font, notif.Text, dest.ToVector2(), notif.Color, 0f, Vector2.Zero, .5f, SpriteEffects.None, 0f);
         }
     }
-    public void AddNotification(string text, Color? color = null, float duration = 4f)
+    public Notification AddNotification(string text, Color? color = null, float duration = 4f)
     {
         // Remove repeats
         if (Notifications.Count > 0 && Notifications[0].Text == text && Notifications[0].Color == color)
         {
             Notifications[0].Timer = 0f; // Reset timer
             Notifications[0].Duration = duration; // Reset duration
-            return;
         }
 
         Notifications.Insert(0, new Notification(text, color ?? Color, duration));
         // Remove oldest if too many
         if (Notifications.Count > Height)
             Notifications.RemoveAt(Notifications.Count - 1);
+        return Notifications[0];
     }
 }

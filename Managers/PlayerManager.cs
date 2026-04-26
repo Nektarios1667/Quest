@@ -32,7 +32,7 @@ public class PlayerManager : IEntity
     }
     public int Speed => (int)(Constants.PlayerBaseSpeed * StatusManager.GetSpeedMult());
     // Inventory and UI
-
+    public NotificationArea StatusArea { get; } = new(new(5, 5), 400, PixelOperatorSubtitle, color: Color.Gray, hAlign: HorizontalAlignment.Left, vAlign: VerticalAlignment.Top);
     public bool InventoryOpen { get; set; } = false;
     public Container Inventory { get; }
     public UserInterface InventoryUI { get; }
@@ -119,6 +119,8 @@ public class PlayerManager : IEntity
 
         // Inventory
         DebugManager.StartBenchmark("InventoryUpdate");
+
+        StatusArea.Update(GameManager.DeltaTime);
 
         // Change equipped item with hotkeys
         if (!InventoryOpen)

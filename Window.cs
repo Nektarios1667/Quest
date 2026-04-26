@@ -171,6 +171,7 @@ public class Window : Game
 
         // Draw overlays
         overlayManager.Draw(GraphicsDevice, gameManager, playerManager);
+        playerManager.StatusArea.Draw(spriteBatch);
         menuManager.Draw();
 
         // Text info
