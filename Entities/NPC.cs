@@ -15,6 +15,49 @@ public class ShopOption
         Cost = cost;
         Stock = stock;
     }
+    public override string ToString()
+    {
+        string costStr = Cost == null ? "FREE" : $"{Cost.Name} ({Cost.Amount})";
+        return $"{Item.Name} ({Item.Amount}) : {costStr} | {Stock}";
+    }
+    public static ShopOption ParseText(string text)
+    {
+        // Format: "ITEM_NAME (AMOUNT) : COST_NAME (COST_AMOUNT) | STOCK"
+        string[] parts = text.Split(':');
+        if (parts.Length != 2)
+            throw new FormatException($"Invalid shop option format: {text}");
+        // Item
+        string itemPart = parts[0].Trim();
+        int itemAmountStart = itemPart.IndexOf('(');
+        int itemAmountEnd = itemPart.IndexOf(')');
+        if (itemAmountStart == -1 || itemAmountEnd == -1 || itemAmountEnd < itemAmountStart)
+            throw new FormatException($"Invalid item format in shop option: {itemPart}");
+        string itemName = itemPart[..itemAmountStart].Trim();
+        int itemAmount = int.Parse(itemPart.Substring(itemAmountStart + 1, itemAmountEnd - itemAmountStart - 1).Trim());
+
+        // Cost and stock
+        string costStockPart = parts[1].Trim();
+        string[] costStockParts = costStockPart.Split('|');
+        if (costStockParts.Length != 2)
+            throw new FormatException($"Invalid cost/stock format in shop option: {costStockPart}");
+        
+        // Cost
+        string costPart = costStockParts[0].Trim();
+        ItemRef? cost = null;
+        if (!costPart.Equals("FREE", StringComparison.OrdinalIgnoreCase))
+        {
+            int costStart = costPart.IndexOf('(');
+            int costEnd = costPart.IndexOf(')');
+            if (costStart == -1 || costEnd == -1 || costEnd < costStart)
+                throw new FormatException($"Invalid cost format in shop option: {costPart}");
+            string costName = costPart[..costStart].Trim();
+            byte costAmount = byte.Parse(costPart.Substring(costStart + 1, costEnd - costStart - 1).Trim());
+            cost = new ItemRef(ItemTypes.All[(int)Enum.Parse<ItemTypeID>(costName, true)], costAmount);
+        }
+        // Stock
+        int stock = int.Parse(costStockParts[1].Trim());
+        return new ShopOption(new ItemRef(ItemTypes.All[(int)Enum.Parse<ItemTypeID>(itemName, true)], (byte)itemAmount), cost, stock);
+    }
 }
 
 public class NPC : IEntity

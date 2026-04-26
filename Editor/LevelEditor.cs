@@ -164,7 +164,7 @@ public class LevelEditor : Game
 
         // Movement
         DebugManager.StartBenchmark("InputUpdate");
-        int speedup = InputManager.BindDown(InputAction.FastMove) ? 6 : 2;
+        int speedup = InputManager.BindDown(InputAction.FastMove) ? 8 : 3;
         moveX = 0; moveY = 0;
         moveX += InputManager.BindDown(InputAction.MoveLeft) ? -Constants.PlayerBaseSpeed : 0;
         moveX += InputManager.BindDown(InputAction.MoveRight) ? Constants.PlayerBaseSpeed : 0;

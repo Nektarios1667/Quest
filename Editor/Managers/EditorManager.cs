@@ -239,7 +239,17 @@ public class EditorManager
         }
 
         // Winforms
-        var (success, values) = ShowInputForm("NPC Editor", [new("Name", null), new("Dialog", null), new("Size [0.1-25.5]", IsScaleValue), new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())])]);
+        var (success, values) = ShowInputForm("NPC Editor", [
+            new("Name", null),
+            new("Dialog", null),
+            new("Size [0.1-25.5]", IsScaleValue),
+            new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())]),
+            new("Shop Option 1", null),
+            new("Shop Option 2", null),
+            new("Shop Option 3", null),
+            new("Shop Option 4", null),
+            new("Shop Option 5", null)
+        ]);
         if (!success)
         {
             if (!PopupOpen) Logger.Error("NPC creation failed.");
@@ -250,13 +260,33 @@ public class EditorManager
         string name = values[0];
         string dialog = values[1];
         float scale = float.Parse(values[2]);
+
+        // Shop options parsing
+        List<ShopOption> shopOptions = [];
+        foreach (string option in values[4].Split('\n'))
+        {
+            if (string.IsNullOrWhiteSpace(option)) continue;
+            try
+            {
+                shopOptions.Add(ShopOption.ParseText(option));
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to parse shop option '{option}': {ex.Message}");
+                return;
+            }
+        }
+
         if (scale < 0.1 || scale > 25.5)
         {
             Logger.Warning("Scale must be between 0.1 and 25.5. Scale defaulted to 1.");
             scale = 1;
         }
         TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), values[3]);
-        LevelManager.Level.NPCs.Add(new NPC(texture, MouseSelectionCoord, name, dialog, Color.White, scale));
+        NPC npc = new NPC(texture, MouseSelectionCoord, name, dialog, Color.White, scale);
+        foreach (ShopOption option in shopOptions)
+            npc.AddShopOption(option);
+        LevelManager.Level.NPCs.Add(npc);
     }
     public void DeleteNPC()
     {
@@ -289,7 +319,13 @@ public class EditorManager
             new("Name", null, placeholder: editing.Name),
             new("Dialog", null, placeholder: editing.Dialog),
             new("Size [0.1-25.5]", IsScaleValue, placeholder: editing.Scale.ToString()),
-            new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())], placeholder: editing.Texture.ToString())]);
+            new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())], placeholder: editing.Texture.ToString()),
+            new("Shop Option 1", null, placeholder: editing.ShopOptions.ElementAtOrDefault(0)?.ToString() ?? ""),
+            new("Shop Option 2", null, placeholder: editing.ShopOptions.ElementAtOrDefault(1)?.ToString() ?? ""),
+            new("Shop Option 3", null, placeholder: editing.ShopOptions.ElementAtOrDefault(2)?.ToString() ?? ""),
+            new("Shop Option 4", null, placeholder: editing.ShopOptions.ElementAtOrDefault(3)?.ToString() ?? ""),
+            new("Shop Option 5", null, placeholder: editing.ShopOptions.ElementAtOrDefault(4)?.ToString() ?? "")
+        ]);
         if (!success)
         {
             if (!PopupOpen) Logger.Error("NPC creation failed.");
@@ -307,6 +343,22 @@ public class EditorManager
         }
         editing.Scale = scale;
         editing.Texture = (TextureID)Enum.Parse(typeof(TextureID), values[3]);
+
+        // Shop options parsing
+        editing.ShopOptions.Clear();
+        foreach (string line in values[4].Split('\n'))
+        {
+            if (string.IsNullOrWhiteSpace(line)) continue;
+            try
+            {
+                editing.AddShopOption(ShopOption.ParseText(line));
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to parse shop option '{line}': {ex.Message}");
+                return;
+            }
+        }
     }
     public void NewEnemy()
     {

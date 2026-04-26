@@ -19,7 +19,7 @@ public static class PopupFactory
         if (PopupOpen) return (false, Array.Empty<string>());
         PopupOpen = true;
         // Setup
-        Form = new() { Text = title, Width = 400, Height = 100 + fields.Length * 35 };
+        Form = new() { Text = title, Width = 500, Height = 100 + fields.Length * 35 };
         List<Control> inputs = [];
 
         // Fields
@@ -44,7 +44,7 @@ public static class PopupFactory
                 {
                     Left = 165,
                     Top = 10 + i * 35,
-                    Width = 200,
+                    Width = 300,
                     DropDownStyle = ComboBoxStyle.DropDownList
                 };
                 combo.Items.AddRange(field.DropdownOptions!);
@@ -60,7 +60,7 @@ public static class PopupFactory
                 {
                     Left = 165,
                     Top = 10 + i * 35,
-                    Width = 200,
+                    Width = 300,
                     Text = field.Placeholder,
                 };
                 inputControl = textBox;
