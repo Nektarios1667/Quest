@@ -233,16 +233,15 @@ public static class CodeGenerator
             string? itemResp = "";
             do
             {
-                int item;
                 byte percentChance;
                 byte min, max;
 
                 // Item
                 itemResp = Ask("Item name or ID: ");
                 if (itemResp == null || itemResp == "") break;
-                item = ParseItemEnumOrInt(itemResp, offset: 1);
-                if (item == -1) continue;
-                writer.Write((byte)item);
+                var itemEnum = ParseItemEnumByte(itemResp, offset: 1);
+                if (itemEnum == null) continue;
+                writer.Write((byte)itemEnum.Value);
 
                 // Chance
                 percentChance = Logger.InputByte("Percent chance: ", 0);
@@ -274,26 +273,14 @@ public static class CodeGenerator
         Directory.CreateDirectory($"{sourceDirectory}/GameData/Worlds/{world}/loot");
         File.WriteAllBytes($"{sourceDirectory}/GameData/Worlds/{world}/loot/{tableName}.qlt", data);
     }
-    public static int ParseItemEnumOrInt(string input, int offset = 0)
+    public static ItemTypeID? ParseItemEnumByte(string input, int offset = 0)
     {
         // Try parse as int
-        if (int.TryParse(input, out int intValue))
-        {
-            if (Enum.IsDefined(typeof(ItemTypeID), intValue - offset))
-                return intValue;
-            else
-            {
-                Logger.Error($"'{intValue - offset}' is not a valid value of enum ItemType.");
-                return -1;
-            }
-        }
-
-        // Try parse as enum name
-        if (Enum.TryParse(input, true, out ItemTypeID enumValue))
-            return (int)enumValue + offset;
+        if (Enum.TryParse<ItemTypeID>(input, true, out var result))
+            return result;
 
         Logger.Error($"'{input}' is not a valid name or value of enum ItemType.");
-        return -1;
+        return null;
     }
 
     public static string? Ask(string question)
