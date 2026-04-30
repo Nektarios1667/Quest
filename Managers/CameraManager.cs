@@ -50,8 +50,7 @@ public static class CameraManager
         Vector2 beforeCamera = Camera;
 
         // Lerp camera
-        if (Vector2.DistanceSquared(Camera, CameraDest) < 1f) Camera = CameraDest; // If close enough snap to destination
-        else if (deltaTime > 0 && !FreeCam)
+        if (deltaTime > 0 && !FreeCam)
         {
             Camera = Vector2.Lerp(Camera, CameraDest, 1f - MathF.Pow(1f - Constants.CameraRigidity, deltaTime * 60f));
             Camera = Vector2.Clamp(Camera, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
