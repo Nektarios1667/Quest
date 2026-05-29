@@ -61,7 +61,7 @@ public class FloodLightingGrid
 
                 // Calculate new light level
                 float newLightLevel = current.LightLevel - ((offset.X == 0 || offset.Y == 0) ? 1f : 1.5f); // 1.5 is an estimate of sqrt(2)
-                if (newLightLevel > neighborNode.LightLevel && newLightLevel > 0.05)
+                if (newLightLevel > neighborNode.LightLevel && newLightLevel > 0.05f)
                 {
                     neighborNode.LightLevel = newLightLevel;
                     toVisit.Enqueue(neighborNode);
