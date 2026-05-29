@@ -6,9 +6,11 @@ public class Crossbow : RangedWeapon
     {
          Ammo = new(ItemTypes.Arrow, 1);
     }
-    public override void PrimaryUse(GameManager gameManager, PlayerManager player)
+    public override bool PrimaryUse(GameManager gameManager, PlayerManager player)
     {
-        base.PrimaryUse(gameManager, player);
-        SoundManager.PlaySound("Bow", 0.7f, pitchVariation: 0.2f);
+        bool success = base.PrimaryUse(gameManager, player);
+        if (success)
+            SoundManager.PlaySound("Bow", 0.7f, pitchVariation: 0.2f);
+        return success;
     }
 }

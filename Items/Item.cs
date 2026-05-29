@@ -235,8 +235,8 @@ public class ItemTypes
     RawBeef,
     CookedBeef,
     Crossbow,
-    HealthPotion,
     Arrow,
+    HealthPotion,
     SpeedPotion,
     SlownessPotion,
     RegenerationPotion,
@@ -307,8 +307,8 @@ public class Item
         UID = UIDManager.Get(UIDCategory.Items);
         CustomName = item.CustomName;
     }
-    public virtual void PrimaryUse(GameManager gameManager, PlayerManager player) { }
-    public virtual void SecondaryUse(GameManager gameManager, PlayerManager player) { }
+    public virtual bool PrimaryUse(GameManager gameManager, PlayerManager player) => false;
+    public virtual bool SecondaryUse(GameManager gameManager, PlayerManager player) => false;
     public static Item Create(ItemType type, byte amount, string? customName = null)
     {
         return Create(type.TypeID, amount, customName);

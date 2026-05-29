@@ -11,7 +11,7 @@ public class MeleeWeapon : Item
         Range = range;
         Damage = damage;
     }
-    public override void PrimaryUse(GameManager gameManager, PlayerManager player)
+    public override bool PrimaryUse(GameManager gameManager, PlayerManager player)
     {
         if (TimerManager.IsCompleteOrMissing($"MeleeAttack_{UID}"))
         {
@@ -26,7 +26,10 @@ public class MeleeWeapon : Item
             TimerManager.SetTimer($"MeleeAttackDecay_{UID}", FireRate / 2, projectile.Destroy);
 
             TimerManager.SetTimer($"MeleeAttack_{UID}", FireRate, null);
+
+            return true;
         }
+        return false;
     }
 }
 

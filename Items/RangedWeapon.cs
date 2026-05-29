@@ -14,7 +14,7 @@ public class RangedWeapon : Item
         Damage = damage;
         ProjectileTexture = projectileTexture;
     }
-    public override void PrimaryUse(GameManager gameManager, PlayerManager player)
+    public override bool PrimaryUse(GameManager gameManager, PlayerManager player)
     {
         if (TimerManager.IsCompleteOrMissing($"RangedAttack_{UID}") &&
             (Ammo == null || player.Inventory.Has(Ammo)))
@@ -27,7 +27,10 @@ public class RangedWeapon : Item
 
             if (Ammo != null) player.Inventory.Consume(Ammo, ignoreCheck: true);
             TimerManager.SetTimer($"RangedAttack_{UID}", FireRate, null);
+
+            return true;
         }
+        return false;
     }
 }
 
