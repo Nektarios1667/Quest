@@ -1,4 +1,4 @@
-﻿namespace Quest;
+﻿namespace Quest.World;
 
 // Limited to 256 biome types b/c of save files
 public enum BiomeType : byte

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace Quest;
+namespace Quest.World;
 
 public class QuillScript
 {

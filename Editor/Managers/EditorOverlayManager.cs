@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Quest.World;
+using System.Text;
 
 namespace Quest.Editor.Managers;
 public class EditorOverlayManager
