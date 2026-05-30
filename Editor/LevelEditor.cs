@@ -18,7 +18,7 @@ public class LevelEditor : Game
     private EditorLevelManager editorLevelManager = null!;
     private EditorOverlayManager editorOverlayManager = null!;
     private GUI gui = null!;
-    private Matrix scale = Matrix.CreateScale(Constants.ScreenScale.X, Constants.ScreenScale.Y, 1f);
+    private Matrix scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
 
     // Editing
     private TileTypeID TileSelection;
@@ -50,17 +50,17 @@ public class LevelEditor : Game
         {
             //PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
             //PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height,
-            PreferredBackBufferWidth = Constants.ScreenResolution.X,
-            PreferredBackBufferHeight = Constants.ScreenResolution.Y,
+            PreferredBackBufferWidth = SettingsManager.ScreenResolution.X,
+            PreferredBackBufferHeight = SettingsManager.ScreenResolution.Y,
             IsFullScreen = false,
-            SynchronizeWithVerticalRetrace = Constants.VSYNC,
+            SynchronizeWithVerticalRetrace = SettingsManager.VSYNC,
             PreferHalfPixelOffset = false,
         };
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
-        IsFixedTimeStep = Constants.FPS != -1;
+        IsFixedTimeStep = SettingsManager.FPS != -1;
         if (IsFixedTimeStep)
-            TargetElapsedTime = TimeSpan.FromSeconds(1d / Constants.FPS);
+            TargetElapsedTime = TimeSpan.FromSeconds(1d / SettingsManager.FPS);
         Logger.System("Initialized level editor window object.");
     }
 

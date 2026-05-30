@@ -156,11 +156,11 @@ public static partial class Interpreter
         ExternalSymbols["<fps>"] = (1f / GameManager.DeltaTime).ToString();
         ExternalSymbols["<deltatime>"] = GameManager.DeltaTime.ToString();
         ExternalSymbols["<ispaused>"] = (StateManager.OverlayState == OverlayState.Pause).ToString();
-        ExternalSymbols["<vsync>"] = Constants.VSYNC.ToString().ToLower();
-        ExternalSymbols["<resolution_x>"] = Constants.ScreenResolution.X.ToString();
-        ExternalSymbols["<resolution_y>"] = Constants.ScreenResolution.X.ToString();
-        ExternalSymbols["<resolution>"] = $"{Constants.ScreenResolution.X};{Constants.ScreenResolution.Y}";
-        ExternalSymbols["<fpslimit>"] = Constants.FPS.ToString();
+        ExternalSymbols["<vsync>"] = SettingsManager.VSYNC.ToString().ToLower();
+        ExternalSymbols["<resolution_x>"] = SettingsManager.ScreenResolution.X.ToString();
+        ExternalSymbols["<resolution_y>"] = SettingsManager.ScreenResolution.X.ToString();
+        ExternalSymbols["<resolution>"] = $"{SettingsManager.ScreenResolution.X};{SettingsManager.ScreenResolution.Y}";
+        ExternalSymbols["<fpslimit>"] = SettingsManager.FPS.ToString();
 
 
         DebugManager.EndBenchmark("QuillSymbolsUpdate");

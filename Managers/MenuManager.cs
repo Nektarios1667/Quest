@@ -36,40 +36,7 @@ public class MenuManager
         MainMenu.Widgets = [startButton, continueButton, settingsButton, creditsButton, exitButton];
 
         // Settings Menu
-        SettingsMenu = new(window, batch, PixelOperator);
-        SettingsMenu.LoadContent(content, "Images/Gui");
-        Label settingsLabel = new(SettingsMenu, new(Constants.Middle.X - 130, 50), Color.White, "Settings", PixelOperatorTitle);
-        Button settingsBackButton = new(SettingsMenu, new(20, 20), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, StateManager.RevertGameState, [], text: "Back", font: PixelOperator, border: 0);
-
-        HorizontalSlider musicSlider = new(SettingsMenu, new(200, 300), 300, Color.Gray, Color.White, thickness: 5, size: 12);
-        musicSlider.Value = SoundManager.MusicVolume;
-        musicSlider.ValueChanged += (value) => SoundManager.MusicVolume = value;
-        Label musicLabel = new(SettingsMenu, new(200, 250), Color.White, "Music Volume", PixelOperator);
-        Label musicValue = new(SettingsMenu, new(520, 285), Color.White, $"{(int)(musicSlider.Value * 100)}%", PixelOperator);
-        musicSlider.ValueChanged += (value) => musicValue.Text = $"{(int)(value * 100)}%";
-
-        HorizontalSlider soundSlider = new(SettingsMenu, new(200, 365), 300, Color.Gray, Color.White, thickness: 5, size: 12);
-        soundSlider.Value = SoundManager.SoundVolume;
-        soundSlider.ValueChanged += (value) => SoundManager.SoundVolume = value;
-        Label soundLabel = new(SettingsMenu, new(200, 315), Color.White, "Sound Volume", PixelOperator);
-        Label soundValue = new(SettingsMenu, new(520, 350), Color.White, $"{(int)(soundSlider.Value * 100)}%", PixelOperator);
-        soundSlider.ValueChanged += (value) => soundValue.Text = $"{(int)(value * 100)}%";
-
-        HorizontalSlider saturationSlider = new(SettingsMenu, new(200, 430), 300, Color.Gray, Color.White, thickness: 5, size: 12);
-        saturationSlider.Value = 0.5f;
-        saturationSlider.ValueChanged += (value) => window.Grading.Parameters["Saturation"].SetValue(value * 2);
-        Label saturationLabel = new(SettingsMenu, new(200, 380), Color.White, "Saturation", PixelOperator);
-        Label saturationValue = new(SettingsMenu, new(520, 415), Color.White, $"{(int)(saturationSlider.Value * 2)}", PixelOperator);
-        saturationSlider.ValueChanged += (value) => saturationValue.Text = $"{value * 2:F1}x";
-
-        HorizontalSlider contrastSlider = new(SettingsMenu, new(200, 495), 300, Color.Gray, Color.White, thickness: 5, size: 12);
-        contrastSlider.Value = 0.5f;
-        contrastSlider.ValueChanged += (value) => window.Grading.Parameters["Contrast"].SetValue(value + 0.5f);
-        Label contrastLabel = new(SettingsMenu, new(200, 445), Color.White, "Contrast", PixelOperator);
-        Label contrastValue = new(SettingsMenu, new(520, 480), Color.White, $"{(int)(contrastSlider.Value + 0.5f)}", PixelOperator);
-        contrastSlider.ValueChanged += (value) => contrastValue.Text = $"{value + 0.5f:F1}x";
-
-        SettingsMenu.Widgets = [settingsLabel, settingsBackButton, musicSlider, musicLabel, musicValue, soundSlider, soundLabel, soundValue, saturationSlider, saturationLabel, saturationValue, contrastSlider, contrastLabel, contrastValue];
+        SettingsMenu = SettingsManager.CreateSettingsMenu(window, batch, content);
 
         // Credits Menu
         CreditsMenu = new(window, batch, PixelOperator);

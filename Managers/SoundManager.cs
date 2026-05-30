@@ -32,13 +32,6 @@ public static class SoundManager
         LoadSound(content, "Bow", "Sounds/Effects/Bow");
         LoadSound(content, "Gulp", "Sounds/Effects/Gulp");
     }
-    public static float SoundVolume { get; set; } = 1f;
-
-    public static float MusicVolume
-    {
-        get => MediaPlayer.Volume;
-        set => MediaPlayer.Volume = MathHelper.Clamp(value, 0f, 1f);
-    }
 
     public static bool IsMusicPlaying => MediaPlayer.State == MediaState.Playing;
 
@@ -57,7 +50,7 @@ public static class SoundManager
     public static void PlaySound(string key, float volume = 1f, float pitch = 0f, float pitchVariation = 0f, float pan = 0f)
     {
         if (soundEffects.TryGetValue(key, out var sfx))
-            sfx.Play(MathHelper.Clamp(volume * SoundVolume, 0f, 1f), pitch + RandomManager.RandomFloatRange(-pitchVariation, pitchVariation), pan);
+            sfx.Play(MathHelper.Clamp(volume * SettingsManager.SoundVolume, 0f, 1f), pitch + RandomManager.RandomFloatRange(-pitchVariation, pitchVariation), pan);
     }
 
     public static void PlaySoundInstance(string key, float volume = 1f, float pitch = 0f, float pan = 0f)
@@ -65,7 +58,7 @@ public static class SoundManager
         var instance = GetOrCreateInstance(key);
         if (instance != null)
         {
-            instance.Volume = MathHelper.Clamp(volume * SoundVolume, 0f, 1f);
+            instance.Volume = MathHelper.Clamp(volume * SettingsManager.SoundVolume, 0f, 1f);
             instance.Pitch = pitch;
             instance.Pan = pan;
             if (instance.State != SoundState.Playing)
@@ -93,7 +86,7 @@ public static class SoundManager
         if (!soundInstances.TryGetValue(key, out var instance) || instance.State == SoundState.Stopped)
         {
             instance = sfx.CreateInstance();
-            instance.Volume = SoundVolume;
+            instance.Volume = SettingsManager.SoundVolume;
             soundInstances[key] = instance;
         }
 

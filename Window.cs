@@ -15,7 +15,7 @@ public class Window : Game
     private OverlayManager overlayManager = null!;
     private LevelManager levelManager = null!;
     private MenuManager menuManager = null!;
-    public static readonly Matrix Scale = Matrix.CreateScale(Constants.ScreenScale.X, Constants.ScreenScale.Y, 1f);
+    private static Matrix Scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
     public RenderTarget2D Render = null!;
 
     // Time
@@ -45,21 +45,47 @@ public class Window : Game
     {
         graphics = new GraphicsDeviceManager(this)
         {
-            PreferredBackBufferWidth = Constants.ScreenResolution.X,
-            PreferredBackBufferHeight = Constants.ScreenResolution.Y,
+            PreferredBackBufferWidth = SettingsManager.ScreenResolution.X,
+            PreferredBackBufferHeight = SettingsManager.ScreenResolution.Y,
             IsFullScreen = false,
-            SynchronizeWithVerticalRetrace = Constants.VSYNC,
+            SynchronizeWithVerticalRetrace = SettingsManager.VSYNC,
             PreferHalfPixelOffset = false,
             GraphicsProfile = GraphicsProfile.HiDef,
         };
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
-        IsFixedTimeStep = Constants.FPS != -1;
+        IsFixedTimeStep = SettingsManager.FPS != 0;
         if (IsFixedTimeStep)
-            TargetElapsedTime = TimeSpan.FromSeconds(1d / Constants.FPS);
+            TargetElapsedTime = TimeSpan.FromSeconds(1d / SettingsManager.FPS);
         Logger.System("Initialized game window object.");
     }
+    public void SetVsync(bool enabled)
+    {
+        graphics.SynchronizeWithVerticalRetrace = enabled;
+        graphics.ApplyChanges();
+    }
+    public void SetResolution(int width, int height)
+    {
+        graphics.PreferredBackBufferWidth = width;
+        graphics.PreferredBackBufferHeight = height;
 
+        Scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
+
+        Render = new RenderTarget2D(
+            GraphicsDevice,
+            SettingsManager.ScreenResolution.X, SettingsManager.ScreenResolution.Y,
+            false,
+            SurfaceFormat.Color,
+            DepthFormat.None
+        );
+
+        graphics.ApplyChanges();
+    }
+    public void SetFullscreen(bool enabled)
+    {
+        graphics.IsFullScreen = enabled;
+        graphics.ApplyChanges();
+    }
     protected override void Initialize()
     {
         // Defaults
@@ -108,7 +134,7 @@ public class Window : Game
         // Render Targets
         Render = new RenderTarget2D(
             GraphicsDevice,
-            Constants.ScreenResolution.X, Constants.ScreenResolution.Y,
+            SettingsManager.ScreenResolution.X, SettingsManager.ScreenResolution.Y,
             false,
             SurfaceFormat.Color,
             DepthFormat.None

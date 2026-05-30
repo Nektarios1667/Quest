@@ -27,16 +27,12 @@ public static class Constants
     public static readonly Point[] AllNeighborTiles = [.. NeighborTiles.Concat(DiagonalNeighborTiles)]; // All 8 neighbor tiles
 
     // Screen
-    public static readonly Point ScreenResolution = new(1280, 720); // Actual screen resolution
     public static readonly Point NativeResolution = new(1280, 720); // Game window resolution
     public static readonly Point NativeResolutionTiles = NativeResolution / TileSize;
-    public static readonly Vector2 ScreenScale = ScreenResolution.ToVector2() / NativeResolution.ToVector2(); // Scale factor from native resolution to actual screen resolution
     public static readonly Rectangle WindowRect = new(Point.Zero, NativeResolution); // Game window rectangle
     public static readonly Point Middle = new(NativeResolution.X / 2, NativeResolution.Y / 2); // Center of the screen
     public static readonly Point MiddleCoord = Middle / TileSize; // Center tile coordinate
     public static readonly float CameraRigidity = 0.07f; // Camera smoothing weight - 1 = no smoothing
-    public const int FPS = -1; // -1 = unlimited
-    public const bool VSYNC = false;
 
     // Utility
     public static readonly Vector2 HalfVec = new(0.5f);
