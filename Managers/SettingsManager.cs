@@ -126,7 +126,7 @@ public static class SettingsManager
     public static void WriteSettings()
     {
         // Write to settings.qkv in GameData/Persistent
-        StateManager.WriteKeyValueFile("settings.qkv", new Dictionary<string, string>
+        StateManager.WriteKeyValueFile("settings", new Dictionary<string, string>
         {
             { "ScreenResolution", $"{ScreenResolution.X}x{ScreenResolution.Y}" },
             { "FullScreen", Fullscreen.ToString() },
@@ -139,7 +139,7 @@ public static class SettingsManager
     public static void LoadSettings(Window window)
     {
         // Read from settings.qkv in GameData/Persistent
-        var settings = StateManager.ReadKeyValueFile("settings.qkv");
+        var settings = StateManager.ReadKeyValueFile("settings");
         if (settings.TryGetValue("ScreenResolution", out string? res))
         {
             var parts = res.Split('x');
