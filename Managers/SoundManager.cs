@@ -31,6 +31,7 @@ public static class SoundManager
         LoadSound(content, "Scribble", "Sounds/Effects/Scribble");
         LoadSound(content, "Bow", "Sounds/Effects/Bow");
         LoadSound(content, "Gulp", "Sounds/Effects/Gulp");
+        LoadSound(content, "Hammer", "Sounds/Effects/Hammer");
     }
 
     public static bool IsMusicPlaying => MediaPlayer.State == MediaState.Playing;

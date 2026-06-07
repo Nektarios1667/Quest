@@ -1,7 +1,11 @@
-﻿namespace Quest.Interaction;
+﻿using SharpDX.WIC;
+using System.Linq;
+
+namespace Quest.Interaction;
 public partial class UserInterface
 {
     public static UserInterface ChestUI { get; private set; } = null!;
+    public static UserInterface CrafterUI { get; private set; } = null!;
     public static UserInterface CrateUI { get; private set; } = null!;
     public static UserInterface DiscWriterUI { get; private set; } = null!;
     public static UserInterface DisplayCaseUI { get; private set; } = null!;
@@ -13,6 +17,7 @@ public partial class UserInterface
     public static void Init(SpriteBatch batch, LevelManager levelManager)
     {
         CreateChestUI(batch);
+        CreateCrafterUI(batch, levelManager);
         CreateCrateUI(batch);
         CreateDiscWriterUI(batch);
         CreateDisplayCaseUI(batch);
@@ -43,6 +48,48 @@ public partial class UserInterface
                 ChestUI.AddElement($"slot_{x + y * Chest.Size.X}", slot);
             }
         }
+    }
+    private static void CreateCrafterUI(SpriteBatch batch, LevelManager levelManager)
+    {
+        // ----- Crafter UI -----
+        CrafterUI = new(batch);
+        // Title
+        Point titleSize = PixelOperatorLarge.MeasureString("CRAFTER").ToPoint();
+        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "CRAFTER", PixelOperatorLarge, Color.White);
+        CrafterUI.AddElement("title", title);
+        // Create ingredient slots
+        for (int y = 0; y < Crafter.IngredientsSize.Y; y++)
+        {
+            for (int x = 0; x < Crafter.IngredientsSize.X; x++)
+            {
+                Slot slot = new(new(Constants.Middle.X - (Slot.SlotSize.X + 4) * Crafter.IngredientsSize.X / 2 + (Slot.SlotSize.X + 4) * x, Constants.NativeResolution.Y - (Slot.SlotSize.Y + 4) * 8 + (Slot.SlotSize.Y + 4) * y));
+                CrafterUI.AddElement($"ingredient_{x + y * Crafter.IngredientsSize.X}", slot);
+            }
+        }
+
+        // Create output slot
+        OutputSlot output = new(new((int)(Constants.Middle.X + (Slot.SlotSize.X + 4) * Crafter.IngredientsSize.X / 1.5f), Constants.NativeResolution.Y - (Slot.SlotSize.Y + 4) * (9 - Crafter.IngredientsSize.Y)));
+        CrafterUI.AddElement("output", output);
+
+        // Craft button
+        Button craft = new(new(Constants.Middle.X - 87, Constants.NativeResolution.Y - (Slot.SlotSize.Y + 4) * (8 - Crafter.IngredientsSize.Y)), new(175, 35), "Craft", PixelOperatorLarge, Color.White, Color.Black * 0.6f, Color.Black * 0.4f, borderThickness: 0);
+        craft.Clicked += () =>
+        {
+            Item[] inputs = CrafterUI.SlotElements.Select(e => ((Slot)CrafterUI.Elements[e]).Item).Take(Crafter.IngredientsSize.X * Crafter.IngredientsSize.Y).Where(i => i != null).ToArray()!;
+            if (inputs.Length <= 0) return;
+
+            Item? crafted = RecipeRegistry.UseRecipe(inputs, null, RecipeType.Crafter);
+            if (crafted == null) return;
+
+            if (CrafterUI.BoundContainer != null && crafted != null)
+            {
+                SoundManager.PlaySound("Hammer");
+                Item? leftover = CrafterUI.BoundContainer.AddItem(crafted, Crafter.IngredientsSize.X * Crafter.IngredientsSize.Y);
+                if (leftover != null && leftover.Amount > 0)
+                    levelManager.Level.Loot.Add(new(leftover.GetItemRef(), CameraManager.PlayerFoot, GameManager.GameTime));
+            }
+        };
+        CrafterUI.AddElement("craft", craft);
     }
     private static void CreateCrateUI(SpriteBatch batch)
     {
@@ -145,8 +192,8 @@ public partial class UserInterface
             if (input.Item == null || fuel.Item == null) return;
 
             // Convert to cooked
-            SoundManager.PlaySoundInstance("Fire2");
-            Item? outputItem = RecipeRegistry.UseRecipe(input.Item, RecipeType.Furnace, fuel.Item);
+            SoundManager.PlaySound("Fire2");
+            Item? outputItem = RecipeRegistry.UseRecipe([input.Item], fuel.Item, RecipeType.Furnace);
             if (FurnaceUI.BoundContainer != null && outputItem != null)
             {
                 Item? leftover = FurnaceUI.AddItem(outputItem);
@@ -272,10 +319,10 @@ public partial class UserInterface
             if (input.Item == null || fuel.Item == null) return;
 
             // Convert to cooked
-            Item? outputItem = RecipeRegistry.UseRecipe(input.Item, RecipeType.Stove, fuel.Item);
+            Item? outputItem = RecipeRegistry.UseRecipe([input.Item], fuel.Item, RecipeType.Stove);
             if (StoveUI.BoundContainer != null && outputItem != null)
             {
-                SoundManager.PlaySoundInstance("Fire");
+                SoundManager.PlaySound("Fire");
                 Item? leftover = StoveUI.AddItem(outputItem);
                 if (leftover != null && leftover.Amount > 0)
                     levelManager.Level.Loot.Add(new(leftover.GetItemRef(), CameraManager.PlayerFoot, GameManager.GameTime));

@@ -102,30 +102,41 @@ public class Container
     }
     public Item AddItem(Item adding)
     {
-        for (int i = 0; i < Items.Length; i++)
-        {
-            Item? item = Items[i];
-            if (item == null)
-            {
-                byte moved = Math.Min(adding.Amount, adding.MaxAmount);
-                SetSlot(i, Item.Create(adding.Type, moved, adding.CustomName));
-                adding.Amount -= moved; // Reduce amount of new item
-            }
-            if (SameItem(item, adding))
-            {
-                byte moved = (byte)Math.Min(adding.Amount, item!.MaxAmount - item.Amount);
-                item.Amount += moved; // Add to existing item
-                adding.Amount -= moved; // Reduce amount of new item
-            }
+        for (int i = 0; i < Items.Length && adding.Amount > 0; i++)
+            TryAddToSlot(i, adding);
 
-            // Check if done
-            if (adding.Amount <= 0) break;
+        RemoveEmptyItems();
+        return adding;
+    }
+    public Item AddItem(Item adding, int slot)
+    {
+        if (slot >= 0 && slot < Items.Length)
+            TryAddToSlot(slot, adding);
+
+        RemoveEmptyItems();
+        return adding;
+    }
+    private bool TryAddToSlot(int i, Item adding)
+    {
+        Item? item = Items[i];
+
+        if (item == null)
+        {
+            byte moved = (byte)Math.Min(adding.Amount, adding.MaxAmount);
+            SetSlot(i, Item.Create(adding.Type, moved, adding.CustomName));
+            adding.Amount -= moved;
+            return adding.Amount <= 0;
         }
 
-        // Cleanup
-        RemoveEmptyItems();
+        if (SameItem(item, adding))
+        {
+            byte moved = (byte)Math.Min(adding.Amount, item.MaxAmount - item.Amount);
+            item.Amount += moved;
+            adding.Amount -= moved;
+            return adding.Amount <= 0;
+        }
 
-        return adding;
+        return false;
     }
     public int Count(ItemType itemType)
     {

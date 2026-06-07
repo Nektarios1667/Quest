@@ -33,6 +33,7 @@ public static class PointExtensions
     {
         return new((byte)Math.Clamp(point.X, 0, 255), (byte)Math.Clamp(point.Y, 0, 255));
     }
+    public static int CompMult(this Point point) => point.X * point.Y;
 }
 public static class CoordinateExtensions
 {

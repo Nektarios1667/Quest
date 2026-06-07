@@ -339,6 +339,7 @@ public class Item
             ItemTypeID.StrengthPotion => new StrengthPotion(amount, customName),
             ItemTypeID.VulnerabilityPotion => new VulnerabilityPotion(amount, customName),
             ItemTypeID.WeaknessPotion => new WeaknessPotion(amount, customName),
+            // ITEMFROMID
             _ => new Item(type, amount, customName),
         };
     }

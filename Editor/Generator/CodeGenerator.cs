@@ -2,6 +2,7 @@
 using ScottPlot.TickGenerators;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Quest.Editor.Generator;
 public static class CodeGenerator
@@ -112,9 +113,10 @@ public static class CodeGenerator
     public static void WriteTileCode()
     {
         string? name = Ask("Tile name: ");
-        bool isWalkable = Ask("Is Walkable [y/n]: ")?.ToLower() == "y";
-        bool isWall = !isWalkable && Ask("Is Wall [y/n]:")?.ToLower() == "y";
-        string? color = Ask("Tile Minimap Color [new(r, g, b)/Color.someColor]: ");
+        bool isWalkable = Ask("Is walkable [y/n]: ")?.ToLower() == "y";
+        bool isWall = !isWalkable && Ask("Is wall [y/n]:")?.ToLower() == "y";
+        string? color = Ask("Tile minimap color [new(r, g, b)/Color.someColor]: ");
+        bool isSpecial = Ask("Is special (requires custom constructor) [y/n]: ")?.ToLower() == "y";
         if (color == null) return;
         if (name == null) return;
 
@@ -136,11 +138,9 @@ public static class CodeGenerator
         string newTileSource = tileSource.Replace("    // TILES ID", $"    {name},\r\n    // TILES ID");
         // TileType variable in TileTypes class in Tile.cs
         newTileSource = newTileSource.Replace("        // TILES REGISTER", $"        new(TileTypeID.{name}, TextureID.{name}, {isWalkable.ToString().ToLower()}, {isWall.ToString().ToLower()}),\r\n        // TILES REGISTER");
+        if (isSpecial)
+            newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, levelName),\r\n            // TILEFROMID\r\n");
         File.WriteAllText($"{sourceDirectory}/Tiles/Tile.cs", newTileSource);
-
-        // TileFromID in LevelManager.cs
-        string newLevelManagerSource = levelManagerSource.Replace("            // TILEFROMID INSERT", $"            TileTypeID.{name} => new {name}(location),\r\n            // TILEFROMID INSERT");
-        File.WriteAllText($"{sourceDirectory}/Managers/LevelManager.cs", newLevelManagerSource);
 
         // Minimap color
         string newConstantsSource = constantsSource.Replace("        // MINIMAPCOLORS", $"        {color}, // {name}\r\n        // MINIMAPCOLORS");

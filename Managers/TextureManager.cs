@@ -160,6 +160,7 @@ public static class TextureManager
         Furnace,
         DisplayCase,
         Crate,
+        Crafter,
         // TILES ENUM INSERT
         Torch,
         BlueTorch,
@@ -368,6 +369,7 @@ public static class TextureManager
         Textures[TextureID.Furnace] = content.Load<Texture2D>("Images/Tiles/Furnace");
         Textures[TextureID.DisplayCase] = content.Load<Texture2D>("Images/Tiles/DisplayCase");
         Textures[TextureID.Crate] = content.Load<Texture2D>("Images/Tiles/Crate");
+        Textures[TextureID.Crafter] = content.Load<Texture2D>("Images/Tiles/Crafter");
         // TILES INSERT
         Textures[TextureID.Torch] = content.Load<Texture2D>("Images/Decals/Torch");
         Textures[TextureID.BlueTorch] = content.Load<Texture2D>("Images/Decals/BlueTorch");
@@ -562,6 +564,7 @@ public static class TextureManager
         Metadata[TextureID.Furnace] = new(Textures[TextureID.Furnace].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.DisplayCase] = new(Textures[TextureID.DisplayCase].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Crate] = new(Textures[TextureID.Crate].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.Crafter] = new(Textures[TextureID.Crafter].Bounds.Size, new(4, 4), "tile");
         // TILES METADATA INSERT
         Metadata[TextureID.Torch] = new(Textures[TextureID.Torch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), "decal");

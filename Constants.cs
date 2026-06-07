@@ -119,6 +119,7 @@ public static class Constants
         new(80,80,80), // Furnace
         new(89, 55, 18), // DisplayCase
         new(158, 114, 17), // Crate
+        Color.Brown, // Crafter
         // MINIMAPCOLORS
     ];
 }
