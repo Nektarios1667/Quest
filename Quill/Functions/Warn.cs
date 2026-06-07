@@ -1,6 +1,7 @@
 ﻿using NCalc;
 
 namespace Quest.Quill.Functions;
+
 public class Warn : IBuiltinFunction
 {
     public FunctionResponse Run(Dictionary<string, string> _, string[] args)

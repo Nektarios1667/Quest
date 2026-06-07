@@ -1,4 +1,5 @@
 namespace Quest.Items;
+
 public class HealthPotion : Item
 {
     public HealthPotion(byte amount, string? customName = null) : base(ItemTypes.HealthPotion, amount, customName)

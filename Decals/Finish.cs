@@ -1,5 +1,6 @@
 
 namespace Quest.Decals;
+
 public class Finish(Point location) : Decal(location)
 {
     public override void Draw(GameManager gameManager)

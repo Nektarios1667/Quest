@@ -1,4 +1,5 @@
 ﻿namespace Quest.Managers;
+
 public static class RandomManager
 {
     const string lower = "abcdefghijklmnopqrstuvwxyz";

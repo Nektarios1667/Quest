@@ -1,4 +1,5 @@
 ﻿namespace Quest.Decals;
+
 public class BlueTorch(Point location) : Decal(location)
 {
     private static readonly Vector2 lightShift = new(0, 1);

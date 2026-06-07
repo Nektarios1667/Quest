@@ -1,6 +1,7 @@
 ﻿using System.IO;
 
 namespace Quest.Quill.Functions;
+
 public class ReadFile : IBuiltinFunction
 {
     public FunctionResponse Run(Dictionary<string, string> vars, string[] args)

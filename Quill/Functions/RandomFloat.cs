@@ -1,6 +1,7 @@
 ﻿using SharpDX;
 
 namespace Quest.Quill.Functions;
+
 public class RandomFloat : IBuiltinFunction
 {
     public FunctionResponse Run(Dictionary<string, string> vars, string[] args)

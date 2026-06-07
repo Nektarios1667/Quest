@@ -1,6 +1,7 @@
 ﻿using System.IO;
 
 namespace Quest.Utilities;
+
 public static class FileTools
 {
     public static byte ReadHeader(BinaryReader reader)

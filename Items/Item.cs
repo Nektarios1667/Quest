@@ -1,4 +1,5 @@
 namespace Quest.Items;
+
 public enum ItemTypeID : byte
 {
     ActivePalantir,

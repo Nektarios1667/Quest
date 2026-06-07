@@ -1,6 +1,7 @@
 using System.Linq;
 
 namespace Quest.Decals;
+
 public enum DecalType : byte
 {
     Footprint,

@@ -1,4 +1,5 @@
 ﻿namespace Quest.Interaction;
+
 public class Image : UIElement
 {
     public Rectangle Bounds => Texture.Bounds.Inflated(BorderThickness, BorderThickness);

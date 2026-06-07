@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text;
 
 namespace Quest;
+
 public class Window : Game
 {
     readonly StringBuilder debugSb = new();

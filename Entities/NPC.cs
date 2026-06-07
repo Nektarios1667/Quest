@@ -40,7 +40,7 @@ public class ShopOption
         string[] costStockParts = costStockPart.Split('|');
         if (costStockParts.Length != 2)
             throw new FormatException($"Invalid cost/stock format in shop option: {costStockPart}");
-        
+
         // Cost
         string costPart = costStockParts[0].Trim();
         ItemRef? cost = null;

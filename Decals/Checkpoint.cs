@@ -1,4 +1,5 @@
 namespace Quest.Decals;
+
 public class Checkpoint(Point location) : Decal(location)
 {
     private readonly Timer cooldown = TimerManager.SetTimer("CheckpointCooldown", 15, null);

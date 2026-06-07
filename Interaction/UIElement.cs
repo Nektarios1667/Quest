@@ -1,4 +1,5 @@
 ﻿namespace Quest.Interaction;
+
 public abstract class UIElement
 {
     public List<string> Tags { get; set; } = [];

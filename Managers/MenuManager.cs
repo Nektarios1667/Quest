@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 
 namespace Quest.Managers;
+
 public class MenuManager
 {
     public GUI MainMenu { get; private set; }

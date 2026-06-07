@@ -1,4 +1,5 @@
 ﻿namespace Quest.Gui;
+
 public enum HorizontalAlignment
 {
     Left,

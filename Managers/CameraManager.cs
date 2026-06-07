@@ -1,4 +1,5 @@
 ﻿namespace Quest.Managers;
+
 public static class CameraManager
 {
     public static bool FreeCam { get; set; } = false;

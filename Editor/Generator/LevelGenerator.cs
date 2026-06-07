@@ -2,6 +2,7 @@
 using System.Linq;
 
 namespace Quest.Editor.Generator;
+
 public class Terrain(params (float min, float max, TileTypeID tile)[] ranges)
 {
     public (float min, float max, TileTypeID tile)[] Ranges { get; private set; } = ranges;

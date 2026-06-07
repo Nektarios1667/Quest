@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Media;
 
 namespace Quest.Managers;
+
 public enum Soundtracks
 {
     CavesOfDawn,

@@ -1,8 +1,9 @@
 namespace Quest.Items;
+
 public class ProtectionPotion : Item
 {
     public ProtectionPotion(byte amount, string? customName = null) : base(ItemTypes.ProtectionPotion, amount, customName)
-    {}
+    { }
     public override bool PrimaryUse(GameManager gameManager, PlayerManager player)
     {
         player.StatusManager.AddStatusEffect(player, StatusEffect.Protection, 30);

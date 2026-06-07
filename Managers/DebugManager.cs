@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 
 namespace Quest.Managers;
+
 public static class DebugManager
 {
     public static Stopwatch Watch { get; private set; } = new();

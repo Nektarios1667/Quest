@@ -1,7 +1,7 @@
-﻿using SharpDX.WIC;
-using System.Linq;
+﻿using System.Linq;
 
 namespace Quest.Interaction;
+
 public partial class UserInterface
 {
     public static UserInterface ChestUI { get; private set; } = null!;
@@ -79,7 +79,6 @@ public partial class UserInterface
             if (inputs.Length <= 0) return;
 
             Item? crafted = RecipeRegistry.UseRecipe(inputs, null, RecipeType.Crafter);
-            if (crafted == null) return;
 
             if (CrafterUI.BoundContainer != null && crafted != null)
             {

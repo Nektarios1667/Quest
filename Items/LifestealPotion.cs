@@ -1,8 +1,9 @@
 namespace Quest.Items;
+
 public class LifestealPotion : Item
 {
     public LifestealPotion(byte amount, string? customName = null) : base(ItemTypes.LifestealPotion, amount, customName)
-    {}
+    { }
     public override bool PrimaryUse(GameManager gameManager, PlayerManager player)
     {
         player.StatusManager.AddStatusEffect(player, StatusEffect.Lifesteal, 30);

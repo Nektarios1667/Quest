@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 
 namespace Quest.Items;
+
 public enum RecipeType
 {
     Stove,
@@ -101,7 +102,7 @@ public static class RecipeRegistry
             // Consume fuel
             if (matchingRecipe.Fuel > 0)
                 fuel!.Consume(matchingRecipe.Fuel);
-            
+
             // If we reach here, all ingredients are present in the required amounts
             return Item.Create(matchingRecipe.Output.Type, matchingRecipe.Output.Amount);
         }

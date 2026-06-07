@@ -1,4 +1,5 @@
 ﻿namespace Quest.Utilities;
+
 public struct LevelPath
 {
     public string WorldName { get; private set; }

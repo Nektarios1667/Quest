@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Content;
 
 namespace Quest.Managers;
+
 public class GameManager
 {
     // Static times

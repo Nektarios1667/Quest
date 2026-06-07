@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 namespace Quest.Utilities;
+
 public static class BinaryWriterExtensions
 {
     public static void Write(this BinaryWriter writer, Color color)

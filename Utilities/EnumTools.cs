@@ -1,4 +1,5 @@
 ﻿namespace Quest.Utilities;
+
 public static class EnumTools
 {
     public static bool IsBetween<T>(T value, T lower, T upper) where T : Enum

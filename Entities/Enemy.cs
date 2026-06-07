@@ -2,6 +2,7 @@
 using System.Linq;
 
 namespace Quest.Entities;
+
 public class Enemy : IEntity
 {
     public ushort UID { get; set; }

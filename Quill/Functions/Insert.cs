@@ -1,4 +1,5 @@
 ﻿namespace Quest.Quill.Functions;
+
 public class Insert : IBuiltinFunction
 {
     public FunctionResponse Run(Dictionary<string, string> vars, string[] args)

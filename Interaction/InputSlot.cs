@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 
 namespace Quest.Interaction;
+
 public enum FilterType
 {
     Whitelist,

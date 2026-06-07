@@ -1,4 +1,5 @@
 ﻿namespace Quest.Interaction;
+
 public class Group : UIElement
 {
     public List<string> Elements { get; private set; }

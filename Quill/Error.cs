@@ -1,4 +1,5 @@
 ﻿namespace Quest.Quill;
+
 public enum QuillErrorType
 {
     UnknownError,

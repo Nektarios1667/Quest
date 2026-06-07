@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 
 namespace Quest.Utilities;
+
 public static class ColorTools
 {
     public static readonly Color NearBlack = new(35, 35, 35);

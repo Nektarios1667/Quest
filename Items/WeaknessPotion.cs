@@ -1,8 +1,9 @@
 namespace Quest.Items;
+
 public class WeaknessPotion : Item
 {
     public WeaknessPotion(byte amount, string? customName = null) : base(ItemTypes.WeaknessPotion, amount, customName)
-    {}
+    { }
     public override bool PrimaryUse(GameManager gameManager, PlayerManager player)
     {
         player.StatusManager.AddStatusEffect(player, StatusEffect.Weakness, 30);

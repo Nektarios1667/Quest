@@ -1,4 +1,5 @@
 ﻿namespace Quest.Utilities;
+
 public static class ArrayTools
 {
     public static T[,] Resize2DArray<T>(T[,] array, int width, int height)

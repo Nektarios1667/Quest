@@ -1,4 +1,5 @@
 ﻿namespace Quest.Quill.Functions;
+
 public class Log : IBuiltinFunction
 {
     public FunctionResponse Run(Dictionary<string, string> _, string[] args)

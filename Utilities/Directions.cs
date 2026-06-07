@@ -1,4 +1,5 @@
 ﻿namespace Quest.Utilities;
+
 public enum Direction : byte
 {
     Forward,

@@ -1,8 +1,9 @@
 namespace Quest.Items;
+
 public class SlownessPotion : Item
 {
     public SlownessPotion(byte amount, string? customName = null) : base(ItemTypes.SlownessPotion, amount, customName)
-    {}
+    { }
     public override bool PrimaryUse(GameManager gameManager, PlayerManager player)
     {
         player.StatusManager.AddStatusEffect(player, StatusEffect.Slowness, 30);

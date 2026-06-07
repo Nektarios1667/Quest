@@ -2,6 +2,7 @@
 using System.Text;
 
 namespace Quest.Quill;
+
 public static class Utilities
 {
     public static string DictToQict<K, V>(Dictionary<K, V> dict)

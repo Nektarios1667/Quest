@@ -2,6 +2,7 @@
 using System.Text;
 
 namespace Quest.Editor.Managers;
+
 public class EditorOverlayManager
 {
     private static readonly Color[] FrameTimeColors = {

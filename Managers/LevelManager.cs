@@ -9,6 +9,7 @@ using System.Text;
 using IO = System.IO;
 
 namespace Quest.Managers;
+
 public class LevelManager
 {
     public List<ILootGenerator> LootGenerators = new();

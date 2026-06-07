@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 
 namespace Quest.Managers;
+
 [Flags]
 public enum LevelFeatures : ushort
 {

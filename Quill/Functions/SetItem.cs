@@ -1,4 +1,5 @@
 ﻿namespace Quest.Quill.Functions;
+
 public class SetItem : IBuiltinFunction
 {
     public FunctionResponse Run(Dictionary<string, string> vars, string[] args)

@@ -1,8 +1,9 @@
 namespace Quest.Items;
+
 public class RegenerationPotion : Item
 {
     public RegenerationPotion(byte amount, string? customName = null) : base(ItemTypes.RegenerationPotion, amount, customName)
-    {}
+    { }
     public override bool PrimaryUse(GameManager gameManager, PlayerManager player)
     {
         player.StatusManager.AddStatusEffect(player, StatusEffect.Regeneration, 10);

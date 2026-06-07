@@ -1,4 +1,5 @@
 ﻿namespace Quest.Utilities;
+
 public struct ByteCoord
 {
     public byte X;

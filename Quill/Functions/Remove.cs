@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 
 namespace Quest.Quill.Functions;
+
 public class Remove : IBuiltinFunction
 {
     public FunctionResponse Run(Dictionary<string, string> vars, string[] args)

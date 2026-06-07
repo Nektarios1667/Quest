@@ -1,4 +1,5 @@
 ﻿namespace Quest.Managers;
+
 public class Timer
 {
     public float Left { get; set; }

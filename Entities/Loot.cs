@@ -1,4 +1,5 @@
 ﻿namespace Quest.Entities;
+
 public struct Loot : IEntity
 {
     public ushort UID { get; } = UIDManager.Get(UIDCategory.Loot);

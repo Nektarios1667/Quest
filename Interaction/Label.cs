@@ -1,4 +1,5 @@
 ﻿namespace Quest.Interaction;
+
 public class Label : UIElement
 {
     public Rectangle Bounds { get; private set; }

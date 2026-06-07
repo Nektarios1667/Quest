@@ -5,6 +5,7 @@ using System.Linq;
 using static Quest.Editor.PopupFactory;
 
 namespace Quest.Editor.Managers;
+
 public enum EditorTool : byte
 {
     Tile,

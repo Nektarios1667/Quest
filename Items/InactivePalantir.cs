@@ -1,4 +1,5 @@
 namespace Quest.Items;
+
 public class InactivePalantir : Item
 {
     public InactivePalantir(int amount) : base(ItemTypes.InactivePalantir, amount)

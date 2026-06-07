@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using static Quest.Editor.PopupFactory;
 
 namespace Quest.Editor.Managers;
+
 public class EditorLevelManager
 {
     public GameManager GameManager { get; private set; }

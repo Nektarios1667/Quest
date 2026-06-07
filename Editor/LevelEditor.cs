@@ -5,6 +5,7 @@ using Quest.World;
 using System.Text;
 
 namespace Quest.Editor;
+
 public class LevelEditor : Game
 {
     readonly StringBuilder programDebugSb = new();

@@ -1,4 +1,5 @@
 namespace Quest.Items;
+
 public class MeleeWeapon : Item
 {
     public float FireRate { get; } // Seconds between swings

@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 
 namespace Quest.Utilities;
+
 public static class NumberTools
 {
     public static int RoundTo<T>(T num, float multiple) where T : INumber<T>

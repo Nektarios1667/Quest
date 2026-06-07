@@ -3,6 +3,7 @@ using Quest.Quill.Functions;
 using System.Linq;
 
 namespace Quest.Quill;
+
 public static partial class Interpreter
 {
     // Handlers
