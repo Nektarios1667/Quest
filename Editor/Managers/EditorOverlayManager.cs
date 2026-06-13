@@ -150,4 +150,5 @@ public class EditorOverlayManager
         FrameTimes = new(DebugManager.FrameTimes);
         CacheDelta = GameManager.DeltaTime;
     }
+    public string GetDebugString() => DebugSb.ToString();
 }

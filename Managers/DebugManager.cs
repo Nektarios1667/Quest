@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Linq;
 
 namespace Quest.Managers;
 
@@ -8,16 +9,22 @@ public static class DebugManager
     public static Dictionary<string, double> FrameTimes { get; private set; } = [];
     private static readonly Dictionary<string, float> benchmarkTimes = [];
     public static bool CollisionDebug { get; set; } = false;
-    public static bool TextInfo { get; set; } = true;
-    public static bool FrameInfo { get; set; } = true;
+    public static bool TextInfo { get; set; } = false;
+    public static bool FrameInfo { get; set; } = false;
     public static bool LogInfo { get; set; } = true;
     public static bool FrameBar { get; set; } = false;
     public static bool DrawHitboxes { get; set; } = false;
     public static bool ProgramInfo { get; set; } = false;
-
-    public static void Update()
+    private static DebugWindow DebugWindow { get; set; } = null!;
+    static DebugManager()
     {
-        // Debug
+        DebugWindow = new DebugWindow();
+        DebugWindow.Show();
+    }
+
+    public static void Update(string infobox = "", IEnumerable<string>? memoryInfobox = null)
+    {
+        // Debug toggles
         if (InputManager.BindPressed(InputAction.ToggleCollisionDebug))
         {
             CollisionDebug = !CollisionDebug;
@@ -44,7 +51,7 @@ public static class DebugManager
             Logger.System($"FrameBar set to: {FrameBar}");
         }
         if (InputManager.BindPressed(InputAction.ToggleHitboxes))
-        {
+        {   
             DrawHitboxes = !DrawHitboxes;
             Logger.System($"DrawHitboxes set to: {DrawHitboxes}");
         }
@@ -53,7 +60,17 @@ public static class DebugManager
             ProgramInfo = !ProgramInfo;
             Logger.System($"ProgramInfo set to: {ProgramInfo}");
         }
+        if (InputManager.BindPressed(InputAction.OpenDebugWindow))
+        {
+            if (!DebugWindow.Visible)
+                Logger.System("Opened Debug Window");
+            DebugWindow.Show();
+        }
+
+        // Updates
+        UpdateDebugWindow(infobox, memoryInfobox ?? []);
     }
+    public static void Log(string message) => DebugWindow?.AddLog(message);
     public static void StartBenchmark(string name)
     {
         benchmarkTimes[name] = (float)Watch.Elapsed.TotalMilliseconds;
@@ -77,4 +94,27 @@ public static class DebugManager
         batch.DrawPoint(screnPos + entity.Bounds.Size.ToVector2() * 0.5f, Constants.DebugPinkTint, 3);
         batch.DrawPoint(screnPos + entity.Bounds.Size.ToVector2() * new Vector2(0.5f, 1), Constants.DebugPinkTint, 3);
     }
+    public static void UpdateDebugWindow(string infobox, IEnumerable<string> memoryInfobox)
+    {
+        if (!TimerManager.IsCompleteOrMissing("DebugWindowUpdate")) return;
+        if (DebugWindow == null) return;
+
+        TimerManager.SetTimer("DebugWindowUpdate", 0.5f, null);
+
+        // Frame times
+        DebugWindow.SetFrameTimes(FrameTimes.Select(t => (t.Key, t.Value)));
+        // Timers
+        DebugWindow.SetTimers(TimerManager.GetAllTimers().Select(t => (t.Key, t.Value.Left)));
+        // UIDS
+        DebugWindow.SetUIDS(
+        Enum.GetValues<UIDCategory>().Select(category => (
+            category.ToString(),
+            UIDManager.InUse(category),
+            (int)UIDManager.Counter(category)
+        )));
+        // Infobox
+        DebugWindow.SetInfobox(infobox);
+        DebugWindow.SetMemoryInfobox(memoryInfobox);
+    }
+    public static void CloseDebugWindow() => DebugWindow.ForceClose();
 }

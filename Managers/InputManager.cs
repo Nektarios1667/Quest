@@ -31,6 +31,7 @@ public enum InputAction
     ToggleHitboxes,
     ToggleProgramInfo,
     OpenCommandWindow,
+    OpenDebugWindow,
 
     // Editor
     FastMove,
@@ -106,6 +107,7 @@ public static class InputManager
         { InputAction.ToggleHitboxes,       new(Keys.F6, [Keys.LeftControl]) },
         { InputAction.ToggleProgramInfo,    new(Keys.F7, [Keys.LeftControl]) },
         { InputAction.OpenCommandWindow,    new(Keys.OemTilde, [Keys.LeftControl, Keys.LeftShift]) },
+        { InputAction.OpenDebugWindow,      new(Keys.F8, [Keys.LeftControl]) },
 
         // Editor
         { InputAction.FastMove,             new(Keys.LeftAlt) },

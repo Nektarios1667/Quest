@@ -6,8 +6,9 @@ namespace Quest;
 
 public class Window : Game
 {
-    readonly StringBuilder debugSb = new();
-    readonly StringBuilder programDebugSb = new();
+    readonly StringBuilder infoSb = new();
+    readonly StringBuilder memoryDebugSb = new();
+    readonly StringBuilder frameTimesSb = new();
     // Devices and managers
     private readonly GraphicsDeviceManager graphics = null!;
     private SpriteBatch spriteBatch = null!;
@@ -152,6 +153,11 @@ public class Window : Game
         // Final
         Logger.System("Game finished initializing.");
     }
+    protected override void OnExiting(object sender, ExitingEventArgs args)
+    {
+        DebugManager.CloseDebugWindow();
+        base.OnExiting(sender, args);
+    }
 
     protected override void Update(GameTime gameTime)
     {
@@ -166,7 +172,7 @@ public class Window : Game
         // Managers
         Quill.Interpreter.Update(gameManager, playerManager);
         InputManager.Update(this);
-        DebugManager.Update();
+        DebugManager.Update(infoSb.ToString().Replace("\n", "\r\n"), memoryDebugSb.ToString().Split("\n"));
         CameraManager.Update(delta);
         TimerManager.Update(gameManager);
         SoundtrackManager.Update();
@@ -202,24 +208,20 @@ public class Window : Game
         menuManager.Draw();
 
         // Text info
-        DebugManager.StartBenchmark("DebugTextDraw");
-        if (DebugManager.TextInfo)
-            DrawTextInfo();
+        DebugManager.StartBenchmark("DebugText");
+        DrawTextInfo();
 
         // Program info
-        if (DebugManager.ProgramInfo)
-            DrawProgramInfo(programDebugSb, spriteBatch);
+        DrawProgramInfo(memoryDebugSb, spriteBatch);
 
         // Frame info
-        if (DebugManager.FrameInfo)
-            DrawFrameInfo();
-        DebugManager.EndBenchmark("DebugTextDraw");
+        DrawFrameInfo();
+        DebugManager.EndBenchmark("DebugText");
 
         // Frame bar
-        DebugManager.StartBenchmark("FrameBarDraw");
-        if (DebugManager.FrameBar)
-            DrawFrameBar();
-        DebugManager.EndBenchmark("FrameBarDraw");
+        DebugManager.StartBenchmark("FrameBar");
+        DrawFrameBar();
+        DebugManager.EndBenchmark("FrameBar");
 
         // Cursor
         DrawTexture(spriteBatch, TextureID.CursorArrow, InputManager.MousePosition);
@@ -238,102 +240,112 @@ public class Window : Game
     public void DrawFrameInfo()
     {
         float boxHeight = DebugManager.FrameTimes.Count * 20;
-        FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 200, 0, 200, (int)boxHeight), Color.Black * 0.8f);
 
-        debugSb.Clear();
+        frameTimesSb.Clear();
         foreach (var kv in frameTimes)
         {
-            debugSb.Append(kv.Key);
-            debugSb.Append(": ");
-            debugSb.AppendFormat("{0:0.0}ms", kv.Value);
-            debugSb.Append('\n');
+            frameTimesSb.Append(kv.Key);
+            frameTimesSb.Append(": ");
+            frameTimesSb.AppendFormat("{0:0.0}ms", kv.Value);
+            frameTimesSb.Append('\n');
         }
 
-        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(Constants.NativeResolution.X - 190, 0), Color.White);
+        // Draw
+        if (!DebugManager.FrameInfo) return;
+
+        FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 200, 0, 200, (int)boxHeight), Color.Black * 0.8f);
+        spriteBatch.DrawString(Arial, frameTimesSb.ToString(), new Vector2(Constants.NativeResolution.X - 190, 0), Color.White);
     }
-    public static void DrawProgramInfo(StringBuilder programDebugSb, SpriteBatch spriteBatch)
+    public static void DrawProgramInfo(StringBuilder memoryDebugSb, SpriteBatch spriteBatch)
     {
         if (TimerManager.IsCompleteOrMissing("UpdateProgramInfo"))
         {
-            programDebugSb.Clear();
+            memoryDebugSb.Clear();
             var process = Process.GetCurrentProcess();
 
-            programDebugSb.Append("Memory: ");
-            programDebugSb.AppendFormat("{0:0.0} MB", process.WorkingSet64 / 1024.0 / 1024.0);
-            programDebugSb.Append("\nThreads: ");
-            programDebugSb.Append(process.Threads.Count);
-            programDebugSb.Append("\nHandles: ");
-            programDebugSb.Append(process.HandleCount);
-            programDebugSb.Append("\nUptime: ");
-            programDebugSb.AppendFormat("{0:hh\\:mm\\:ss}", DateTime.Now - process.StartTime);
-            programDebugSb.Append("\nGC Memory: ");
-            programDebugSb.AppendFormat("{0:0.0} MB", GC.GetTotalMemory(false) / 1024.0 / 1024.0);
-            programDebugSb.Append("\nGC Gen0: ");
-            programDebugSb.Append(GC.CollectionCount(0));
-            programDebugSb.Append("\nGC Gen1: ");
-            programDebugSb.Append(GC.CollectionCount(1));
-            programDebugSb.Append("\nGC Gen2: ");
-            programDebugSb.Append(GC.CollectionCount(2));
+            memoryDebugSb.Append("Memory: ");
+            memoryDebugSb.AppendFormat("{0:0.0} MB", process.WorkingSet64 / 1024.0 / 1024.0);
+            memoryDebugSb.Append("\nThreads: ");
+            memoryDebugSb.Append(process.Threads.Count);
+            memoryDebugSb.Append("\nHandles: ");
+            memoryDebugSb.Append(process.HandleCount);
+            memoryDebugSb.Append("\nUptime: ");
+            memoryDebugSb.AppendFormat("{0:hh\\:mm\\:ss}", DateTime.Now - process.StartTime);
+            memoryDebugSb.Append("\nGC Memory: ");
+            memoryDebugSb.AppendFormat("{0:0.0} MB", GC.GetTotalMemory(false) / 1024.0 / 1024.0);
+            memoryDebugSb.Append("\nGC Gen0: ");
+            memoryDebugSb.Append(GC.CollectionCount(0));
+            memoryDebugSb.Append("\nGC Gen1: ");
+            memoryDebugSb.Append(GC.CollectionCount(1));
+            memoryDebugSb.Append("\nGC Gen2: ");
+            memoryDebugSb.Append(GC.CollectionCount(2));
 
             TimerManager.SetTimer("UpdateProgramInfo", 1f, null);
         }
 
-        int height = programDebugSb.ToString().Split('\n').Length * 20;
+        if (!DebugManager.ProgramInfo) return;
+
+        int height = memoryDebugSb.ToString().Split('\n').Length * 20;
         FillRectangle(spriteBatch, new(0, Constants.NativeResolution.Y - height, 220, height), Color.Black * 0.8f);
-        spriteBatch.DrawString(Arial, programDebugSb.ToString(), new(5, Constants.NativeResolution.Y - height + 5), Color.White);
+        spriteBatch.DrawString(Arial, memoryDebugSb.ToString(), new(5, Constants.NativeResolution.Y - height + 5), Color.White);
     }
     public void DrawTextInfo()
     {
 
-        debugSb.Clear();
-        debugSb.Append("FPS: ");
-        debugSb.AppendFormat("{0:0.0}", cacheDelta != 0 ? 1f / cacheDelta : 0);
-        debugSb.Append("\nGameTime: ");
-        debugSb.AppendFormat("{0:0.00}", GameManager.GameTime);
-        debugSb.Append("\nDayTime: ");
-        debugSb.AppendFormat("{0:0.00}", gameManager.DayTime);
-        debugSb.Append("\nTotalTime: ");
-        debugSb.AppendFormat("{0:0.00}", GameManager.GameTime);
-        debugSb.Append("\nCamera: ");
-        debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.Camera.X, CameraManager.Camera.Y);
-        debugSb.Append("\nTile Below: ");
-        debugSb.Append(playerManager.TileBelow == null ? "none" : playerManager.TileBelow.Type.Texture.ToString());
-        debugSb.Append("\nCoord: ");
-        debugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.TileCoord.X, CameraManager.TileCoord.Y);
-        debugSb.Append("\nLevel: ");
-        debugSb.Append(levelManager.Level?.Path);
-        debugSb.Append("\nInventory: ");
-        debugSb.Append(playerManager.InventoryOpen);
-        debugSb.Append("\nGUI: ");
-        debugSb.Append(overlayManager.Gui.Widgets.Count);
-        debugSb.Append("\nMood: ");
-        debugSb.Append(StateManager.Mood);
-        debugSb.Append("\nMusic: ");
-        debugSb.Append(SoundtrackManager.Playing.ToString() ?? "none");
-        debugSb.Append("\nDaylight: ");
-        debugSb.AppendFormat("{0:0}%", ColorTools.GetDaylightPercent(gameManager.DayTime));
-        debugSb.Append("\nLighting: ");
-        debugSb.AppendFormat("{0}", LightingManager.Lights.Count);
-        debugSb.Append("\nWeather: ");
-        debugSb.Append(StateManager.WeatherIntensity(GameManager.GameTime));
-        debugSb.AppendFormat(" [{0:0.00}]", StateManager.WeatherValue(GameManager.GameTime));
-        debugSb.Append("\nUIDs: ");
-        debugSb.AppendFormat("L:{0}/{1} E:{2}/{3} I:{4}/{5} P:{6}/{7}", UIDManager.InUse(UIDCategory.Loot), UIDManager.Counter(UIDCategory.Loot), UIDManager.InUse(UIDCategory.Enemies), UIDManager.Counter(UIDCategory.Enemies), UIDManager.InUse(UIDCategory.Items), UIDManager.Counter(UIDCategory.Items), UIDManager.InUse(UIDCategory.Projectiles), UIDManager.Counter(UIDCategory.Projectiles));
-        debugSb.Append("\nSave: ");
-        debugSb.Append(StateManager.CurrentSave);
-        debugSb.Append("\nCurrent Luxel: ");
-        debugSb.Append(CameraManager.Camera.ToPoint() / Constants.TileSize.Scaled(0.5f));
-        debugSb.Append("\nSoundtrack: ");
-        debugSb.Append(SoundtrackManager.Playing);
-        debugSb.Append("\nQuill: ");
+        infoSb.Clear();
+        infoSb.Append("FPS: ");
+        infoSb.AppendFormat("{0:0.0}", cacheDelta != 0 ? 1f / cacheDelta : 0);
+        infoSb.Append("\nGameTime: ");
+        infoSb.AppendFormat("{0:0.00}", GameManager.GameTime);
+        infoSb.Append("\nDayTime: ");
+        infoSb.AppendFormat("{0:0.00}", gameManager.DayTime);
+        infoSb.Append("\nTotalTime: ");
+        infoSb.AppendFormat("{0:0.00}", GameManager.GameTime);
+        infoSb.Append("\nCamera: ");
+        infoSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.Camera.X, CameraManager.Camera.Y);
+        infoSb.Append("\nTile Below: ");
+        infoSb.Append(playerManager.TileBelow == null ? "none" : playerManager.TileBelow.Type.Texture.ToString());
+        infoSb.Append("\nCoord: ");
+        infoSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.TileCoord.X, CameraManager.TileCoord.Y);
+        infoSb.Append("\nLevel: ");
+        infoSb.Append(levelManager.Level?.Path);
+        infoSb.Append("\nInventory: ");
+        infoSb.Append(playerManager.InventoryOpen);
+        infoSb.Append("\nGUI: ");
+        infoSb.Append(overlayManager.Gui.Widgets.Count);
+        infoSb.Append("\nMood: ");
+        infoSb.Append(StateManager.Mood);
+        infoSb.Append("\nMusic: ");
+        infoSb.Append(SoundtrackManager.Playing.ToString() ?? "none");
+        infoSb.Append("\nDaylight: ");
+        infoSb.AppendFormat("{0:0}%", ColorTools.GetDaylightPercent(gameManager.DayTime));
+        infoSb.Append("\nLighting: ");
+        infoSb.AppendFormat("{0}", LightingManager.Lights.Count);
+        infoSb.Append("\nWeather: ");
+        infoSb.Append(StateManager.WeatherIntensity(GameManager.GameTime));
+        infoSb.AppendFormat(" [{0:0.00}]", StateManager.WeatherValue(GameManager.GameTime));
+        infoSb.Append("\nUIDs: ");
+        infoSb.AppendFormat("L:{0}/{1} E:{2}/{3} I:{4}/{5} P:{6}/{7}", UIDManager.InUse(UIDCategory.Loot), UIDManager.Counter(UIDCategory.Loot), UIDManager.InUse(UIDCategory.Enemies), UIDManager.Counter(UIDCategory.Enemies), UIDManager.InUse(UIDCategory.Items), UIDManager.Counter(UIDCategory.Items), UIDManager.InUse(UIDCategory.Projectiles), UIDManager.Counter(UIDCategory.Projectiles));
+        infoSb.Append("\nSave: ");
+        infoSb.Append(StateManager.CurrentSave);
+        infoSb.Append("\nCurrent Luxel: ");
+        infoSb.Append(CameraManager.Camera.ToPoint() / Constants.TileSize.Scaled(0.5f));
+        infoSb.Append("\nSoundtrack: ");
+        infoSb.Append(SoundtrackManager.Playing);
+        infoSb.Append("\nQuill: ");
         foreach (var inst in Quill.Interpreter.GetQuillInstances())
-            debugSb.Append($"\n  {inst.Script.Name} | @{inst.L:000} | C:{inst.Callbacks.Count:0} | Sc:{(inst.Scopes.TryPeek(out string? sc) ? sc : "GLOBAL")}");
+            infoSb.Append($"\n  {inst.Script.Name} | @{inst.L:000} | C:{inst.Callbacks.Count:0} | Sc:{(inst.Scopes.TryPeek(out string? sc) ? sc : "GLOBAL")}");
 
-        FillRectangle(spriteBatch, new(0, 0, 220, debugSb.ToString().Split('\n').Length * 20), Color.Black * 0.8f);
-        spriteBatch.DrawString(Arial, debugSb.ToString(), new Vector2(10, 10), Color.White);
+        // Drawing  
+        if (!DebugManager.TextInfo) return;
+
+        FillRectangle(spriteBatch, new(0, 0, 220, infoSb.ToString().Split('\n').Length * 20), Color.Black * 0.8f);
+        spriteBatch.DrawString(Arial, infoSb.ToString(), new Vector2(10, 10), Color.White);
     }
     public void DrawFrameBar()
     {
+        if (!DebugManager.FrameBar) return;
+
         // Update info twice a second
         if (debugUpdateTime >= .5)
         {

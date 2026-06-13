@@ -8,7 +8,7 @@ namespace Quest.Editor;
 
 public class LevelEditor : Game
 {
-    readonly StringBuilder programDebugSb = new();
+    readonly StringBuilder memoryDebugSb = new();
     // Devices and managers
     private readonly GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch = null!;
@@ -271,7 +271,7 @@ public class LevelEditor : Game
 
         // Managers
         if (!PopupFactory.PopupOpen) InputManager.Update(this);
-        DebugManager.Update();
+        DebugManager.Update(editorOverlayManager.GetDebugString());
         CameraManager.Update(delta);
         CameraManager.CameraDest = Vector2.Clamp(CameraManager.CameraDest, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
         // Gui
@@ -312,7 +312,7 @@ public class LevelEditor : Game
 
         // Program info
         if (DebugManager.ProgramInfo)
-            Quest.Window.DrawProgramInfo(programDebugSb, spriteBatch);
+            Quest.Window.DrawProgramInfo(memoryDebugSb, spriteBatch);
 
         // Frame info
         if (DebugManager.FrameInfo)

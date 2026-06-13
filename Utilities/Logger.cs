@@ -13,17 +13,6 @@ public static class Logger
             MessageColors.Add(color);
         }
     }
-    public static void Output(string message, string type)
-    {
-        if (MessageLevels.Contains(type))
-        {
-            Console.ForegroundColor = MessageColors[MessageLevels.IndexOf(type)];
-            Console.WriteLine($"({Timestamp}) [{type}] {message}");
-            Console.ForegroundColor = ConsoleColor.White; // Reset color
-        }
-        else
-            Console.WriteLine($"[Unknown] {message}");
-    }
     public static int InputInt(string message, int fallback = 0)
     {
         string resp = Input(message);
@@ -86,12 +75,16 @@ public static class Logger
     }
     public static void System(string message)
     {
+        DebugManager.Log($"({Timestamp}) [System] {message}");
+
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("System")];
         Console.WriteLine($"({Timestamp}) [System] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color
     }
     public static void Log(string message)
     {
+        DebugManager.Log($"({Timestamp}) [System] {message}");
+
         if (!DebugManager.LogInfo) return; // Skip logging if not enabled
 
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Log")];
@@ -100,12 +93,16 @@ public static class Logger
     }
     public static void Warning(string message)
     {
+        DebugManager.Log($"({Timestamp}) [System] {message}");
+
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Warning")];
         Console.WriteLine($"({Timestamp}) [Warning] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color
     }
     public static void Error(string message, bool exit = false)
     {
+        DebugManager.Log($"({Timestamp}) [System] {message}");
+
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Error")];
         Console.WriteLine($"({Timestamp}) [Error] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color

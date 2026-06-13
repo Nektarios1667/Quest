@@ -1,4 +1,6 @@
-﻿namespace Quest.Managers;
+﻿using System.Linq;
+
+namespace Quest.Managers;
 
 public class Timer
 {
@@ -80,6 +82,7 @@ public static class TimerManager
             return timer;
         throw new KeyNotFoundException($"No timer with name '{name}' found");
     }
+    public static Dictionary<string, Timer> GetAllTimers() => timers;
 
     public static float TryTimeLeft(string name)
     {
