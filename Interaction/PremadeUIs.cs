@@ -173,11 +173,11 @@ public partial class UserInterface
         FurnaceUI.AddElement("title", title);
 
         // Fuel input
-        InputSlot fuel = new(new(Constants.Middle.X - 168, 75), new([ItemTypeID.Coal], FilterType.Whitelist));
+        InputSlot fuel = new(new(Constants.Middle.X - 168, 75), new(ItemTypes.FuelTypes, FilterType.Whitelist));
         FurnaceUI.AddElement("fuel", fuel);
 
         // Unsmelted item input
-        InputSlot input = new(new(Constants.Middle.X - 84, 75), new([ItemTypeID.RawCopper, ItemTypeID.RawGold, ItemTypeID.RawIron], FilterType.Whitelist));
+        InputSlot input = new(new(Constants.Middle.X - 84, 75), new(ItemTypes.FurnaceableTypes, FilterType.Whitelist));
         FurnaceUI.AddElement("input", input);
 
         // Smelted item output
@@ -299,12 +299,12 @@ public partial class UserInterface
         StoveUI.AddElement("title", title);
 
         // Fuel input
-        InputSlot fuel = new(new(Constants.Middle.X - 168, 75), new([ItemTypeID.Coal], FilterType.Whitelist));
+        InputSlot fuel = new(new(Constants.Middle.X - 168, 75), new(ItemTypes.FuelTypes, FilterType.Whitelist));
         StoveUI.AddElement("fuel", fuel);
 
 
         // Uncooked food input
-        InputSlot input = new(new(Constants.Middle.X - 84, 75), new([ItemTypeID.RawBeef, ItemTypeID.RawFish], FilterType.Whitelist));
+        InputSlot input = new(new(Constants.Middle.X - 84, 75), new(ItemTypes.StoveableTypes, FilterType.Whitelist));
         StoveUI.AddElement("input", input);
 
         // Cooked food output

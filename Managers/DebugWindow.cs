@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -97,7 +98,7 @@ public partial class DebugWindow : Form
     }
     public void SetMemoryInfobox(IEnumerable<string> info)
     {
-        RunOnUI(() => 
+        RunOnUI(() =>
         {
             MemoryListbox.Items.Clear();
             MemoryListbox.Items.AddRange(info.ToArray());
@@ -115,5 +116,24 @@ public partial class DebugWindow : Form
             e.Cancel = true;
             Hide();
         }
+    }
+
+    private void ExportLog_Click(object sender, EventArgs e)
+    {
+        RunOnUI(() =>
+        {
+            using (SaveFileDialog dialog = new SaveFileDialog())
+            {
+                dialog.Title = "Export log";
+                dialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+                dialog.DefaultExt = "txt";
+                dialog.FileName = "document.txt";
+
+                if (dialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    File.WriteAllLines(dialog.FileName, LogListbox.Items.Cast<object>().Select(i => i.ToString())!);
+                }
+            }
+        });
     }
 }

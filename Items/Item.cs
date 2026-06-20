@@ -97,13 +97,11 @@ public class ItemType
 
 public class ItemTypes
 {
-    public static ItemType Get(ItemTypeID typeID) => All[(byte)typeID];
-    public static ItemType Get(string typeID)
-    {
-        if (!Enum.TryParse<ItemTypeID>(typeID, out var parsedTypeID))
-            throw new ArgumentException($"ItemType {typeID} does not exist");
-        return All[(byte)Enum.Parse(typeof(ItemTypeID), typeID)];
-    }
+    // Premade lists
+    public static readonly ItemTypeID[] FuelTypes = [ItemTypeID.Coal];
+    public static readonly ItemTypeID[] FurnaceableTypes = [ItemTypeID.RawCopper, ItemTypeID.RawGold, ItemTypeID.RawIron];
+    public static readonly ItemTypeID[] StoveableTypes = [ItemTypeID.RawBeef, ItemTypeID.RawFish];
+    // ItemTypes
     public static readonly ItemType ActivePalantir = new(ItemTypeID.ActivePalantir, "A seeing stone used to communicate with Sauron.", 1);
     public static readonly ItemType SteelSword = new(ItemTypeID.SteelSword, "A sturdy steel sword.", 1);
     public static readonly ItemType DeltaCoin = new(ItemTypeID.DeltaCoin, "A gold coin.");
@@ -129,7 +127,7 @@ public class ItemTypes
     public static readonly ItemType Orange = new(ItemTypeID.Orange, "A fresh juicy orange.");
     public static readonly ItemType Lantern = new(ItemTypeID.Lantern, "A burning lantern used for light.", 1, isLight: true);
     public static readonly ItemType WoodPlanks = new(ItemTypeID.WoodPlanks, "Sturdy wooden boards cut from trees.");
-    public static readonly ItemType Rock = new(ItemTypeID.Rock, "Hard rock mined from the ground.");
+    public static readonly ItemType Rock = new(ItemTypeID.Rock, "Hard rock taken from the ground.");
     public static readonly ItemType GlassBottle = new(ItemTypeID.GlassBottle, "An empty bottle made of glass.", 3);
     public static readonly ItemType BottledWater = new(ItemTypeID.BottledWater, "A glass bottle of potable water.", 3);
     public static readonly ItemType BottledCloud = new(ItemTypeID.BottledCloud, "A cloud somehow trapped in a glass bottle...", 3);
@@ -137,7 +135,7 @@ public class ItemTypes
     public static readonly ItemType Disc = new(ItemTypeID.Disc, "A music disc.");
     public static readonly ItemType Cloth = new(ItemTypeID.Cloth, "A piece of fabric.");
     public static readonly ItemType Coal = new(ItemTypeID.Coal, "A hard lump of coal.");
-    public static readonly ItemType RawIron = new(ItemTypeID.RawIron, "Unprocessed iron ore.");
+    public static readonly ItemType RawIron = new(ItemTypeID.RawIron, "Unprocessed iron ore."); 
     public static readonly ItemType Iron = new(ItemTypeID.Iron, "Processed iron ore.");
     public static readonly ItemType Ink = new(ItemTypeID.Ink, "Ink used for dyes and writing.");
     public static readonly ItemType RawCopper = new(ItemTypeID.RawCopper, "Unprocessed copper ore.");

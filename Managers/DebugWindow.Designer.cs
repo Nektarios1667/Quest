@@ -39,6 +39,7 @@ partial class DebugWindow
         Infobox = new System.Windows.Forms.TextBox();
         MemoryListbox = new System.Windows.Forms.ListBox();
         MemoryLabel = new System.Windows.Forms.Label();
+        ExportLog = new System.Windows.Forms.Button();
         SuspendLayout();
         // 
         // TimerLabel
@@ -158,12 +159,25 @@ partial class DebugWindow
         MemoryLabel.TabIndex = 11;
         MemoryLabel.Text = "Memory";
         // 
+        // ExportLog
+        // 
+        ExportLog.BackColor = System.Drawing.SystemColors.Control;
+        ExportLog.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+        ExportLog.Location = new System.Drawing.Point(777, 532);
+        ExportLog.Name = "ExportLog";
+        ExportLog.Size = new System.Drawing.Size(87, 30);
+        ExportLog.TabIndex = 13;
+        ExportLog.Text = "Export";
+        ExportLog.UseVisualStyleBackColor = false;
+        ExportLog.Click += ExportLog_Click;
+        // 
         // DebugWindow
         // 
         AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
         AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
         BackColor = System.Drawing.SystemColors.ControlText;
         ClientSize = new System.Drawing.Size(1184, 661);
+        Controls.Add(ExportLog);
         Controls.Add(MemoryListbox);
         Controls.Add(MemoryLabel);
         Controls.Add(Infobox);
@@ -193,4 +207,5 @@ partial class DebugWindow
     private System.Windows.Forms.TextBox Infobox;
     private System.Windows.Forms.ListBox MemoryListbox;
     private System.Windows.Forms.Label MemoryLabel;
+    private System.Windows.Forms.Button ExportLog;
 }
