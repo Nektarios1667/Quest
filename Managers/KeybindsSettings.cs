@@ -62,7 +62,7 @@ public partial class KeybindsSettings : Form
 
             // Set bind
             if (keyData != WinKeys.Escape)
-                BindsGrid.Rows[row].Cells[col].Value = keyString;
+                BindsGrid.Rows[row].Cells[col].Value = keyString.TrimEnd('+');
 
             // Exit binding mode
             if (exit || keyData == WinKeys.Escape)
@@ -85,7 +85,6 @@ public partial class KeybindsSettings : Form
 
     private void SaveButton_Click(object sender, EventArgs e)
     {
-        DebugManager.StartBenchmark("SaveBinds");
         // Rebind
         foreach (DataGridViewRow row in BindsGrid.Rows)
         {
@@ -101,7 +100,6 @@ public partial class KeybindsSettings : Form
 
         // Write
         SettingsManager.WriteSettings();
-        DebugManager.EndBenchmark("SaveBinds");
     }
     public static readonly Dictionary<WinKeys, string> WinKeyToString = new()
     {
