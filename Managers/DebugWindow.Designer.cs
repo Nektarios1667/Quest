@@ -189,6 +189,7 @@ partial class DebugWindow
         Controls.Add(TimersListbox);
         Controls.Add(FrameTimesLabel);
         Controls.Add(TimerLabel);
+        ForeColor = System.Drawing.Color.White;
         Name = "DebugWindow";
         Text = "Debug Window";
         ResumeLayout(false);

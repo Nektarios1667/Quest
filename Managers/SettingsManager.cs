@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
 using MonoGUI;
+using System.Linq;
 
 namespace Quest.Managers;
 
@@ -20,6 +21,7 @@ public static class SettingsManager
     public static float SoundVolume { get; set; } = 1f;
     // GUI / Widgets
     private static GUI settingsMenu = null!;
+    private static GUI bindsMenu = null!;
     private static HorizontalSlider musicSlider = null!;
     private static HorizontalSlider soundSlider = null!;
     private static HorizontalSlider fpsSlider = null!;
@@ -40,6 +42,9 @@ public static class SettingsManager
             StateManager.RevertGameState();
         }, [], text: "Save", font: PixelOperator, border: 0);
         Button revertButton = new(settingsMenu, new(Constants.NativeResolution.X - 240, 20), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, () => LoadSettings(window), [], text: "Revert", font: PixelOperator, border: 0);
+
+        // Binds button in bottom left
+        Button bindsButton = new(settingsMenu, new(20, Constants.NativeResolution.Y - 60), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, OpenKeybindsSettings, [], text: "Binds", font: PixelOperator, border: 0);
 
         // Sound
         // Music
@@ -106,7 +111,7 @@ public static class SettingsManager
             window.SetFullscreen(SettingsManager.Fullscreen);
         };
 
-        settingsMenu.Widgets = [saveButton, revertButton, settingsLabel, settingsBackButton, musicSlider, musicLabel, musicValue, soundSlider, soundLabel, soundValue, fpsSlider, fpsLabel, fpsValue, vsyncCheckbox, vsyncLabel, resolutionDropdown, fullscreenCheckbox, fullscreenLabel];
+        settingsMenu.Widgets = [saveButton, revertButton, bindsButton, settingsLabel, settingsBackButton, musicSlider, musicLabel, musicValue, soundSlider, soundLabel, soundValue, fpsSlider, fpsLabel, fpsValue, vsyncCheckbox, vsyncLabel, resolutionDropdown, fullscreenCheckbox, fullscreenLabel];
         LoadSettings(window);
         return settingsMenu;
     }
@@ -116,10 +121,16 @@ public static class SettingsManager
         if (window.IsFixedTimeStep)
             window.TargetElapsedTime = TimeSpan.FromSeconds(1d / SettingsManager.FPS);
     }
+    private static void OpenKeybindsSettings()
+    {
+        var window = new KeybindsSettings();
+        window.Show();
+        window.SetBinds(InputManager.GetBinds());
+    }
     public static void WriteSettings()
     {
-        // Write to settings.qkv in GameData/Persistent
-        StateManager.WriteKeyValueFile("settings", new Dictionary<string, string>
+        // Collect settings
+        var settings = new Dictionary<string, string>
         {
             { "ScreenResolution", $"{ScreenResolution.X}x{ScreenResolution.Y}" },
             { "FullScreen", Fullscreen.ToString() },
@@ -127,7 +138,13 @@ public static class SettingsManager
             { "VSYNC", VSYNC.ToString() },
             { "MusicVolume", MusicVolume.ToString() },
             { "SoundVolume", SoundVolume.ToString() }
-        });
+        };
+        // Add binds
+        foreach (var kv in InputManager.GetBinds())
+            settings[$"Bind_{kv.Key}"] = kv.Value.ToString();
+
+        // Write to settings.qkv in GameData/Persistent
+        StateManager.WriteKeyValueFile("settings", settings);
     }
     public static void LoadSettings(Window window)
     {
@@ -170,6 +187,15 @@ public static class SettingsManager
         {
             SoundVolume = soundVol;
             soundSlider.SetValue(soundVol);
+        }
+
+        // Binds
+        foreach (var inputAction in Enum.GetValues<InputAction>())
+        {
+            if (settings.TryGetValue($"Bind_{inputAction}", out var bind))
+            {
+                InputManager.Rebind(inputAction, InputManager.ParseBindingString(bind));
+            }
         }
     }
 }

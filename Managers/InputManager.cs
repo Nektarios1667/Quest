@@ -1,4 +1,5 @@
 ﻿using MonoGame.Extended.Input;
+using System.Linq;
 
 namespace Quest.Managers;
 
@@ -66,6 +67,15 @@ public struct InputBinding(Keys? key = null, Keys[]? modifiers = null, MouseButt
     public Keys? Key = key;
     public Keys[]? Modifiers = modifiers;
     public MouseButton? Mouse = mouse;
+    public override readonly string ToString()
+    {
+        if (Key != null && Modifiers != null)
+                return $"{string.Join('+', Modifiers)}+{Key}";
+        else if (Key != null)
+            return $"{Key}";
+        else
+            return $"{Mouse} Click";
+    }
 }
 public static class InputManager
 {
@@ -78,6 +88,7 @@ public static class InputManager
         }
     }
     // Bindings
+    public static Dictionary<InputAction, InputBinding> GetBinds() => binds;
     private static readonly Dictionary<InputAction, InputBinding> binds = new()
     {
         // Game
@@ -153,6 +164,36 @@ public static class InputManager
         KeyboardState = Keyboard.GetState();
         MouseState = Mouse.GetState();
     }
+    public static InputBinding ParseBindingString(string binding)
+    {
+        // Mouse click
+        if (binding.Contains("Click"))
+        {
+            return binding.Split(' ')[0] switch
+            {
+                "Left" => new InputBinding(mouse: MouseButton.Left),
+                "Right" => new InputBinding(mouse: MouseButton.Right),
+                _ => new InputBinding(mouse: MouseButton.Middle)
+            };
+        }
+        // Multi part
+        else if (binding.Contains('+'))
+        {
+            string[] keys = binding.Split('+');
+            Keys[] modifierKeys = keys[..^1].Select(k => Enum.Parse<Keys>(k, true)).ToArray();
+            Keys baseKey = Enum.Parse<Keys>(keys[^1], true);
+
+            return new(baseKey, modifierKeys);
+        }
+        // Single key
+        else
+        {
+            Keys baseKey = Enum.Parse<Keys>(binding, true);
+            return new(baseKey);
+        }
+    }
+    
+    public static void Rebind(InputAction action, InputBinding binding) => binds[action] = binding;
     public static Point MousePosition => MouseState.Position;
     public static Keys[] KeysDown => KeyboardState.GetPressedKeys();
     public static Keys[] LastKeysDown => LastKeyboardState.GetPressedKeys();
