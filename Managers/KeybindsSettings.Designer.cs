@@ -103,11 +103,11 @@ partial class KeybindsSettings
         // 
         PressKeyLabel.AutoSize = true;
         PressKeyLabel.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-        PressKeyLabel.Location = new System.Drawing.Point(339, 410);
+        PressKeyLabel.Location = new System.Drawing.Point(279, 410);
         PressKeyLabel.Name = "PressKeyLabel";
-        PressKeyLabel.Size = new System.Drawing.Size(101, 25);
+        PressKeyLabel.Size = new System.Drawing.Size(244, 25);
         PressKeyLabel.TabIndex = 3;
-        PressKeyLabel.Text = "Press key...";
+        PressKeyLabel.Text = "Press key or escape to exit...";
         PressKeyLabel.Visible = false;
         // 
         // KeybindsSettings

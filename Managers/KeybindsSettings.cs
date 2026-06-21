@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WinKeys = System.Windows.Forms.Keys;
-using GameKeys = Microsoft.Xna.Framework.Input.Keys;
 
 namespace Quest.Managers;
 
