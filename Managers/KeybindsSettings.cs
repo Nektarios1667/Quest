@@ -27,7 +27,7 @@ public partial class KeybindsSettings : Form
     {
         foreach (var kv in binds)
         {
-            BindsGrid.Rows.Add(kv.Key.ToString(), kv.Value.ToString());
+            BindsGrid.Rows.Add(StringTools.FillCamelSpaces(kv.Key.ToString()), kv.Value.ToString());
         }
     }
 
@@ -89,7 +89,14 @@ public partial class KeybindsSettings : Form
         // Rebind
         foreach (DataGridViewRow row in BindsGrid.Rows)
         {
-            InputManager.Rebind(Enum.Parse<InputAction>(row.Cells[0].Value?.ToString()!, true), InputManager.ParseBindingString(row.Cells[1].Value?.ToString()!));
+            // Get action-bind pair
+            string action = row.Cells[0].Value.ToString()!.Replace(" ", "");
+            string bind = row.Cells[1].Value.ToString()!;
+            // Parse and bind
+            InputManager.Rebind(
+                Enum.Parse<InputAction>(action, true),
+                InputManager.ParseBindingString(bind)
+            );
         }
 
         // Write
