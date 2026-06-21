@@ -91,7 +91,7 @@ public class PlayerManager : IEntity
             }
             else OpenInventory();
         }
-        if (InputManager.BindPressed(InputAction.Back))
+        if (InputManager.KeyPressed(Keys.Escape))
         {
             CloseInventory();
             CloseInterface();

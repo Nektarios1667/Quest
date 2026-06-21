@@ -153,7 +153,7 @@ public class LevelEditor : Game
         DebugManager.Watch.Restart();
 
         // Exit
-        if (InputManager.BindPressed(InputAction.Quit)) Exit();
+        if (InputManager.KeyPressed(Keys.LeftAlt) && InputManager.KeyPressed(Keys.Escape)) Exit();
 
         // Delta
         delta = (float)gameTime.ElapsedGameTime.TotalSeconds;

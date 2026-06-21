@@ -8,12 +8,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WinKeys = System.Windows.Forms.Keys;
+using GameKeys = Microsoft.Xna.Framework.Input.Keys;
 
 namespace Quest.Managers;
 
 public partial class KeybindsSettings : Form
 {
     bool waitingForKey = false;
+    string keyString = "";
     int row;
     int col;
     public KeybindsSettings()
@@ -23,7 +26,9 @@ public partial class KeybindsSettings : Form
     public void SetBinds(Dictionary<InputAction, InputBinding> binds)
     {
         foreach (var kv in binds)
+        {
             BindsGrid.Rows.Add(kv.Key.ToString(), kv.Value.ToString());
+        }
     }
 
     private void BindsGrid_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -33,19 +38,39 @@ public partial class KeybindsSettings : Form
             row = e.RowIndex;
             col = e.ColumnIndex;
             waitingForKey = true;
-
-            BindsGrid.Rows[row].Cells[col].Value = "Press key...";
+            PressKeyLabel.Visible = true;
         }
     }
-    protected override bool ProcessCmdKey(ref Message msg, System.Windows.Forms.Keys keyData)
+    protected override bool ProcessCmdKey(ref Message msg, WinKeys keyData)
     {
         if (waitingForKey)
         {
-            BindsGrid.Rows[row]
-                .Cells[col]
-                .Value = keyData;
 
-            waitingForKey = false;
+            // Parse key data
+            bool exit = false;
+            if (keyData.HasFlag(WinKeys.Control) || keyData.HasFlag(WinKeys.Shift) || keyData.HasFlag(WinKeys.Alt))
+            {
+                if (keyData.HasFlag(WinKeys.Control) && !keyString.Contains("Control")) keyString += "Ctrl+";
+                if (keyData.HasFlag(WinKeys.Shift) && !keyString.Contains("Shift")) keyString += "Shift+";
+                if (keyData.HasFlag(WinKeys.Alt) && !keyString.Contains("Alt")) keyString += "Alt+";
+            } else if (keyData != WinKeys.Escape)
+            {
+                keyString += WinKeyToString.GetValueOrDefault(keyData, keyData.ToString());
+                exit = true;
+            }
+
+
+            // Set bind
+            if (keyData != WinKeys.Escape)
+                BindsGrid.Rows[row].Cells[col].Value = keyString;
+
+            // Exit binding mode
+            if (exit || keyData == WinKeys.Escape)
+            {
+                waitingForKey = false;
+                PressKeyLabel.Visible = false;
+                keyString = "";
+            }
 
             return true;
         }
@@ -71,4 +96,28 @@ public partial class KeybindsSettings : Form
         SettingsManager.WriteSettings();
         DebugManager.EndBenchmark("SaveBinds");
     }
+    public static readonly Dictionary<WinKeys, string> WinKeyToString = new()
+    {
+        { WinKeys.D1, "1" },
+        { WinKeys.D2, "2" },
+        { WinKeys.D3, "3" },
+        { WinKeys.D4, "4" },
+        { WinKeys.D5, "5" },
+        { WinKeys.D6, "6" },
+        { WinKeys.D7, "7" },
+        { WinKeys.D8, "8" },
+        { WinKeys.D9, "9" },
+        { WinKeys.D0, "0" },
+        { WinKeys.Oem2, "/" },
+        { WinKeys.Oem3, "`" },
+        { WinKeys.Oem4, "[" },
+        { WinKeys.Oem6, "]" },
+        { WinKeys.Oem7, "'" },
+        { WinKeys.Oemcomma, "," },
+        { WinKeys.OemMinus, "-" },
+        { WinKeys.OemPeriod, "." },
+        { WinKeys.OemPipe, "\\" },
+        { WinKeys.Oemplus, "=" },
+        { WinKeys.OemSemicolon, ";" },
+    };
 }

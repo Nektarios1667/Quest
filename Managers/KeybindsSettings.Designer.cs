@@ -37,6 +37,7 @@ partial class KeybindsSettings
         dataGridViewTextBoxColumn2 = new DataGridViewTextBoxColumn();
         SaveButton = new Button();
         CancelButton = new Button();
+        PressKeyLabel = new Label();
         ((System.ComponentModel.ISupportInitialize)BindsGrid).BeginInit();
         SuspendLayout();
         // 
@@ -98,12 +99,24 @@ partial class KeybindsSettings
         CancelButton.UseVisualStyleBackColor = false;
         CancelButton.Click += CancelButton_Click;
         // 
+        // PressKeyLabel
+        // 
+        PressKeyLabel.AutoSize = true;
+        PressKeyLabel.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+        PressKeyLabel.Location = new System.Drawing.Point(339, 410);
+        PressKeyLabel.Name = "PressKeyLabel";
+        PressKeyLabel.Size = new System.Drawing.Size(101, 25);
+        PressKeyLabel.TabIndex = 3;
+        PressKeyLabel.Text = "Press key...";
+        PressKeyLabel.Visible = false;
+        // 
         // KeybindsSettings
         // 
         AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
         BackColor = System.Drawing.SystemColors.ControlText;
         ClientSize = new System.Drawing.Size(800, 450);
+        Controls.Add(PressKeyLabel);
         Controls.Add(CancelButton);
         Controls.Add(SaveButton);
         Controls.Add(BindsGrid);
@@ -112,6 +125,7 @@ partial class KeybindsSettings
         Text = "KeybindsSettings";
         ((System.ComponentModel.ISupportInitialize)BindsGrid).EndInit();
         ResumeLayout(false);
+        PerformLayout();
     }
 
     #endregion
@@ -121,4 +135,5 @@ partial class KeybindsSettings
     private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
     private Button SaveButton;
     private Button CancelButton;
+    private Label PressKeyLabel;
 }

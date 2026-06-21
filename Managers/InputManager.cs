@@ -22,8 +22,6 @@ public enum InputAction
     Hotbar5,
     Hotbar6,
     DropItem,
-    Back,
-    Quit,
     ToggleCollisionDebug,
     ToggleTextInfo,
     ToggleFrameInfo,
@@ -62,19 +60,25 @@ public enum InputAction
     FloodFill,
     NewLevel,
 }
-public struct InputBinding(Keys? key = null, Keys[]? modifiers = null, MouseButton? mouse = null)
+public struct InputBinding
 {
-    public Keys? Key = key;
-    public Keys[]? Modifiers = modifiers;
-    public MouseButton? Mouse = mouse;
+    public Keys? Key;
+    public Keys[]? Modifiers;
+    public MouseButton? Mouse;
+    public InputBinding(Keys? key = null, Keys[]? modifiers = null, MouseButton? mouse = null)
+    {
+        Key = key;
+        Modifiers = modifiers;
+        Mouse = mouse;
+    }
     public override readonly string ToString()
     {
         if (Key != null && Modifiers != null)
-                return $"{string.Join('+', Modifiers)}+{Key}";
+                return $"{string.Join('+', Modifiers.Select(m => InputManager.GameToDisplayKey(m.ToString())))}+{InputManager.GameToDisplayKey(Key.ToString()!)}";
         else if (Key != null)
-            return $"{Key}";
+            return $"{InputManager.GameToDisplayKey(Key.ToString()!)}";
         else
-            return $"{Mouse} Click";
+            return $"{Mouse}Click";
     }
 }
 public static class InputManager
@@ -108,8 +112,6 @@ public static class InputManager
         { InputAction.Hotbar5,              new(Keys.D5) },
         { InputAction.Hotbar6,              new(Keys.D6) },
         { InputAction.DropItem,             new(Keys.D) },
-        { InputAction.Back,                 new(Keys.Escape) },
-        { InputAction.Quit,                 new(Keys.Escape, [Keys.LeftAlt]) },
         { InputAction.ToggleCollisionDebug, new(Keys.F1, [Keys.LeftControl]) },
         { InputAction.ToggleTextInfo,       new(Keys.F2, [Keys.LeftControl]) },
         { InputAction.ToggleFrameInfo,      new(Keys.F3, [Keys.LeftControl]) },
@@ -179,7 +181,7 @@ public static class InputManager
         // Multi part
         else if (binding.Contains('+'))
         {
-            string[] keys = binding.Split('+');
+            string[] keys = binding.Split('+').Select(k => DisplayToGameKey(k)).ToArray();
             Keys[] modifierKeys = keys[..^1].Select(k => Enum.Parse<Keys>(k, true)).ToArray();
             Keys baseKey = Enum.Parse<Keys>(keys[^1], true);
 
@@ -188,11 +190,25 @@ public static class InputManager
         // Single key
         else
         {
-            Keys baseKey = Enum.Parse<Keys>(binding, true);
+            Keys baseKey = Enum.Parse<Keys>(DisplayToGameKey(binding), true);
             return new(baseKey);
         }
     }
-    
+    private static string[] DisplayKeys = { "Ctrl", "Shift", "Alt", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "/", "`", "[", "]", "'", ",", "-", ".", "\\", "=", ";" };
+    private static string[] GameKeys = { "LeftControl", "LeftShift", "LeftAlt", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D0", "Oem2", "OemTilde", "OemOpenBrackets", "OemCloseBrackets", "Oem7", "Oemcomma", "OemMinus", "OemPeriod", "OemPipe", "Oemplus", "OemSemicolon" };
+    public static string DisplayToGameKey(string key)
+    {
+        if (DisplayKeys.Contains(key))
+            return GameKeys[Array.IndexOf(DisplayKeys, key)];
+        return key;
+    }
+    public static string GameToDisplayKey(string key)
+    {
+        if (GameKeys.Contains(key))
+            return DisplayKeys[Array.IndexOf(GameKeys, key)];
+        return key;
+    }
+
     public static void Rebind(InputAction action, InputBinding binding) => binds[action] = binding;
     public static Point MousePosition => MouseState.Position;
     public static Keys[] KeysDown => KeyboardState.GetPressedKeys();
