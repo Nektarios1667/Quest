@@ -60,6 +60,7 @@ partial class KeybindsSettings
         BindsGrid.Size = new System.Drawing.Size(780, 398);
         BindsGrid.TabIndex = 0;
         BindsGrid.CellDoubleClick += BindsGrid_CellDoubleClick;
+        BindsGrid.MouseClick += KeybindsSettings_MouseClick;
         // 
         // dataGridViewTextBoxColumn1
         // 
@@ -109,6 +110,7 @@ partial class KeybindsSettings
         PressKeyLabel.TabIndex = 3;
         PressKeyLabel.Text = "Press key or escape to exit...";
         PressKeyLabel.Visible = false;
+        PressKeyLabel.MouseClick += KeybindsSettings_MouseClick;
         // 
         // KeybindsSettings
         // 
@@ -123,6 +125,7 @@ partial class KeybindsSettings
         ForeColor = System.Drawing.Color.White;
         Name = "KeybindsSettings";
         Text = "KeybindsSettings";
+        MouseClick += KeybindsSettings_MouseClick;
         ((System.ComponentModel.ISupportInitialize)BindsGrid).EndInit();
         ResumeLayout(false);
         PerformLayout();

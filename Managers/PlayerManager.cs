@@ -110,10 +110,8 @@ public class PlayerManager : IEntity
                 UpdateMovements(gameManager);
 
             // Item use
-            DebugManager.StartBenchmark("UpdateAttacks");
-            if (InputManager.LMouseClicked) EquippedItem?.PrimaryUse(gameManager, this);
-            else if (InputManager.RMouseClicked) EquippedItem?.SecondaryUse(gameManager, this);
-            DebugManager.EndBenchmark("UpdateAttacks");
+            if (InputManager.BindDown(InputAction.PrimaryUse)) EquippedItem?.PrimaryUse(gameManager, this);
+            else if (InputManager.BindDown(InputAction.SecondaryUse)) EquippedItem?.SecondaryUse(gameManager, this);
         }
 
 

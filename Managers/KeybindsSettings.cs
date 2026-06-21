@@ -52,7 +52,8 @@ public partial class KeybindsSettings : Form
                 if (keyData.HasFlag(WinKeys.Control) && !keyString.Contains("Control")) keyString += "Ctrl+";
                 if (keyData.HasFlag(WinKeys.Shift) && !keyString.Contains("Shift")) keyString += "Shift+";
                 if (keyData.HasFlag(WinKeys.Alt) && !keyString.Contains("Alt")) keyString += "Alt+";
-            } else if (keyData != WinKeys.Escape)
+            }
+            else if (keyData != WinKeys.Escape)
             {
                 keyString += WinKeyToString.GetValueOrDefault(keyData, keyData.ToString());
                 exit = true;
@@ -76,7 +77,28 @@ public partial class KeybindsSettings : Form
 
         return base.ProcessCmdKey(ref msg, keyData);
     }
+    private void KeybindsSettings_MouseClick(object sender, MouseEventArgs e)
+    {
+        if (waitingForKey)
+        {
+            string? mouseKey = e.Button switch
+            {
+                MouseButtons.Left => "Left Click",
+                MouseButtons.Right => "Right Click",
+                MouseButtons.Middle => "Middle Click",
+                _ => null
+            };
 
+            if (mouseKey != null)
+            {
+                BindsGrid.Rows[row].Cells[col].Value = mouseKey;
+                waitingForKey = false;
+                PressKeyLabel.Visible = false;
+                keyString = "";
+                return;
+            }
+        }
+    }
     private void CancelButton_Click(object sender, EventArgs e)
     {
         Close();

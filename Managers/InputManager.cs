@@ -6,6 +6,8 @@ namespace Quest.Managers;
 public enum InputAction
 {
     // Game
+    PrimaryUse,
+    SecondaryUse,
     MoveUp,
     MoveDown,
     MoveLeft,
@@ -35,6 +37,7 @@ public enum InputAction
     // Editor
     FastMove,
     EditTile,
+    PickTile,
     OpenLevel,
     NewNPC,
     DeleteNPC,
@@ -78,7 +81,7 @@ public struct InputBinding
         else if (Key != null)
             return $"{InputManager.GameToDisplayKey(Key.ToString()!)}";
         else
-            return $"{Mouse}Click";
+            return $"{Mouse} Click";
     }
 }
 public static class InputManager
@@ -96,6 +99,8 @@ public static class InputManager
     private static readonly Dictionary<InputAction, InputBinding> binds = new()
     {
         // Game
+        { InputAction.PrimaryUse,           new(mouse: MouseButton.Left) },
+        { InputAction.SecondaryUse,         new(mouse: MouseButton.Right) },
         { InputAction.MoveUp,               new(Keys.W) },
         { InputAction.MoveDown,             new(Keys.S) },
         { InputAction.MoveLeft,             new(Keys.A) },
@@ -125,6 +130,7 @@ public static class InputManager
         // Editor
         { InputAction.FastMove,             new(Keys.LeftAlt) },
         { InputAction.EditTile,             new(Keys.M, [Keys.LeftControl]) },
+        { InputAction.PickTile,             new(mouse: MouseButton.Middle) },
         { InputAction.OpenLevel,            new(Keys.O, [Keys.LeftControl]) },
         { InputAction.NewNPC,               new(Keys.C, [Keys.LeftControl]) },
         { InputAction.DeleteNPC,            new(Keys.C, [Keys.LeftControl, Keys.LeftShift]) },
