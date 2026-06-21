@@ -74,7 +74,7 @@ public static class SoundtrackManager
     }
     public static void Update()
     {
-        if (!SoundManager.IsMusicPlaying && QueueNextSong)
+        if (!SoundManager.IsMusicPlaying && QueueNextSong && StateManager.IsPlayingState)
         {
             Soundtracks? soundtrack = GetRandomSoundtrack(StateManager.Mood);
             if (soundtrack != null)
