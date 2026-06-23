@@ -197,6 +197,7 @@ public class EditorLevelManager
         }
         GameManager.LevelManager.ReadLevel(GameManager, filename, reload: true);
         GameManager.LevelManager.LoadLevel(GameManager, filename);
+
         Logger.Log($"Opened level '{filename}'.");
     }
     public void NewLevel()

@@ -63,9 +63,11 @@ public class LevelEditor : Game, IAdjustableWindow
         };
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
+        Window.Title = $"Quest Level Editor";
         IsFixedTimeStep = SettingsManager.FPS != -1;
         if (IsFixedTimeStep)
             TargetElapsedTime = TimeSpan.FromSeconds(1d / SettingsManager.FPS);
+
         Logger.System("Initialized level editor window object.");
     }
     public void SetVsync(bool enabled)
@@ -108,6 +110,9 @@ public class LevelEditor : Game, IAdjustableWindow
         editorLevelManager = new(gameManager, levelGenerator);
         editorOverlayManager = new(gameManager, spriteBatch, GraphicsDevice);
         TimerManager.SetTimer("UpdateMinimap", 1, editorOverlayManager.FlagRebuildMinimap, int.MaxValue);
+        TimerManager.SetTimer("UpdateEditorWindowTile", 1, () =>
+            Window.Title = editorLevelManager.LevelManager.Level.LevelPath.IsNull() ? "Quest Level Editor" : $"Quest Level Editor - {editorLevelManager.LevelManager.Level.LevelPath}",
+        int.MaxValue);
 
         StateManager.State = GameState.Editor;
         Logger.System("Initialized managers.");
@@ -268,9 +273,10 @@ public class LevelEditor : Game, IAdjustableWindow
 
         // Managers
         if (!PopupFactory.PopupOpen) InputManager.Update(this);
-        DebugManager.Update(editorOverlayManager.GetDebugString());
+        DebugManager.Update(editorOverlayManager.GetDebugString().Replace("\n", "\r\n"), memoryDebugSb.ToString().Split("\n"));
         CameraManager.Update(delta);
         CameraManager.CameraDest = Vector2.Clamp(CameraManager.CameraDest, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
+        
         // Gui
         gui.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
 
@@ -304,16 +310,13 @@ public class LevelEditor : Game, IAdjustableWindow
 
         // Text info
         DebugManager.StartBenchmark("DebugTextDraw");
-        if (DebugManager.TextInfo)
-            editorOverlayManager.DrawTextInfo();
+        editorOverlayManager.DrawTextInfo();
 
         // Program info
-        if (DebugManager.ProgramInfo)
-            Quest.Window.DrawProgramInfo(memoryDebugSb, spriteBatch);
+        Quest.Window.DrawProgramInfo(memoryDebugSb, spriteBatch);
 
         // Frame info
-        if (DebugManager.FrameInfo)
-            editorOverlayManager.DrawFrameInfo();
+        editorOverlayManager.DrawFrameInfo();
         DebugManager.EndBenchmark("DebugTextDraw");
 
         // Frame bar

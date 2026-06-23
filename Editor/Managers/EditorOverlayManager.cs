@@ -18,6 +18,7 @@ public class EditorOverlayManager
     private LevelManager LevelManager => GameManager.LevelManager;
     // 
     private readonly StringBuilder DebugSb;
+    private readonly StringBuilder FrameTimeSb;
     private float CacheDelta;
     private Dictionary<string, double> FrameTimes = [];
     private RenderTarget2D Minimap = null!;
@@ -28,6 +29,7 @@ public class EditorOverlayManager
         Batch = batch;
         Graphics = graphics;
         DebugSb = new();
+        FrameTimeSb = new();
     }
     public void Update()
     {
@@ -115,22 +117,22 @@ public class EditorOverlayManager
     public void DrawFrameInfo()
     {
         float boxHeight = DebugManager.FrameTimes.Count * 20;
-        FillRectangle(Batch, new(Constants.NativeResolution.X - 190, 0, 190, (int)boxHeight), Color.Black * 0.8f);
-
-        DebugSb.Clear();
+        FrameTimeSb.Clear();
         foreach (var kv in FrameTimes)
         {
-            DebugSb.Append(kv.Key);
-            DebugSb.Append(": ");
-            DebugSb.AppendFormat("{0:0.0}ms", kv.Value);
-            DebugSb.Append('\n');
+            FrameTimeSb.Append(kv.Key);
+            FrameTimeSb.Append(": ");
+            FrameTimeSb.AppendFormat("{0:0.0}ms", kv.Value);
+            FrameTimeSb.Append('\n');
         }
 
-        Batch.DrawString(Arial, DebugSb.ToString(), new Vector2(Constants.NativeResolution.X - 180, 10), Color.White);
+        if (!DebugManager.FrameInfo) return;
+
+        FillRectangle(Batch, new(Constants.NativeResolution.X - 190, 0, 190, (int)boxHeight), Color.Black * 0.8f);
+        Batch.DrawString(Arial, FrameTimeSb.ToString(), new Vector2(Constants.NativeResolution.X - 180, 10), Color.White);
     }
     public void DrawTextInfo()
     {
-
         DebugSb.Clear();
         DebugSb.Append("FPS: ");
         DebugSb.AppendFormat("{0:0.0}", CacheDelta != 0 ? 1f / CacheDelta : 0);
@@ -147,6 +149,8 @@ public class EditorOverlayManager
         }
         DebugSb.Append("\nLevel: ");
         DebugSb.Append(LevelManager.Level.Path);
+
+        if (!DebugManager.TextInfo) return;
 
         FillRectangle(Batch, new(0, 0, 200, 150), Color.Black * 0.8f);
         Batch.DrawString(Arial, DebugSb.ToString(), new Vector2(10, 10), Color.White);
