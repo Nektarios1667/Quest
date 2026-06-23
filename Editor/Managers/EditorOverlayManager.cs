@@ -34,6 +34,30 @@ public class EditorOverlayManager
         if (RebuildMiniMapFlag)
             RebuildMiniMap();
     }
+    public void DrawTileOverlay(SpriteBatch spriteBatch, TileTypeID selection, Tile? mouseTile)
+    {
+        if (mouseTile is Stairs stair)
+            DrawBottomInfo(spriteBatch, selection, $"[Stairs] dest: '{stair.DestLevel}' @ {stair.Dest}");
+        else if (mouseTile is Door door)
+            DrawBottomInfo(spriteBatch, selection, $"[Door] key: {(door.Key == null ? "NUL" : $"'{door.Key.Name}' x{door.Key.Amount}")} consume: {door.ConsumeKey}");
+        else if (mouseTile is Chest chest)
+            DrawBottomInfo(spriteBatch, selection, $"[Chest] gen: '{chest.LootGenerator.FileName}' key: {(chest.Key == null ? "NUL" : $"'{chest.Key.Name}' x{chest.Key.Amount}")} consume: {chest.ConsumeKey}");
+        else if (mouseTile is Lamp lamp)
+            DrawBottomInfo(spriteBatch, selection, $"[Lamp] radius: {lamp.LightRadius}");
+        else if (mouseTile is DisplayCase displayCase)
+            DrawBottomInfo(spriteBatch, selection, $"[Display Case] item: {displayCase.Container.Items[0]?.Name} x{displayCase.Container.Items[0]?.Amount}");
+        else
+            DrawBottomInfo(spriteBatch, selection, $"[{mouseTile?.Type.Texture}]");
+    }
+    public void DrawBottomInfo(SpriteBatch spriteBatch, TileTypeID tileSelection, string text)
+    {
+        text = $"{tileSelection} | {text}";
+        Vector2 textSize = Arial.MeasureString(text);
+        Vector2 pos = new(Constants.Middle.X - textSize.X / 2, Constants.NativeResolution.Y - textSize.Y - 3);
+        spriteBatch.FillRectangle(new(pos - Vector2.One * 4, textSize + Vector2.One * 8), Color.Gray * 0.5f);
+        spriteBatch.DrawRectangle(new(pos - Vector2.One * 4, textSize + Vector2.One * 8), Color.Black * 0.5f);
+        spriteBatch.DrawString(Arial, text, pos, Color.Black);
+    }
     public void DrawBiomes()
     {
         Point start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;

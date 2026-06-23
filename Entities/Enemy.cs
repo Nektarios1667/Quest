@@ -120,7 +120,7 @@ public class Enemy : IEntity
     public virtual void Draw(GameManager gameManager)
     {
         Rectangle source = GetAnimationSource(Texture, GameManager.GameTime, duration: 0.5f);
-        DrawTexture(gameManager.Batch, Texture, Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, source: source, scale: Scale); //, origin: new(Size.X / Scale, Size.Y / Scale));
+        DrawTexture(gameManager.Batch, Texture, Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, source: source, scale: new(Scale)); //, origin: new(Size.X / Scale, Size.Y / Scale));
 
         DebugManager.DrawHitbox(gameManager.Batch, this);
         HealthBar.Draw(gameManager.Batch);

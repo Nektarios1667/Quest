@@ -20,7 +20,7 @@ public class Projectile : IEntity
         Texture = tex;
         Damage = damage;
         Speed = speed;
-        Size = size ?? (TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap).Scaled(Constants.ProjectileScale);
+        Size = size ?? (TextureManager.Metadata[Texture].Size / (TextureManager.Metadata[Texture].TileMap.ToVector2() * Constants.ProjectileScale).ToPoint());
         UID = UIDManager.Get(UIDCategory.Projectiles);
 
         // Update collision 60/s
@@ -37,7 +37,7 @@ public class Projectile : IEntity
     {
         Rectangle source = GetAnimationSource(Texture, GameManager.GameTime, duration: 0.5f);
         Vector2 texMiddle = Size.ToVector2() / Constants.ProjectileScale / 2; // Since the origin is the center (for rotation), we need to offset the position by half the size of the texture (times the scale)
-        DrawTexture(gameManager.Batch, Texture, Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle + (texMiddle * Constants.ProjectileScale).ToPoint(), source: source, origin: texMiddle, rotation: Direction, scale: Constants.ProjectileScale);
+        DrawTexture(gameManager.Batch, Texture, Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle + (texMiddle * Constants.ProjectileScale).ToPoint(), source: source, origin: texMiddle, rotation: Direction, scale: new(Constants.ProjectileScale));
         // Debug
         DebugManager.DrawHitbox(gameManager.Batch, this);
     }

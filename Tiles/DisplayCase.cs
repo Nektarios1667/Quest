@@ -19,7 +19,7 @@ public class DisplayCase : Tile, IContainer
 
         // Draw displayed item
         if (Container.Items[0] != null)
-            DrawTexture(gameManager.Batch, Container.Items[0]!.Texture, dest + Constants.TileHalfSize + new Point(0, (int)(Math.Sin(GameManager.GameTime) * 2)), scale: 3, origin: new Vector2(8, 8));
+            DrawTexture(gameManager.Batch, Container.Items[0]!.Texture, dest + Constants.TileHalfSize + new Point(0, (int)(Math.Sin(GameManager.GameTime) * 2)), scale: new(3), origin: new Vector2(8, 8));
     }
     public override void OnPlayerCollide(GameManager game, PlayerManager player)
     {

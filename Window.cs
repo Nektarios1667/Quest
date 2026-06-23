@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Quest;
 
-public class Window : Game
+public class Window : Game, IAdjustableWindow
 {
     readonly StringBuilder infoSb = new();
     readonly StringBuilder memoryDebugSb = new();
@@ -205,7 +205,7 @@ public class Window : Game
         // Draw overlays
         overlayManager.Draw(GraphicsDevice, gameManager, playerManager);
         playerManager.StatusArea.Draw(spriteBatch);
-        menuManager.Draw();
+        menuManager.Draw(spriteBatch);
 
         // Text info
         DebugManager.StartBenchmark("DebugText");

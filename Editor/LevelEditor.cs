@@ -3,10 +3,11 @@ using Quest.Editor.Generator;
 using Quest.Editor.Managers;
 using Quest.World;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Quest.Editor;
 
-public class LevelEditor : Game
+public class LevelEditor : Game, IAdjustableWindow
 {
     readonly StringBuilder memoryDebugSb = new();
     // Devices and managers
@@ -20,6 +21,9 @@ public class LevelEditor : Game
     private EditorOverlayManager editorOverlayManager = null!;
     private GUI gui = null!;
     private Matrix scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
+
+    // GUIs and menus
+    private GUI SettingsMenu = null!;
 
     // Editing
     private TileTypeID TileSelection;
@@ -64,10 +68,28 @@ public class LevelEditor : Game
             TargetElapsedTime = TimeSpan.FromSeconds(1d / SettingsManager.FPS);
         Logger.System("Initialized level editor window object.");
     }
+    public void SetVsync(bool enabled)
+    {
+        graphics.SynchronizeWithVerticalRetrace = enabled;
+        graphics.ApplyChanges();
+    }
+    public void SetResolution(int width, int height)
+    {
+        graphics.PreferredBackBufferWidth = width;
+        graphics.PreferredBackBufferHeight = height;
 
+        graphics.ApplyChanges();
+    }
+    public void SetFullscreen(bool enabled)
+    {
+        graphics.IsFullScreen = enabled;
+        graphics.ApplyChanges();
+    }
     protected override void Initialize()
     {
         base.Initialize();
+
+        StateManager.State = GameState.Editor;
     }
 
     protected override void LoadContent()
@@ -90,7 +112,11 @@ public class LevelEditor : Game
         StateManager.State = GameState.Editor;
         Logger.System("Initialized managers.");
 
-        // Gui
+        // Settings gui
+        SettingsMenu = SettingsManager.CreateSettingsMenu(this, this, spriteBatch, Content);
+        SettingsMenu.LoadContent(Content, "Images/Gui");
+
+        // Editor gui
         gui = new(this, spriteBatch, Arial);
         mouseMenu = new(gui, Point.Zero, new(100, 300), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         mouseMenu.AddItem("Pick", () => { TileSelection = mouseTile.Type.ID; Logger.Log($"Picked tile '{TileSelection}' @ {mouseCoord.X}, {mouseCoord.Y}."); }, []);
@@ -127,6 +153,7 @@ public class LevelEditor : Game
         mouseMenu.AddItem("Spawn", editorManager.SetSpawn, []);
         mouseMenu.AddItem("Tint", editorManager.SetTint, []);
         mouseMenu.AddItem("Generate", editorLevelManager.GenerateLevel, []);
+        mouseMenu.AddItem("Settings", () => StateManager.State = GameState.Settings, []);
         mouseMenu.AddItem("Exit", Exit, []);
         gui.AddWidget(mouseMenu);
 
@@ -177,6 +204,7 @@ public class LevelEditor : Game
 
         // Manager
         editorManager.Update(TileSelection, BiomeSelection, currentTool, delta, mouseTile, mouseCoord, mouseSelection, mouseSelectionCoord);
+        SettingsMenu.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
 
         // Change material
         if (InputManager.ScrolledUp || InputManager.BindPressed(InputAction.CycleToolNext))
@@ -192,39 +220,8 @@ public class LevelEditor : Game
             else if (currentTool == EditorTool.Biome) NumberTools.CycleDown(ref BiomeSelection);
         }
 
-        // Draw
-        if (InputManager.LMouseDown && !mouseMenu.Visible)
-        {
-            // Add tile
-            if (currentTool == EditorTool.Tile)
-            {
-                Tile tile;
-                if (TileSelection == TileTypeID.Stairs)
-                    tile = new Stairs(mouseCoord, "", Constants.MiddleCoord);
-                else
-                    tile = Tile.TileFromId(TileSelection, mouseCoord, "NUL");
-
-                editorManager.SetTile(tile);
-            }
-            // Add decal
-            else if (currentTool == EditorTool.Decal && InputManager.LMouseClicked)
-            {
-                // Check existing decal
-                Decal? current = levelManager.Level.Decals.TryGetValue(mouseCoord.ToByteCoord(), out var dec) ? dec : null;
-                bool alreadyThere = current != null && current.Type == DecalSelection;
-                if (current != null && current.Type != DecalSelection) levelManager.Level.Decals.Remove(mouseCoord.ToByteCoord()); // Remove current one
-
-                // Add
-                if (!alreadyThere && levelManager.Level.Decals.Count < 255)
-                    levelManager.Level.Decals[mouseCoord.ToByteCoord()] = LevelManager.DecalFromId(DecalSelection, mouseCoord);
-            }
-            // Set biome
-            else if (currentTool == EditorTool.Biome)
-            {
-                int idx = LevelManager.Flatten(mouseCoord);
-                levelManager.Level.Biome[idx] = BiomeSelection;
-            }
-        }
+        // Placing tiles
+        UpdateTilePlacing();
 
         // Edit options
         if (InputManager.BindPressed(InputAction.EditTile)) editorManager.EditTile();
@@ -233,7 +230,7 @@ public class LevelEditor : Game
         if (InputManager.RMouseDown) MouseSelect();
 
         // Pick
-        if (InputManager.MMouseClicked) PickTile();
+        if (InputManager.BindPressed(InputAction.PickTile)) PickTile();
         // Open file
         if (InputManager.BindPressed(InputAction.OpenLevel)) editorLevelManager.OpenLevelDialog();
         // Fill
@@ -329,7 +326,35 @@ public class LevelEditor : Game
         if (!DebugManager.ProgramInfo)
             editorOverlayManager.DrawMiniMap();
 
-        // Ghost tile
+        // Ghost tile cursor
+        DrawTileGhostCursor(mouseCoordDraw);
+
+        // Tile info
+        editorOverlayManager.DrawTileOverlay(spriteBatch, TileSelection, mouseTile);
+
+        // Gui
+        if (StateManager.State == GameState.Settings)
+        {
+            TextureManager.DrawTexture(spriteBatch, TextureID.MenuBackground, Point.Zero, scale: MenuManager.MenuBackgroundScale);
+            SettingsMenu.Draw();
+        } else
+        {
+            gui.Draw();
+        }
+
+        // Cursor
+        DrawTexture(spriteBatch, TextureID.CursorArrow, InputManager.MousePosition);
+
+        // Final
+        spriteBatch.End();
+        base.Draw(gameTime);
+    }
+    public void DrawTileGhostCursor(Point mouseCoordDraw)
+    {
+        // Check skip
+        if (StateManager.State != GameState.Editor) return;
+
+        // Tool ghosts
         if (currentTool == EditorTool.Tile)
         {
             TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), TileSelection.ToString());
@@ -346,31 +371,41 @@ public class LevelEditor : Game
             Vector2 textCenter = Arial.MeasureString(BiomeSelection.ToString()) / 2;
             spriteBatch.DrawString(Arial, BiomeSelection.ToString(), (mouseCoordDraw + Constants.TileHalfSize).ToVector2(), Color.Black, MathHelper.PiOver4, textCenter, 1.0f, SpriteEffects.None, 1.0f);
         }
+    }
+    public void UpdateTilePlacing()
+    {
+        // Check skip
+        if (!InputManager.LMouseDown || mouseMenu.Visible || StateManager.State != GameState.Editor) return;
 
+        // Add tile
+        if (currentTool == EditorTool.Tile)
+        {
+            Tile tile;
+            if (TileSelection == TileTypeID.Stairs)
+                tile = new Stairs(mouseCoord, "", Constants.MiddleCoord);
+            else
+                tile = Tile.TileFromId(TileSelection, mouseCoord, "NUL");
 
-        // Tile info
-        if (mouseTile is Stairs stair)
-            DrawBottomInfo($"[Stairs] dest: '{stair.DestLevel}' @ {stair.Dest}");
-        else if (mouseTile is Door door)
-            DrawBottomInfo($"[Door] key: {(door.Key == null ? "NUL" : $"'{door.Key.Name}' x{door.Key.Amount}")} consume: {door.ConsumeKey}");
-        else if (mouseTile is Chest chest)
-            DrawBottomInfo($"[Chest] gen: '{chest.LootGenerator.FileName}' key: {(chest.Key == null ? "NUL" : $"'{chest.Key.Name}' x{chest.Key.Amount}")} consume: {chest.ConsumeKey}");
-        else if (mouseTile is Lamp lamp)
-            DrawBottomInfo($"[Lamp] radius: {lamp.LightRadius}");
-        else if (mouseTile is DisplayCase displayCase)
-            DrawBottomInfo($"[Display Case] item: {displayCase.Container.Items[0]?.Name} x{displayCase.Container.Items[0]?.Amount}");
-        else
-            DrawBottomInfo($"[{mouseTile?.Type.Texture}]");
+            editorManager.SetTile(tile);
+        }
+        // Add decal
+        else if (currentTool == EditorTool.Decal && InputManager.LMouseClicked)
+        {
+            // Check existing decal
+            Decal? current = levelManager.Level.Decals.TryGetValue(mouseCoord.ToByteCoord(), out var dec) ? dec : null;
+            bool alreadyThere = current != null && current.Type == DecalSelection;
+            if (current != null && current.Type != DecalSelection) levelManager.Level.Decals.Remove(mouseCoord.ToByteCoord()); // Remove current one
 
-        // Gui
-        gui.Draw();
-
-        // Cursor
-        DrawTexture(spriteBatch, TextureID.CursorArrow, InputManager.MousePosition);
-
-        // Final
-        spriteBatch.End();
-        base.Draw(gameTime);
+            // Add
+            if (!alreadyThere && levelManager.Level.Decals.Count < 255)
+                levelManager.Level.Decals[mouseCoord.ToByteCoord()] = LevelManager.DecalFromId(DecalSelection, mouseCoord);
+        }
+        // Set biome
+        else if (currentTool == EditorTool.Biome)
+        {
+            int idx = LevelManager.Flatten(mouseCoord);
+            levelManager.Level.Biome[idx] = BiomeSelection;
+        }
     }
     public void PickTile()
     {
@@ -399,13 +434,5 @@ public class LevelEditor : Game
             throw new ArgumentOutOfRangeException(nameof(coord), "Coordinates are out of bounds of the level.");
         return levelManager.Level.Tiles[coord.X + coord.Y * Constants.MapSize.X];
     }
-    public void DrawBottomInfo(string text)
-    {
-        text = $"{TileSelection} | {text}";
-        Vector2 textSize = Arial.MeasureString(text);
-        Vector2 pos = new(Constants.Middle.X - textSize.X / 2, Constants.NativeResolution.Y - textSize.Y - 3);
-        spriteBatch.FillRectangle(new(pos - Vector2.One * 4, textSize + Vector2.One * 8), Color.Gray * 0.5f);
-        spriteBatch.DrawRectangle(new(pos - Vector2.One * 4, textSize + Vector2.One * 8), Color.Black * 0.5f);
-        spriteBatch.DrawString(Arial, text, pos, Color.Black);
-    }
+
 }

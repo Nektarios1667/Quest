@@ -27,12 +27,12 @@ public struct Loot : IEntity
     {
         Point pos = Position - CameraManager.Camera.ToPoint() + Constants.Middle;
         pos.Y += (int)(Math.Sin((GameManager.GameTime - Birth) * 2 % (Math.PI * 2)) * 6); // Bob up and down
-        DrawTexture(gameManager.Batch, Texture, pos, scale: 2);
+        DrawTexture(gameManager.Batch, Texture, pos, scale: new(2));
         // Draw stacks if multiple
         if (Item.Amount > 1)
-            DrawTexture(gameManager.Batch, Texture, pos + lootStackOffset, scale: 2);
+            DrawTexture(gameManager.Batch, Texture, pos + lootStackOffset, scale: new(2));
         if (Item.Amount > 2)
-            DrawTexture(gameManager.Batch, Texture, pos + lootStackOffset.Scaled(2), scale: 2);
+            DrawTexture(gameManager.Batch, Texture, pos + lootStackOffset.Scaled(2), scale: new(2));
         // Draw hitbox
         DebugManager.DrawHitbox(gameManager.Batch, this);
     }

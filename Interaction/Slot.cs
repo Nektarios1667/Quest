@@ -62,7 +62,7 @@ public class Slot : UIElement
 
         // Draw inventory items
         if (Item == null) return;
-        DrawTexture(ui.Batch, Item.Texture, Location + slotOffset, scale: itemScale);
+        DrawTexture(ui.Batch, Item.Texture, Location + slotOffset, scale: new(itemScale));
 
         // Amount text
         if (Item.Amount <= 1) return; // Don't draw amount text for single items

@@ -4,7 +4,15 @@ using MonoGUI;
 using System.Linq;
 
 namespace Quest.Managers;
+public interface IAdjustableWindow
+{
+    public bool IsFixedTimeStep { get;  set; }
+    public TimeSpan TargetElapsedTime { get;  set; }
+    public void SetVsync(bool vsytnc);
+    public void SetFullscreen(bool fullscreen);
+    public void SetResolution(int x, int y);
 
+}
 public static class SettingsManager
 {
     // Settings
@@ -28,9 +36,9 @@ public static class SettingsManager
     private static Checkbox vsyncCheckbox = null!;
     private static Checkbox fullscreenCheckbox = null!;
     private static Dropdown resolutionDropdown = null!;
-    public static GUI CreateSettingsMenu(Window window, SpriteBatch batch, ContentManager content)
+    public static GUI CreateSettingsMenu(IAdjustableWindow window, Game game, SpriteBatch batch, ContentManager content)
     {
-        settingsMenu = new(window, batch, PixelOperator);
+        settingsMenu = new(game, batch, PixelOperator);
         settingsMenu.LoadContent(content, "Images/Gui");
         Label settingsLabel = new(settingsMenu, new(Constants.Middle.X - 130, 50), Color.White, "Settings", PixelOperatorTitle);
         Button settingsBackButton = new(settingsMenu, new(20, 20), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, StateManager.RevertGameState, [], text: "Back", font: PixelOperator, border: 0);
@@ -115,7 +123,7 @@ public static class SettingsManager
         LoadSettings(window);
         return settingsMenu;
     }
-    private static void UpdateFPSLimit(Window window)
+    private static void UpdateFPSLimit(IAdjustableWindow window)
     {
         window.IsFixedTimeStep = SettingsManager.FPS <= 240;
         if (window.IsFixedTimeStep)
@@ -146,7 +154,7 @@ public static class SettingsManager
         // Write to settings.qkv in GameData/Persistent
         StateManager.WriteKeyValueFile("settings", settings);
     }
-    public static void LoadSettings(Window window)
+    public static void LoadSettings(IAdjustableWindow window)
     {
         // Read from settings.qkv in GameData/Persistent
         var settings = StateManager.ReadKeyValueFile("settings");

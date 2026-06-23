@@ -21,7 +21,7 @@ public static class Constants
     public static readonly Point TileMapDim = new(4, 4); // Dimensions of the connected texture map
     public static readonly Point MapSize = new(256, 256); // Map size in tiles - can not be above 256x256 because of save file
     public static readonly Point HalfMapSize = new(MapSize.X / 2, MapSize.Y / 2); // Half of the map size in tiles
-    public static readonly float TileSizeScale = TileSize.X / TilePixelSize.X; // Scale factor from tile pixel size to in-game tile size
+    public static readonly Vector2 TileSizeScale = (TileSize / TilePixelSize).ToVector2(); // Scale factor from tile pixel size to in-game tile size
     public static readonly Point[] NeighborTiles = [new(0, 1), new(1, 0), new(0, -1), new(-1, 0)];
     public static readonly Point[] DiagonalNeighborTiles = [new(1, 1), new(1, -1), new(-1, 1), new(-1, -1)];
     public static readonly Point[] AllNeighborTiles = [.. NeighborTiles.Concat(DiagonalNeighborTiles)]; // All 8 neighbor tiles
@@ -50,9 +50,10 @@ public static class Constants
     public static readonly Point MageHalfSizeX = new(MageSize.X / 2, 0); // Half size of the mage sprite in x pixels
     public static readonly Point MageHalfSizeY = new(0, MageSize.Y / 2); // Half size of the mage sprite in y pixels
     public static readonly Point MageItemShift = new(MageSize.X / 8, 0); // Used for center aligning mages
+
     public const float PlayerScale = 3;
-    public const int NPCScale = 4;
-    public const int ProjectileScale = 2;
+    public const float NPCScale = 4;
+    public const float ProjectileScale = 2;
 
     // Colors
     public static readonly Color NearBlack = new(85, 85, 85);

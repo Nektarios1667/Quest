@@ -641,12 +641,14 @@ public static class TextureManager
         }
         return tex;
     }
-    public static void DrawTexture(SpriteBatch batch, TextureID id, Point pos, Rectangle? source = null, Color? color = null, float rotation = 0f, Vector2? origin = null, float scale = 1, SpriteEffects effects = SpriteEffects.None)
+    public static void DrawTexture(SpriteBatch batch, TextureID id, Point pos, Rectangle? source = null, Color? color = null, float rotation = 0f, Vector2? origin = null, Vector2? scale = null, SpriteEffects effects = SpriteEffects.None)
     {
         Texture2D tex = GetTexture(id);
-        if (color == null) color = Color.White;
-        if (origin == null) origin = Vector2.Zero;
-        batch.Draw(tex, pos.ToVector2(), source, color.Value, rotation, origin.Value, scale, effects, 0);
+        color ??= Color.White;
+        origin ??= Vector2.Zero;
+        scale ??= Vector2.One;
+
+        batch.Draw(tex, pos.ToVector2(), source, color.Value, rotation, origin.Value, scale.Value, effects, 0);
     }
     public static void FillRectangle(SpriteBatch batch, Point pos, Point size, Color color)
     {

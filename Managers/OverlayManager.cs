@@ -87,7 +87,7 @@ public class OverlayManager
         {
             Item? item = playerManager.MouseSelection.Value.ui.BoundContainer?.Items[playerManager.MouseSelection.Value.idx];
             if (item != null)
-                DrawTexture(gameManager.Batch, item.Texture, InputManager.MousePosition - new Point(20, 20), scale: 2);
+                DrawTexture(gameManager.Batch, item.Texture, InputManager.MousePosition - new Point(20, 20), scale: new(2));
         }
 
         // Draw hover label

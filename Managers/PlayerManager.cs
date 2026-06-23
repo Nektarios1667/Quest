@@ -305,14 +305,14 @@ public class PlayerManager : IEntity
         // Draw player
         Point pos = Constants.Middle - Constants.MageHalfSize + CameraManager.CameraOffset.ToPoint();
         Rectangle source = GetAnimationSource(TextureID.BlueMage, GameManager.GameTime, duration: sourceRow == 0 ? .5f : .25f, row: sourceRow);
-        DrawTexture(gameManager.Batch, TextureID.BlueMage, pos, scale: Constants.PlayerScale, source: source);
+        DrawTexture(gameManager.Batch, TextureID.BlueMage, pos, scale: new(Constants.PlayerScale), source: source);
         // Draw equipped item
         if (EquippedItem != null)
         {
             bool left = PlayerDirection == Direction.Left;
             var leftShift = left ? new(TextureManager.Metadata[EquippedItem.Texture].Size.X * 2, 0) : Point.Zero;
             Point itemPos = Constants.Middle + CameraManager.CameraOffset.ToPoint() - leftShift + Constants.MageItemShift.Scaled(left ? -1 : 1);
-            DrawTexture(gameManager.Batch, EquippedItem.Texture, itemPos, scale: 2, effects: PlayerDirection == Direction.Left ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+            DrawTexture(gameManager.Batch, EquippedItem.Texture, itemPos, scale: new(2), effects: PlayerDirection == Direction.Left ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
         }
         // Hitbox
         DebugManager.DrawHitbox(gameManager.Batch, this);

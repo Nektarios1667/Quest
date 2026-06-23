@@ -8,6 +8,7 @@ namespace Quest.Managers;
 
 public class MenuManager
 {
+    public static Vector2 MenuBackgroundScale => Constants.NativeResolution.ToVector2() / TextureManager.Metadata[TextureID.MenuBackground].Size.ToVector2();
     public GUI MainMenu { get; private set; }
     public GUI SettingsMenu { get; private set; }
     public GUI CreditsMenu { get; private set; }
@@ -37,7 +38,7 @@ public class MenuManager
         MainMenu.Widgets = [startButton, continueButton, settingsButton, creditsButton, exitButton];
 
         // Settings Menu
-        SettingsMenu = SettingsManager.CreateSettingsMenu(window, batch, content);
+        SettingsMenu = SettingsManager.CreateSettingsMenu(window, window, batch, content);
 
         // Credits Menu
         CreditsMenu = new(window, batch, PixelOperator);
@@ -204,9 +205,6 @@ public class MenuManager
             case GameState.Game:
                 //DebugMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
-            case GameState.Loading:
-                DrawLoading();
-                break;
         }
 
         switch (StateManager.OverlayState)
@@ -219,75 +217,66 @@ public class MenuManager
 
         DebugManager.EndBenchmark("MenuUpdate");
     }
-    public void Draw()
+    public void Draw(SpriteBatch batch)
     {
         DebugManager.StartBenchmark("MenuDraw");
 
         switch (StateManager.State)
         {
             case GameState.MainMenu:
-                DrawMenu();
+                DrawMenu(batch);
                 break;
             case GameState.Settings:
-                DrawSettings();
+                DrawSettings(batch);
                 break;
             case GameState.Credits:
-                DrawCredits();
+                DrawCredits(batch);
                 break;
             case GameState.LevelSelect:
-                DrawLevelSelection();
+                DrawLevelSelection(batch);
                 break;
             case GameState.Game:
-                //DebugMenu.Draw();
+                //DebugMenu.Draw(batch);
                 break;
         }
 
         switch (StateManager.OverlayState)
         {
             case OverlayState.Pause:
-                DrawPauseMenu();
+                DrawPauseMenu(batch);
                 break;
         }
         DebugManager.EndBenchmark("MenuDraw");
     }
-    private void DrawMenu()
+    private void DrawMenu(SpriteBatch batch)
     {
 
-        Vector2 loc = Vector2.Zero - Vector2.Max(InputManager.MousePosition.ToVector2() / 50f, Vector2.Zero);
-        gameManager.Batch.Draw(Textures[TextureID.MenuBackground], loc, null, Color.White, 0f, Vector2.Zero, Constants.NativeResolution.ToVector2() / TextureManager.Metadata[TextureID.MenuBackground].Size.ToVector2() + Vector2.One * 0.3f, SpriteEffects.None, 0.0f);
+        TextureManager.DrawTexture(batch, TextureID.MenuBackground, Point.Zero, scale: MenuBackgroundScale);
         Vector2 logoCenter = new(Constants.Middle.X - TextureManager.Metadata[TextureID.QuestTitle].Size.X / 2, 20);
         gameManager.Batch.Draw(Textures[TextureID.QuestTitle], logoCenter, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.0f);
 
         MainMenu.Draw();
     }
-    private void DrawSettings()
+    private void DrawSettings(SpriteBatch batch)
     {
-        gameManager.Batch.Draw(Textures[TextureID.MenuBackground], new(0, 0), null, Color.White, 0f, Vector2.Zero, Constants.NativeResolution.ToVector2() / TextureManager.Metadata[TextureID.MenuBackground].Size.ToVector2(), SpriteEffects.None, 0.0f);
+        TextureManager.DrawTexture(batch, TextureID.MenuBackground, Point.Zero, scale: MenuBackgroundScale);
         gameManager.Batch.FillRectangle(new(Vector2.Zero, Constants.NativeResolution), Color.Black * 0.6f);
         SettingsMenu.Draw();
     }
-    private void DrawCredits()
+    private void DrawCredits(SpriteBatch batch)
     {
-        gameManager.Batch.Draw(Textures[TextureID.MenuBackground], new(0, 0), null, Color.White, 0f, Vector2.Zero, Constants.NativeResolution.ToVector2() / TextureManager.Metadata[TextureID.MenuBackground].Size.ToVector2(), SpriteEffects.None, 0.0f);
+        TextureManager.DrawTexture(batch, TextureID.MenuBackground, Point.Zero, scale: MenuBackgroundScale);
         gameManager.Batch.FillRectangle(new(Vector2.Zero, Constants.NativeResolution), Color.Black * 0.6f);
         CreditsMenu.Draw();
     }
-    private void DrawLevelSelection()
+    private void DrawLevelSelection(SpriteBatch batch)
     {
-        gameManager.Batch.Draw(Textures[TextureID.MenuBackground], new(0, 0), null, Color.White, 0f, Vector2.Zero, Constants.NativeResolution.ToVector2() / TextureManager.Metadata[TextureID.MenuBackground].Size.ToVector2(), SpriteEffects.None, 0.0f);
+        TextureManager.DrawTexture(batch, TextureID.MenuBackground, Point.Zero, scale: MenuBackgroundScale);
         LevelSelectMenu.Draw();
     }
-    private void DrawPauseMenu()
+    private void DrawPauseMenu(SpriteBatch batch)
     {
         gameManager.Batch.FillRectangle(new(Vector2.Zero, Constants.NativeResolution), Color.Black * 0.6f);
         PauseMenu.Draw();
-    }
-    private void DrawLoading()
-    {
-        gameManager.Batch.FillRectangle(new(Vector2.Zero, Constants.NativeResolution), Color.Black);
-        string loadingText = "Loading...";
-        Vector2 textSize = PixelOperatorTitle.MeasureString(loadingText);
-        Vector2 position = new((Constants.NativeResolution.X - textSize.X) / 2, (Constants.NativeResolution.Y - textSize.Y) / 2);
-        gameManager.Batch.DrawString(PixelOperatorTitle, loadingText, position, Color.White);
     }
 }

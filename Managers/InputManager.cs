@@ -105,10 +105,6 @@ public static class InputManager
         { InputAction.MoveDown,             new(Keys.S) },
         { InputAction.MoveLeft,             new(Keys.A) },
         { InputAction.MoveRight,            new(Keys.D) },
-        { InputAction.FreecamUp,            new(Keys.W) },
-        { InputAction.FreecamDown,          new(Keys.S) },
-        { InputAction.FreecamLeft,          new(Keys.A) },
-        { InputAction.FreecamRight,         new(Keys.D) },
         { InputAction.ToggleInventory,      new(Keys.E) },
         { InputAction.Hotbar1,              new(Keys.D1) },
         { InputAction.Hotbar2,              new(Keys.D2) },
@@ -117,6 +113,10 @@ public static class InputManager
         { InputAction.Hotbar5,              new(Keys.D5) },
         { InputAction.Hotbar6,              new(Keys.D6) },
         { InputAction.DropItem,             new(Keys.D) },
+        { InputAction.FreecamUp,            new(Keys.W) },
+        { InputAction.FreecamDown,          new(Keys.S) },
+        { InputAction.FreecamLeft,          new(Keys.A) },
+        { InputAction.FreecamRight,         new(Keys.D) },
         { InputAction.ToggleCollisionDebug, new(Keys.F1, [Keys.LeftControl]) },
         { InputAction.ToggleTextInfo,       new(Keys.F2, [Keys.LeftControl]) },
         { InputAction.ToggleFrameInfo,      new(Keys.F3, [Keys.LeftControl]) },
@@ -249,7 +249,7 @@ public static class InputManager
     {
         return BindDown(action) && !BindDown(action, keystate: LastKeyboardState, mousestate: LastMouseState);
     }
-    public static bool IsMouseDown(MouseButton button, MouseState? mousestate = null)
+    private static bool IsMouseDown(MouseButton button, MouseState? mousestate = null)
     {
         mousestate = mousestate ?? MouseState;
 
