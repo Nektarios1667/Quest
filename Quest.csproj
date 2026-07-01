@@ -52,6 +52,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="GameData\Persistent\" />
+	  <Folder Include="GameData\Worlds\TEST\levels\" />
 	</ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />
