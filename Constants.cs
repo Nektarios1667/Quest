@@ -51,6 +51,8 @@ public static class Constants
     public static readonly Point MageHalfSizeY = new(0, MageSize.Y / 2); // Half size of the mage sprite in y pixels
     public static readonly Point MageItemShift = new(MageSize.X / 8, 0); // Used for center aligning mages
 
+    public static readonly Point TileDrawPadding = new(10, 10); // Padding for drawing tiles off screen
+
     public const float PlayerScale = 3;
     public const float NPCScale = 4;
     public const float ProjectileScale = 2;

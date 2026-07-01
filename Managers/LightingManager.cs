@@ -140,10 +140,13 @@ public static class LightingManager
         if (LuxelSize.X == 0)
             LuxelSize = Constants.TileSize.Scaled(InvLightDivisions);
 
-        // Flood fill lighting                                                          one tile buffer at top
-        LightingStart = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize + PointTools.Up;
+        // Flood fill lighting                                                          one tile buffer at top          tile padding
+        LightingStart = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize + PointTools.Up - Constants.TileDrawPadding;
+        Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize + Constants.TileDrawPadding;
+
         LastLuxel = CameraManager.Camera.ToPoint() / Constants.TileSize.Scaled(InvLightDivisions);
-        Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
+
+        // Calculate grid size
         int tileWidth = end.X - LightingStart.X + 1;
         int tileHeight = end.Y - LightingStart.Y + 3; // Extra row ontop and below for smoothness
 

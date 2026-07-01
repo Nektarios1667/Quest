@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Quest.Utilities;
 
@@ -45,5 +46,14 @@ public static class ColorTools
         float b = color.B / 255f;
 
         return 0.2126f * r + 0.7152f * g + 0.0722f * b;
+    }
+    public static Color Add(Color color, Color add)
+    {
+        return new Color(
+            (byte)Math.Min(color.R + add.R, 255),
+            (byte)Math.Min(color.G + add.G, 255),
+            (byte)Math.Min(color.B + add.B, 255),
+            (byte)Math.Min(color.A + add.A, 255)
+        );
     }
 }

@@ -20,7 +20,7 @@ public static class SettingsManager
     public static Vector2 ScreenScale => ScreenResolution.ToVector2() / Constants.NativeResolution.ToVector2(); // Scale factor from native resolution to actual screen resolution
     public static bool Fullscreen { get; private set; } = false;
     public static int FPS { get; private set; } = 241; // >240 means unlimited
-    public static bool VSYNC { get; private set; } = false;
+    public static bool VSYNC { get; private set; } = true;
     public static float MusicVolume
     {
         get => MediaPlayer.Volume;

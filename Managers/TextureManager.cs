@@ -643,10 +643,16 @@ public static class TextureManager
     }
     public static void DrawTexture(SpriteBatch batch, TextureID id, Point pos, Rectangle? source = null, Color? color = null, float rotation = 0f, Vector2? origin = null, Vector2? scale = null, SpriteEffects effects = SpriteEffects.None)
     {
+        // Check if the position is outside the screen bounds
+        if (pos.X > Constants.NativeResolution.X || pos.Y > Constants.NativeResolution.Y) return;
+
         Texture2D tex = GetTexture(id);
         color ??= Color.White;
         origin ??= Vector2.Zero;
         scale ??= Vector2.One;
+
+        // Check if the position is outside the texture bounds
+        if (pos.X < (int)(-tex.Width * scale.Value.X) || pos.Y < (int)(-tex.Height * scale.Value.Y)) return;
 
         batch.Draw(tex, pos.ToVector2(), source, color.Value, rotation, origin.Value, scale.Value, effects, 0);
     }

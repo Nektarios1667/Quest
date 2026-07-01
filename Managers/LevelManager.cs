@@ -145,10 +145,10 @@ public class LevelManager
         if (Level.Tiles == null || Level.Tiles.Length == 0) return;
 
         // Get bounds
-        Point start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
-        Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
+        Point start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize - Constants.TileDrawPadding;
+        Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize + Constants.TileDrawPadding;
 
-        // Iterate
+        // Iterate through each tile in the bounds
         for (int y = start.Y; y <= end.Y; y++)
         {
             for (int x = start.X; x <= end.X; x++)

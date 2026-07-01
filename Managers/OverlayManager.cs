@@ -29,7 +29,7 @@ public class OverlayManager
             playerManager.InventoryUI.OnSlotDrop += (_, _) => MarkUpdateLighting();
             playerManager.InventoryUI.OnSlotItemChange += (_, _) => MarkUpdateLighting();
         }
-        TimerManager.SetTimer("LightingUpdate", 1f, MarkUpdateLighting, int.MaxValue);
+        //TimerManager.SetTimer("LightingUpdate", 3f, MarkUpdateLighting, int.MaxValue);
         CameraManager.TileChange += (_, _) => MarkUpdateLighting();
         CameraManager.CameraMove += (_, newCam) =>
         {
@@ -156,16 +156,16 @@ public class OverlayManager
     public void DrawLighting(GameManager gameManager)
     {
 
-        DebugManager.StartBenchmark("Lighting");
+        DebugManager.StartBenchmark("LightingCalculations");
         if (UpdateLighting)
             LightingManager.RecalculateLighting(gameManager);
-        DebugManager.EndBenchmark("Lighting");
+        DebugManager.EndBenchmark("LightingCalculations");
 
         DebugManager.StartBenchmark("DrawLighting");
-        // Draw shadows
-        for (int y = 0; y < LM.LightGrid.Height; y++)
+        // Draw lighting - do not draw the offscreen lighting
+        for (int y = Constants.TileDrawPadding.Y; y < LM.LightGrid.Height - Constants.TileDrawPadding.Y; y++)
         {
-            for (int x = 0; x < LM.LightGrid.Width; x++)
+            for (int x = Constants.TileDrawPadding.X; x < LM.LightGrid.Width - Constants.TileDrawPadding.X; x++)
             {
                 // Light
                 float light = LM.LightGrid.Grid[x, y].LightLevel;
@@ -173,15 +173,17 @@ public class OverlayManager
                 float intensity = LM.LightToIntensityCache[intensityLookup];
 
                 // Skip full light
-                if (intensity >= 0.99f)
+                if (intensity >= 0.98f)
                     continue;
 
                 // Draw
                 Rectangle rect = new((new Point(x, y) + LM.LightingStart.Scaled(LM.LightDivisions)) * LM.LuxelSize + Constants.Middle - CameraManager.Camera.ToPoint(), LM.LuxelSize);
-                gameManager.Batch.FillRectangle(rect, gameManager.LevelManager.SkyColor * (1 - intensity));
+                Color color = ColorTools.Add(
+                    gameManager.LevelManager.SkyColor * (1 - intensity),
+                    LM.BiomeColors[x / LM.LightDivisions, y / LM.LightDivisions] * (1 - intensity)
+                );
 
-                // Biome
-                gameManager.Batch.FillRectangle(rect, LM.BiomeColors[x / LM.LightDivisions, y / LM.LightDivisions] * (1 - intensity));
+                gameManager.Batch.FillRectangle(rect, color);
             }
         }
 
