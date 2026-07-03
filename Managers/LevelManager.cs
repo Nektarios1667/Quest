@@ -213,18 +213,16 @@ public class LevelManager
         // MiniMap
         gameManager.OverlayManager.RefreshMiniMap();
 
-        // Close old QuillSciprs
+        // Close old QuillScripts
         Interpreter.ClearScripts();
-
-        // Run
-        LevelLoaded?.Invoke(Level.Path);
         Level.RunScripts();
 
         // Spawn
         CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
         CameraManager.Camera = CameraManager.CameraDest;
-        CameraManager.Update(0); // Ensure in bounds
+        CameraManager.Update(0); // Ensure camera in bounds
 
+        LevelLoaded?.Invoke(Level.Path);
         gameManager.OverlayManager.MarkUpdateLighting();
 
         return true;

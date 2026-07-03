@@ -156,10 +156,8 @@ public class OverlayManager
     public void DrawLighting(GameManager gameManager)
     {
 
-        DebugManager.StartBenchmark("LightingCalculations");
         if (UpdateLighting)
             LightingManager.RecalculateLighting(gameManager);
-        DebugManager.EndBenchmark("LightingCalculations");
 
         DebugManager.StartBenchmark("DrawLighting");
         // Draw lighting - do not draw the offscreen lighting

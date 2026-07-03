@@ -134,6 +134,8 @@ public static class LightingManager
 
     public static void RecalculateLighting(GameManager gameManager)
     {
+        DebugManager.StartBenchmark("LightingCalculations");
+
         gameManager.OverlayManager.UpdateLighting = false;
 
         // Precomputations
@@ -200,5 +202,7 @@ public static class LightingManager
                 BiomeColors[x, y] = gameManager.LevelManager.GetWeatherColor(gameManager, worldLoc, blend);
             }
         }
+
+        DebugManager.EndBenchmark("LightingCalculations");
     }
 }

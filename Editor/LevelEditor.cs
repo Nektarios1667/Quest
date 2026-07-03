@@ -13,7 +13,7 @@ public class LevelEditor : Game, IAdjustableWindow
     private readonly GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch = null!;
     private GameManager gameManager = null!;
-    private OverlayManager uiManager = null!;
+    private OverlayManager overlayManager = null!;
     private LevelManager levelManager = null!;
     private EditorManager editorManager = null!;
     private EditorLevelManager editorLevelManager = null!;
@@ -103,8 +103,8 @@ public class LevelEditor : Game, IAdjustableWindow
         // Managers
         levelGenerator = new(42, 1f / 64);
         levelManager = new();
-        uiManager = new(null);
-        gameManager = new(Content, spriteBatch, levelManager, uiManager, null);
+        overlayManager = new(null);
+        gameManager = new(Content, spriteBatch, levelManager, overlayManager, null);
         editorManager = new(gameManager);
         editorLevelManager = new(gameManager, levelGenerator);
         editorOverlayManager = new(gameManager, spriteBatch, GraphicsDevice);
@@ -282,7 +282,7 @@ public class LevelEditor : Game, IAdjustableWindow
         TimerManager.Update(gameManager);
         gameManager.Update(delta);
         levelManager.Update(gameManager);
-        uiManager.Update(gameManager, null);
+        overlayManager.Update(gameManager, null);
         editorOverlayManager.Update();
 
         // Final
@@ -299,7 +299,7 @@ public class LevelEditor : Game, IAdjustableWindow
 
         // Draw game
         levelManager.Draw(gameManager);
-        uiManager.Draw(GraphicsDevice, gameManager, null);
+        overlayManager.Draw(GraphicsDevice, gameManager, null);
 
         // Render biome markers
         DebugManager.StartBenchmark("DrawBiomes");
