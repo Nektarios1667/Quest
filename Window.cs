@@ -22,7 +22,7 @@ public class Window : Game, IAdjustableWindow
 
     // Time
     private float delta;
-    private Dictionary<string, double> frameTimes = [];
+    private Dictionary<string, float> frameTimes = [];
 
     // Textures
     public Texture2D CursorArrow { get; private set; } = null!;
@@ -295,6 +295,8 @@ public class Window : Game, IAdjustableWindow
         infoSb.Clear();
         infoSb.Append("FPS: ");
         infoSb.AppendFormat("{0:0.0}", cacheDelta != 0 ? 1f / cacheDelta : 0);
+        infoSb.Append("\nFrame time: ");
+        infoSb.AppendFormat("{0:0.0} ms", cacheDelta * 1000);
         infoSb.Append("\nGameTime: ");
         infoSb.AppendFormat("{0:0.00}", GameManager.GameTime);
         infoSb.Append("\nDayTime: ");
@@ -350,7 +352,7 @@ public class Window : Game, IAdjustableWindow
         if (debugUpdateTime >= .5)
         {
             cacheDelta = delta;
-            frameTimes = new Dictionary<string, double>(DebugManager.FrameTimes);
+            frameTimes = new(DebugManager.FrameTimes);
             debugUpdateTime = 0;
         }
         // Background
@@ -360,7 +362,7 @@ public class Window : Game, IAdjustableWindow
         int start = 0;
         int c = 0;
         FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 310, Constants.NativeResolution.Y - 40, 300, 25), Color.White);
-        foreach (KeyValuePair<string, double> process in frameTimes)
+        foreach (var process in frameTimes)
         {
             spriteBatch.DrawString(Arial, process.Key, new(Constants.NativeResolution.X - Arial.MeasureString(process.Key).X - 5, Constants.NativeResolution.Y - 20 * c - 60), colors[c]);
             FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 310 + start, Constants.NativeResolution.Y - 40, (int)(process.Value / (cacheDelta * 1000) * 300), 25), colors[c]);

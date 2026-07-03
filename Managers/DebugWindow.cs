@@ -21,7 +21,7 @@ public partial class DebugWindow : Form
             action();
     }
 
-    public void SetFrameTimes(IEnumerable<(string Name, double Time)> frameTimes)
+    public void SetFrameTimes(IEnumerable<(string Name, float Time)> frameTimes)
     {
         RunOnUI(() =>
         {

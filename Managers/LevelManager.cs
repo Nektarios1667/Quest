@@ -222,9 +222,11 @@ public class LevelManager
         CameraManager.Camera = CameraManager.CameraDest;
         CameraManager.Update(0); // Ensure camera in bounds
 
-        LevelLoaded?.Invoke(Level.Path);
+        // Lighting
+        LightingManager.ClearLights();
         gameManager.OverlayManager.MarkUpdateLighting();
 
+        LevelLoaded?.Invoke(Level.Path);
         return true;
     }
     public bool LoadLevel(GameManager gameManager, string name)
@@ -282,6 +284,9 @@ public class LevelManager
         foreach (Enemy enemy in level.Enemies.Values)
             enemy.Dispose();
         UIDManager.ReleaseAll(UIDCategory.Items);
+
+        // Stop Quill scripts
+        Interpreter.ClearScripts();
 
         // Remove
         Levels.Remove(level);

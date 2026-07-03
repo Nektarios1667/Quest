@@ -20,7 +20,7 @@ public class EditorOverlayManager
     private readonly StringBuilder DebugSb;
     private readonly StringBuilder FrameTimeSb;
     private float CacheDelta;
-    private Dictionary<string, double> FrameTimes = [];
+    private Dictionary<string, float> FrameTimes = [];
     private RenderTarget2D Minimap = null!;
     private bool RebuildMiniMapFlag = true;
     public EditorOverlayManager(GameManager gameManager, SpriteBatch batch, GraphicsDevice graphics)
@@ -164,7 +164,7 @@ public class EditorOverlayManager
         int start = 0;
         int c = 0;
         FillRectangle(Batch, new(Constants.NativeResolution.X - 310, Constants.NativeResolution.Y - 40, 300, 25), Color.White);
-        foreach (KeyValuePair<string, double> process in FrameTimes)
+        foreach (var process in FrameTimes)
         {
             Batch.DrawString(Arial, process.Key, new Vector2(Constants.NativeResolution.X - Arial.MeasureString(process.Key).X - 5, Constants.NativeResolution.Y - 20 * c - 60), FrameTimeColors[c]);
             FillRectangle(Batch, new Rectangle(Constants.NativeResolution.X - 310 + start, Constants.NativeResolution.Y - 40, (int)(process.Value / (CacheDelta * 1000) * 300), 25), FrameTimeColors[c]);

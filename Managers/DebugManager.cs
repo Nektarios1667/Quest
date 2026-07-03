@@ -6,7 +6,7 @@ namespace Quest.Managers;
 public static class DebugManager
 {
     public static Stopwatch Watch { get; private set; } = new();
-    public static Dictionary<string, double> FrameTimes { get; private set; } = [];
+    public static Dictionary<string, float> FrameTimes { get; private set; } = [];
     private static readonly Dictionary<string, float> benchmarkTimes = [];
     public static bool CollisionDebug { get; set; } = false;
     public static bool TextInfo { get; set; } = false;
@@ -16,7 +16,7 @@ public static class DebugManager
     public static bool DrawHitboxes { get; set; } = false;
     public static bool ProgramInfo { get; set; } = false;
     private static DebugWindow DebugWindow { get; set; } = null!;
-    private static List<string> Logs { get; set; } = new();
+    private static List<string> Logs { get; set; } = [];
     public static List<string> GetLogs() => Logs;
     static DebugManager()
     {
@@ -26,6 +26,7 @@ public static class DebugManager
 
     public static void Update(string infobox = "", IEnumerable<string>? memoryInfobox = null)
     {
+        // Exit
         if (InputManager.BindPressed(InputAction.ForceError))
             Logger.Error("Forced error caused by pressing keybind.", exit: true);
 

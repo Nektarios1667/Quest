@@ -131,6 +131,7 @@ public static class LightingManager
     }
     public static void SetLight(string name, Point pos, float tileSize, bool singleFrame = false) => Lights[name] = new(pos, (int)(tileSize * Constants.TileSize.X), singleFrame);
     public static void RemoveLight(string name) => Lights.Remove(name);
+    public static void ClearLights() => Lights.Clear();
 
     public static void RecalculateLighting(GameManager gameManager)
     {
