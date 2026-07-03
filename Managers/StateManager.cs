@@ -562,7 +562,7 @@ public static class StateManager
         Directory.CreateDirectory("GameData/Persistent");
         if (!File.Exists($"GameData/Persistent/{name}.qkv"))
         {
-            Logger.Error("Quest Key Value file does not exist.");
+            Logger.Error($"Quest Key Value file '{name}.qkv' not found in GameData/Persistent.");
             return [];
         }
 

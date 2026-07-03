@@ -116,7 +116,10 @@ public class MenuManager
     public void RefreshWorldList()
     {
         worlds.Items.Clear();
-        worlds.AddItems([.. Directory.GetDirectories("GameData\\Worlds").Select(d => d.Split('\\')[^1])]);
+        if (Directory.Exists("GameData/Worlds"))
+            worlds.AddItems([.. Directory.GetDirectories("GameData/Worlds").Select(d => d.Split('\\')[^1])]);
+        else
+            Logger.Error("Worlds directory not found. Please ensure that the 'GameData/Worlds' directory exists.");
     }
     public void DeleteSelectedSave()
     {

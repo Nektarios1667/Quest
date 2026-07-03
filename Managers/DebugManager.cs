@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using ScottPlot.AxisRules;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Quest.Managers;
@@ -16,6 +17,8 @@ public static class DebugManager
     public static bool DrawHitboxes { get; set; } = false;
     public static bool ProgramInfo { get; set; } = false;
     private static DebugWindow DebugWindow { get; set; } = null!;
+    private static List<string> Logs { get; set; } = new();
+    public static List<string> GetLogs() => Logs;
     static DebugManager()
     {
         DebugWindow = new DebugWindow();
@@ -24,6 +27,9 @@ public static class DebugManager
 
     public static void Update(string infobox = "", IEnumerable<string>? memoryInfobox = null)
     {
+        if (InputManager.BindPressed(InputAction.ForceError))
+            Logger.Error("Forced error caused by pressing keybind.", exit: true);
+
         // Debug toggles
         if (InputManager.BindPressed(InputAction.ToggleCollisionDebug))
         {
@@ -70,7 +76,11 @@ public static class DebugManager
         // Updates
         UpdateDebugWindow(infobox, memoryInfobox ?? []);
     }
-    public static void Log(string message) => DebugWindow?.AddLog(message);
+    public static void Log(string message)
+    {
+        Logs.Add(message);
+        DebugWindow?.AddLog(message);
+    }
     public static void StartBenchmark(string name)
     {
         benchmarkTimes[name] = (float)Watch.Elapsed.TotalMilliseconds;

@@ -33,6 +33,7 @@ public enum InputAction
     ToggleProgramInfo,
     OpenCommandWindow,
     OpenDebugWindow,
+    ForceError,
 
     // Editor
     FastMove,
@@ -126,6 +127,7 @@ public static class InputManager
         { InputAction.ToggleProgramInfo,    new(Keys.F7, [Keys.LeftControl]) },
         { InputAction.OpenCommandWindow,    new(Keys.OemTilde, [Keys.LeftControl, Keys.LeftShift]) },
         { InputAction.OpenDebugWindow,      new(Keys.F8, [Keys.LeftControl]) },
+        { InputAction.ForceError,           new(Keys.Delete, [Keys.LeftControl, Keys.LeftShift]) },
 
         // Editor
         { InputAction.FastMove,             new(Keys.LeftAlt) },

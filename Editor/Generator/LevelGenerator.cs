@@ -39,19 +39,28 @@ public class LevelGenerator
         Noise.SetFrequency(freq);
 
         // Read each structure
-        foreach (string file in Directory.GetFiles("GameData/Structures", "*.qst"))
+        if (Directory.Exists("GameData/Structures"))
         {
-            string name = System.IO.Path.GetFileNameWithoutExtension(file);
-            Structures[name] = ReadStructure(file);
-        }
+            foreach (string file in Directory.GetFiles("GameData/Structures", "*.qst"))
+            {
+                string name = System.IO.Path.GetFileNameWithoutExtension(file);
+                Structures[name] = ReadStructure(file);
+            }
+        } else
+            Logger.Error("Directory 'GameData/Structures' does not exist. No structures will be loaded.");
 
         // Read each terrain preset
-        foreach (string file in Directory.GetFiles("GameData/Terrain", "*.qtr"))
+        if (Directory.Exists("GameData/Terrain"))
         {
-            string name = System.IO.Path.GetFileNameWithoutExtension(file);
-            Terrains[name] = ReadTerrainPreset(file);
+            foreach (string file in Directory.GetFiles("GameData/Terrain", "*.qtr"))
+            {
+                string name = System.IO.Path.GetFileNameWithoutExtension(file);
+                Terrains[name] = ReadTerrainPreset(file);
+            }
+            Terrain = Terrains["Islands"];
         }
-        Terrain = Terrains["Islands"];
+        else
+            Logger.Error("Directory 'GameData/Terrain' does not exist. No terrain presets will be loaded.");
     }
 
     public float GetNormNoise(int x, int y)

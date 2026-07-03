@@ -1,10 +1,13 @@
-﻿namespace Quest.Utilities;
+﻿using System.IO;
+
+namespace Quest.Utilities;
 
 public static class Logger
 {
     private static readonly List<string> MessageLevels = ["Input", "System", "Log", "Warning", "Error"];
     private static readonly List<ConsoleColor> MessageColors = [ConsoleColor.Cyan, ConsoleColor.Blue, ConsoleColor.Green, ConsoleColor.Yellow, ConsoleColor.Red];
     private static string Timestamp => DateTime.Now.ToString("HH:mm:ss.fff");
+    public static List<string> Logs { get; private set; } = new();
     public static void CreateLevel(string levelName, ConsoleColor color)
     {
         if (!MessageLevels.Contains(levelName))
@@ -69,10 +72,6 @@ public static class Logger
         Console.ForegroundColor = ConsoleColor.White; // Reset color
         return Console.ReadLine() ?? "";
     }
-    public static void Print(string message)
-    {
-        Console.WriteLine(message);
-    }
     public static void System(string message)
     {
         DebugManager.Log($"({Timestamp}) [System] {message}");
@@ -83,7 +82,7 @@ public static class Logger
     }
     public static void Log(string message)
     {
-        DebugManager.Log($"({Timestamp}) [System] {message}");
+        DebugManager.Log($"({Timestamp}) [Log] {message}");
 
         if (!DebugManager.LogInfo) return; // Skip logging if not enabled
 
@@ -93,7 +92,7 @@ public static class Logger
     }
     public static void Warning(string message)
     {
-        DebugManager.Log($"({Timestamp}) [System] {message}");
+        DebugManager.Log($"({Timestamp}) [Warning] {message}");
 
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Warning")];
         Console.WriteLine($"({Timestamp}) [Warning] {message}");
@@ -101,11 +100,16 @@ public static class Logger
     }
     public static void Error(string message, bool exit = false)
     {
-        DebugManager.Log($"({Timestamp}) [System] {message}");
+        DebugManager.Log($"({Timestamp}) [Error] {message}");
 
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Error")];
         Console.WriteLine($"({Timestamp}) [Error] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color
-        if (exit) Environment.Exit(1);
+        if (exit)
+        {
+            Directory.CreateDirectory("Logs");
+            File.WriteAllText($"Logs/error_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.log", string.Join("\n", DebugManager.GetLogs()));
+            Environment.Exit(1);
+        }
     }
 }
