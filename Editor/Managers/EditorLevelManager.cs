@@ -195,6 +195,10 @@ public class EditorLevelManager
             Logger.Error("Invalid level name. Use format 'WorldName/LevelName'.");
             return;
         }
+        // Autocomplete 'world/' to 'world/world'
+        if (filename.EndsWith('/'))
+            filename = $"{filename[..^1]}/{filename[..^1]}";
+
         GameManager.LevelManager.ReadLevel(GameManager, filename, reload: true);
         GameManager.LevelManager.LoadLevel(GameManager, filename);
 

@@ -1,6 +1,6 @@
 namespace Quest.Tiles;
 
-public class Lava : Tile
+public class Lava : Tile, IDynamicTile
 {
     public Lava(Point location) : base(location, TileTypeID.Lava)
     { }

@@ -201,6 +201,7 @@ public static class TextureManager
     }
     private static readonly List<string> errors = [];
     public static Dictionary<TextureID, Texture2D> Textures { get; private set; } = [];
+    public static Texture2D NullTexture { get; private set; } = null!;
     public static Dictionary<TextureID, Metadata> Metadata { get; private set; } = [];
     public static TextureID[] CharacterTextures { get; private set; } = [];
     public static TextureID[] ProjectileTextures { get; private set; } = [];
@@ -608,9 +609,13 @@ public static class TextureManager
                 Logger.System($"Metadata for texture '{kv.Key}' successfully loaded.");
         Logger.System($"Successfully loaded {Metadata.Count}/{Textures.Count} texture Metadata.");
 
+        // Null texture
+        NullTexture = Textures[TextureID.Null];
+
         // Generate characters
         CharacterTextures = [.. Textures.Where(kv => Metadata[kv.Key].Type == "character").Select(kv => kv.Key)];
         ProjectileTextures = [.. Textures.Where(kv => Metadata[kv.Key].Type == "projectile").Select(kv => kv.Key)];
+
 
         // Fonts
         PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");
@@ -632,8 +637,8 @@ public static class TextureManager
     }
     public static Texture2D GetTexture(TextureID id)
     {
-        Texture2D tex = Textures.GetValueOrDefault(id, Textures[TextureID.Null]);
-        if (tex == Textures[TextureID.Null] && !errors.Contains($"getfail-{id}"))
+        Texture2D? tex = Textures.GetValueOrDefault(id, NullTexture);
+        if (tex == NullTexture && !errors.Contains($"getfail-{id}"))
         {
             Logger.Error($"Texture with name '{id}' not found.");
             errors.Add($"getfail-{id}");
@@ -643,17 +648,24 @@ public static class TextureManager
     }
     public static void DrawTexture(SpriteBatch batch, TextureID id, Point pos, Rectangle? source = null, Color? color = null, float rotation = 0f, Vector2? origin = null, Vector2? scale = null, SpriteEffects effects = SpriteEffects.None)
     {
-        // Check if the position is outside the screen bounds
-        if (pos.X > Constants.NativeResolution.X || pos.Y > Constants.NativeResolution.Y) return;
+        DebugManager.IncrStat(Stats.DrawCalls);
+
+        // Fill in default values for optional parameters
+        color ??= Color.White;
+        scale ??= Vector2.One;
+        origin ??= Vector2.Zero;
 
         Texture2D tex = GetTexture(id);
-        color ??= Color.White;
-        origin ??= Vector2.Zero;
-        scale ??= Vector2.One;
 
-        // Check if the position is outside the texture bounds
-        if (pos.X < (int)(-tex.Width * scale.Value.X) || pos.Y < (int)(-tex.Height * scale.Value.Y)) return;
+        // Check if the position is outside the screen bounds
+        if (DebugManager.Culling)
+        {
+            Rectangle texRect = new(pos - (origin.Value * scale.Value).ToPoint(), tex.Bounds.Size * scale.Value.ToPoint());
+            if (!Constants.WindowRect.Intersects(texRect)) return;
+        }
 
+        // Draw
+        DebugManager.IncrStat(Stats.UnculledDrawCalls);
         batch.Draw(tex, pos.ToVector2(), source, color.Value, rotation, origin.Value, scale.Value, effects, 0);
     }
     public static void FillRectangle(SpriteBatch batch, Point pos, Point size, Color color)

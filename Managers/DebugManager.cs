@@ -1,10 +1,20 @@
-﻿using System.Diagnostics;
+﻿using ScottPlot.AxisRules;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Quest.Managers;
 
+public enum Stats
+{
+    DrawCalls,
+    UnculledDrawCalls,
+}
+
 public static class DebugManager
 {
+    // Stats
+    public static readonly Dictionary<Stats, int> Stats = [];
+    // Debugging
     public static Stopwatch Watch { get; private set; } = new();
     public static Dictionary<string, float> FrameTimes { get; private set; } = [];
     private static readonly Dictionary<string, float> benchmarkTimes = [];
@@ -15,6 +25,7 @@ public static class DebugManager
     public static bool FrameBar { get; set; } = false;
     public static bool DrawHitboxes { get; set; } = false;
     public static bool ProgramInfo { get; set; } = false;
+    public static bool Culling { get; set; } = true;
     private static DebugWindow DebugWindow { get; set; } = null!;
     private static List<string> Logs { get; set; } = [];
     public static List<string> GetLogs() => Logs;
@@ -22,10 +33,18 @@ public static class DebugManager
     {
         DebugWindow = new DebugWindow();
         DebugWindow.Show();
+
+        foreach (var stat in Enum.GetValues<Stats>())
+            Stats[stat] = 0;
     }
 
     public static void Update(string infobox = "", IEnumerable<string>? memoryInfobox = null)
     {
+        DebugManager.StartBenchmark("DebugUpdates");
+
+        foreach (var stat in Enum.GetValues<Stats>())
+            Stats[stat] = 0;
+
         // Exit
         if (InputManager.BindPressed(InputAction.ForceError))
             Logger.Error("Forced error caused by pressing keybind.", exit: true);
@@ -72,15 +91,24 @@ public static class DebugManager
                 Logger.System("Opened Debug Window");
             DebugWindow.Show();
         }
+        if (InputManager.BindPressed(InputAction.ToggleCulling))
+        {
+            Culling = !Culling;
+            Logger.System($"Culling set to: {Culling}");
+        }
 
         // Updates
         UpdateDebugWindow(infobox, memoryInfobox ?? []);
+
+        DebugManager.EndBenchmark("DebugUpdates");
     }
     public static void Log(string message)
     {
         Logs.Add(message);
         DebugWindow?.AddLog(message);
     }
+    public static void IncrStat(Stats stat) => Stats[stat]++;
+    public static int Stat(Stats stat) => Stats[stat];
     public static void StartBenchmark(string name)
     {
         benchmarkTimes[name] = (float)Watch.Elapsed.TotalMilliseconds;

@@ -74,11 +74,13 @@ public class LevelManager
         // Dynamic lighting
         DebugManager.StartBenchmark("LootLighting");
         foreach (Loot loot in Level.Loot)
+        {
             if (loot.Item.Type == ItemTypes.Lantern)
             {
                 Point loc = loot.Position - CameraManager.Camera.ToPoint() + Constants.Middle + TextureManager.Metadata[loot.Texture].Size;
                 LightingManager.SetLight($"Loot_{loot.UID}", loc, 2);
             }
+        }
         DebugManager.EndBenchmark("LootLighting");
 
         // Weather sounds
@@ -144,16 +146,25 @@ public class LevelManager
         DebugManager.StartBenchmark("TileDraws");
         if (Level.Tiles == null || Level.Tiles.Length == 0) return;
 
-        // Get bounds
-        Point start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize - Constants.TileDrawPadding;
-        Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize + Constants.TileDrawPadding;
+        // Get bounds - padding start includes the padding area, while screen start is the area that is actually visible on screen
+        Point paddingStart = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize - Constants.TileDrawPadding;
+        Point paddingEnd = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize + Constants.TileDrawPadding;
+        Point screenStart = paddingStart + Constants.TileDrawPadding;
+        Point screenEnd = paddingEnd - Constants.TileDrawPadding;
 
-        // Iterate through each tile in the bounds
-        for (int y = start.Y; y <= end.Y; y++)
+        // Iterate through each tile in the padded bounds
+        for (int y = paddingStart.Y; y <= paddingEnd.Y; y++)
         {
-            for (int x = start.X; x <= end.X; x++)
+            for (int x = paddingStart.X; x <= paddingEnd.X; x++)
             {
-                GetTile(x, y)?.Draw(gameManager);
+                // Get tile
+                var tile = Level.Tiles[x + y * Constants.MapSize.X];
+                if (tile == null) continue;
+
+                // Cull static offscreen tiles - either it has to be on screen, or a dynamic tile e.g. lamp that emits light even offscreen
+                bool onScreen = x >= screenStart.X && x <= screenEnd.X && y >= screenStart.Y && y <= screenEnd.Y;
+                if (onScreen || tile is IDynamicTile)
+                    tile.Draw(gameManager);
             }
         }
         DebugManager.EndBenchmark("TileDraws");

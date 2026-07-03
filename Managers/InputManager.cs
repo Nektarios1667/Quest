@@ -31,8 +31,9 @@ public enum InputAction
     ToggleFrameBar,
     ToggleHitboxes,
     ToggleProgramInfo,
-    OpenCommandWindow,
+    ToggleCulling,
     OpenDebugWindow,
+    OpenCommandWindow,
     ForceError,
 
     // Editor
@@ -125,8 +126,9 @@ public static class InputManager
         { InputAction.ToggleFrameBar,       new(Keys.F5, [Keys.LeftControl]) },
         { InputAction.ToggleHitboxes,       new(Keys.F6, [Keys.LeftControl]) },
         { InputAction.ToggleProgramInfo,    new(Keys.F7, [Keys.LeftControl]) },
+        { InputAction.ToggleCulling,        new(Keys.F8, [Keys.LeftControl]) },
+        { InputAction.OpenDebugWindow,      new(Keys.F9, [Keys.LeftControl]) },
         { InputAction.OpenCommandWindow,    new(Keys.OemTilde, [Keys.LeftControl, Keys.LeftShift]) },
-        { InputAction.OpenDebugWindow,      new(Keys.F8, [Keys.LeftControl]) },
         { InputAction.ForceError,           new(Keys.Delete, [Keys.LeftControl, Keys.LeftShift]) },
 
         // Editor

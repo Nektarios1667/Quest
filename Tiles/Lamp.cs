@@ -1,7 +1,7 @@
 
 namespace Quest.Tiles;
 
-public class Lamp : Tile
+public class Lamp : Tile, IDynamicTile
 {
     public byte LightRadius { get; set; }
     public Lamp(Point location, byte lightRadius = 10) : base(location, TileTypeID.Lamp)
