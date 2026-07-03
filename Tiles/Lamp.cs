@@ -12,7 +12,7 @@ public class Lamp : Tile, IDynamicTile
     {
         base.Draw(gameManager);
 
-        Color tintColor = Color.Lerp(Color.White, Color.Yellow, LightRadius / 20f);
+        Color tintColor = Color.Lerp(Color.Transparent, Color.Yellow, Math.Clamp(LightRadius / 15f, 0.3f, 0.75f));
         gameManager.Batch.FillRectangle(new((Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle).ToVector2(), Constants.TileSize), tintColor);
 
         LightingManager.SetLight($"LampTile_{X}_{Y}", Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle, LightRadius, singleFrame: true);

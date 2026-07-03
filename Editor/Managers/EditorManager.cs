@@ -126,7 +126,7 @@ public class EditorManager
                 if (!PopupOpen) Logger.Error("Lamp edit failed.");
                 return;
             }
-            lamp.LightRadius = byte.Parse(values[4]);
+            lamp.LightRadius = byte.Parse(values[0]);
         }
         // Display case
         else if (tile is DisplayCase displayCase)

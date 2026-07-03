@@ -158,7 +158,7 @@ public class LevelManager
             for (int x = paddingStart.X; x <= paddingEnd.X; x++)
             {
                 // Get tile
-                var tile = Level.Tiles[x + y * Constants.MapSize.X];
+                var tile = GetTile(x, y);
                 if (tile == null) continue;
 
                 // Cull static offscreen tiles - either it has to be on screen, or a dynamic tile e.g. lamp that emits light even offscreen
