@@ -153,6 +153,12 @@ It is not recommended to edit save files manually as they contain important play
 - Custom tile behavior can be added by modifying the custom tile's class in `/Tiles`.
 - Tiles can have custom `OnPlayerCollide` methods for more complex behavior.
 
+#### IDynamicTile
+- IDynamicTile is an empty interface in `Tiles/TileSets.cs` used to identify dynamic tiles.
+- These dynamic tiles are updated even when off screen as long as they are within the padding of the screen, as specfied in `Constants.cs`.
+- For example, the Lamp tile generates light even off screen, so it inherits IDynamicTile and is updated when not in the viewport.
+- Dynamic Tiles generally are not that expensive to update, as the DrawTexture method will cull them anyway. Still, only use them when necessary.
+
 ### Decals
 - Decals are defined in the `DecalTypeID` enum in `Decal.cs`.  
 - Decals have their own classes in the `/Decals` folder that inherits from `Decal`.

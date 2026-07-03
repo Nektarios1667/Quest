@@ -8,6 +8,7 @@ public enum Stats
 {
     DrawCalls,
     UnculledDrawCalls,
+    FloodFillCellUpdates,
 }
 
 public static class DebugManager

@@ -67,6 +67,7 @@ public class FloodLightingGrid
         {
             // Get current node
             var current = toVisit.Dequeue();
+            DebugManager.IncrStat(Stats.FloodFillCellUpdates);
             if (current.IsBlocked) continue;
 
             // Spread light to neighbors
@@ -82,7 +83,6 @@ public class FloodLightingGrid
                 if (newLightLevel > neighborNode.LightLevel && newLightLevel > 0.05f)
                 {
                     neighborNode.LightLevel = newLightLevel;
-
                     toVisit.Enqueue(neighborNode);
                 }
             }
@@ -118,6 +118,7 @@ public static class LightingManager
     public const int LightMax = 10;
     public const float LightMult = 0.7f;
     // Lighting
+    public static bool UpdateLighting { get; private set; } = true;
     public static FloodLightingGrid LightGrid { get; private set; } = null!;
     public static bool[,] BlockedLuxels { get; private set; } = new bool[0, 0];
     public static Color[,] BiomeColors { get; private set; } = new Color[0, 0];
@@ -149,6 +150,7 @@ public static class LightingManager
                 Lights.Remove(key);
         }
     }
+    public static void MarkUpdateLighting() => UpdateLighting = true;
     public static void SetLight(string name, Point pos, float tileSize, bool singleFrame = false) => Lights[name] = new(pos, (int)(tileSize * Constants.TileSize.X), singleFrame);
     public static void RemoveLight(string name) => Lights.Remove(name);
     public static void ClearLights() => Lights.Clear();
@@ -179,12 +181,14 @@ public static class LightingManager
         // Biome
         if (BiomeColors.GetLength(0) != LightGrid.Width || BiomeColors.GetLength(1) != LightGrid.Height)
             BiomeColors = new Color[LightGrid.Width, LightGrid.Height];
+
+        MarkUpdateLighting();
     }
     public static void RecalculateLighting(GameManager gameManager)
     {
         DebugManager.StartBenchmark("LightingCalculations");
 
-        gameManager.OverlayManager.UpdateLighting = false;
+        UpdateLighting = false;
 
         // Precomputations
         if (LuxelSize.X == 0)
@@ -239,5 +243,6 @@ public static class LightingManager
                 LightGrid.Grid[tile.X * LightDivisions + dx, tile.Y * LightDivisions + dy].IsBlocked = isBlocked;
             }
         }
+        MarkUpdateLighting();
     }
 }

@@ -10,7 +10,6 @@ public class OverlayManager
     public StatusBar HealthBar { get; private set; }
     public static readonly Point lootStackOffset = new(4, 4);
     private RenderTarget2D? minimap;
-    public bool UpdateLighting { get; set; } = true;
     public OverlayManager(PlayerManager? playerManager)
     {
         Gui = new()
@@ -25,16 +24,16 @@ public class OverlayManager
         // Trigger lighting updates
         if (playerManager != null)
         {
-            playerManager.EquippedSlotChanged += (_) => MarkUpdateLighting();
-            playerManager.InventoryUI.OnSlotDrop += (_, _) => MarkUpdateLighting();
-            playerManager.InventoryUI.OnSlotItemChange += (_, _) => MarkUpdateLighting();
+            playerManager.EquippedSlotChanged += (_) => LM.MarkUpdateLighting();
+            playerManager.InventoryUI.OnSlotDrop += (_, _) => LM.MarkUpdateLighting();
+            playerManager.InventoryUI.OnSlotItemChange += (_, _) => LM.MarkUpdateLighting();
         }
         //TimerManager.SetTimer("LightingUpdate", 3f, MarkUpdateLighting, int.MaxValue);
-        CameraManager.TileChange += (_, _) => MarkUpdateLighting();
+        CameraManager.TileChange += (_, _) => LM.MarkUpdateLighting();
         CameraManager.CameraMove += (_, newCam) =>
         {
             if (newCam.ToPoint() / Constants.TileSize.Scaled(LM.InvLightDivisions) != LM.LastLuxel)
-                MarkUpdateLighting();
+                LM.MarkUpdateLighting();
         };
     }
 
@@ -149,14 +148,10 @@ public class OverlayManager
 
         DebugManager.EndBenchmark("PostProcessing");
     }
-    public void MarkUpdateLighting()
-    {
-        UpdateLighting = true;
-    }
     public void DrawLighting(GameManager gameManager)
     {
 
-        if (UpdateLighting)
+        if (LM.UpdateLighting)
             LightingManager.RecalculateLighting(gameManager);
 
         DebugManager.StartBenchmark("DrawLighting");

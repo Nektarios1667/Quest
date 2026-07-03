@@ -97,7 +97,7 @@ public static class CommandManager
             new("freecam <bool>", CFreecam, "Set freecam to |1|", "Failed to set freecam to |1|"),
             new("kill [enemy|projectile] <ushort>", CKill, "Killed |1| with UID |2|", "Failed to kill |1| with UID |2|"),
             new("effect <effect> {1:999}", CEffect, "Applied effect '|1|' for |2| seconds.", "Failed to apply effect '|1|' for |2| seconds."),
-            new("reload [lights|lightgrid]", CReload, "Reloaded |1|.", "Failed to reload |1|."),
+            new("reload [lights|lightgrid|level]", CReload, "Reloaded |1|.", "Failed to reload |1|."),
         ];
     }
     public static (bool success, string output) Execute(string command)
@@ -401,13 +401,19 @@ public static class CommandManager
         if (parts[1] == "lights")
         {
             LightingManager.ClearLights();
-            GameManager!.OverlayManager.MarkUpdateLighting();
+            LightingManager.MarkUpdateLighting();
             return true;
         } else if (parts[1] == "lightgrid")
         {
             LightingManager.ClearLights();
             LightingManager.BuildLevelLighting(GameManager!);
-            GameManager!.OverlayManager.MarkUpdateLighting();
+            return true;
+        } else if (parts[1] == "level")
+        {
+            StateManager.SaveGameState(GameManager!, PlayerManager!);
+            LevelManager!.ReadLevel(GameManager!, LevelManager.Level.LevelPath.ToString(), reload: true);
+            LevelManager!.LoadLevel(GameManager!, LevelManager.Level.LevelPath.ToString());
+            StateManager.ReadGameState(GameManager!, PlayerManager!, StateManager.CurrentSave.ToString());
             return true;
         }
         return false;
