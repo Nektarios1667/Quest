@@ -7,6 +7,7 @@ public class FloodLightingGrid
     public int Width { get; }
     public int Height { get; }
     public FloodLightingNode[,] Grid { get; }
+    private readonly Queue<FloodLightingNode> toVisit = new();
     public FloodLightingGrid(int width, int height, bool[,] blocked)
     {
         Width = width;
@@ -17,15 +18,21 @@ public class FloodLightingGrid
             for (int y = 0; y < height; y++)
                 Grid[x, y] = new(this, new(x, y), 0, blocked[x, y]);
     }
-    public void Reset(int light = 0, bool[,]? blocked = null)
+    public void Reset(Rectangle region)
     {
-        for (int x = 0; x < Width; x++)
-            for (int y = 0; y < Height; y++)
+        // Clamping
+        int minX = Math.Clamp(region.X, 0, Width);
+        int minY = Math.Clamp(region.Y, 0, Height);
+        int maxX = Math.Clamp(region.Right, 0, Width);
+        int maxY = Math.Clamp(region.Bottom, 0, Height);
+
+        for (int y = minY; y < maxY; y++)
+        {
+            for (int x = minX; x < maxX; x++)
             {
-                Grid[x, y].LightLevel = light;
-                if (blocked != null)
-                    Grid[x, y].IsBlocked = blocked[x, y];
+                Grid[x, y].LightLevel = 0;
             }
+        }
     }
     public void AddLight(Point pos, int light)
     {
@@ -34,14 +41,25 @@ public class FloodLightingGrid
 
         Grid[pos.X, pos.Y].LightLevel = light;
     }
-    public void Run()
+    public void Run(Rectangle region)
     {
+        // Clamping
+        int minX = Math.Clamp(region.X, 0, Width);
+        int minY = Math.Clamp(region.Y, 0, Height);
+        int maxX = Math.Clamp(region.Right, 0, Width);
+        int maxY = Math.Clamp(region.Bottom, 0, Height);
+
         // Queue all lights
-        Queue<FloodLightingNode> toVisit = new();
-        foreach (FloodLightingNode node in Grid)
+        toVisit.Clear();
+        for (int y = minY; y < maxY; y++)
         {
-            if (node.LightLevel > 0)
-                toVisit.Enqueue(node);
+            for (int x = minX; x < maxX; x++)
+            {
+                if (Grid[x, y].LightLevel > 0)
+                {
+                    toVisit.Enqueue(Grid[x, y]);
+                }
+            }
         }
 
         // Solve
@@ -56,7 +74,7 @@ public class FloodLightingGrid
             {
                 // Get neighbor
                 Point neighbor = current.Position + offset;
-                if (neighbor.X < 0 || neighbor.Y < 0 || neighbor.X >= Width || neighbor.Y >= Height) continue;
+                if (neighbor.X < minX || neighbor.Y < minY || neighbor.X >= maxX || neighbor.Y >= maxY) continue;
                 var neighborNode = Grid[neighbor.X, neighbor.Y];
 
                 // Calculate new light level
@@ -64,6 +82,7 @@ public class FloodLightingGrid
                 if (newLightLevel > neighborNode.LightLevel && newLightLevel > 0.05f)
                 {
                     neighborNode.LightLevel = newLightLevel;
+
                     toVisit.Enqueue(neighborNode);
                 }
             }
@@ -104,6 +123,7 @@ public static class LightingManager
     public static Color[,] BiomeColors { get; private set; } = new Color[0, 0];
     public static Point LuxelSize { get; private set; } = Point.Zero;
     public static Point LightingStart { get; private set; }
+    public static Point LightingEnd { get; private set; }
     public static Point LastLuxel { get; private set; } = Point.Zero;
     // Other
     public static Dictionary<string, RadialLight> Lights { get; private set; } = [];
@@ -132,7 +152,34 @@ public static class LightingManager
     public static void SetLight(string name, Point pos, float tileSize, bool singleFrame = false) => Lights[name] = new(pos, (int)(tileSize * Constants.TileSize.X), singleFrame);
     public static void RemoveLight(string name) => Lights.Remove(name);
     public static void ClearLights() => Lights.Clear();
+    public static void BuildLevelLighting(GameManager gameManager)
+    {
+        int lightWidth = Constants.MapSize.X * LightDivisions;
+        int lightHeight = Constants.MapSize.Y * LightDivisions;
 
+        // Blocked
+        if (BlockedLuxels.GetLength(0) != lightWidth || BlockedLuxels.GetLength(1) != lightHeight)
+            BlockedLuxels = new bool[lightWidth, lightHeight];
+
+        // Set blocked luxels
+        for (int y = 0; y < Constants.MapSize.Y; y++)
+        {
+            for (int x = 0; x < Constants.MapSize.Y; x++)
+            {
+                Tile? tile = gameManager.LevelManager.GetTile(x, y);
+                bool isBlocked = tile == null || (tile.IsWall && !tile.IsWalkable);
+                for (int dy = 0; dy < LightDivisions; dy++)
+                    for (int dx = 0; dx < LightDivisions; dx++)
+                        BlockedLuxels[x * LightDivisions + dx, y * LightDivisions + dy] = isBlocked;
+            }
+        }
+
+        LightGrid = new(lightWidth, lightHeight, BlockedLuxels);
+
+        // Biome
+        if (BiomeColors.GetLength(0) != LightGrid.Width || BiomeColors.GetLength(1) != LightGrid.Height)
+            BiomeColors = new Color[LightGrid.Width, LightGrid.Height];
+    }
     public static void RecalculateLighting(GameManager gameManager)
     {
         DebugManager.StartBenchmark("LightingCalculations");
@@ -142,68 +189,55 @@ public static class LightingManager
         // Precomputations
         if (LuxelSize.X == 0)
             LuxelSize = Constants.TileSize.Scaled(InvLightDivisions);
-
-        // Flood fill lighting                                                          one tile buffer at top          tile padding
-        LightingStart = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize + PointTools.Up - Constants.TileDrawPadding;
-        Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize + Constants.TileDrawPadding;
-
         LastLuxel = CameraManager.Camera.ToPoint() / Constants.TileSize.Scaled(InvLightDivisions);
+        // Calculate region
+        LightingStart = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize + PointTools.Up - Constants.TileDrawPadding;
+        LightingEnd = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize - PointTools.Up + Constants.TileDrawPadding;
+        Rectangle updateRegion = new(LightingStart.Scaled(LightDivisions), (LightingEnd - LightingStart).Scaled(LightDivisions));
 
-        // Calculate grid size
-        int tileWidth = end.X - LightingStart.X + 1;
-        int tileHeight = end.Y - LightingStart.Y + 3; // Extra row ontop and below for smoothness
-
-        int lightWidth = tileWidth * LightDivisions;
-        int lightHeight = tileHeight * LightDivisions;
-
-        // Blocked
-        if (BlockedLuxels.GetLength(0) != lightWidth || BlockedLuxels.GetLength(1) != lightHeight)
-            BlockedLuxels = new bool[lightWidth, lightHeight];
-
-        // Set blocked luxels
-        for (int y = 0; y < tileHeight; y++)
-            for (int x = 0; x < tileWidth; x++)
-            {
-                Tile? tile = gameManager.LevelManager.GetTile(x + LightingStart.X, y + LightingStart.Y);
-                bool isBlocked = tile == null || (tile.IsWall && !tile.IsWalkable);
-                for (int dy = 0; dy < LightDivisions; dy++)
-                    for (int dx = 0; dx < LightDivisions; dx++)
-                        BlockedLuxels[x * LightDivisions + dx, y * LightDivisions + dy] = isBlocked;
-            }
-
-        // Reset or make new grid
-        if (LightGrid == null || LightGrid.Width != lightWidth || LightGrid.Height != lightHeight)
-            LightGrid = new(lightWidth, lightHeight, BlockedLuxels);
-        else
-            LightGrid.Reset(blocked: BlockedLuxels);
+        // Reset
+        LightGrid.Reset(updateRegion);
         // Set lights
         foreach (var light in Lights.Values)
         {
-            Point lightTile = ((light.Position + CameraManager.Camera.ToPoint() - Constants.Middle).ToVector2() / Constants.TileSize.ToVector2()).ToPoint() - LightingStart;
-            if (lightTile.X >= 0 && lightTile.Y >= 0 && lightTile.X < LightGrid.Width && lightTile.Y < LightGrid.Height)
-            {
-                // Set all luxels in the light tile area
-                for (int dy = 0; dy < LightDivisions; dy++)
-                    for (int dx = 0; dx < LightDivisions; dx++)
-                        LightGrid.AddLight(lightTile.Scaled(LightDivisions) + new Point(dx, dy), light.Size * LightDivisions / Constants.TileSize.X);
-            }
-        }
-        LightGrid.Run();
+            Point lightTile = ((light.Position + CameraManager.Camera.ToPoint() - Constants.Middle).ToVector2() / Constants.TileSize.ToVector2()).ToPoint();
 
-        // Biome
-        if (BiomeColors.GetLength(0) != tileWidth || BiomeColors.GetLength(1) != tileHeight)
-            BiomeColors = new Color[tileWidth, tileHeight];
+            // Check if light is in camera view
+            if (lightTile.X < LightingStart.X || lightTile.Y < LightingStart.Y || lightTile.X > LightingEnd.X || lightTile.Y > LightingEnd.Y)
+                continue;
+
+            // Set all luxels in the light tile area
+            for (int dy = 0; dy < LightDivisions; dy++)
+                for (int dx = 0; dx < LightDivisions; dx++)
+                    LightGrid.AddLight(lightTile.Scaled(LightDivisions) + new Point(dx, dy), light.Size * LightDivisions / Constants.TileSize.X);
+        }
+
+        LightGrid.Run(updateRegion);
+
         float blend = StateManager.WeatherIntensity(GameManager.GameTime);
-        for (int y = 0; y < tileHeight; y++)
+        Point start = (LightingStart + Constants.TileDrawPadding);
+        Point end = (LightingEnd - Constants.TileDrawPadding + Constants.OnePoint);
+        for (int y = start.Y; y < end.Y; y++)
         {
-            for (int x = 0; x < tileWidth; x++)
+            for (int x = start.X; x < end.X; x++)
             {
                 // Biome
-                Point worldLoc = (new Point(x, y) + LightingStart) * Constants.TileSize / Constants.TileSize;
+                Point worldLoc = new Point(x, y);
                 BiomeColors[x, y] = gameManager.LevelManager.GetWeatherColor(gameManager, worldLoc, blend);
             }
         }
 
         DebugManager.EndBenchmark("LightingCalculations");
+    }
+    public static void SetLightGridBlocking(Point tile, bool isBlocked)
+    {
+        for (int dy = 0; dy < LightDivisions; dy++)
+        {
+            for (int dx = 0; dx < LightDivisions; dx++)
+            {
+                BlockedLuxels[tile.X * LightDivisions + dx, tile.Y * LightDivisions + dy] = isBlocked;
+                LightGrid.Grid[tile.X * LightDivisions + dx, tile.Y * LightDivisions + dy].IsBlocked = isBlocked;
+            }
+        }
     }
 }

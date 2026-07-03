@@ -161,10 +161,16 @@ public class OverlayManager
 
         DebugManager.StartBenchmark("DrawLighting");
         // Draw lighting - do not draw the offscreen lighting
-        for (int y = Constants.TileDrawPadding.Y; y < LM.LightGrid.Height - Constants.TileDrawPadding.Y; y++)
+        Point start = (LM.LightingStart + Constants.TileDrawPadding).Scaled(LM.LightDivisions);
+        Point end = (LM.LightingEnd - Constants.TileDrawPadding + Constants.OnePoint).Scaled(LM.LightDivisions);
+        for (int y = start.Y; y < end.Y; y++)
         {
-            for (int x = Constants.TileDrawPadding.X; x < LM.LightGrid.Width - Constants.TileDrawPadding.X; x++)
+            for (int x = start.X; x < end.X; x++)
             {
+                // Check bounds
+                if (x < 0 || y < 0 || x >= LM.LightGrid.Grid.GetLength(0) || y >= LM.LightGrid.Grid.GetLength(1))
+                    continue;
+
                 // Light
                 float light = LM.LightGrid.Grid[x, y].LightLevel;
                 int intensityLookup = Math.Clamp((int)Math.Floor(light * LM.LightDivisions), 0, LM.LightMax * LM.LightDivisions);
@@ -175,7 +181,7 @@ public class OverlayManager
                     continue;
 
                 // Draw
-                Rectangle rect = new((new Point(x, y) + LM.LightingStart.Scaled(LM.LightDivisions)) * LM.LuxelSize + Constants.Middle - CameraManager.Camera.ToPoint(), LM.LuxelSize);
+                Rectangle rect = new(new Point(x, y) * LM.LuxelSize + Constants.Middle - CameraManager.Camera.ToPoint(), LM.LuxelSize);
                 Color color = ColorTools.Add(
                     gameManager.LevelManager.SkyColor * (1 - intensity),
                     LM.BiomeColors[x / LM.LightDivisions, y / LM.LightDivisions] * (1 - intensity)

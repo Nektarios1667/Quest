@@ -51,6 +51,7 @@ public class Door : Tile
     public void Open(GameManager game)
     {
         IsOpened = true;
+        LightingManager.SetLightGridBlocking(Location.ToPoint(), false);
         StateManager.SaveDoorOpened(TileID, game.LevelManager.Level.LevelName);
     }
 }

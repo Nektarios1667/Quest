@@ -224,6 +224,7 @@ public class LevelManager
 
         // Lighting
         LightingManager.ClearLights();
+        LightingManager.BuildLevelLighting(gameManager);
         gameManager.OverlayManager.MarkUpdateLighting();
 
         LevelLoaded?.Invoke(Level.Path);
