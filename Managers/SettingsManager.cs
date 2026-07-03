@@ -1,13 +1,13 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
 using MonoGUI;
-using System.Linq;
 
 namespace Quest.Managers;
+
 public interface IAdjustableWindow
 {
-    public bool IsFixedTimeStep { get;  set; }
-    public TimeSpan TargetElapsedTime { get;  set; }
+    public bool IsFixedTimeStep { get; set; }
+    public TimeSpan TargetElapsedTime { get; set; }
     public void SetVsync(bool vsytnc);
     public void SetFullscreen(bool fullscreen);
     public void SetResolution(int x, int y);
@@ -29,7 +29,7 @@ public static class SettingsManager
     public static float SoundVolume { get; set; } = 1f;
     // GUI / Widgets
     private static GUI settingsMenu = null!;
-    private static GUI bindsMenu = null!;
+    private static readonly GUI bindsMenu = null!;
     private static HorizontalSlider musicSlider = null!;
     private static HorizontalSlider soundSlider = null!;
     private static HorizontalSlider fpsSlider = null!;

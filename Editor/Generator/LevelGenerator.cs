@@ -46,7 +46,8 @@ public class LevelGenerator
                 string name = System.IO.Path.GetFileNameWithoutExtension(file);
                 Structures[name] = ReadStructure(file);
             }
-        } else
+        }
+        else
             Logger.Error("Directory 'GameData/Structures' does not exist. No structures will be loaded.");
 
         // Read each terrain preset

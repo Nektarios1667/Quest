@@ -121,7 +121,7 @@ public class Container
 
         if (item == null)
         {
-            byte moved = (byte)Math.Min(adding.Amount, adding.MaxAmount);
+            byte moved = Math.Min(adding.Amount, adding.MaxAmount);
             SetSlot(i, Item.Create(adding.Type, moved, adding.CustomName));
             adding.Amount -= moved;
             return adding.Amount <= 0;

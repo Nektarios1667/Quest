@@ -1,5 +1,4 @@
-﻿using ScottPlot.AxisRules;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
 
 namespace Quest.Managers;
@@ -57,7 +56,7 @@ public static class DebugManager
             Logger.System($"FrameBar set to: {FrameBar}");
         }
         if (InputManager.BindPressed(InputAction.ToggleHitboxes))
-        {   
+        {
             DrawHitboxes = !DrawHitboxes;
             Logger.System($"DrawHitboxes set to: {DrawHitboxes}");
         }

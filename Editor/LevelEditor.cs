@@ -3,7 +3,6 @@ using Quest.Editor.Generator;
 using Quest.Editor.Managers;
 using Quest.World;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Quest.Editor;
 
@@ -276,7 +275,7 @@ public class LevelEditor : Game, IAdjustableWindow
         DebugManager.Update(editorOverlayManager.GetDebugString().Replace("\n", "\r\n"), memoryDebugSb.ToString().Split("\n"));
         CameraManager.Update(delta);
         CameraManager.CameraDest = Vector2.Clamp(CameraManager.CameraDest, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
-        
+
         // Gui
         gui.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
 
@@ -340,7 +339,8 @@ public class LevelEditor : Game, IAdjustableWindow
         {
             TextureManager.DrawTexture(spriteBatch, TextureID.MenuBackground, Point.Zero, scale: MenuManager.MenuBackgroundScale);
             SettingsMenu.Draw();
-        } else
+        }
+        else
         {
             gui.Draw();
         }

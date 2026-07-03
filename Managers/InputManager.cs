@@ -78,7 +78,7 @@ public struct InputBinding
     public override readonly string ToString()
     {
         if (Key != null && Modifiers != null)
-                return $"{string.Join('+', Modifiers.Select(m => InputManager.GameToDisplayKey(m.ToString())))}+{InputManager.GameToDisplayKey(Key.ToString()!)}";
+            return $"{string.Join('+', Modifiers.Select(m => InputManager.GameToDisplayKey(m.ToString())))}+{InputManager.GameToDisplayKey(Key.ToString()!)}";
         else if (Key != null)
             return $"{InputManager.GameToDisplayKey(Key.ToString()!)}";
         else
@@ -202,8 +202,8 @@ public static class InputManager
             return new(baseKey);
         }
     }
-    private static string[] DisplayKeys = { "Ctrl", "Shift", "Alt", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "/", "`", "[", "]", "'", ",", "-", ".", "\\", "=", ";" };
-    private static string[] GameKeys = { "LeftControl", "LeftShift", "LeftAlt", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D0", "Oem2", "OemTilde", "OemOpenBrackets", "OemCloseBrackets", "Oem7", "Oemcomma", "OemMinus", "OemPeriod", "OemPipe", "Oemplus", "OemSemicolon" };
+    private static readonly string[] DisplayKeys = { "Ctrl", "Shift", "Alt", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "/", "`", "[", "]", "'", ",", "-", ".", "\\", "=", ";" };
+    private static readonly string[] GameKeys = { "LeftControl", "LeftShift", "LeftAlt", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D0", "Oem2", "OemTilde", "OemOpenBrackets", "OemCloseBrackets", "Oem7", "Oemcomma", "OemMinus", "OemPeriod", "OemPipe", "Oemplus", "OemSemicolon" };
     public static string DisplayToGameKey(string key)
     {
         if (DisplayKeys.Contains(key))

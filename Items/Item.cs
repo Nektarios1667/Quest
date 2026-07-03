@@ -135,7 +135,7 @@ public class ItemTypes
     public static readonly ItemType Disc = new(ItemTypeID.Disc, "A music disc.");
     public static readonly ItemType Cloth = new(ItemTypeID.Cloth, "A piece of fabric.");
     public static readonly ItemType Coal = new(ItemTypeID.Coal, "A hard lump of coal.");
-    public static readonly ItemType RawIron = new(ItemTypeID.RawIron, "Unprocessed iron ore."); 
+    public static readonly ItemType RawIron = new(ItemTypeID.RawIron, "Unprocessed iron ore.");
     public static readonly ItemType Iron = new(ItemTypeID.Iron, "Processed iron ore.");
     public static readonly ItemType Ink = new(ItemTypeID.Ink, "Ink used for dyes and writing.");
     public static readonly ItemType RawCopper = new(ItemTypeID.RawCopper, "Unprocessed copper ore.");
