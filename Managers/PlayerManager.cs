@@ -149,7 +149,7 @@ public class PlayerManager : IEntity
 
         // Player lighting
         if (EquippedItem is Light light)
-            LightingManager.SetLight("PlayerLightItem", CameraManager.PlayerFoot - CameraManager.Camera.ToPoint() + Constants.Middle, light.LightStrength);
+            LightingManager.SetLight("PlayerLightItem", CameraManager.TileCoord, light.LightStrength);
         else
             LightingManager.RemoveLight("PlayerLightItem");
     }

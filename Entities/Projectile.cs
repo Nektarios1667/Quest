@@ -52,7 +52,7 @@ public class Projectile : IEntity
     private void UpdateCollision(GameManager gameManager)
     {
         // Check collisions with walls
-        Point tileCoord = CameraManager.PositionToWorldCoord(Position + Size.ToVector2() / 2);
+        Point tileCoord = CameraManager.WorldToTile(Position.ToPoint() + Size.Scaled(0.5f));
         // Either OOB, or non-walkable wall
         if (tileCoord.X < 0 || tileCoord.X >= Constants.MapSize.X || tileCoord.Y < 0 || tileCoord.Y >= Constants.MapSize.Y ||
             (gameManager.LevelManager.Level.Tiles[tileCoord.Y * Constants.MapSize.X + tileCoord.X].IsWall &&

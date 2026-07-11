@@ -151,7 +151,7 @@ public static class LightingManager
         }
     }
     public static void MarkUpdateLighting() => UpdateLighting = true;
-    public static void SetLight(string name, Point pos, float tileSize, bool singleFrame = false) => Lights[name] = new(pos, (int)(tileSize * Constants.TileSize.X), singleFrame);
+    public static void SetLight(string name, Point tilePos, float radius, bool singleFrame = false) => Lights[name] = new(tilePos, (int)(radius * Constants.TileSize.X), singleFrame);
     public static void RemoveLight(string name) => Lights.Remove(name);
     public static void ClearLights() => Lights.Clear();
     public static void BuildLevelLighting(GameManager gameManager)
@@ -204,16 +204,14 @@ public static class LightingManager
         // Set lights
         foreach (var light in Lights.Values)
         {
-            Point lightTile = ((light.Position + CameraManager.Camera.ToPoint() - Constants.Middle).ToVector2() / Constants.TileSize.ToVector2()).ToPoint();
-
             // Check if light is in camera view
-            if (lightTile.X < LightingStart.X || lightTile.Y < LightingStart.Y || lightTile.X > LightingEnd.X || lightTile.Y > LightingEnd.Y)
+            if (light.Position.X < LightingStart.X || light.Position.Y < LightingStart.Y || light.Position.X > LightingEnd.X || light.Position.Y > LightingEnd.Y)
                 continue;
 
             // Set all luxels in the light tile area
             for (int dy = 0; dy < LightDivisions; dy++)
                 for (int dx = 0; dx < LightDivisions; dx++)
-                    LightGrid.AddLight(lightTile.Scaled(LightDivisions) + new Point(dx, dy), light.Size * LightDivisions / Constants.TileSize.X);
+                    LightGrid.AddLight(light.Position.Scaled(LightDivisions) + new Point(dx, dy), light.Size * LightDivisions / Constants.TileSize.X);
         }
 
         LightGrid.Run(updateRegion);

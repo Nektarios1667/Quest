@@ -64,6 +64,15 @@ public static class CameraManager
 
         DebugManager.EndBenchmark("CameraUpdate");
     }
-    public static Point PositionToWorldCoord(Vector2 position) => position.ToPoint() / Constants.TileSize;
-    public static Point PositionToWorldCoord(Point position) => position / Constants.TileSize;
+    // World = pixel position in the world
+    // Tile = tile coordinate in the world
+    // Screen = pixel position on the screen
+    public static Point WorldToTile(Point position) => position / Constants.TileSize;
+    public static Point TileToWorld(Point tileCoord) => tileCoord * Constants.TileSize;
+    public static Point TileToWorld(ByteCoord tileCoord) => tileCoord * Constants.TileSize;
+    public static Point TileToScreen(Point tileCoord) => tileCoord * Constants.TileSize - Camera.ToPoint() + Constants.Middle;
+    public static Point TileToScreen(ByteCoord tileCoord) => tileCoord * Constants.TileSize - Camera.ToPoint() + Constants.Middle;
+    public static Point ScreenToTile(Point screenCoord) => (screenCoord + Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
+    public static Point WorldToScreen(Point worldCoord) => worldCoord - Camera.ToPoint() + Constants.Middle;
+    public static Point ScreenToWorld(Point screenCoord) => screenCoord + Camera.ToPoint() - Constants.Middle;
 }

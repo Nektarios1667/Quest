@@ -77,7 +77,7 @@ public class LevelManager
         {
             if (loot.Item.Type == ItemTypes.Lantern)
             {
-                Point loc = loot.Position - CameraManager.Camera.ToPoint() + Constants.Middle + TextureManager.Metadata[loot.Texture].Size;
+                Point loc = CameraManager.WorldToTile(loot.Position + TextureManager.Metadata[loot.Texture].Size);
                 LightingManager.SetLight($"Loot_{loot.UID}", loc, 2);
             }
         }
