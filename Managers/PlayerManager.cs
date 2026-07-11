@@ -286,14 +286,14 @@ public class PlayerManager : IEntity
         // Draw marked tile
         if (TileBelow != null && DebugManager.CollisionDebug)
         {
-            Point belowDest = TileBelow.Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
+            Point belowDest = CameraManager.TileToScreen(TileBelow.Location);
             gameManager.Batch.FillRectangle(new(belowDest.ToVector2(), Constants.TileSize), Color.Red * 0.5f);
         }
         if (TileBumps != null && DebugManager.CollisionDebug)
         {
             foreach (Tile tile in TileBumps)
             {
-                Point bumpDest = tile.Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
+                Point bumpDest = CameraManager.TileToScreen(tile.Location);
                 gameManager.Batch.FillRectangle(new(bumpDest.ToVector2(), Constants.TileSize), Color.Blue * 0.5f);
             }
         }

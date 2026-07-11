@@ -295,7 +295,7 @@ public class LevelEditor : Game, IAdjustableWindow
         GraphicsDevice.Clear(Color.Magenta);
         spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: scale);
 
-        Point mouseCoordDraw = mouseCoord * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
+        Point mouseCoordDraw = CameraManager.TileToScreen(mouseCoord);
 
         // Draw game
         levelManager.Draw(gameManager);

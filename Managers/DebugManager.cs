@@ -128,10 +128,10 @@ public static class DebugManager
     {
         if (!DrawHitboxes) return;
 
-        Vector2 screnPos = entity.Bounds.Position - CameraManager.Camera + Constants.Middle.ToVector2();
-        batch.DrawRectangle(screnPos, entity.Bounds.Size, Constants.DebugGreenTint, thickness: 2);
-        batch.DrawPoint(screnPos + entity.Bounds.Size.ToVector2() * 0.5f, Constants.DebugPinkTint, 3);
-        batch.DrawPoint(screnPos + entity.Bounds.Size.ToVector2() * new Vector2(0.5f, 1), Constants.DebugPinkTint, 3);
+        Vector2 screenPos = CameraManager.WorldToScreen(entity.Bounds.Position.ToPoint()).ToVector2();
+        batch.DrawRectangle(screenPos, entity.Bounds.Size, Constants.DebugGreenTint, thickness: 2);
+        batch.DrawPoint(screenPos + entity.Bounds.Size.ToVector2() * 0.5f, Constants.DebugPinkTint, 3);
+        batch.DrawPoint(screenPos + entity.Bounds.Size.ToVector2() * new Vector2(0.5f, 1), Constants.DebugPinkTint, 3);
     }
     public static void UpdateDebugWindow(string infobox, IEnumerable<string> memoryInfobox)
     {

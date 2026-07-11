@@ -99,7 +99,7 @@ public class NPC : IEntity
     {
         // Npc
         Vector2 origin = new(spritesize.X / 2, spritesize.Y);
-        Point pos = Position * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle + Constants.TileHalfSize;
+        Point pos = CameraManager.TileToWorld(Position) + Constants.TileHalfSize;
         Rectangle source = GetAnimationSource(Texture, GameManager.GameTime);
         DrawTexture(gameManager.Batch, Texture, pos, color: TextureColor, scale: new(Scale * Constants.NPCScale), source: source, origin: origin);
         // Debug

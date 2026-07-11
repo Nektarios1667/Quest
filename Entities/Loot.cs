@@ -25,7 +25,7 @@ public struct Loot : IEntity
     }
     public readonly void Draw(GameManager gameManager)
     {
-        Point pos = Position - CameraManager.Camera.ToPoint() + Constants.Middle;
+        Point pos = CameraManager.WorldToScreen(Position);
         pos.Y += (int)(Math.Sin((GameManager.GameTime - Birth) * 2 % (Math.PI * 2)) * 6); // Bob up and down
         DrawTexture(gameManager.Batch, Texture, pos, scale: new(2));
         // Draw stacks if multiple

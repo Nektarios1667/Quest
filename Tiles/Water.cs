@@ -8,7 +8,7 @@ public class Water : Tile
     public override void Draw(GameManager gameManager)
     {
         // Draw each tile using the sprite batch
-        Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
+        Point dest = CameraManager.TileToScreen(Location);
 
         // Draw tile
         Color color = Color.Lerp(Color.LightBlue, Color.Blue, 0.1f * (float)Math.Sin(GameManager.GameTime + X + Y));

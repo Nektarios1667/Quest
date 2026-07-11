@@ -147,7 +147,7 @@ public class Tile
     public virtual void Draw(GameManager gameManager)
     {
         // Draw tile
-        Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
+        Point dest = CameraManager.TileToScreen(Location);
         DrawTexture(gameManager.Batch, Type.Texture, dest, source: gameManager.LevelManager.TileTextureSource(this), scale: Constants.TileSizeScale);
     }
 

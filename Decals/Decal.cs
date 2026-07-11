@@ -59,7 +59,7 @@ public class Decal
     public virtual void Draw(GameManager gameManager)
     {
         // Draw
-        Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
+        Point dest = CameraManager.TileToScreen(Location);
         Rectangle source = GetAnimationSource(Texture, GameManager.GameTime, duration: .75f);
         DrawTexture(gameManager.Batch, Texture, dest, source: source, scale: Constants.TileSizeScale);
     }

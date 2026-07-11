@@ -110,17 +110,17 @@ public class Enemy : IEntity
         }
 
         // Healthbar
-        HealthBar.Position = Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle + new Point(0, Size.Y + 10);
+        HealthBar.Position = CameraManager.WorldToScreen(Position.ToPoint()) + new Point(0, Size.Y + 10);
         HealthBar.CurrentValue = Health;
         HealthBar.Update(GameManager.DeltaTime);
         // Damage notifs
-        DamageNotifs.Position = Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle;
+        DamageNotifs.Position = CameraManager.WorldToScreen(Position.ToPoint());
         DamageNotifs.Update(GameManager.DeltaTime);
     }
     public virtual void Draw(GameManager gameManager)
     {
         Rectangle source = GetAnimationSource(Texture, GameManager.GameTime, duration: 0.5f);
-        DrawTexture(gameManager.Batch, Texture, Position.ToPoint() - CameraManager.Camera.ToPoint() + Constants.Middle, source: source, scale: new(Scale)); //, origin: new(Size.X / Scale, Size.Y / Scale));
+        DrawTexture(gameManager.Batch, Texture, CameraManager.WorldToScreen(Position.ToPoint()), source: source, scale: new(Scale)); //, origin: new(Size.X / Scale, Size.Y / Scale));
 
         DebugManager.DrawHitbox(gameManager.Batch, this);
         HealthBar.Draw(gameManager.Batch);

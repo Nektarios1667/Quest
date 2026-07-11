@@ -5,7 +5,7 @@ public class Checkpoint(Point location) : Decal(location)
     private readonly Timer cooldown = TimerManager.SetTimer("CheckpointCooldown", 15, null);
     public override void Draw(GameManager gameManager)
     {
-        Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
+        Point dest = CameraManager.TileToScreen(Location);
         Rectangle source = GetAnimationSource(Texture, GameManager.GameTime, duration: .75f);
         DrawTexture(gameManager.Batch, Texture, dest, source: source, scale: Constants.TileSizeScale, color: Color.White * (float)((Math.Cos(GameManager.GameTime * MathHelper.Pi) + 1.01f) / 2f));
     }

@@ -15,7 +15,7 @@ public class Door : Tile
     public override void Draw(GameManager gameManager)
     {
         // Draw tile
-        Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
+        Point dest = CameraManager.TileToScreen(Location);
         Rectangle source = new(IsWalkable ? 16 : 0, 0, 16, 16);
         DrawTexture(gameManager.Batch, TextureID.Door, dest, source: source, scale: Constants.TileSizeScale);
     }

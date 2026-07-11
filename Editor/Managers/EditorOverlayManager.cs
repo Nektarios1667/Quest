@@ -69,7 +69,7 @@ public class EditorOverlayManager
             for (int x = start.X; x <= end.X; x++)
             {
                 Point loc = new(x, y);
-                Point dest = loc * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;
+                Point dest = CameraManager.TileToScreen(loc);
                 BiomeType? biome = LevelManager.GetBiome(loc);
                 Color color = biome == null ? Color.Magenta : Biome.Colors[(int)biome];
                 GameManager.Batch.Draw(Textures[TextureID.TileOutline], dest.ToVector2(), LevelManager.BiomeTextureSource(loc), color, 0, Vector2.Zero, Constants.TileSizeScale, SpriteEffects.None, 1.0f);
