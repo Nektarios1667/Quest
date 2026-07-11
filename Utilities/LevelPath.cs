@@ -2,6 +2,7 @@
 
 public struct LevelPath
 {
+    public static readonly LevelPath Null = new();
     public string WorldName { get; private set; }
     public string LevelName { get; private set; }
     public string Path => ToString();

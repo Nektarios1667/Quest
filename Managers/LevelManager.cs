@@ -488,7 +488,7 @@ public class LevelManager
 
         return type switch
         {
-            TileTypeID.Stairs => new Stairs(loc, $"{levelPath.WorldName}/{reader.ReadString()}", new(reader.ReadByte(), reader.ReadByte())),
+            TileTypeID.Stairs => new Stairs(loc, new LevelPath(levelPath.WorldName, reader.ReadString()), new(reader.ReadByte(), reader.ReadByte())),
             TileTypeID.Door => new Door(loc, StateManager.ReadItemData(reader)?.GetItemRef(), reader.ReadBoolean()),
             TileTypeID.Chest => ReadChest(loc),
             TileTypeID.Lamp => new Lamp(loc, reader.ReadByte()),

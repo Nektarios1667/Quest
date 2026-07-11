@@ -160,7 +160,7 @@ public class Tile
         {
             TileTypeID.Water => new Water(location),
             TileTypeID.Lava => new Lava(location),
-            TileTypeID.Stairs => new Stairs(location, "", Constants.MiddleCoord),
+            TileTypeID.Stairs => new Stairs(location, LevelPath.Null, Constants.MiddleCoord),
             TileTypeID.Door => new Door(location, null),
             TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, "_"),
             TileTypeID.Lamp => new Lamp(location),

@@ -57,7 +57,7 @@ public static class BinaryWriterExtensions
     }
     public static void Write(this BinaryWriter writer, Loot loot)
     {
-        writer.Write(loot.Item.Name);
+        writer.Write((byte)loot.Item.Type.TypeID);
         writer.Write(LevelEditor.IntToByte(loot.Item.Amount));
         writer.Write((ushort)loot.Position.X);
         writer.Write((ushort)loot.Position.Y);

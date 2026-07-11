@@ -55,7 +55,7 @@ public class EditorManager
         if (tile is Stairs stairs)
         {
             var (success, values) = ShowInputForm("Stair Editor", [
-                new("Level", null, placeholder: stairs.DestLevel),
+                new("Level", null, placeholder: stairs.DestLevel.LevelName),
                 new("Spawn X", IsByte, placeholder: stairs.Dest.X.ToString()),
                 new("Spawn Y", IsByte, placeholder: stairs.Dest.Y.ToString())]);
             if (!success)
@@ -70,7 +70,7 @@ public class EditorManager
             }
 
             // Level
-            stairs.DestLevel = $"{CurrentLevel.WorldName}/{values[0]}";
+            stairs.DestLevel = new(CurrentLevel.WorldName, values[0]);
             stairs.Dest = new(byte.Parse(values[1]), byte.Parse(values[2]));
         }
         // Door
@@ -93,9 +93,12 @@ public class EditorManager
         // Chest
         else if (tile is Chest chest)
         {
+            string genFile = chest.LootGenerator.FileName;
+            genFile = genFile.Contains('.') ? genFile : "NUL.qlt";
+
             var (success, values) = ShowInputForm("Chest Editor", [
-                new("Loot File Name", null, placeholder: chest.LootGenerator.FileName.Split('.')[0]),
-                new("Loot Type", null, ["Loot Preset", "Loot Table"], chest.LootGenerator.FileName.Split('.')[1] == "qlt" ? "Loot Table" : "Loot Preset"),
+                new("Loot File Name", null, placeholder: genFile.Split('.')[0]),
+                new("Loot Type", null, ["Loot Preset", "Loot Table"], genFile.Split('.')[1] == "qlt" ? "Loot Table" : "Loot Preset"),
                 new("Key", null, ItemsOptionsWNone, chest.Key == null ? "NONE" : chest.Key.Name.ToString()),
                 new("Amount", IsByte, placeholder: chest.Key == null ? "0" : chest.Key.Amount.ToString()),
                 new("Consume Key", null, ["True", "False"], chest.ConsumeKey.ToString())]);

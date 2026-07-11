@@ -157,7 +157,7 @@ public static class InputManager
         { InputAction.SelectBiomeTool,      new(Keys.D3) },
         { InputAction.CycleToolNext,        new(Keys.OemCloseBrackets) },
         { InputAction.CycleToolPrevious,    new(Keys.OemOpenBrackets) },
-        { InputAction.FloodFill,            new(Keys.F) },
+        { InputAction.FloodFill,            new(Keys.F, [Keys.LeftControl]) },
         { InputAction.NewLevel,             new(Keys.N, [Keys.LeftControl]) },
     };
 

@@ -54,7 +54,7 @@ public static class Constants
     public static readonly Point TileDrawPadding = new(10, 10); // Padding for drawing tiles off screen
 
     public const float PlayerScale = 3;
-    public const float NPCScale = 4;
+    public const float NPCScale = 3;
     public const float ProjectileScale = 2;
 
     // Colors

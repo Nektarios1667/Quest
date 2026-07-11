@@ -2,7 +2,7 @@
 
 public class Torch(Point location) : Decal(location)
 {
-    private static readonly Vector2 lightShift = new(0, 1);
+    public static readonly Vector2 lightShift = new(0, 1);
     public override void Draw(GameManager game)
     {
         Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint() + Constants.Middle;

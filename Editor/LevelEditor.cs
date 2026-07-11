@@ -128,14 +128,14 @@ public class LevelEditor : Game, IAdjustableWindow
         mouseMenu.AddItem("Fill", editorManager.FloodFill, []);
         mouseMenu.AddItem("Draw Biome", () => editorManager.ShowBiomeMarkers = !editorManager.ShowBiomeMarkers, []);
 
-        MouseMenu editMenu = new(gui, Point.Zero, new(100, 50), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
+        MouseMenu editMenu = new(gui, Point.Zero, new(100, 65), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         editMenu.AddItem("Edit NPC", editorManager.EditNPC, []);
         editMenu.AddItem("Edit Enemy", editorManager.EditEnemy, []);
         editMenu.AddItem("Edit Tile", editorManager.EditTile, []);
         mouseMenu.AddItem("Edit...", null, []);
         mouseMenu.AddSubMenu("Edit...", editMenu);
 
-        MouseMenu newMenu = new(gui, Point.Zero, new(100, 80), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
+        MouseMenu newMenu = new(gui, Point.Zero, new(100, 105), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         newMenu.AddItem("New NPC", editorManager.NewNPC, []);
         newMenu.AddItem("New Enemy", editorManager.NewEnemy, []);
         newMenu.AddItem("New Loot", editorManager.NewLoot, []);
@@ -144,7 +144,7 @@ public class LevelEditor : Game, IAdjustableWindow
         mouseMenu.AddItem("New...", null, []);
         mouseMenu.AddSubMenu("New...", newMenu);
 
-        MouseMenu deleteMenu = new(gui, Point.Zero, new(150, 100), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
+        MouseMenu deleteMenu = new(gui, Point.Zero, new(150, 105), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         deleteMenu.AddItem("Delete NPC", editorManager.DeleteNPC, []);
         deleteMenu.AddItem("Delete Enemy", editorManager.DeleteEnemy, []);
         deleteMenu.AddItem("Delete Loot", editorManager.DeleteLoot, []);
@@ -385,7 +385,7 @@ public class LevelEditor : Game, IAdjustableWindow
         {
             Tile tile;
             if (TileSelection == TileTypeID.Stairs)
-                tile = new Stairs(mouseCoord, "", Constants.MiddleCoord);
+                tile = new Stairs(mouseCoord, LevelPath.Null, Constants.MiddleCoord);
             else
                 tile = Tile.TileFromId(TileSelection, mouseCoord, "NUL");
 

@@ -39,7 +39,7 @@ public class EditorOverlayManager
     public void DrawTileOverlay(SpriteBatch spriteBatch, TileTypeID selection, Tile? mouseTile)
     {
         if (mouseTile is Stairs stair)
-            DrawBottomInfo(spriteBatch, selection, $"[Stairs] dest: '{stair.DestLevel}' @ {stair.Dest}");
+            DrawBottomInfo(spriteBatch, selection, $"[Stairs] dest: '{stair.DestLevel.LevelName}' @ {stair.Dest}");
         else if (mouseTile is Door door)
             DrawBottomInfo(spriteBatch, selection, $"[Door] key: {(door.Key == null ? "NUL" : $"'{door.Key.Name}' x{door.Key.Amount}")} consume: {door.ConsumeKey}");
         else if (mouseTile is Chest chest)

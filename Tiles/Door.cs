@@ -36,14 +36,14 @@ public class Door : Tile
         }
         else
         {
-            // Notif
-            game.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)} needed to unlock", Color.Red, 5);
-
-            // Sound fx
             string timerName = $"DoorLocked_{X + Y * Constants.MapSize.X}";
             if (TimerManager.IsCompleteOrMissing(timerName))
             {
+                // Notif
+                game.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)} needed to unlock", Color.Red, 5);
+                // Sfx
                 SoundManager.PlaySoundInstance("DoorLocked");
+                
                 TimerManager.SetTimer(timerName, 5, null);
             }
         }

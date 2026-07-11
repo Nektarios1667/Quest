@@ -2,21 +2,21 @@ namespace Quest.Tiles;
 
 public class Stairs : Tile
 {
-    public string DestLevel { get; set; }
+    public LevelPath DestLevel { get; set; }
     public ByteCoord Dest { get; set; }
-    public Stairs(Point location, string destLevel, Point destPosition) : base(location, TileTypeID.Stairs)
+    public Stairs(Point location, LevelPath destLevel, Point destPosition) : base(location, TileTypeID.Stairs)
     {
         Dest = new(destPosition);
-        DestLevel = destLevel.Replace('\\', '/'); // For consistency
+        DestLevel = destLevel; // For consistency
     }
     public override void OnPlayerEnter(GameManager game, PlayerManager player)
     {
         // Load another level
-        bool read = game.LevelManager.ReadLevel(game, DestLevel, reload: false);
-        bool loaded = game.LevelManager.LoadLevel(game, DestLevel);
+        bool read = game.LevelManager.ReadLevel(game, DestLevel.ToString(), reload: false);
+        bool loaded = game.LevelManager.LoadLevel(game, DestLevel.ToString());
         if (!read || !loaded)
         {
-            Logger.Error($"Failed to teleport to level '{DestLevel}'");
+            Logger.Error($"Failed to teleport to level '{DestLevel.LevelName}'");
             return;
         }
 
@@ -24,6 +24,6 @@ public class Stairs : Tile
         CameraManager.Camera = CameraManager.CameraDest;
         CameraManager.Update(0f); // Force update to avoid visual glitches
 
-        Logger.System($"Teleporting to level '{DestLevel}' @ {Dest}");
+        Logger.System($"Teleporting to level '{DestLevel.LevelName}' @ {Dest}");
     }
 }
