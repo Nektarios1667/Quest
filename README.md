@@ -25,7 +25,7 @@
   The game supports saving and loading player progress.
 
 - **Optimized Performance**  
-  The game runs very fast on any computer and uses up little memory.
+  The game runs very fast on any computer and uses little memory.
 
 ## Getting Started
 
@@ -50,6 +50,7 @@ The level editor allows you to create and modify game levels with ease.
 The level editor is included in the same project as the game. To run it, run the game with the argument `--level-editor`.
 
 ### Controls
+These controls are the default keybinds and can be changed in the settings menu at any time.
 - **Camera**  
 `W`, `A`, `S`, `D` or `Arrow Keys` to pan the camera around the level. Use `Left Alt` to increase pan speed.
 - **Tools**  
