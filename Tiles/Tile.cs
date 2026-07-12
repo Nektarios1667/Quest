@@ -47,6 +47,7 @@ public enum TileTypeID : byte
     DisplayCase,
     Crate,
     Crafter,
+    ConcreteFlooring,
     // TILES ID
 }
 
@@ -116,6 +117,7 @@ public static class TileTypes
         new(TileTypeID.DisplayCase, TextureID.DisplayCase, false, false),
         new(TileTypeID.Crate, TextureID.Crate, false, false),
         new(TileTypeID.Crafter, TextureID.Crafter, false, false),
+        new(TileTypeID.ConcreteFlooring, TextureID.ConcreteFlooring, true, false),
         // TILES REGISTER
     ];
 }
