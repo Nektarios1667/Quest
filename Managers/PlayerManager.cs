@@ -428,6 +428,22 @@ public class PlayerManager : IEntity
         if (MouseSelection == null)
         {
             if (ui.BoundContainer?.Items[slot] == null) return;
+
+            // Shift click
+            if ((InputManager.KeyDown(Keys.LeftShift) || InputManager.KeyDown(Keys.RightShift)) && // Shift pressed
+                OpenedInterface != null && OpenedInterface.BoundContainer != null)                 // Container opened
+            {
+                if (ui == InventoryUI)
+                    OpenedInterface.BoundContainer.AddItem(ui.BoundContainer.Items[slot]!);
+                else
+                    Inventory.AddItem(ui.BoundContainer.Items[slot]!);
+
+                OpenedInterface.BoundContainer.RemoveEmptyItems();
+                Inventory.RemoveEmptyItems();
+                return;
+            }
+
+            // Regular move
             MouseSelection = (ui, slot);
         }
         else if (MouseSelection.Value.ui.BoundContainer != null && ui.BoundContainer != null)

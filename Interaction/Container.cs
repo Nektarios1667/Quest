@@ -60,6 +60,13 @@ public class Container
         from.RemoveEmptyItems();
         to.RemoveEmptyItems();
     }
+    public int? GetOpenSlot()
+    {
+        for (int s = 0; s < Items.Length; s++)
+            if (Items[s] == null || Items[s]?.Amount <= 0)
+                return s;
+        return null;
+    }
     public static void MergeItems(Container from, int fromIdx, Container to, int toIdx)
     {
         // Get and check
