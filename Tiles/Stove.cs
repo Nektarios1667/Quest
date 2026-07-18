@@ -4,6 +4,7 @@ namespace Quest.Tiles;
 
 public class Stove : Tile, IContainer
 {
+    public const float CookingTime = 2f; // Seconds
     public Interaction.Container Container { get; private set; }
     public Stove(Point location, string levelName) : base(location, TileTypeID.Stove)
     {

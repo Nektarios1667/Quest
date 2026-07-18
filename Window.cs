@@ -120,9 +120,9 @@ public class Window : Game, IAdjustableWindow
         // Managers
         SoundManager.Init(Content);
         levelManager = new();
+        overlayManager = new(playerManager);
         UserInterface.Init(spriteBatch, levelManager);
         playerManager = new();
-        overlayManager = new(playerManager);
         gameManager = new(Content, spriteBatch, levelManager, overlayManager, Grading);
         menuManager = new(this, spriteBatch, Content, gameManager, playerManager);
         CommandManager.Init(this, gameManager, levelManager, playerManager);

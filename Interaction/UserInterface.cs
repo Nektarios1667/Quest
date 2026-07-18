@@ -16,8 +16,8 @@ public partial class UserInterface
     public bool IsEnabled { get; set; } = true;
     public UserInterface(SpriteBatch batch, Dictionary<string, UIElement>? elements = null)
     {
-        Elements = elements ?? [];
         Batch = batch;
+        Elements = elements ?? [];
     }
     public void Update(string? tag = null)
     {

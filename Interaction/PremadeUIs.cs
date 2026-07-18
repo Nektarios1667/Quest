@@ -176,6 +176,10 @@ public partial class UserInterface
         InputSlot fuel = new(new(Constants.Middle.X - 168, 75), new(ItemTypes.FuelTypes, FilterType.Whitelist));
         FurnaceUI.AddElement("fuel", fuel);
 
+        // Timer bar
+        TimerBar timer = new(new(Constants.Middle.X - 100, 210), Furnace.SmeltingTime, new(200, 30), Color.Black, Color.Gray, 3);
+        FurnaceUI.AddElement("timer", timer);
+
         // Unsmelted item input
         InputSlot input = new(new(Constants.Middle.X - 84, 75), new(ItemTypes.FurnaceableTypes, FilterType.Whitelist));
         FurnaceUI.AddElement("input", input);
@@ -190,9 +194,14 @@ public partial class UserInterface
         {
             if (input.Item == null || fuel.Item == null) return;
 
+            timer.Restart();
+        };
+
+        timer.TimerComplete += (_) =>
+        {
             // Convert to cooked
             SoundManager.PlaySound("Fire2");
-            Item? outputItem = RecipeRegistry.UseRecipe([input.Item], fuel.Item, RecipeType.Furnace);
+            Item? outputItem = RecipeRegistry.UseRecipe([input.Item!], fuel.Item, RecipeType.Furnace);
             if (FurnaceUI.BoundContainer != null && outputItem != null)
             {
                 Item? leftover = FurnaceUI.AddItem(outputItem);
@@ -293,7 +302,7 @@ public partial class UserInterface
         // ----- Jukebox -----
         StoveUI = new(batch);
 
-        // Title
+        // Title    
         Point titleSize = PixelOperatorLarge.MeasureString("STOVE").ToPoint();
         Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "STOVE", PixelOperatorLarge, Color.White);
         StoveUI.AddElement("title", title);
@@ -302,6 +311,9 @@ public partial class UserInterface
         InputSlot fuel = new(new(Constants.Middle.X - 168, 75), new(ItemTypes.FuelTypes, FilterType.Whitelist));
         StoveUI.AddElement("fuel", fuel);
 
+        // Timer bar
+        TimerBar timer = new(new(Constants.Middle.X - 100, 210), Stove.CookingTime, new(200, 30), Color.Black, Color.Gray, 3);
+        StoveUI.AddElement("timer", timer);
 
         // Uncooked food input
         InputSlot input = new(new(Constants.Middle.X - 84, 75), new(ItemTypes.StoveableTypes, FilterType.Whitelist));
@@ -317,8 +329,12 @@ public partial class UserInterface
         {
             if (input.Item == null || fuel.Item == null) return;
 
+            timer.Restart();
+        };
+
+        timer.TimerComplete += (_) => {
             // Convert to cooked
-            Item? outputItem = RecipeRegistry.UseRecipe([input.Item], fuel.Item, RecipeType.Stove);
+            Item? outputItem = RecipeRegistry.UseRecipe([input.Item!], fuel.Item, RecipeType.Stove);
             if (StoveUI.BoundContainer != null && outputItem != null)
             {
                 SoundManager.PlaySound("Fire");
@@ -327,6 +343,7 @@ public partial class UserInterface
                     levelManager.Level.Loot.Add(new(leftover.GetItemRef(), CameraManager.PlayerFoot, GameManager.GameTime));
             }
         };
+
         StoveUI.AddElement("cook", cook);
     }
 }

@@ -4,6 +4,7 @@ namespace Quest.Tiles;
 
 public class Furnace : Tile, IContainer
 {
+    public const float SmeltingTime = 4; // Seconds
     public Interaction.Container Container { get; private set; }
     public Furnace(Point location, string levelName) : base(location, TileTypeID.Furnace)
     {
