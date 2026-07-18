@@ -21,8 +21,12 @@ public static partial class Interpreter
         }
         // Since index starts at 0
         l--;
-        Logger.Log($"{inst.Script.Name} | @{inst.L} | {inst.CompiledLines[l]} | {inst.CompiledLines[l].Flags()} | e:{inst.Errors.Count} | pf:{inst.PerformanceMode} | sc:{inst.Scopes.LastOrDefault() ?? "NUL"} | {string.Join(',', inst.Callbacks)} | ln:{inst.CompiledLines.Length}");
+        string data = $"{inst.Script.Name};@{inst.L};{inst.CompiledLines[l]};{inst.CompiledLines[l].Flags()};e{inst.Errors.Count};pf{inst.PerformanceMode};sc{inst.Scopes.LastOrDefault() ?? "NUL"};{string.Join(',', inst.Callbacks)};ln{inst.CompiledLines.Length}";
 
+        if (inst.Scopes.Count == 0)
+            inst.Variables["[return]"] = data;
+        else
+            inst.Locals["[return]"] = data;
     }
     private static void HandlePerfMode(QuillInstance inst, string[] args, string? label)
     {

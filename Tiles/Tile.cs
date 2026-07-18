@@ -48,6 +48,11 @@ public enum TileTypeID : byte
     Crate,
     Crafter,
     ConcreteFlooring,
+    StoneWindow,
+    ConcreteWindow,
+    IronWindow,
+    SandstoneWindow,
+    WoodWindow,
     // TILES ID
 }
 
@@ -57,14 +62,16 @@ public class TileType
     public TextureID Texture { get; }
     public bool IsWalkable { get; }
     public bool IsWall { get; }
+    public bool IsTransparent { get; }
     public float Weight { get; }
-    public TileType(TileTypeID id, TextureID texture, bool isWalkable, bool isWall, float weight = 1f)
+    public TileType(TileTypeID id, TextureID texture, bool isWalkable, bool isWall, bool isTransparent = false, float weight = 1f)
     {
         ID = id;
         Texture = texture;
         IsWalkable = isWalkable;
         IsWall = isWall;
         Weight = weight;
+        IsTransparent = isTransparent;
     }
 }
 
@@ -118,6 +125,11 @@ public static class TileTypes
         new(TileTypeID.Crate, TextureID.Crate, false, false),
         new(TileTypeID.Crafter, TextureID.Crafter, false, false),
         new(TileTypeID.ConcreteFlooring, TextureID.ConcreteFlooring, true, false),
+        new(TileTypeID.StoneWindow, TextureID.StoneWindow, false, true, isTransparent: true),
+        new(TileTypeID.ConcreteWindow, TextureID.ConcreteWindow, false, true, isTransparent: true),
+        new(TileTypeID.IronWindow, TextureID.IronWindow, false, true, isTransparent: true),
+        new(TileTypeID.SandstoneWindow, TextureID.SandstoneWindow, false, true, isTransparent: true),
+        new(TileTypeID.WoodWindow, TextureID.WoodWindow, false, true, isTransparent: true),
         // TILES REGISTER
     ];
 }
@@ -130,8 +142,9 @@ public class Tile
     // Computed properties
     public byte X => Location.X;
     public byte Y => Location.Y;
-    public virtual bool IsWalkable => Type.IsWalkable;
     public bool IsWall => Type.IsWall;
+    public virtual bool IsWalkable => Type.IsWalkable; // Door changes this depending on if its open/closed
+    public virtual bool IsTransparent => Type.IsTransparent; // Door changes this depending on if its open/closed
     public virtual float Weight => Type.Weight;
     public ushort TileID => (ushort)(X + Y * Constants.MapSize.X);
     public TileType Type => TileTypes.All[TypeID];

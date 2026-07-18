@@ -415,7 +415,7 @@ public class EditorManager
     {
         foreach (Enemy enemy in LevelManager.Level.Enemies.Values)
         {
-            if (Vector2.DistanceSquared(enemy.Position, MouseSelection.ToVector2()) < 50 * 50)
+            if (Vector2.Distance(enemy.Bounds.Center, MouseSelection.ToVector2()) < Constants.TileSize.X * 2)
             {
                 LevelManager.Level.Enemies.Remove(enemy.UID);
                 Logger.Log($"Deleted Enemy @ {MouseSelection.X}, {MouseSelection.Y}.");
@@ -429,7 +429,7 @@ public class EditorManager
         Enemy? editing = null;
         foreach (Enemy enemy in LevelManager.Level.Enemies.Values)
         {
-            if (Vector2.DistanceSquared(enemy.Position, MouseSelection.ToVector2()) < 50 * 50)
+            if (Vector2.Distance(enemy.Bounds.Center, MouseSelection.ToVector2()) < Constants.TileSize.X * 2)
             {
                 editing = enemy;
                 break;

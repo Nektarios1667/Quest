@@ -78,7 +78,7 @@ public class NPC : IEntity
     // Private
     private Point spritesize;
 
-    public NPC(TextureID texture, Point location, string name, string dialog, Color textureColor = default, float scale = 1, ushort? uid = null)
+    public NPC(TextureID texture, Point position, string name, string dialog, Color textureColor = default, float scale = 1, ushort? uid = null)
     {
         Texture = texture;
         UID = uid ?? UIDManager.Get(UIDCategory.NPCs); ;
@@ -86,20 +86,17 @@ public class NPC : IEntity
         // Private
         spritesize = TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap;
 
-        Position = location;
+        Position = position;
         Name = name;
         Dialog = dialog;
         TextureColor = textureColor == default ? Color.White : textureColor;
         Scale = scale;
-        // DEBUG TODO
-        //for (int i = 0; i < 8; i++)
-        //    ShopOptions.Add(new(new(ItemTypes.Apple, 1, $"Apple-{i}"), null, i));
     }
     public void Draw(GameManager gameManager)
     {
         // Npc
         Vector2 origin = new(spritesize.X / 2, spritesize.Y);
-        Point pos = CameraManager.TileToWorld(Position) + Constants.TileHalfSize;
+        Point pos = CameraManager.TileToScreen(Position) + Constants.TileHalfSize;
         Rectangle source = GetAnimationSource(Texture, GameManager.GameTime);
         DrawTexture(gameManager.Batch, Texture, pos, color: TextureColor, scale: new(Scale * Constants.NPCScale), source: source, origin: origin);
         // Debug
@@ -154,7 +151,7 @@ public class NPC : IEntity
         {
             Item leftover = cont.AddItem(new(option.Item));
             if (leftover.Amount > 0)
-                gameManager.LevelManager.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), Position, GameManager.GameTime));
+                gameManager.LevelManager.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), CameraManager.TileToWorld(Position), GameManager.GameTime));
             SoundManager.PlaySound("Trinkets", pitchVariation: 0.25f);
             option.Stock -= 1;
         }

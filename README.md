@@ -236,6 +236,7 @@ The following commands are currently supported:
 ### Builtin Functions
 The following are builtin functions that can be called just like commands:  
 - `#perfmode (0, 1, 2)` - sets the performance mode of the script. 0 = Low, 1 = Medium, 2 = High.  
+- `#meta (line number)` - returns information about the script and the specified line number
 - `contains |array / 2d-array|, (target)` - checks if the array contains a specific value
 - `error (message), (exit?)` - prints an error message and optionally exits the script
 - `execute (command)` - executes a console command

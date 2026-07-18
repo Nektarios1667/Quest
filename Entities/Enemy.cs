@@ -91,7 +91,9 @@ public class Enemy : IEntity
             {
                 Point from = LevelManager.TileCoord(FootPosition) - CameraManager.TopLeftTileCoord;
                 Point to = CameraManager.TileCoord - CameraManager.TopLeftTileCoord;
+
                 var path = PathfindingManager.GetPath(from, to);
+
                 Path = path != null ? [.. path.Select(p => p.ToPoint() + CameraManager.TopLeftTileCoord)] : null;
                 TimerManager.SetTimer($"EnemyPathfind_{UID}", 0.5f, null);
             }

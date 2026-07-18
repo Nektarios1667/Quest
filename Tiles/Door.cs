@@ -5,6 +5,7 @@ public class Door : Tile
     public ItemRef? Key { get; set; }
     public bool ConsumeKey { get; set; }
     public bool IsOpened { get; private set; }
+    public override bool IsTransparent => Type.IsTransparent || IsOpened;
     public override bool IsWalkable => Type.IsWalkable || IsOpened;
     public override float Weight => IsOpened ? 1 : float.MaxValue;
     public Door(Point location, ItemRef? key = null, bool consumeKey = true) : base(location, TileTypeID.Door)

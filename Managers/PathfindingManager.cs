@@ -48,28 +48,14 @@ public static class PathfindingManager
     public static Coordinate[]? GetPath(Point from, Point to) => GetPath(from.X, from.Y, to.X, to.Y);
     public static Coordinate[]? GetPath(int fromX, int fromY, int toX, int toY)
     {
+        if (fromX < 0 || fromY < 0 || toX >= Grid.GetLength(0) || toY >= Grid.GetLength(1))
+        {
+            Logger.Error("Pathfinding calculation is off grid.");
+            return null;
+
+        }
+
         var result = Pathfinder.GetPath(PathAgent, new(fromX, fromY), new(toX, toY));
         return result.Path?.ToArray();
-    }
-    private static void PrintGrid(int fromX, int fromY, int toX, int toY, Coordinate[]? path, bool success)
-    {
-        Console.WriteLine("_______________________");
-        Console.WriteLine(success ? "Success" : "Failed");
-        for (int x = 0; x < Grid.GetLength(1); x++)
-        {
-            for (int y = 0; y < Grid.GetLength(0); y++)
-            {
-                if (fromX == y && fromY == x)
-                    Console.Write("F ");
-                else if (toX == y && toY == x)
-                    Console.Write("T ");
-                else if (path != null && path.Contains(new(y, x)))
-                    Console.Write("X ");
-                else
-                    Console.Write(Grid[y, x].IsWalkable ? ". " : "# ");
-            }
-            Console.WriteLine();
-        }
-        Console.WriteLine("_______________________");
     }
 }

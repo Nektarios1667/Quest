@@ -124,6 +124,11 @@ public static class Constants
         new(158, 114, 17), // Crate
         Color.Brown, // Crafter
         Color.Gray, // ConcreteFlooring
+        Color.Gray, // StoneWindow
+        Color.Gray, // ConcreteWindow
+        new(168, 159, 151), // IronWindow
+        new(255, 255, 90), // SandstoneWindow
+        new(92, 53, 23), // WoodWindow
         // MINIMAPCOLORS
     ];
 }

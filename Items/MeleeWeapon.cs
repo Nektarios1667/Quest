@@ -23,6 +23,8 @@ public class MeleeWeapon : Item
             projectile.Position -= projectile.Size.ToVector2() / 2;
             projectile.Position += dir.NormalizedCopy() * (Range / 2);
 
+            SoundManager.PlaySound("Swoosh", pitchVariation: 0.25f);
+
             gameManager.LevelManager.Level.Projectiles.Add(projectile);
             TimerManager.SetTimer($"MeleeAttackDecay_{UID}", FireRate / 2, projectile.Destroy);
 

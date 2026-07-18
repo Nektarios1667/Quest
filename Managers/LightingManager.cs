@@ -169,7 +169,7 @@ public static class LightingManager
             for (int x = 0; x < Constants.MapSize.Y; x++)
             {
                 Tile? tile = gameManager.LevelManager.GetTile(x, y);
-                bool isBlocked = tile == null || (tile.IsWall && !tile.IsWalkable);
+                bool isBlocked = tile == null || (tile.IsWall && !tile.IsTransparent && !tile.IsWalkable);
                 for (int dy = 0; dy < LightDivisions; dy++)
                     for (int dx = 0; dx < LightDivisions; dx++)
                         BlockedLuxels[x * LightDivisions + dx, y * LightDivisions + dy] = isBlocked;

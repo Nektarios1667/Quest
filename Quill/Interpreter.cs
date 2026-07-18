@@ -146,8 +146,8 @@ public static partial class Interpreter
         ExternalSymbols["<inventorysize>"] = $"{Chest.Size.X};{Chest.Size.Y}";
         ExternalSymbols["<isinventoryopen>"] = player.InventoryOpen.ToString();
         ExternalSymbols["<equippedslot>"] = player.EquippedSlot.ToString();
-        ExternalSymbols["<equippeditem>"] = (player.EquippedItem?.Name ?? "NUL").WrapSingleQuotes();
-        ExternalSymbols["<equippeditemuid>"] = player.EquippedItem?.UID.ToString() ?? "-1";
+        ExternalSymbols["<equippeditem>"] = (player.EquippedItem?.Type.TypeID.ToString() ?? "NUL").WrapSingleQuotes();
+        ExternalSymbols["<equippeditemuid>"] = player.EquippedItem?.UID.ToString() ?? "NUL";
         ExternalSymbols["<equippeditemamount>"] = player.EquippedItem?.Amount.ToString() ?? "0";
         // Technical
         ExternalSymbols["<ready>"] = "true";
@@ -286,7 +286,7 @@ public static partial class Interpreter
             OutputErrors(instance);
 
         // Fill variables and expressions
-        string[] args = command.Args;
+        string[] args = (string[])command.Args.Clone();
         if (command.HasVariables)
         {
             ReplaceVariables(args, instance.Locals);
