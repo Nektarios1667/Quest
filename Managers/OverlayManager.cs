@@ -28,6 +28,8 @@ public class OverlayManager
             playerManager.InventoryUI.OnSlotDrop += (_, _) => LM.MarkUpdateLighting();
             playerManager.InventoryUI.OnSlotItemChange += (_, _) => LM.MarkUpdateLighting();
         }
+        else if (Program.Mode == ProgramMode.Game)
+            Logger.Warning("No PlayerMaqnager object for the OverlayManager");
         //TimerManager.SetTimer("LightingUpdate", 3f, MarkUpdateLighting, int.MaxValue);
         CameraManager.TileChange += (_, _) => LM.MarkUpdateLighting();
         CameraManager.CameraMove += (_, newCam) =>

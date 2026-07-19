@@ -41,14 +41,18 @@ public class PlayerManager : IEntity
     public int EquippedSlot
     {
         get => equippedSlot;
-        set { equippedSlot = value; EquippedSlotChanged?.Invoke(equippedSlot); }
+        set
+        {
+            equippedSlot = value;
+            EquippedSlotChanged?.Invoke(equippedSlot);
+            Console.WriteLine(value);
+        }
     }
     public Item? HoveredItem { get; private set; }
     public Item? EquippedItem => EquippedSlot >= 0 && EquippedSlot < Inventory.Items.Length ? Inventory.Items[EquippedSlot] : null;
     public (UserInterface ui, int idx)? MouseSelection { get; set; } // Item being moved with mouse and its original inventory
     // Position and collision
     public RectangleF Bounds => GetHitbox();
-
     public Tile? TileBelow { get; private set; }
     public List<Tile> TileBumps { get; private set; } = [];
     public Direction PlayerDirection { get; private set; }

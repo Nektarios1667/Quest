@@ -36,23 +36,36 @@ using System.Linq;
          \  /     / /_      | |_| |     | |_| |
           \/     |____| (_)  \___/  (_)  \___/                                          
 */
+namespace Quest
+{
+    public enum ProgramMode
+    {
+        Game,
+        LevelEditor,
+        CodeGenerator,
+    }
+}
 
 static class Program
 {
+    public static Quest.ProgramMode Mode = Quest.ProgramMode.Game;
     [STAThread]
     static void Main(string[] args)
     {
         if (args.Contains("--level-editor"))
         {
+            Mode = Quest.ProgramMode.LevelEditor;
             using var levelEditorApp = new LevelEditor();
             levelEditorApp.Run();
         }
         else if (args.Contains("--code-generator"))
         {
+            Mode = Quest.ProgramMode.CodeGenerator;
             CodeGenerator.Run("C:/Users/nekta/source/repos/Quest");
         }
         else
         {
+            Mode = Quest.ProgramMode.Game;
             using var gameApp = new Quest.Window();
             gameApp.Run();
         }
