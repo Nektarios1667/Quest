@@ -42,17 +42,17 @@ public class Decal
         tileType => Enum.TryParse<TextureID>(tileType.ToString(), out var texture) ? texture : TextureID.Null
     );
     // Auto generated - no setter
-    public ByteCoord Location { get; }
+    public Point Location { get; }
     public TextureID Texture { get; }
     public DecalType Type { get; protected set; }
     // Generated properties
-    public byte X => Location.X;
-    public byte Y => Location.Y;
+    public int X => Location.X;
+    public int Y => Location.Y;
     public ushort UID => (ushort)(Y * LevelManager.MapSize.X + X);
     public Decal(Point location, DecalType? type = null)
     {
         // Initialize the tile
-        Location = new(location);
+        Location = location;
         Type = type ?? (DecalType)Enum.Parse(typeof(DecalType), GetType().Name);
         Texture = TileToTexture.TryGetValue(Type, out var tex) ? tex : TextureID.Null;
     }

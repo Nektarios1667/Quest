@@ -490,7 +490,7 @@ public class EditorManager
         string name = values[0];
         DecalType decal = Enum.TryParse<DecalType>(name, true, out var dec) ? dec : DecalType.Torch;
         PreviousDecal = decal;
-        LevelManager.Level.Decals[MouseSelectionCoord.ToByteCoord()] = LevelManager.DecalFromId(decal, MouseSelectionCoord);
+        LevelManager.Level.Decals[MouseSelectionCoord] = LevelManager.DecalFromId(decal, MouseSelectionCoord);
     }
     public void DeleteDecal()
     {

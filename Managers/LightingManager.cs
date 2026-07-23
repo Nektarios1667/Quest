@@ -223,6 +223,8 @@ public static class LightingManager
         {
             for (int x = start.X; x < end.X; x++)
             {
+                if (x < 0 || y < 0 || x >= LevelManager.MapSize.X ||  y >= LevelManager.MapSize.Y) continue;
+
                 // Biome
                 Point worldLoc = new Point(x, y);
                 BiomeColors[x, y] = gameManager.LevelManager.GetWeatherColor(gameManager, worldLoc, blend);

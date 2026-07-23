@@ -427,7 +427,7 @@ public class LevelManager
 
             // Decals
             ushort decalCount = reader.ReadUInt16();
-            Dictionary<ByteCoord, Decal> decalBuffer = new(decalCount);
+            Dictionary<Point, Decal> decalBuffer = new(decalCount);
             for (int n = 0; n < decalCount; n++)
             {
                 Decal decal = reader.ReadDecal();

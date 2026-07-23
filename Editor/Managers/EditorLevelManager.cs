@@ -121,7 +121,7 @@ public class EditorLevelManager
         // Biome
         if (flags.HasFlag(LevelFeatures.Biomes))
             for (int i = 0; i < LevelManager.MapSize.X * LevelManager.MapSize.Y; i++)
-                writer.Write((byte)(int)LevelManager.Level.Biome[i]);
+                writer.Write((byte)LevelManager.Level.Biome[i]);
 
         // NPCs
         writer.Write((ushort)Math.Min(LevelManager.Level.NPCs.Count, ushort.MaxValue));

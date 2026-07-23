@@ -17,7 +17,7 @@ public class Level
 {
     public Dictionary<ushort, Enemy> Enemies { get; private set; }
     public List<Projectile> Projectiles { get; private set; }
-    public Dictionary<ByteCoord, Decal> Decals { get; private set; }
+    public Dictionary<Point, Decal> Decals { get; private set; }
     public Dictionary<ushort, NPC> NPCs { get; private set; }
     public LevelPath LevelPath { get; private set; }
     public string Path => LevelPath.Path;
@@ -30,7 +30,7 @@ public class Level
     public Point Spawn { get; set; }
     public Color Tint { get; set; }
     public List<QuillScript> Scripts { get; private set; }
-    public Level(string name, Point size, Tile[] tiles, BiomeType[] biome, Point spawn, List<NPC> npcs, List<Loot> loot, Dictionary<ByteCoord, Decal> decals, List<Enemy> enemies, List<Projectile> projectiles, List<QuillScript> scripts, Color? tint = null)
+    public Level(string name, Point size, Tile[] tiles, BiomeType[] biome, Point spawn, List<NPC> npcs, List<Loot> loot, Dictionary<Point, Decal> decals, List<Enemy> enemies, List<Projectile> projectiles, List<QuillScript> scripts, Color? tint = null)
     {
         // Initialize the level
         Size = size;

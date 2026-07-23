@@ -395,13 +395,13 @@ public class LevelEditor : Game, IAdjustableWindow
         else if (currentTool == EditorTool.Decal && InputManager.LMouseClicked)
         {
             // Check existing decal
-            Decal? current = levelManager.Level.Decals.TryGetValue(mouseCoord.ToByteCoord(), out var dec) ? dec : null;
+            Decal? current = levelManager.Level.Decals.TryGetValue(mouseCoord, out var dec) ? dec : null;
             bool alreadyThere = current != null && current.Type == DecalSelection;
-            if (current != null && current.Type != DecalSelection) levelManager.Level.Decals.Remove(mouseCoord.ToByteCoord()); // Remove current one
+            if (current != null && current.Type != DecalSelection) levelManager.Level.Decals.Remove(mouseCoord); // Remove current one
 
             // Add
-            if (!alreadyThere && levelManager.Level.Decals.Count < 255)
-                levelManager.Level.Decals[mouseCoord.ToByteCoord()] = LevelManager.DecalFromId(DecalSelection, mouseCoord);
+            if (!alreadyThere && levelManager.Level.Decals.Count < ushort.MaxValue)
+                levelManager.Level.Decals[mouseCoord] = LevelManager.DecalFromId(DecalSelection, mouseCoord);
         }
         // Set biome
         else if (currentTool == EditorTool.Biome)
@@ -415,7 +415,7 @@ public class LevelEditor : Game, IAdjustableWindow
         if (currentTool == EditorTool.Tile) TileSelection = mouseTile.Type.ID;
         else if (currentTool == EditorTool.Decal)
         {
-            Decal? picked = levelManager.Level.Decals.TryGetValue(mouseCoord.ToByteCoord(), out var dec) ? dec : null;
+            Decal? picked = levelManager.Level.Decals.TryGetValue(mouseCoord, out var dec) ? dec : null;
             if (picked != null) DecalSelection = picked.Type;
         }
         else if (currentTool == EditorTool.Biome) BiomeSelection = levelManager.GetBiome(mouseCoord)!.Value;

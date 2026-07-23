@@ -45,7 +45,6 @@ public class PlayerManager : IEntity
         {
             equippedSlot = value;
             EquippedSlotChanged?.Invoke(equippedSlot);
-            Console.WriteLine(value);
         }
     }
     public Item? HoveredItem { get; private set; }
@@ -354,7 +353,7 @@ public class PlayerManager : IEntity
         TileBelow.OnPlayerEnter(gameManager, this);
 
         // Decal
-        if (gameManager.LevelManager.Level.Decals.TryGetValue(CameraManager.TileCoord.ToByteCoord(), out var dec))
+        if (gameManager.LevelManager.Level.Decals.TryGetValue(CameraManager.TileCoord, out var dec))
             dec.OnPlayerEnter(gameManager, this);
     }
     public bool IsColliding(GameManager gameManager)
