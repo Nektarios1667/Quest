@@ -58,12 +58,12 @@ public static class RandomManager
         double angle = random.NextDouble() * Math.PI * 2;
         return new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
     }
-    public static bool ChancePerSecond(float chancePerSecond, float deltaTime)
+    public static bool ChancePerSecond(float chancePerSecond)
     {
-        if (chancePerSecond <= 0f || deltaTime <= 0f)
+        if (chancePerSecond <= 0f || GameManager.DeltaTime <= 0f)
             return false;
 
-        float chanceThisFrame = chancePerSecond * deltaTime;
+        float chanceThisFrame = chancePerSecond * GameManager.DeltaTime;
         return random.NextDouble() < chanceThisFrame;
     }
     public static Color RandomColor()

@@ -88,14 +88,27 @@ public class LevelManager
         float weatherIntensity = StateManager.WeatherIntensity(GameManager.GameTime);
         if (!Constants.EDITOR && weatherIntensity > 0)
         {
+            // Biome weather ambience
             BiomeType currentBiome = Level.Biome[CameraManager.TileCoord.X + CameraManager.TileCoord.Y * Constants.MapSize.X];
             switch (currentBiome)
             {
                 case BiomeType.Temperate: SoundManager.PlaySoundInstance("Rain", volume: weatherIntensity * 0.5f); break;
                 case BiomeType.Ocean: SoundManager.PlaySoundInstance("Rain", volume: weatherIntensity * 0.5f); break;
                 case BiomeType.Indoors: break;
-                case BiomeType.Snowy: SoundManager.PlaySoundInstance("Sandstorm", volume: weatherIntensity * 0.1f); break;
-                case BiomeType.Desert: SoundManager.PlaySoundInstance("Sandstorm", volume: weatherIntensity * 0.25f); break;
+                case BiomeType.Snowy: SoundManager.PlaySoundInstance("Sandstorm", volume: weatherIntensity * 0.3f); break;
+                case BiomeType.Desert: SoundManager.PlaySoundInstance("Sandstorm", volume: weatherIntensity * 0.5f); break;
+            }
+            // Biome weather sounds
+            if (weatherIntensity > .2f && RandomManager.ChancePerSecond(0.1f))
+            {
+                switch (currentBiome)
+                {
+                    case BiomeType.Temperate: SoundManager.PlaySoundInstance($"Thunder{RandomManager.RandomIntRange(1,6)}", volume: weatherIntensity * 0.75f); break;
+                    case BiomeType.Ocean: SoundManager.PlaySoundInstance($"Thunder{RandomManager.RandomIntRange(1,6)}", volume: weatherIntensity * 0.75f); break;
+                    case BiomeType.Indoors: break;
+                    case BiomeType.Snowy: break;
+                    case BiomeType.Desert: break;
+                }
             }
         }
         DebugManager.EndBenchmark("WeatherSounds");

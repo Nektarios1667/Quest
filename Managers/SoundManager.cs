@@ -32,6 +32,11 @@ public static class SoundManager
         LoadSound(content, "Bow", "Sounds/Effects/Bow");
         LoadSound(content, "Gulp", "Sounds/Effects/Gulp");
         LoadSound(content, "Hammer", "Sounds/Effects/Hammer");
+        LoadSound(content, "Thunder1", "Sounds/Effects/Thunder1");
+        LoadSound(content, "Thunder2", "Sounds/Effects/Thunder2");
+        LoadSound(content, "Thunder3", "Sounds/Effects/Thunder3");
+        LoadSound(content, "Thunder4", "Sounds/Effects/Thunder4");
+        LoadSound(content, "Thunder5", "Sounds/Effects/Thunder5");
     }
 
     public static bool IsMusicPlaying => MediaPlayer.State == MediaState.Playing;
