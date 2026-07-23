@@ -49,7 +49,7 @@ public class Chest : Tile, IContainer
             game.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)} needed to unlock", Color.Red, 5);
 
             // Sound fx
-            string timerName = $"ChestLocked_{X + Y * Constants.MapSize.X}";
+            string timerName = $"ChestLocked_{X + Y * LevelManager.MapSize.X}";
             if (TimerManager.IsCompleteOrMissing(timerName))
             {
                 SoundManager.PlaySoundInstance("ChestLocked");

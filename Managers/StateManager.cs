@@ -10,6 +10,7 @@ public enum LevelFeatures : ushort
     None = 0,
     Biomes = 1,
     QuillScripts = 2,
+    CustomSize = 4,
 }
 public enum GameState
 {
@@ -423,7 +424,7 @@ public static class StateManager
     public static void WriteContainerData(BinaryWriter writer, IContainer container)
     {
         // Idx
-        writer.Write((ushort)(container.Location.Y * Constants.MapSize.X + container.Location.X));
+        writer.Write((ushort)(container.Location.Y * LevelManager.MapSize.X + container.Location.X));
         // Amount of items
         byte amount = (byte)Math.Clamp(container.Container.Items.Length, 0, 255);
         writer.Write(amount);
@@ -487,7 +488,7 @@ public static class StateManager
             items[i] = ReadItemData(reader);
 
         // Apply buffer to IContainer
-        if (idx < Constants.MapSize.X * Constants.MapSize.Y && current.Tiles[idx] is IContainer cont)
+        if (idx < LevelManager.MapSize.X * LevelManager.MapSize.Y && current.Tiles[idx] is IContainer cont)
             cont.Container.SetItems(items);
         else
             Logger.Error($"Tile {idx} is not an IContainer");
@@ -496,7 +497,7 @@ public static class StateManager
     {
         int idx = reader.ReadUInt16(); // TileID
         bool isGenerated = reader.ReadBoolean(); // IsGenerated
-        if (idx < Constants.MapSize.X * Constants.MapSize.Y && current.Tiles[idx] is Chest chest)
+        if (idx < LevelManager.MapSize.X * LevelManager.MapSize.Y && current.Tiles[idx] is Chest chest)
         {
             if (isGenerated)
             {

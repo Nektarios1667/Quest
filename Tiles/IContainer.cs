@@ -3,5 +3,5 @@
 public interface IContainer
 {
     public Interaction.Container Container { get; }
-    public ByteCoord Location { get; }
+    public Point Location { get; }
 }

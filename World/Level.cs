@@ -23,18 +23,20 @@ public class Level
     public string Path => LevelPath.Path;
     public string WorldName => LevelPath.WorldName;
     public string LevelName => LevelPath.LevelName;
+    public Point Size { get; private set; }
     public List<Loot> Loot { get; private set; }
     public Tile[] Tiles { get; private set; }
     public BiomeType[] Biome { get; private set; }
     public Point Spawn { get; set; }
     public Color Tint { get; set; }
     public List<QuillScript> Scripts { get; private set; }
-    public Level(string name, Tile[] tiles, BiomeType[] biome, Point spawn, List<NPC> npcs, List<Loot> loot, Dictionary<ByteCoord, Decal> decals, List<Enemy> enemies, List<Projectile> projectiles, List<QuillScript> scripts, Color? tint = null)
+    public Level(string name, Point size, Tile[] tiles, BiomeType[] biome, Point spawn, List<NPC> npcs, List<Loot> loot, Dictionary<ByteCoord, Decal> decals, List<Enemy> enemies, List<Projectile> projectiles, List<QuillScript> scripts, Color? tint = null)
     {
         // Initialize the level
+        Size = size;
         LevelPath = new(name);
         Tiles = tiles;
-        Biome = biome.Length == 0 ? new BiomeType[Constants.MapSize.X * Constants.MapSize.Y] : biome;
+        Biome = biome.Length == 0 ? new BiomeType[LevelManager.MapSize.X * LevelManager.MapSize.Y] : biome;
         Spawn = spawn;
         NPCs = npcs.ToDictionary(npc => npc.UID, npc => npc);
         Loot = [.. loot];

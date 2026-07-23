@@ -28,8 +28,8 @@ public class OverlayManager
             playerManager.InventoryUI.OnSlotDrop += (_, _) => LM.MarkUpdateLighting();
             playerManager.InventoryUI.OnSlotItemChange += (_, _) => LM.MarkUpdateLighting();
         }
-        else if (Program.Mode == ProgramMode.Game)
-            Logger.Warning("No PlayerMaqnager object for the OverlayManager");
+        else if (StateManager.State != GameState.Editor)
+            Logger.Warning("No PlayerManager object for the OverlayManager");
         //TimerManager.SetTimer("LightingUpdate", 3f, MarkUpdateLighting, int.MaxValue);
         CameraManager.TileChange += (_, _) => LM.MarkUpdateLighting();
         CameraManager.CameraMove += (_, newCam) =>
@@ -64,7 +64,8 @@ public class OverlayManager
 
         // Widgets
         LootNotifications.Offset = (CameraManager.CameraDest - CameraManager.Camera).ToPoint();
-        Gui.Draw(gameManager.Batch);
+        if (StateManager.State != GameState.Editor)
+            Gui.Draw(gameManager.Batch);
 
         // Minimap
         if (StateManager.OverlayState != OverlayState.None)
@@ -195,22 +196,22 @@ public class OverlayManager
     {
         DebugManager.StartBenchmark("DrawMinimap");
         // Frame
-        gameManager.Batch.DrawRectangle(new(7, Constants.NativeResolution.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
+        gameManager.Batch.DrawRectangle(new(7, Constants.NativeResolution.Y - LevelManager.MapSize.Y - 13, LevelManager.MapSize.X + 6, LevelManager.MapSize.Y + 6), Color.Black, 3);
 
         // Create render if not done already
         if (minimap == null)
         {
             // Setup target
-            minimap = new RenderTarget2D(device, Constants.MapSize.X, Constants.MapSize.Y);
+            minimap = new RenderTarget2D(device, LevelManager.MapSize.X, LevelManager.MapSize.Y);
             gameManager.Batch.End();
             device.SetRenderTarget(minimap);
             device.Clear(Color.Transparent);
             gameManager.MinimapBatch.Begin();
 
             // Pixels
-            for (int y = 0; y < Constants.MapSize.Y; y++)
+            for (int y = 0; y < LevelManager.MapSize.Y; y++)
             {
-                for (int x = 0; x < Constants.MapSize.X; x++)
+                for (int x = 0; x < LevelManager.MapSize.X; x++)
                 {
                     // Get tile
                     Tile tile = gameManager.LevelManager.GetTile(new Point(x, y))!;
@@ -223,10 +224,10 @@ public class OverlayManager
             device.SetRenderTarget(null);
             gameManager.Batch.Begin();
         }
-        gameManager.Batch.Draw(minimap, new Rectangle(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
+        gameManager.Batch.Draw(minimap, new Rectangle(10, Constants.NativeResolution.Y - LevelManager.MapSize.Y - 10, LevelManager.MapSize.X, LevelManager.MapSize.Y), Color.White);
 
         // Player
-        Point dest = CameraManager.TileCoord + new Point(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10);
+        Point dest = CameraManager.TileCoord + new Point(10, Constants.NativeResolution.Y - LevelManager.MapSize.Y - 10);
         gameManager.Batch.DrawPoint(dest.ToVector2(), Color.Red, size: 2);
 
         DebugManager.EndBenchmark("DrawMinimap");

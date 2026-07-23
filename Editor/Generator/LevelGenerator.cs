@@ -19,6 +19,7 @@ public class LevelGenerator
     private int _seed;
     private readonly Dictionary<string, Structure> Structures = new();
     private readonly List<Rectangle> GeneratedStructures = [];
+    public Point Size { get; set; }
     public Terrain Terrain { get; set; }
     public Dictionary<string, Terrain> Terrains { get; set; } = new();
     public int Seed

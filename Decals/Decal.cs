@@ -48,7 +48,7 @@ public class Decal
     // Generated properties
     public byte X => Location.X;
     public byte Y => Location.Y;
-    public ushort UID => (ushort)(Y * Constants.MapSize.X + X);
+    public ushort UID => (ushort)(Y * LevelManager.MapSize.X + X);
     public Decal(Point location, DecalType? type = null)
     {
         // Initialize the tile

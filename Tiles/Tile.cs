@@ -138,32 +138,35 @@ public class Tile
 {
     // Properties
     public byte TypeID { get; }
-    public ByteCoord Location { get; }
+    public Point Location { get; }
     // Computed properties
-    public byte X => Location.X;
-    public byte Y => Location.Y;
+    public int X => (int)Location.X;
+    public int Y => (int)Location.Y;
     public bool IsWall => Type.IsWall;
     public virtual bool IsWalkable => Type.IsWalkable; // Door changes this depending on if its open/closed
     public virtual bool IsTransparent => Type.IsTransparent; // Door changes this depending on if its open/closed
     public virtual float Weight => Type.Weight;
-    public ushort TileID => (ushort)(X + Y * Constants.MapSize.X);
+    public ushort TileID => (ushort)(X + Y * LevelManager.MapSize.X);
     public TileType Type => TileTypes.All[TypeID];
 
     public Tile(Point location, TileTypeID type)
-    {
-        Location = new(location);
-        TypeID = (byte)type;
-    }
-    public Tile(ByteCoord location, TileTypeID type)
     {
         Location = location;
         TypeID = (byte)type;
     }
     public virtual void Draw(GameManager gameManager)
     {
-        // Draw tile
         Point dest = CameraManager.TileToScreen(Location);
+
+        // Draw tile
         DrawTexture(gameManager.Batch, Type.Texture, dest, source: gameManager.LevelManager.TileTextureSource(this), scale: Constants.TileSizeScale);
+
+        // Connected textures debug
+        int mask = gameManager.LevelManager.TileConnectionsMask(this);
+        gameManager.Batch.DrawPoint(dest.ToVector2() + new Vector2(0, Constants.TileSize.Y / 2), (mask & 1) == 0 ? Color.Red : Color.Green, size: 5);     // Left
+        gameManager.Batch.DrawPoint(dest.ToVector2() + new Vector2(Constants.TileSize.X, Constants.TileSize.Y / 2), (mask & 4) == 0 ? Color.Red : Color.Green, size: 5); // Right
+        gameManager.Batch.DrawPoint(dest.ToVector2() + new Vector2(Constants.TileSize.X / 2, 0), (mask & 8) == 0 ? Color.Red : Color.Green, size: 5); // Up
+        gameManager.Batch.DrawPoint(dest.ToVector2() + new Vector2(Constants.TileSize.X / 2, Constants.TileSize.Y), (mask & 2) == 0 ? Color.Red : Color.Green, size: 5); // Down
     }
 
     public virtual void OnPlayerEnter(GameManager game, PlayerManager player) { }

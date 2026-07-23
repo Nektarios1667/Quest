@@ -3,7 +3,7 @@
 public static class CameraManager
 {
     public static bool FreeCam { get; set; } = false;
-    public static Vector2 Camera { get; set; } = (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2();
+    public static Vector2 Camera { get; set; } = (LevelManager.MapSize * Constants.TileSize - Constants.Middle).ToVector2();
     private static Vector2 _cameraDest { get; set; } = Camera;
     public static Vector2 CameraDest
     {
@@ -16,7 +16,7 @@ public static class CameraManager
             // TileChange
             Point beforeTile = TileCoord;
             // Set and clamp
-            _cameraDest = Vector2.Clamp(value, Vector2.Zero, (Constants.MapSize * Constants.TileSize).ToVector2());
+            _cameraDest = Vector2.Clamp(value, Vector2.Zero, (LevelManager.MapSize * Constants.TileSize).ToVector2());
             // TileChange event
             if (beforeTile != TileCoord) TileChange?.Invoke(beforeTile, TileCoord);
         }
@@ -54,9 +54,9 @@ public static class CameraManager
         if (deltaTime > 0 && !FreeCam)
         {
             Camera = Vector2.Lerp(Camera, CameraDest, 1f - MathF.Pow(1f - Constants.CameraRigidity, deltaTime * 60f));
-            Camera = Vector2.Clamp(Camera, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
+            Camera = Vector2.Clamp(Camera, Constants.Middle.ToVector2(), (LevelManager.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
         }
-        Camera = Vector2.Clamp(Camera, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
+        Camera = Vector2.Clamp(Camera, Constants.Middle.ToVector2(), (LevelManager.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
 
         // Events
         if (beforeCamera != Camera)

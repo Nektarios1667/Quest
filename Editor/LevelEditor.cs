@@ -191,8 +191,8 @@ public class LevelEditor : Game, IAdjustableWindow
 
         // Mouse
         mouseCoord = (InputManager.MousePosition + CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
-        mouseCoord.X = Math.Clamp(mouseCoord.X, 0, Constants.MapSize.X - 1);
-        mouseCoord.Y = Math.Clamp(mouseCoord.Y, 0, Constants.MapSize.Y - 1);
+        mouseCoord.X = Math.Clamp(mouseCoord.X, 0, LevelManager.MapSize.X - 1);
+        mouseCoord.Y = Math.Clamp(mouseCoord.Y, 0, LevelManager.MapSize.Y - 1);
         mouseTile = GetTile(mouseCoord);
 
         // Movement
@@ -274,7 +274,7 @@ public class LevelEditor : Game, IAdjustableWindow
         if (!PopupFactory.PopupOpen) InputManager.Update(this);
         DebugManager.Update(editorOverlayManager.GetDebugString().Replace("\n", "\r\n"), memoryDebugSb.ToString().Split("\n"));
         CameraManager.Update(delta);
-        CameraManager.CameraDest = Vector2.Clamp(CameraManager.CameraDest, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
+        CameraManager.CameraDest = Vector2.Clamp(CameraManager.CameraDest, Constants.Middle.ToVector2(), (LevelManager.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
 
         // Gui
         gui.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
@@ -433,9 +433,9 @@ public class LevelEditor : Game, IAdjustableWindow
     }
     public Tile GetTile(Point coord)
     {
-        if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
+        if (coord.X < 0 || coord.X >= LevelManager.MapSize.X || coord.Y < 0 || coord.Y >= LevelManager.MapSize.Y)
             throw new ArgumentOutOfRangeException(nameof(coord), "Coordinates are out of bounds of the level.");
-        return levelManager.Level.Tiles[coord.X + coord.Y * Constants.MapSize.X];
+        return levelManager.Level.Tiles[coord.X + coord.Y * LevelManager.MapSize.X];
     }
 
 }

@@ -73,7 +73,7 @@ public class EditorLevelManager
         using BinaryWriter writer = new(gzipStream);
 
         // Metadata
-        var flags = LevelFeatures.Biomes | LevelFeatures.QuillScripts;
+        var flags = LevelFeatures.Biomes | LevelFeatures.QuillScripts | LevelFeatures.CustomSize;
         writer.Write(Encoding.UTF8.GetBytes("QLVL")); // Magic number
         writer.Write((ushort)flags); // Flags
 
@@ -83,8 +83,12 @@ public class EditorLevelManager
         // Write spawn
         writer.Write(new ByteCoord(LevelManager.Level.Spawn));
 
+        // Size
+        if (flags.HasFlag(LevelFeatures.CustomSize))
+            writer.Write(LevelManager.Level.Size);
+
         // Tiles
-        for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
+        for (int i = 0; i < LevelManager.MapSize.X * LevelManager.MapSize.Y; i++)
         {
             Tile tile = LevelManager.Level.Tiles[i];
             // Write tile data
@@ -116,7 +120,7 @@ public class EditorLevelManager
 
         // Biome
         if (flags.HasFlag(LevelFeatures.Biomes))
-            for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
+            for (int i = 0; i < LevelManager.MapSize.X * LevelManager.MapSize.Y; i++)
                 writer.Write((byte)(int)LevelManager.Level.Biome[i]);
 
         // NPCs
@@ -159,7 +163,13 @@ public class EditorLevelManager
     public void GenerateLevel()
     {
         // Winforms
-        var (success, values) = ShowInputForm("Generate Level", [new("Seed", IsInteger), new("Terrain", null, [.. LevelGenerator.Terrains.Keys]), new("Structure Attempts", IsPositiveIntegerOrZero)]);
+        var (success, values) = ShowInputForm("Generate Level", [
+                new("Width", IsPositiveInteger),
+                new("Height", IsPositiveInteger),
+                new("Seed", IsInteger),
+                new("Terrain", null, [.. LevelGenerator.Terrains.Keys]),
+                new("Structure Attempts", IsPositiveIntegerOrZero),
+            ]);
         if (!success)
         {
             if (!PopupOpen) Logger.Error("Level generation failed.");
@@ -167,12 +177,13 @@ public class EditorLevelManager
         }
 
         // Generate
-        LevelGenerator.Seed = int.Parse(values[0]);
-        LevelGenerator.Terrain = LevelGenerator.Terrains.GetValueOrDefault(values[1], LevelGenerator.Terrain);
-        Tile[] tiles = LevelGenerator.GenerateLevel(Constants.MapSize, int.Parse(values[2]));
+        LevelGenerator.Size = new(int.Parse(values[0]), int.Parse(values[1]));
+        LevelGenerator.Seed = int.Parse(values[2]);
+        LevelGenerator.Terrain = LevelGenerator.Terrains.GetValueOrDefault(values[3], LevelGenerator.Terrain);
+        Tile[] tiles = LevelGenerator.GenerateLevel(LevelGenerator.Size, int.Parse(values[4]));
 
         Level current = LevelManager.Level;
-        Level level = new(current.Path, tiles, [], current.Spawn, [.. current.NPCs.Values], current.Loot, current.Decals, [.. current.Enemies.Values], current.Projectiles, [], current.Tint);
+        Level level = new(current.Path, LevelGenerator.Size, tiles, new BiomeType[LevelGenerator.Size.X * LevelGenerator.Size.Y], current.Spawn, [.. current.NPCs.Values], current.Loot, current.Decals, [.. current.Enemies.Values], current.Projectiles, [], current.Tint);
 
         LevelManager.LoadLevelObject(GameManager, level);
     }
@@ -212,7 +223,7 @@ public class EditorLevelManager
         // Make blank level
         Tile[] grassTiles = new Tile[256 * 256];
         for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) grassTiles[t] = new Grass(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
-        LevelManager.LoadLevelObject(GameManager, new("NUL/NUL", grassTiles, [], new(128, 128), [], [], [], [], [], []));
+        LevelManager.LoadLevelObject(GameManager, new("NUL/NUL", Constants.MapSize, grassTiles, [], new(128, 128), [], [], [], [], [], []));
     }
     public bool WarnSave()
     {

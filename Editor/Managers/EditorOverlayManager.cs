@@ -81,28 +81,28 @@ public class EditorOverlayManager
         DebugManager.StartBenchmark("DrawMinimap");
 
         // Frame
-        GameManager.Batch.DrawRectangle(new(7, Constants.NativeResolution.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
+        GameManager.Batch.DrawRectangle(new(7, Constants.NativeResolution.Y - LevelManager.MapSize.Y - 13, LevelManager.MapSize.X + 6, LevelManager.MapSize.Y + 6), Color.Black, 3);
 
         // Draw minimap texture
         if (Minimap != null)
-            Batch.Draw(Minimap, new Rectangle(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
+            Batch.Draw(Minimap, new Rectangle(10, Constants.NativeResolution.Y - LevelManager.MapSize.Y - 10, LevelManager.MapSize.X, LevelManager.MapSize.Y), Color.White);
 
         // Player
-        Point dest = CameraManager.TileCoord + new Point(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10);
+        Point dest = CameraManager.TileCoord + new Point(10, Constants.NativeResolution.Y - LevelManager.MapSize.Y - 10);
         Batch.DrawPoint(dest.ToVector2(), Color.Red, size: 2);
 
         DebugManager.EndBenchmark("DrawMinimap");
     }
     public void RebuildMiniMap()
     {
-        Minimap = new RenderTarget2D(Graphics, Constants.MapSize.X, Constants.MapSize.Y);
+        Minimap = new RenderTarget2D(Graphics, LevelManager.MapSize.X, LevelManager.MapSize.Y);
         Graphics.SetRenderTarget(Minimap);
         Graphics.Clear(Color.Transparent);
         Batch.Begin();
 
-        for (int y = 0; y < Constants.MapSize.Y; y++)
+        for (int y = 0; y < LevelManager.MapSize.Y; y++)
         {
-            for (int x = 0; x < Constants.MapSize.X; x++)
+            for (int x = 0; x < LevelManager.MapSize.X; x++)
             {
                 Tile tile = GameManager.LevelManager.GetTile(new Point(x, y))!;
                 Batch.DrawPoint(new(x, y), Constants.MiniMapColors[(byte)tile.Type.ID]);

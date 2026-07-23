@@ -33,7 +33,7 @@ public static class PathfindingManager
 
         for (int y = startY; y < startY + height; y++)
             for (int x = startX; x < startX + width; x++)
-                SetNode(level.Tiles[y * Constants.MapSize.X + x], x - startX, y - startY);
+                SetNode(level.Tiles[y * LevelManager.MapSize.X + x], x - startX, y - startY);
 
         Pathfinder.InvalidateCache();
         DebugManager.EndBenchmark($"PathfindingGrid");

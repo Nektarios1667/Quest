@@ -12,6 +12,7 @@ namespace Quest.Managers;
 
 public class LevelManager
 {
+    public static Point MapSize { get; private set; } = new(Constants.MapSize.X, Constants.MapSize.Y);
     public List<ILootGenerator> LootGenerators = new();
     public List<Level> Levels { get; private set; }
     public Level Level { get; private set; }
@@ -21,9 +22,9 @@ public class LevelManager
     public static readonly Level EmptyLevel;
     static LevelManager()
     {
-        Tile[] grassTiles = new Tile[256 * 256];
-        for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) grassTiles[t] = new Grass(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
-        EmptyLevel = new("NUL/NUL", grassTiles, [], new(128, 128), [], [], [], [], [], []);
+        Tile[] grassTiles = new Tile[Constants.MapSize.X * Constants.MapSize.Y];
+        for (int t = 0; t < MapSize.X * MapSize.Y; t++) grassTiles[t] = new Grass(new(t % MapSize.X, t / MapSize.Y));
+        EmptyLevel = new("NUL/NUL", MapSize, grassTiles, [], new(128, 128), [], [], [], [], [], []);
     }
     public LevelManager()
     {
@@ -88,7 +89,7 @@ public class LevelManager
         float weatherIntensity = StateManager.WeatherIntensity(GameManager.GameTime);
         if (!Constants.EDITOR && weatherIntensity > 0)
         {
-            BiomeType currentBiome = Level.Biome[CameraManager.TileCoord.X + CameraManager.TileCoord.Y * Constants.MapSize.X];
+            BiomeType currentBiome = Level.Biome[CameraManager.TileCoord.X + CameraManager.TileCoord.Y * MapSize.X];
             switch (currentBiome)
             {
                 case BiomeType.Temperate: SoundManager.PlaySoundInstance("Rain", volume: weatherIntensity * 0.5f); break;
@@ -199,7 +200,7 @@ public class LevelManager
             if (level.Path == name)
                 return level;
         Logger.Error($"Level '{name}' not found in stored levels.");
-        return new("", [], [], new Point(128, 128), [], [], [], [], [], []);
+        return new("NUL/NUL", Point.Zero, [], [], Point.Zero, [], [], [], [], [], []);
     }
     public bool LoadLevel(GameManager gameManager, int levelIndex)
     {
@@ -220,6 +221,7 @@ public class LevelManager
         // Load the level data
         if (levelIndex < 0) levelIndex = Levels.Count - Math.Abs(levelIndex);
         Level = Levels[levelIndex];
+        MapSize = Level.Size;
 
         // MiniMap
         gameManager.OverlayManager.RefreshMiniMap();
@@ -267,6 +269,7 @@ public class LevelManager
 
         // Load the level data
         Level = level;
+        MapSize = level.Size;
 
         // MiniMap
         gameManager.OverlayManager.RefreshMiniMap();
@@ -369,17 +372,12 @@ public class LevelManager
         // Check if already read
         if (!reload && Levels.Any(l => l.Path == filename)) return true;
 
-        // Make buffers
-        int totalTiles = Constants.MapSize.X * Constants.MapSize.Y;
-        Tile[] tilesBuffer = new Tile[totalTiles];
-        BiomeType[] biomeBuffer = new BiomeType[totalTiles];
-
         // Context
         using FileStream fileStream = File.OpenRead(path);
         using BufferedStream buffer = new(fileStream, 128 * 1024);
         using GZipStream gzipStream = new(buffer, CompressionMode.Decompress);
         using BinaryReader reader = new(gzipStream);
-        try
+        //try
         {
 
             // Metadata
@@ -391,11 +389,20 @@ public class LevelManager
             Color tint = reader.ReadColor();
             // Spawn
             Point spawn = reader.ReadByteCoord().ToPoint();
+            // Size
+            Point mapSize = Constants.MapSize;
+            if (flags.HasFlag(LevelFeatures.CustomSize))
+                mapSize = reader.ReadPoint();
+
+            // Buffers
+            int totalTiles = mapSize.X * mapSize.Y;
+            Tile[] tilesBuffer = new Tile[totalTiles];
+            BiomeType[] biomeBuffer = new BiomeType[totalTiles];
 
             // Tiles
-            for (int y = 0; y < Constants.MapSize.Y; y++)
-                for (int x = 0; x < Constants.MapSize.X; x++)
-                    tilesBuffer[x + y * Constants.MapSize.X] = ReadTile(reader, levelPath, x, y);
+            for (int y = 0; y < mapSize.Y; y++)
+                for (int x = 0; x < mapSize.X; x++)
+                    tilesBuffer[x + y * mapSize.X] = ReadTile(reader, levelPath, x, y);
 
             // Biomes
             if (flags.HasFlag(LevelFeatures.Biomes))
@@ -450,18 +457,18 @@ public class LevelManager
             }
 
             // Make and add the level
-            Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, enemyBuffer, [], scriptBuffer, tint);
+            Level created = new(filename, mapSize, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, enemyBuffer, [], scriptBuffer, tint);
             if (reload) Levels.RemoveAll(l => l.Path == filename);
             Levels.Add(created);
             sw.Stop();
             Logger.System($"Successfully read level '{filename}' in {sw.ElapsedMilliseconds:F0}ms.");
             return true;
         }
-        catch (Exception ex)
-        {
-            Logger.Error($"Failed to read level file '{filename}': {ex.Message}");
-            return false;
-        }
+        //catch (Exception ex)
+        //{
+        //    Logger.Error($"Failed to read level file '{filename}': {ex.Message}");
+        //    return false;
+        //}
     }
     private static Tile ReadTile(BinaryReader reader, LevelPath levelPath, int x, int y)
     {
@@ -556,27 +563,27 @@ public class LevelManager
     }
     public BiomeType? GetBiome(Point coord)
     {
-        if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
+        if (coord.X < 0 || coord.X >= MapSize.X || coord.Y < 0 || coord.Y >= MapSize.Y)
             return null;
-        return Level.Biome[coord.X + coord.Y * Constants.MapSize.X];
+        return Level.Biome[coord.X + coord.Y * MapSize.X];
     }
     public BiomeType? GetBiome(int x, int y)
     {
-        if (x < 0 || x >= Constants.MapSize.X || y < 0 || y >= Constants.MapSize.Y)
+        if (x < 0 || x >= MapSize.X || y < 0 || y >= MapSize.Y)
             return null;
-        return Level.Biome[x + y * Constants.MapSize.X];
+        return Level.Biome[x + y * MapSize.X];
     }
     public Tile? GetTile(Point coord)
     {
-        if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
+        if (coord.X < 0 || coord.X >= MapSize.X || coord.Y < 0 || coord.Y >= MapSize.Y)
             return null;
-        return Level.Tiles[coord.X + coord.Y * Constants.MapSize.X];
+        return Level.Tiles[coord.X + coord.Y * MapSize.X];
     }
     public Tile? GetTile(int x, int y)
     {
-        if (x < 0 || x >= Constants.MapSize.X || y < 0 || y >= Constants.MapSize.Y)
+        if (x < 0 || x >= MapSize.X || y < 0 || y >= MapSize.Y)
             return null;
-        return Level.Tiles[x + y * Constants.MapSize.X];
+        return Level.Tiles[x + y * MapSize.X];
     }
     public void DropLoot(GameManager gameManager, Loot loot)
     {
@@ -585,5 +592,5 @@ public class LevelManager
     }
     public static Point TileCoord(Vector2 loc) => new((int)(loc.X / Constants.TileSize.X), (int)(loc.Y / Constants.TileSize.Y));
     public static Vector2 WorldCoord(Point tileCoord) => new(tileCoord.X * Constants.TileSize.X, tileCoord.Y * Constants.TileSize.Y);
-    public static int Flatten(Point point) => point.X + point.Y * Constants.MapSize.X;
+    public static int Flatten(Point point) => point.X + point.Y * MapSize.X;
 }

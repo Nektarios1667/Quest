@@ -156,17 +156,17 @@ public static class LightingManager
     public static void ClearLights() => Lights.Clear();
     public static void BuildLevelLighting(GameManager gameManager)
     {
-        int lightWidth = Constants.MapSize.X * LightDivisions;
-        int lightHeight = Constants.MapSize.Y * LightDivisions;
+        int lightWidth = LevelManager.MapSize.X * LightDivisions;
+        int lightHeight = LevelManager.MapSize.Y * LightDivisions;
 
         // Blocked
         if (BlockedLuxels.GetLength(0) != lightWidth || BlockedLuxels.GetLength(1) != lightHeight)
             BlockedLuxels = new bool[lightWidth, lightHeight];
 
         // Set blocked luxels
-        for (int y = 0; y < Constants.MapSize.Y; y++)
+        for (int y = 0; y < LevelManager.MapSize.Y; y++)
         {
-            for (int x = 0; x < Constants.MapSize.Y; x++)
+            for (int x = 0; x < LevelManager.MapSize.Y; x++)
             {
                 Tile? tile = gameManager.LevelManager.GetTile(x, y);
                 bool isBlocked = tile == null || (tile.IsWall && !tile.IsTransparent && !tile.IsWalkable);

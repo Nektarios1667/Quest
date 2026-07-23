@@ -37,7 +37,7 @@ public class Door : Tile
         }
         else
         {
-            string timerName = $"DoorLocked_{X + Y * Constants.MapSize.X}";
+            string timerName = $"DoorLocked_{X + Y * LevelManager.MapSize.X}";
             if (TimerManager.IsCompleteOrMissing(timerName))
             {
                 // Notif
@@ -52,7 +52,7 @@ public class Door : Tile
     public void Open(GameManager game)
     {
         IsOpened = true;
-        LightingManager.SetLightGridBlocking(Location.ToPoint(), false);
+        LightingManager.SetLightGridBlocking(Location, false);
         StateManager.SaveDoorOpened(TileID, game.LevelManager.Level.LevelName);
     }
 }

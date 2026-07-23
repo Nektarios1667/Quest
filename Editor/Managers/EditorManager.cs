@@ -160,7 +160,7 @@ public class EditorManager
         if (tileBelow.Type.ID != TileSelection)
         {
             Queue<Tile> queue = new();
-            HashSet<ByteCoord> visited = []; // Track visited tiles
+            HashSet<Point> visited = []; // Track visited tiles
             queue.Enqueue(tileBelow);
             count++;
 
@@ -176,7 +176,7 @@ public class EditorManager
                 foreach (Point neighbor in Constants.NeighborTiles)
                 {
                     Point neighborCoord = current.Location + neighbor;
-                    if (neighborCoord.X < 0 || neighborCoord.X >= Constants.MapSize.X || neighborCoord.Y < 0 || neighborCoord.Y >= Constants.MapSize.Y) continue;
+                    if (neighborCoord.X < 0 || neighborCoord.X >= LevelManager.MapSize.X || neighborCoord.Y < 0 || neighborCoord.Y >= LevelManager.MapSize.Y) continue;
                     Tile neighborTile = GetTile(neighborCoord);
                     if (neighborTile.Type == tileBelow.Type && neighborTile.Type.ID != TileSelection)
                         queue.Enqueue(neighborTile);
@@ -209,7 +209,7 @@ public class EditorManager
                 foreach (Point neighbor in Constants.NeighborTiles)
                 {
                     Point neighborCoord = current + neighbor;
-                    if (neighborCoord.X < 0 || neighborCoord.X >= Constants.MapSize.X || neighborCoord.Y < 0 || neighborCoord.Y >= Constants.MapSize.Y) continue;
+                    if (neighborCoord.X < 0 || neighborCoord.X >= LevelManager.MapSize.X || neighborCoord.Y < 0 || neighborCoord.Y >= LevelManager.MapSize.Y) continue;
                     BiomeType? biome = LevelManager.GetBiome(neighborCoord);
                     if (biome == startBiome && biome != BiomeSelection)
                         queue.Enqueue(neighborCoord);
@@ -573,12 +573,12 @@ public class EditorManager
     }
     public Tile GetTile(Point coord)
     {
-        if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
+        if (coord.X < 0 || coord.X >= LevelManager.MapSize.X || coord.Y < 0 || coord.Y >= LevelManager.MapSize.Y)
             throw new ArgumentOutOfRangeException(nameof(coord), "Coordinates are out of bounds of the level.");
-        return LevelManager.Level.Tiles[coord.X + coord.Y * Constants.MapSize.X];
+        return LevelManager.Level.Tiles[coord.X + coord.Y * LevelManager.MapSize.X];
     }
     public void SetTile(Tile tile)
     {
-        LevelManager.Level.Tiles[tile.X + tile.Y * Constants.MapSize.X] = tile;
+        LevelManager.Level.Tiles[tile.X + tile.Y * LevelManager.MapSize.X] = tile;
     }
 }
