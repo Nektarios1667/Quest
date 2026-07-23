@@ -164,6 +164,14 @@ public class Tile
         // Draw tile
         Point dest = CameraManager.TileToScreen(Location);
         DrawTexture(gameManager.Batch, Type.Texture, dest, source: gameManager.LevelManager.TileTextureSource(this), scale: Constants.TileSizeScale);
+
+        // Connected textures debug
+        if (!DebugManager.TileConnectionsDebug) return;
+        int mask = gameManager.LevelManager.TileConnectionsMask(this);
+        gameManager.Batch.DrawPoint(dest.ToVector2() + new Vector2(0, Constants.TileSize.Y / 2), (mask & 1) == 0 ? Color.Red : Color.Green, size: 5);     // Left
+        gameManager.Batch.DrawPoint(dest.ToVector2() + new Vector2(Constants.TileSize.X, Constants.TileSize.Y / 2), (mask & 4) == 0 ? Color.Red : Color.Green, size: 5); // Right
+        gameManager.Batch.DrawPoint(dest.ToVector2() + new Vector2(Constants.TileSize.X / 2, 0), (mask & 8) == 0 ? Color.Red : Color.Green, size: 5); // Up
+        gameManager.Batch.DrawPoint(dest.ToVector2() + new Vector2(Constants.TileSize.X / 2, Constants.TileSize.Y), (mask & 2) == 0 ? Color.Red : Color.Green, size: 5); // Down
     }
 
     public virtual void OnPlayerEnter(GameManager game, PlayerManager player) { }

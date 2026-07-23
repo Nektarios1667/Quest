@@ -40,6 +40,10 @@ partial class DebugWindow
         MemoryListbox = new System.Windows.Forms.ListBox();
         MemoryLabel = new System.Windows.Forms.Label();
         ExportLog = new System.Windows.Forms.Button();
+        LightsLabel = new System.Windows.Forms.Label();
+        LightsListbox = new System.Windows.Forms.ListBox();
+        ScriptsListbox = new System.Windows.Forms.ListBox();
+        ScriptsLabel = new System.Windows.Forms.Label();
         SuspendLayout();
         // 
         // TimerLabel
@@ -145,7 +149,7 @@ partial class DebugWindow
         MemoryListbox.ItemHeight = 15;
         MemoryListbox.Location = new System.Drawing.Point(8, 496);
         MemoryListbox.Name = "MemoryListbox";
-        MemoryListbox.Size = new System.Drawing.Size(197, 154);
+        MemoryListbox.Size = new System.Drawing.Size(197, 259);
         MemoryListbox.TabIndex = 12;
         // 
         // MemoryLabel
@@ -161,8 +165,9 @@ partial class DebugWindow
         // 
         // ExportLog
         // 
-        ExportLog.BackColor = System.Drawing.SystemColors.Control;
+        ExportLog.BackColor = System.Drawing.SystemColors.ActiveCaption;
         ExportLog.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+        ExportLog.ForeColor = System.Drawing.Color.Black;
         ExportLog.Location = new System.Drawing.Point(777, 532);
         ExportLog.Name = "ExportLog";
         ExportLog.Size = new System.Drawing.Size(87, 30);
@@ -171,12 +176,58 @@ partial class DebugWindow
         ExportLog.UseVisualStyleBackColor = false;
         ExportLog.Click += ExportLog_Click;
         // 
+        // LightsLabel
+        // 
+        LightsLabel.AutoSize = true;
+        LightsLabel.Font = new System.Drawing.Font("Segoe UI", 14F);
+        LightsLabel.ForeColor = System.Drawing.Color.CornflowerBlue;
+        LightsLabel.Location = new System.Drawing.Point(287, 529);
+        LightsLabel.Name = "LightsLabel";
+        LightsLabel.Size = new System.Drawing.Size(62, 25);
+        LightsLabel.TabIndex = 14;
+        LightsLabel.Text = "Lights";
+        // 
+        // LightsListbox
+        // 
+        LightsListbox.BackColor = System.Drawing.SystemColors.ActiveBorder;
+        LightsListbox.FormattingEnabled = true;
+        LightsListbox.ItemHeight = 15;
+        LightsListbox.Location = new System.Drawing.Point(219, 557);
+        LightsListbox.Name = "LightsListbox";
+        LightsListbox.Size = new System.Drawing.Size(197, 199);
+        LightsListbox.TabIndex = 15;
+        // 
+        // ScriptsListbox
+        // 
+        ScriptsListbox.BackColor = System.Drawing.SystemColors.ActiveBorder;
+        ScriptsListbox.FormattingEnabled = true;
+        ScriptsListbox.ItemHeight = 15;
+        ScriptsListbox.Location = new System.Drawing.Point(431, 556);
+        ScriptsListbox.Name = "ScriptsListbox";
+        ScriptsListbox.Size = new System.Drawing.Size(197, 199);
+        ScriptsListbox.TabIndex = 17;
+        // 
+        // ScriptsLabel
+        // 
+        ScriptsLabel.AutoSize = true;
+        ScriptsLabel.Font = new System.Drawing.Font("Segoe UI", 14F);
+        ScriptsLabel.ForeColor = System.Drawing.Color.CornflowerBlue;
+        ScriptsLabel.Location = new System.Drawing.Point(499, 528);
+        ScriptsLabel.Name = "ScriptsLabel";
+        ScriptsLabel.Size = new System.Drawing.Size(68, 25);
+        ScriptsLabel.TabIndex = 16;
+        ScriptsLabel.Text = "Scripts";
+        // 
         // DebugWindow
         // 
         AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
         AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
         BackColor = System.Drawing.SystemColors.ControlText;
-        ClientSize = new System.Drawing.Size(1184, 661);
+        ClientSize = new System.Drawing.Size(1184, 761);
+        Controls.Add(ScriptsListbox);
+        Controls.Add(ScriptsLabel);
+        Controls.Add(LightsListbox);
+        Controls.Add(LightsLabel);
         Controls.Add(ExportLog);
         Controls.Add(MemoryListbox);
         Controls.Add(MemoryLabel);
@@ -209,4 +260,8 @@ partial class DebugWindow
     private System.Windows.Forms.ListBox MemoryListbox;
     private System.Windows.Forms.Label MemoryLabel;
     private System.Windows.Forms.Button ExportLog;
+    private System.Windows.Forms.Label LightsLabel;
+    private System.Windows.Forms.ListBox LightsListbox;
+    private System.Windows.Forms.ListBox ScriptsListbox;
+    private System.Windows.Forms.Label ScriptsLabel;
 }

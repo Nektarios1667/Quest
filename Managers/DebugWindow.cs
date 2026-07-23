@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using Quest.World;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -57,15 +58,11 @@ public partial class DebugWindow : Form
     {
         RunOnUI(() =>
         {
-            UIDsListbox.BeginUpdate();
-
             UIDsListbox.Items.Clear();
             UIDsListbox.Items.AddRange(
                 uids
                     .Select(x => $"{x.Name}: {x.InUse} / {x.Counter}")
                     .ToArray());
-
-            UIDsListbox.EndUpdate();
         });
     }
     public void SetLog(IEnumerable<string> messages)
@@ -98,6 +95,29 @@ public partial class DebugWindow : Form
             MemoryListbox.Items.AddRange(info.ToArray());
         });
     }
+    public void SetLights(IEnumerable<RadialLight> lights)
+    {
+        RunOnUI(() =>
+        {
+            LightsListbox.Items.Clear();
+            LightsListbox.Items.AddRange(
+                lights
+                .Select(l => $"{l.Position.X}, {l.Position.Y} | {l.Size / Constants.TileSize.X}t | sf:{l.SingleFrame}")
+                .ToArray()
+            );
+        });
+    }
+    public void SetScripts(string scriptInfo)
+    {
+        RunOnUI(() =>
+        {
+            ScriptsListbox.Items.Clear();
+            ScriptsListbox.Items.AddRange(
+                scriptInfo.Split('\n')
+            );
+        });
+    }
+
     public void ForceClose()
     {
         _allowClose = true;
@@ -130,4 +150,5 @@ public partial class DebugWindow : Form
             }
         });
     }
+
 }

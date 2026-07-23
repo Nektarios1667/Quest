@@ -324,9 +324,6 @@ public class Window : Game, IAdjustableWindow
         infoSb.Append(StateManager.CurrentSave);
         infoSb.Append("\nDraw calls: ");
         infoSb.AppendFormat("{0:0} / {1:0}", DebugManager.Stat(Stats.UnculledDrawCalls), DebugManager.Stat(Stats.DrawCalls));
-        infoSb.Append("\nQuill: ");
-        foreach (var inst in Quill.Interpreter.GetQuillInstances())
-            infoSb.Append($"\n  {inst.Script.Name} | @{inst.L:000} | C:{inst.Callbacks.Count:0} | Sc:{(inst.Scopes.TryPeek(out string? sc) ? sc : "GLOBAL")}");
 
         // Drawing  
         if (!DebugManager.TextInfo) return;

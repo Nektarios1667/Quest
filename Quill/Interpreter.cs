@@ -1,6 +1,7 @@
 ﻿using NCalc;
 using Quest.Quill.Functions;
 using Quest.World;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Quest.Quill;
@@ -344,7 +345,13 @@ public static partial class Interpreter
         }
         instance.Errors.Clear();
     }
-
+    public static string GetInstanceInfo()
+    {
+        StringBuilder infoSb = new();
+        foreach (var inst in Quill.Interpreter.GetQuillInstances())
+            infoSb.Append($"\n  {inst.Script.Name} | @{inst.L:000} | C:{inst.Callbacks.Count:0} | Sc:{(inst.Scopes.TryPeek(out string? sc) ? sc : "GLOBAL")}");
+        return infoSb.ToString();
+    }
     [GeneratedRegex(@"\{([^}]*)\}", RegexOptions.Compiled)]
     private static partial Regex CurlyExpressions();
 }

@@ -1,4 +1,5 @@
-﻿using ScottPlot.AxisRules;
+﻿using Quest.World;
+using ScottPlot.AxisRules;
 using System.Diagnostics;
 using System.Linq;
 
@@ -27,6 +28,7 @@ public static class DebugManager
     public static bool DrawHitboxes { get; set; } = false;
     public static bool ProgramInfo { get; set; } = false;
     public static bool Culling { get; set; } = true;
+    public static bool TileConnectionsDebug { get; set; } = false;
     private static DebugWindow DebugWindow { get; set; } = null!;
     private static List<string> Logs { get; set; } = [];
     public static List<string> GetLogs() => Logs;
@@ -97,6 +99,11 @@ public static class DebugManager
             Culling = !Culling;
             Logger.System($"Culling set to: {Culling}");
         }
+        if (InputManager.BindPressed(InputAction.ToggleTileConnectionsDebug))
+        {
+            TileConnectionsDebug = !TileConnectionsDebug;
+            Logger.System($"TileConnectionsDebug set to: {Culling}");
+        }
 
         // Updates
         UpdateDebugWindow(infobox, memoryInfobox ?? []);
@@ -154,6 +161,8 @@ public static class DebugManager
         // Infobox
         DebugWindow.SetInfobox(infobox);
         DebugWindow.SetMemoryInfobox(memoryInfobox);
+        DebugWindow.SetLights(LightingManager.Lights.Values);
+        DebugWindow.SetScripts(Quill.Interpreter.GetInstanceInfo());
     }
     public static void CloseDebugWindow() => DebugWindow.ForceClose();
 }
