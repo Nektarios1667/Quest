@@ -183,7 +183,7 @@ public class EditorLevelManager
         Tile[] tiles = LevelGenerator.GenerateLevel(LevelGenerator.Size, int.Parse(values[4]));
 
         Level current = LevelManager.Level;
-        Level level = new(current.Path, LevelGenerator.Size, tiles, new BiomeType[LevelGenerator.Size.X * LevelGenerator.Size.Y], current.Spawn, [.. current.NPCs.Values], current.Loot, current.Decals, [.. current.Enemies.Values], current.Projectiles, [], current.Tint);
+        Level level = new(current.LevelPath, LevelGenerator.Size, tiles, new BiomeType[LevelGenerator.Size.X * LevelGenerator.Size.Y], current.Spawn, [.. current.NPCs.Values], current.Loot, current.Decals, [.. current.Enemies.Values], current.Projectiles, [], current.Tint);
 
         LevelManager.LoadLevelObject(GameManager, level);
     }
@@ -220,10 +220,21 @@ public class EditorLevelManager
         // Check save to continue
         if (!WarnSave()) return;
 
-        // Make blank level
-        Tile[] grassTiles = new Tile[256 * 256];
-        for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) grassTiles[t] = new Grass(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
-        LevelManager.LoadLevelObject(GameManager, new("NUL/NUL", Constants.MapSize, grassTiles, [], new(128, 128), [], [], [], [], [], []));
+        // Winforms
+        var (success, values) = ShowInputForm("New Level", [
+            new("World", null),
+            new("Level", null),
+            new("Width", IsPositiveInteger),
+            new("Height", IsPositiveInteger)
+        ]);
+        if (!success)
+        {
+            if (!PopupOpen) Logger.Error("Failed to open file.");
+            return;
+        }
+
+        Level level = LevelManager.GetEmptyLevel(values[0], values[1], int.Parse(values[2]), int.Parse(values[3]));
+        LevelManager.LoadLevelObject(GameManager, level);
     }
     public bool WarnSave()
     {

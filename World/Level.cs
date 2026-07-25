@@ -30,11 +30,11 @@ public class Level
     public Point Spawn { get; set; }
     public Color Tint { get; set; }
     public List<QuillScript> Scripts { get; private set; }
-    public Level(string name, Point size, Tile[] tiles, BiomeType[] biome, Point spawn, List<NPC> npcs, List<Loot> loot, Dictionary<Point, Decal> decals, List<Enemy> enemies, List<Projectile> projectiles, List<QuillScript> scripts, Color? tint = null)
+    public Level(LevelPath name, Point size, Tile[] tiles, BiomeType[] biome, Point spawn, List<NPC> npcs, List<Loot> loot, Dictionary<Point, Decal> decals, List<Enemy> enemies, List<Projectile> projectiles, List<QuillScript> scripts, Color? tint = null)
     {
         // Initialize the level
         Size = size;
-        LevelPath = new(name);
+        LevelPath = name;
         Tiles = tiles;
         Biome = biome.Length == 0 ? new BiomeType[LevelManager.MapSize.X * LevelManager.MapSize.Y] : biome;
         Spawn = spawn;

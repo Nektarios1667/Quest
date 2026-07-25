@@ -19,8 +19,6 @@ public static class Constants
     public static readonly Point TileHalfSize = new(TileSize.X / 2, TileSize.Y / 2); // Half of the in-game tile size
     public static readonly Point TilePixelSize = new(16, 16); // Native resolution of tile images
     public static readonly Point TileMapDim = new(4, 4); // Dimensions of the connected texture map
-    public static readonly Point MapSize = new(256, 256); // Map size in tiles - can not be above 256x256 because of save file
-    public static readonly Point HalfMapSize = new(MapSize.X / 2, MapSize.Y / 2); // Half of the map size in tiles
     public static readonly Vector2 TileSizeScale = (TileSize / TilePixelSize).ToVector2(); // Scale factor from tile pixel size to in-game tile size
     public static readonly Point[] NeighborTiles = [new(0, 1), new(1, 0), new(0, -1), new(-1, 0)];
     public static readonly Point[] DiagonalNeighborTiles = [new(1, 1), new(1, -1), new(-1, 1), new(-1, -1)];

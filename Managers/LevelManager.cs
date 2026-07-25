@@ -1,3 +1,4 @@
+using MonoGUI;
 using Quest.Quill;
 using Quest.World;
 using System.Diagnostics;
@@ -12,32 +13,19 @@ namespace Quest.Managers;
 
 public class LevelManager
 {
-    public static Point MapSize { get; private set; } = new(Constants.MapSize.X, Constants.MapSize.Y);
+    public static Point MapSize { get; private set; } = new(128, 128);
     public List<ILootGenerator> LootGenerators = new();
     public List<Level> Levels { get; private set; }
     public Level Level { get; private set; }
     public Color SkyColor { get; set; }
     public event Action<string>? LevelLoaded;
     public static readonly Point lootStackOffset = new(4, 4);
-    public static readonly Level EmptyLevel;
-    static LevelManager()
-    {
-        Tile[] grassTiles = new Tile[Constants.MapSize.X * Constants.MapSize.Y];
-        for (int t = 0; t < MapSize.X * MapSize.Y; t++) grassTiles[t] = new Grass(new(t % MapSize.X, t / MapSize.Y));
-        EmptyLevel = new("NUL/NUL", MapSize, grassTiles, [], new(128, 128), [], [], [], [], [], []);
-    }
     public LevelManager()
     {
         // Empty
         Levels = [];
-        Level = EmptyLevel;
-        //TimerManager.SetTimer("UpdatePathfindingGrid", 0.1f, () =>
-        //    PathfindingManager.SetGrid(Level,
-        //        CameraManager.TopLeftTileCoord,
-        //        Constants.NativeResolutionTiles
-        //    ),
-        //    int.MaxValue
-        //);
+        Level = GetEmptyLevel();
+        MapSize = Level.Size;
     }
     public void Update(GameManager gameManager)
     {
@@ -200,7 +188,7 @@ public class LevelManager
             if (level.Path == name)
                 return level;
         Logger.Error($"Level '{name}' not found in stored levels.");
-        return new("NUL/NUL", Point.Zero, [], [], Point.Zero, [], [], [], [], [], []);
+        return GetEmptyLevel();
     }
     public bool LoadLevel(GameManager gameManager, int levelIndex)
     {
@@ -290,7 +278,7 @@ public class LevelManager
         }
 
         string name = Levels[levelIndex].Path;
-        if (Level == Levels[levelIndex]) Level = EmptyLevel;
+        if (Level == Levels[levelIndex]) Level = GetEmptyLevel();
 
         // Dispose
         Level level = Levels[levelIndex];
@@ -377,7 +365,7 @@ public class LevelManager
         using BufferedStream buffer = new(fileStream, 128 * 1024);
         using GZipStream gzipStream = new(buffer, CompressionMode.Decompress);
         using BinaryReader reader = new(gzipStream);
-        //try
+        try
         {
 
             // Metadata
@@ -390,7 +378,7 @@ public class LevelManager
             // Spawn
             Point spawn = reader.ReadByteCoord().ToPoint();
             // Size
-            Point mapSize = Constants.MapSize;
+            Point mapSize = new(256, 256); // Default
             if (flags.HasFlag(LevelFeatures.CustomSize))
                 mapSize = reader.ReadPoint();
 
@@ -457,18 +445,18 @@ public class LevelManager
             }
 
             // Make and add the level
-            Level created = new(filename, mapSize, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, enemyBuffer, [], scriptBuffer, tint);
+            Level created = new(new(filename), mapSize, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, enemyBuffer, [], scriptBuffer, tint);
             if (reload) Levels.RemoveAll(l => l.Path == filename);
             Levels.Add(created);
             sw.Stop();
             Logger.System($"Successfully read level '{filename}' in {sw.ElapsedMilliseconds:F0}ms.");
             return true;
         }
-        //catch (Exception ex)
-        //{
-        //    Logger.Error($"Failed to read level file '{filename}': {ex.Message}");
-        //    return false;
-        //}
+        catch (Exception ex)
+        {
+            Logger.Error($"Failed to read level file '{filename}': {ex.Message}");
+            return false;
+        }
     }
     private static Tile ReadTile(BinaryReader reader, LevelPath levelPath, int x, int y)
     {
@@ -593,4 +581,12 @@ public class LevelManager
     public static Point TileCoord(Vector2 loc) => new((int)(loc.X / Constants.TileSize.X), (int)(loc.Y / Constants.TileSize.Y));
     public static Vector2 WorldCoord(Point tileCoord) => new(tileCoord.X * Constants.TileSize.X, tileCoord.Y * Constants.TileSize.Y);
     public static int Flatten(Point point) => point.X + point.Y * MapSize.X;
+    public static Level GetEmptyLevel(string world = "NUL", string level = "NUL", int width = 128, int height = 128)
+    {
+        Tile[] tiles = new Tile[width * height];
+        for (int t = 0; t < tiles.Length; t++)
+            tiles[t] = new Grass(new(t % width, t / width));
+
+        return new(new LevelPath(world, level), new(width, height), tiles, [], new(width / 2, height / 2), [], [], [], [], [], []);
+    }
 }
