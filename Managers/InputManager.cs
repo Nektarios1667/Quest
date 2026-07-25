@@ -170,11 +170,16 @@ public static class InputManager
     public static MouseState LastMouseState { get; private set; }
     public static void Update(Game game)
     {
-        if (!game.IsActive) return;
 
-        // Update input states
+
+        // Update last input states
         LastKeyboardState = KeyboardState;
         LastMouseState = MouseState;
+
+        // Prevent input offscreen from affecting the game
+        if (!game.IsActive) return;
+
+        // Update current input states
         KeyboardState = Keyboard.GetState();
         MouseState = Mouse.GetState();
     }
@@ -270,6 +275,13 @@ public static class InputManager
     }
     private static bool Hotkey(Keys modifier, Keys key, KeyboardState keystate) => keystate.IsKeyDown(modifier) && keystate.IsKeyDown(key);
     private static bool Hotkey(Keys modifier1, Keys modifier2, Keys key, KeyboardState keystate) => keystate.IsKeyDown(modifier1) && keystate.IsKeyDown(modifier2) && keystate.IsKeyDown(key);
+    public static void Clear()
+    {
+        KeyboardState = new();
+        LastKeyboardState = new();
+        MouseState = new();
+        LastMouseState = new();
+    }
     public static bool LMouseClicked => MouseState.LeftButton == ButtonState.Pressed && LastMouseState.LeftButton == ButtonState.Released;
     public static bool RMouseClicked => MouseState.RightButton == ButtonState.Pressed && LastMouseState.RightButton == ButtonState.Released;
     public static bool MMouseClicked => MouseState.MiddleButton == ButtonState.Pressed && LastMouseState.MiddleButton == ButtonState.Released;

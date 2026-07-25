@@ -17,6 +17,8 @@ public static class PopupFactory
     public static Form? Form { get; private set; }
     public static (bool success, string[] values) ShowInputForm(string title, InputField[] fields, bool close = true, Action<string[]>? action = null)
     {
+        InputManager.Clear();
+
         if (PopupOpen) return (false, Array.Empty<string>());
         PopupOpen = true;
         // Setup

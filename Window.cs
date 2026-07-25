@@ -236,6 +236,7 @@ public class Window : Game, IAdjustableWindow
 
         base.Draw(gameTime);
     }
+
     // For cleaner code
     public void DrawFrameInfo()
     {
