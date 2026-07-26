@@ -1,4 +1,5 @@
 ﻿using MonoGUI;
+using MonoGUI.Widgets;
 using Quest.Editor.Generator;
 using Quest.Editor.Managers;
 using Quest.World;
@@ -20,11 +21,11 @@ public class LevelEditor : Game, IAdjustableWindow
     private EditorLevelManager editorLevelManager = null!;
     private EditorOverlayManager editorOverlayManager = null!;
     private GUI gui = null!;
-    private GUI paletteGui = null!;
     private Matrix scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
 
     // GUIs and menus
     private GUI SettingsMenu = null!;
+    private MonoGUI.Widgets.Group tilesetGroup = null!;
 
     // Editing
     private int TileSelectionIdx = 0;
@@ -182,17 +183,17 @@ public class LevelEditor : Game, IAdjustableWindow
         gui.AddWidgets(tileDrawSelect, decalDrawSelect, biomeDrawSelect);
 
         // Palette selection
-        paletteGui = new(this, spriteBatch, Arial);
+        tilesetGroup = new(gui);
         var tilesets = Enum.GetValues<TilesetTypes>();
         for (int t = 0; t < tilesets.Length; t++)
         {
             var tileset = tilesets[t];
-            Button tilesetButton = new(paletteGui, new(10, t * 35 + 10), new(100, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => TilesetSelection = tileset, [], tileset.ToString(), border: 0);
-            paletteGui.AddWidget(tilesetButton);
+            Button tilesetButton = new(gui, new(10, t * 35 + 10), new(100, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => TilesetSelection = tileset, [], tileset.ToString(), border: 0);
+            tilesetGroup.AddWidget(tilesetButton);
         }
+        gui.AddWidget(tilesetGroup);
 
         gui.LoadContent(Content, "Images/Gui");
-        paletteGui.LoadContent(Content, "Images/Gui");
         Logger.System("Initialized GUI.");
 
         // Other
@@ -310,7 +311,6 @@ public class LevelEditor : Game, IAdjustableWindow
 
         // Gui
         gui.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
-        paletteGui.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
 
         TimerManager.Update(gameManager);
         gameManager.Update(delta);
@@ -376,13 +376,9 @@ public class LevelEditor : Game, IAdjustableWindow
         else
         {
             // Main gui
+            tilesetGroup.Visible = currentTool == EditorTool.Tile;
+            if (tilesetGroup.Visible) spriteBatch.DrawRectangle(new(new(10 - 2, (int)TilesetSelection * 35 + 10 - 2), new(104, 34)), Color.White, thickness: 4);
             gui.Draw();
-            // Palette gui
-            if (currentTool == EditorTool.Tile)
-            {
-                spriteBatch.DrawRectangle(new(new(10 - 2, (int)TilesetSelection * 35 + 10 - 2), new(104, 34)), Color.White, thickness: 4);
-                paletteGui.Draw();
-            }
         }
 
         // Cursor
