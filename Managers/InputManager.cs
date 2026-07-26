@@ -63,6 +63,8 @@ public enum InputAction
     SelectBiomeTool,
     CycleToolNext,
     CycleToolPrevious,
+    CycleTilesetNext,
+    CycleTilesetPrevious,
     FloodFill,
     NewLevel,
 }
@@ -159,6 +161,8 @@ public static class InputManager
         { InputAction.SelectBiomeTool,              new(Keys.D3) },
         { InputAction.CycleToolNext,                new(Keys.OemCloseBrackets) },
         { InputAction.CycleToolPrevious,            new(Keys.OemOpenBrackets) },
+        { InputAction.CycleTilesetNext,             new(Keys.Q) },
+        { InputAction.CycleTilesetPrevious,         new(Keys.E) },
         { InputAction.FloodFill,                    new(Keys.F, [Keys.LeftControl]) },
         { InputAction.NewLevel,                     new(Keys.N, [Keys.LeftControl]) },
     };

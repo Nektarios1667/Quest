@@ -51,7 +51,7 @@ public class EditorOverlayManager
         else
             DrawBottomInfo(spriteBatch, selection, $"[{mouseTile?.Type.Texture}]");
     }
-    public void DrawBottomInfo(SpriteBatch spriteBatch, TileTypeID tileSelection, string text)
+    public static void DrawBottomInfo(SpriteBatch spriteBatch, TileTypeID tileSelection, string text)
     {
         text = $"{tileSelection} | {text}";
         Vector2 textSize = Arial.MeasureString(text);

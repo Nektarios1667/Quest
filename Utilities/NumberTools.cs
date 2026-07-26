@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using SharpDX.MediaFoundation;
+using System.Numerics;
 
 namespace Quest.Utilities;
 
@@ -24,12 +25,24 @@ public static class NumberTools
         var values = (T[])Enum.GetValues(typeof(T));
         value = values[(Array.IndexOf(values, value) + 1) % values.Length];
     }
+    public static T CycleUp<T>(T value) where T : Enum
+    {
+        var values = (T[])Enum.GetValues(typeof(T));
+        return values[(Array.IndexOf(values, value) + 1) % values.Length];
+    }
     public static void CycleDown<T>(ref T value) where T : Enum
     {
         var values = (T[])Enum.GetValues(typeof(T));
         int newIdx = Array.IndexOf(values, value) - 1;
         if (newIdx < 0) newIdx = values.Length - 1;
         value = values[newIdx];
+    }
+    public static T CycleDown<T>(T value) where T : Enum
+    {
+        var values = (T[])Enum.GetValues(typeof(T));
+        int newIdx = Array.IndexOf(values, value) - 1;
+        if (newIdx < 0) newIdx = values.Length - 1;
+        return values[newIdx];
     }
     public static bool[] ExtractFlags(byte flags)
     {

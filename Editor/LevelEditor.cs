@@ -2,6 +2,7 @@
 using Quest.Editor.Generator;
 using Quest.Editor.Managers;
 using Quest.World;
+using System.Linq;
 using System.Text;
 
 namespace Quest.Editor;
@@ -19,13 +20,25 @@ public class LevelEditor : Game, IAdjustableWindow
     private EditorLevelManager editorLevelManager = null!;
     private EditorOverlayManager editorOverlayManager = null!;
     private GUI gui = null!;
+    private GUI paletteGui = null!;
     private Matrix scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
 
     // GUIs and menus
     private GUI SettingsMenu = null!;
 
     // Editing
-    private TileTypeID TileSelection;
+    private int TileSelectionIdx = 0;
+    private TilesetTypes _tilesetSelection;
+    private TilesetTypes TilesetSelection
+    {
+        get => _tilesetSelection;
+        set
+        {
+            TileSelectionIdx = 0;
+            _tilesetSelection = value;
+        }
+    }
+    private TileTypeID TileSelection => Tilesets.TypeToArray[TilesetSelection][TileSelectionIdx];
     private DecalType DecalSelection;
     private BiomeType BiomeSelection;
 
@@ -121,9 +134,10 @@ public class LevelEditor : Game, IAdjustableWindow
         SettingsMenu.LoadContent(Content, "Images/Gui");
 
         // Editor gui
+        // Mouse menu
         gui = new(this, spriteBatch, Arial);
         mouseMenu = new(gui, Point.Zero, new(100, 300), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
-        mouseMenu.AddItem("Pick", () => { TileSelection = mouseTile.Type.ID; Logger.Log($"Picked tile '{TileSelection}' @ {mouseCoord.X}, {mouseCoord.Y}."); }, []);
+        mouseMenu.AddItem("Pick", PickTile, []);
         mouseMenu.AddItem("Open", editorLevelManager.OpenLevelDialog, []);
         mouseMenu.AddItem("Fill", editorManager.FloodFill, []);
         mouseMenu.AddItem("Draw Biome", () => editorManager.ShowBiomeMarkers = !editorManager.ShowBiomeMarkers, []);
@@ -161,12 +175,24 @@ public class LevelEditor : Game, IAdjustableWindow
         mouseMenu.AddItem("Exit", Exit, []);
         gui.AddWidget(mouseMenu);
 
+        // Mouse select
         Button tileDrawSelect = new(gui, new(Constants.Middle.X - 100, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Tile, [], "Tiles", border: 0);
         Button decalDrawSelect = new(gui, new(Constants.Middle.X, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.5f, () => currentTool = EditorTool.Decal, [], "Decals", border: 0);
         Button biomeDrawSelect = new(gui, new(Constants.Middle.X + 100, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Biome, [], "Biomes", border: 0);
         gui.AddWidgets(tileDrawSelect, decalDrawSelect, biomeDrawSelect);
 
+        // Palette selection
+        paletteGui = new(this, spriteBatch, Arial);
+        var tilesets = Enum.GetValues<TilesetTypes>();
+        for (int t = 0; t < tilesets.Length; t++)
+        {
+            var tileset = tilesets[t];
+            Button tilesetButton = new(paletteGui, new(10, t * 35 + 10), new(100, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => TilesetSelection = tileset, [], tileset.ToString(), border: 0);
+            paletteGui.AddWidget(tilesetButton);
+        }
+
         gui.LoadContent(Content, "Images/Gui");
+        paletteGui.LoadContent(Content, "Images/Gui");
         Logger.System("Initialized GUI.");
 
         // Other
@@ -213,16 +239,22 @@ public class LevelEditor : Game, IAdjustableWindow
         // Change material
         if (InputManager.ScrolledUp || InputManager.BindPressed(InputAction.CycleToolNext))
         {
-            if (currentTool == EditorTool.Tile) NumberTools.CycleUp(ref TileSelection);
+            if (currentTool == EditorTool.Tile) TileSelectionIdx = (TileSelectionIdx + 1) % Tilesets.TypeToArray[TilesetSelection].Length; // Bugged
             else if (currentTool == EditorTool.Decal) NumberTools.CycleUp(ref DecalSelection);
             else if (currentTool == EditorTool.Biome) NumberTools.CycleUp(ref BiomeSelection);
         }
         if (InputManager.ScrolledDown || InputManager.BindPressed(InputAction.CycleToolPrevious))
         {
-            if (currentTool == EditorTool.Tile) NumberTools.CycleDown(ref TileSelection);
+            if (currentTool == EditorTool.Tile) TileSelectionIdx = (TileSelectionIdx - 1) + (TileSelectionIdx <= 0 ? Tilesets.TypeToArray[TilesetSelection].Length : 0);
             else if (currentTool == EditorTool.Decal) NumberTools.CycleDown(ref DecalSelection);
             else if (currentTool == EditorTool.Biome) NumberTools.CycleDown(ref BiomeSelection);
         }
+
+        // Change tileset
+        if (InputManager.BindPressed(InputAction.CycleTilesetNext))
+            TilesetSelection = NumberTools.CycleUp(TilesetSelection); // Non-ref version since TilesetSelection is a property
+        if (InputManager.BindPressed(InputAction.CycleTilesetPrevious))
+            TilesetSelection = NumberTools.CycleDown(TilesetSelection); // Non-ref version since TilesetSelection is a property
 
         // Placing tiles
         UpdateTilePlacing();
@@ -278,6 +310,7 @@ public class LevelEditor : Game, IAdjustableWindow
 
         // Gui
         gui.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
+        paletteGui.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
 
         TimerManager.Update(gameManager);
         gameManager.Update(delta);
@@ -342,7 +375,14 @@ public class LevelEditor : Game, IAdjustableWindow
         }
         else
         {
+            // Main gui
             gui.Draw();
+            // Palette gui
+            if (currentTool == EditorTool.Tile)
+            {
+                spriteBatch.DrawRectangle(new(new(10 - 2, (int)TilesetSelection * 35 + 10 - 2), new(104, 34)), Color.White, thickness: 4);
+                paletteGui.Draw();
+            }
         }
 
         // Cursor
@@ -412,7 +452,18 @@ public class LevelEditor : Game, IAdjustableWindow
     }
     public void PickTile()
     {
-        if (currentTool == EditorTool.Tile) TileSelection = mouseTile.Type.ID;
+        if (currentTool == EditorTool.Tile)
+        {
+            foreach (var (type, set) in Tilesets.TypeToArray)
+            {
+                int idx = Array.IndexOf(set, mouseTile.Type.ID);
+                if (idx != -1)
+                {
+                    TilesetSelection = type;
+                    TileSelectionIdx = idx;
+                }
+            }
+        }
         else if (currentTool == EditorTool.Decal)
         {
             Decal? picked = levelManager.Level.Decals.TryGetValue(mouseCoord.ToByteCoord(), out var dec) ? dec : null;
