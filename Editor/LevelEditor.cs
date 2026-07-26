@@ -15,7 +15,6 @@ public class LevelEditor : Game, IAdjustableWindow
     private readonly GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch = null!;
     private GameManager gameManager = null!;
-    private OverlayManager overlayManager = null!;
     private LevelManager levelManager = null!;
     private EditorManager editorManager = null!;
     private EditorLevelManager editorLevelManager = null!;
@@ -49,7 +48,7 @@ public class LevelEditor : Game, IAdjustableWindow
     private Point mouseSelectionCoord;
     private Point mouseSelection;
     private LevelGenerator levelGenerator = null!;
-    private MouseMenu mouseMenu;
+    private MouseMenu mouseMenu = null!;
     private EditorTool currentTool = EditorTool.Tile;
 
     // Time
@@ -67,8 +66,6 @@ public class LevelEditor : Game, IAdjustableWindow
         Constants.EDITOR = true;
         graphics = new GraphicsDeviceManager(this)
         {
-            //PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
-            //PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height,
             PreferredBackBufferWidth = SettingsManager.ScreenResolution.X,
             PreferredBackBufferHeight = SettingsManager.ScreenResolution.Y,
             IsFullScreen = false,
@@ -118,8 +115,8 @@ public class LevelEditor : Game, IAdjustableWindow
         // Managers
         levelGenerator = new(42, 1f / 64);
         levelManager = new();
-        overlayManager = new(null);
-        gameManager = new(Content, spriteBatch, levelManager, overlayManager, null);
+        //overlayManager = new(null);
+        gameManager = new(Content, spriteBatch, levelManager, null, null);
         editorManager = new(gameManager);
         editorLevelManager = new(gameManager, levelGenerator);
         editorOverlayManager = new(gameManager, spriteBatch, GraphicsDevice);
@@ -244,22 +241,22 @@ public class LevelEditor : Game, IAdjustableWindow
         // Change material
         if (InputManager.ScrolledUp || InputManager.BindPressed(InputAction.CycleToolNext))
         {
-            if (currentTool == EditorTool.Tile) TileSelectionIdx = (TileSelectionIdx + 1) % Tilesets.TypeToArray[TilesetSelection].Length; // Bugged
-            else if (currentTool == EditorTool.Decal) NumberTools.CycleUp(ref DecalSelection);
-            else if (currentTool == EditorTool.Biome) NumberTools.CycleUp(ref BiomeSelection);
-        }
-        if (InputManager.ScrolledDown || InputManager.BindPressed(InputAction.CycleToolPrevious))
-        {
             if (currentTool == EditorTool.Tile) TileSelectionIdx = (TileSelectionIdx - 1) + (TileSelectionIdx <= 0 ? Tilesets.TypeToArray[TilesetSelection].Length : 0);
             else if (currentTool == EditorTool.Decal) NumberTools.CycleDown(ref DecalSelection);
             else if (currentTool == EditorTool.Biome) NumberTools.CycleDown(ref BiomeSelection);
         }
+        if (InputManager.ScrolledDown || InputManager.BindPressed(InputAction.CycleToolPrevious))
+        {
+            if (currentTool == EditorTool.Tile) TileSelectionIdx = (TileSelectionIdx + 1) % Tilesets.TypeToArray[TilesetSelection].Length;
+            else if (currentTool == EditorTool.Decal) NumberTools.CycleUp(ref DecalSelection);
+            else if (currentTool == EditorTool.Biome) NumberTools.CycleUp(ref BiomeSelection);
+        }
 
         // Change tileset
         if (InputManager.BindPressed(InputAction.CycleTilesetNext))
-            TilesetSelection = NumberTools.CycleUp(TilesetSelection); // Non-ref version since TilesetSelection is a property
-        if (InputManager.BindPressed(InputAction.CycleTilesetPrevious))
             TilesetSelection = NumberTools.CycleDown(TilesetSelection); // Non-ref version since TilesetSelection is a property
+        if (InputManager.BindPressed(InputAction.CycleTilesetPrevious))
+            TilesetSelection = NumberTools.CycleUp(TilesetSelection); // Non-ref version since TilesetSelection is a property
 
         // Placing tiles
         UpdateTilePlacing();
@@ -319,7 +316,7 @@ public class LevelEditor : Game, IAdjustableWindow
         TimerManager.Update(gameManager);
         gameManager.Update(delta);
         levelManager.Update(gameManager);
-        overlayManager.Update(gameManager, null);
+        //overlayManager.Update(gameManager, null);
         editorOverlayManager.Update();
 
         // Final
@@ -336,7 +333,6 @@ public class LevelEditor : Game, IAdjustableWindow
 
         // Draw game
         levelManager.Draw(gameManager);
-        overlayManager.Draw(GraphicsDevice, gameManager, null);
 
         // Render biome markers
         DebugManager.StartBenchmark("DrawBiomes");

@@ -1,4 +1,5 @@
 ﻿using Quest.Gui;
+using System.Diagnostics;
 using LM = Quest.Managers.LightingManager;
 
 namespace Quest.Managers;
@@ -12,14 +13,11 @@ public class OverlayManager
     private RenderTarget2D? minimap;
     public OverlayManager(PlayerManager? playerManager)
     {
-        Gui = new()
-        {
-            Widgets = [
-                HealthBar = new StatusBar(new(10, Constants.NativeResolution.Y - 35), new(300, 25), Color.Green * 0.7f, Color.Red * 0.7f, 100, 100),
+        Gui = new();
+        Gui.Widgets = [
+            HealthBar = new StatusBar(new(10, Constants.NativeResolution.Y - 35), new(300, 25), Color.Green * 0.7f, Color.Red * 0.7f, 100, 100),
                 LootNotifications = new NotificationArea(Constants.Middle - new Point(0, Constants.MageHalfSize.Y + 15), 5, PixelOperatorBold)
-            ]
-        };
-
+        ];
 
         // Trigger lighting updates
         if (playerManager != null)
@@ -28,8 +26,8 @@ public class OverlayManager
             playerManager.InventoryUI.OnSlotDrop += (_, _) => LM.MarkUpdateLighting();
             playerManager.InventoryUI.OnSlotItemChange += (_, _) => LM.MarkUpdateLighting();
         }
-        else if (Program.Mode == ProgramMode.Game)
-            Logger.Warning("No PlayerMaqnager object for the OverlayManager");
+        else if (StateManager.State == GameState.Game)
+            Logger.Error("No PlayerManager object for the OverlayManager");
         //TimerManager.SetTimer("LightingUpdate", 3f, MarkUpdateLighting, int.MaxValue);
         CameraManager.TileChange += (_, _) => LM.MarkUpdateLighting();
         CameraManager.CameraMove += (_, newCam) =>
@@ -42,6 +40,8 @@ public class OverlayManager
 
     public void Update(GameManager gameManager, PlayerManager? playerManager)
     {
+        if (StateManager.State != GameState.Game) return;
+
         // Gui
         DebugManager.StartBenchmark("GuiUpdate");
         Gui.Update(gameManager);
@@ -53,11 +53,10 @@ public class OverlayManager
     }
     public void Draw(GraphicsDevice device, GameManager gameManager, PlayerManager? playerManager)
     {
-        if (!StateManager.IsPlayingState) return;
+        if (StateManager.State != GameState.Game) return;
 
         // Lighting
-        if (StateManager.State == GameState.Game)
-            DrawLighting(gameManager);
+        DrawLighting(gameManager);
 
         // Darkening
         DrawPostProcessing(gameManager, playerManager);

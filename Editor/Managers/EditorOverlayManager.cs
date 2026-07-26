@@ -55,7 +55,7 @@ public class EditorOverlayManager
     {
         text = $"{tileSelection} | {text}";
         Vector2 textSize = Arial.MeasureString(text);
-        Vector2 pos = new(Constants.Middle.X - textSize.X / 2, Constants.NativeResolution.Y - textSize.Y - 3);
+        Vector2 pos = new Vector2(MathF.Round(Constants.Middle.X - textSize.X / 2), MathF.Round(Constants.NativeResolution.Y - textSize.Y - 3));
         spriteBatch.FillRectangle(new(pos - Vector2.One * 4, textSize + Vector2.One * 8), Color.Gray * 0.5f);
         spriteBatch.DrawRectangle(new(pos - Vector2.One * 4, textSize + Vector2.One * 8), Color.Black * 0.5f);
         spriteBatch.DrawString(Arial, text, pos, Color.Black);

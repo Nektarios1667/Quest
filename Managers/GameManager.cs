@@ -16,13 +16,16 @@ public class GameManager
     public SpriteBatch MinimapBatch { get; private set; }
     public Effect? GradingEffect { get; private set; }
 
-    public GameManager(ContentManager content, SpriteBatch batch, LevelManager level, OverlayManager overlay, Effect? gradingEffect)
+    public GameManager(ContentManager content, SpriteBatch batch, LevelManager level, OverlayManager? overlay, Effect? gradingEffect)
     {
+        if (overlay == null && StateManager.State == GameState.Game)
+            Logger.Error("No OverlayManager object for the GameManager.");
+
         GradingEffect = gradingEffect;
         Batch = batch;
         MinimapBatch = new SpriteBatch(batch.GraphicsDevice);
         LevelManager = level;
-        OverlayManager = overlay;
+        OverlayManager = overlay!; // Allow null OverlayManager for level editor. Not using nullable OverlayManager property just for convenience.
     }
     public void Update(float deltaTime)
     {
