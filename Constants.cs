@@ -129,6 +129,12 @@ public static class Constants
         new(168, 159, 151), // IronWindow
         new(255, 255, 90), // SandstoneWindow
         new(92, 53, 23), // WoodWindow
+        new(107, 169, 197), // IceWall
+        new(24, 15, 0), // MudWall
+        Color.Gray, // SnowWall
+        new(24, 15, 0), // MudWindow
+        Color.Gray, // SnowWindow
+        new(107, 169, 197), // IceWindow
         // MINIMAPCOLORS
     ];
 }

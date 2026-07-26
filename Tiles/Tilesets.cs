@@ -37,6 +37,9 @@ public static class Tilesets
         TileTypeID.SandstoneWall,
         TileTypeID.StoneWall,
         TileTypeID.WoodWall,
+        TileTypeID.MudWall,
+        TileTypeID.SnowWall,
+        TileTypeID.IceWall,
         TileTypeID.Door,
     ];
     public static readonly TileTypeID[] Windows = [
@@ -45,6 +48,9 @@ public static class Tilesets
         TileTypeID.SandstoneWindow,
         TileTypeID.StoneWindow,
         TileTypeID.WoodWindow,
+        TileTypeID.MudWindow,
+        TileTypeID.SnowWindow,
+        TileTypeID.IceWindow,
     ];
     public static readonly TileTypeID[] Interactables = [
         TileTypeID.Chest,

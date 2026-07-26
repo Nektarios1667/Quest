@@ -235,7 +235,8 @@ public class LevelManager
         Level = Levels[levelIndex];
 
         // MiniMap
-        gameManager.OverlayManager.RefreshMiniMap();
+        if (StateManager.State == GameState.Game)
+            gameManager.OverlayManager.RefreshMiniMap();
 
         // Close old QuillScripts
         Interpreter.ClearScripts();

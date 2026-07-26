@@ -316,7 +316,6 @@ public class LevelEditor : Game, IAdjustableWindow
         TimerManager.Update(gameManager);
         gameManager.Update(delta);
         levelManager.Update(gameManager);
-        //overlayManager.Update(gameManager, null);
         editorOverlayManager.Update();
 
         // Final
