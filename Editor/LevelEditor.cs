@@ -25,7 +25,8 @@ public class LevelEditor : Game, IAdjustableWindow
 
     // GUIs and menus
     private GUI SettingsMenu = null!;
-    private MonoGUI.Widgets.Group tilesetGroup = null!;
+    private Group tilesetGroup = null!;
+    private RectangleShape tilesetHighlight = null!;
 
     // Editing
     private int TileSelectionIdx = 0;
@@ -191,7 +192,10 @@ public class LevelEditor : Game, IAdjustableWindow
             Button tilesetButton = new(gui, new(10, t * 35 + 10), new(100, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => TilesetSelection = tileset, [], tileset.ToString(), border: 0);
             tilesetGroup.AddWidget(tilesetButton);
         }
-        gui.AddWidget(tilesetGroup);
+        tilesetHighlight = new(gui, new(10, (int)TilesetSelection * 35 + 10), new(100, 30), Color.Transparent, Color.White, 2);
+        tilesetGroup.AddWidget(tilesetHighlight);
+
+        gui.AddWidgets(tilesetGroup);
 
         gui.LoadContent(Content, "Images/Gui");
         Logger.System("Initialized GUI.");
@@ -377,7 +381,8 @@ public class LevelEditor : Game, IAdjustableWindow
         {
             // Main gui
             tilesetGroup.Visible = currentTool == EditorTool.Tile;
-            if (tilesetGroup.Visible) spriteBatch.DrawRectangle(new(new(10 - 2, (int)TilesetSelection * 35 + 10 - 2), new(104, 34)), Color.White, thickness: 4);
+            tilesetHighlight.Location = new Point(10, (int)TilesetSelection * 35 + 10);
+
             gui.Draw();
         }
 
