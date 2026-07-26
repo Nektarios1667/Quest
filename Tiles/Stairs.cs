@@ -7,10 +7,12 @@ public class Stairs : Tile
     public Stairs(Point location, LevelPath destLevel, Point destPosition) : base(location, TileTypeID.Stairs)
     {
         Dest = new(destPosition);
-        DestLevel = destLevel; // For consistency
+        DestLevel = destLevel;
     }
     public override void OnPlayerEnter(GameManager game, PlayerManager player)
     {
+        if (DestLevel.IsNull()) return;
+
         // Load another level
         bool read = game.LevelManager.ReadLevel(game, DestLevel.ToString(), reload: false);
         bool loaded = game.LevelManager.LoadLevel(game, DestLevel.ToString());

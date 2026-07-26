@@ -93,7 +93,7 @@ public class EditorLevelManager
             if (tile is Stairs stairs)
             {
                 // Write destination
-                writer.Write(stairs.DestLevel.LevelName);
+                writer.Write(stairs.DestLevel.LevelName ?? "");
                 writer.Write(stairs.Dest);
             }
             else if (tile is Door door)
