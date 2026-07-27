@@ -173,6 +173,8 @@ public static class TextureManager
         MudWindow,
         SnowWindow,
         IceWindow,
+        DryWall,
+        DryWallWindow,
         // TILES ENUM INSERT
         Torch,
         BlueTorch,
@@ -395,6 +397,8 @@ public static class TextureManager
         Textures[TextureID.MudWindow] = content.Load<Texture2D>("Images/Tiles/MudWindow");
         Textures[TextureID.SnowWindow] = content.Load<Texture2D>("Images/Tiles/SnowWindow");
         Textures[TextureID.IceWindow] = content.Load<Texture2D>("Images/Tiles/IceWindow");
+        Textures[TextureID.DryWall] = content.Load<Texture2D>("Images/Tiles/DryWall");
+        Textures[TextureID.DryWallWindow] = content.Load<Texture2D>("Images/Tiles/DryWallWindow");
         // TILES INSERT
         Textures[TextureID.Torch] = content.Load<Texture2D>("Images/Decals/Torch");
         Textures[TextureID.BlueTorch] = content.Load<Texture2D>("Images/Decals/BlueTorch");
@@ -602,6 +606,8 @@ public static class TextureManager
         Metadata[TextureID.MudWindow] = new(Textures[TextureID.MudWindow].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.SnowWindow] = new(Textures[TextureID.SnowWindow].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.IceWindow] = new(Textures[TextureID.IceWindow].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.DryWall] = new(Textures[TextureID.DryWall].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.DryWallWindow] = new(Textures[TextureID.DryWallWindow].Bounds.Size, new(4, 4), "tile");
         // TILES METADATA INSERT
         Metadata[TextureID.Torch] = new(Textures[TextureID.Torch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), "decal");

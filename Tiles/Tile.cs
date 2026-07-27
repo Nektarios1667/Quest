@@ -59,6 +59,8 @@ public enum TileTypeID : byte
     MudWindow,
     SnowWindow,
     IceWindow,
+    DryWall,
+    DryWallWindow,
     // TILES ID
 }
 
@@ -142,6 +144,8 @@ public static class TileTypes
         new(TileTypeID.MudWindow, TextureID.MudWindow, false, true, isTransparent: true),
         new(TileTypeID.SnowWindow, TextureID.SnowWindow, false, true, isTransparent: true),
         new(TileTypeID.IceWindow, TextureID.IceWindow, false, true, isTransparent: true),
+        new(TileTypeID.DryWall, TextureID.DryWall, false, true),
+        new(TileTypeID.DryWallWindow, TextureID.DryWallWindow, false, true, isTransparent: true),
         // TILES REGISTER
     ];
 }

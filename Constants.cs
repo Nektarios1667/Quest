@@ -135,6 +135,8 @@ public static class Constants
         new(24, 15, 0), // MudWindow
         Color.Gray, // SnowWindow
         new(107, 169, 197), // IceWindow
+        Color.Beige, // DryWall
+        Color.Beige, // DryWallWindow
         // MINIMAPCOLORS
     ];
 }
