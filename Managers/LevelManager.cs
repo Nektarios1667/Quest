@@ -283,7 +283,7 @@ public class LevelManager
         Level = level;
 
         // MiniMap
-        gameManager.OverlayManager.RefreshMiniMap();
+        gameManager.OverlayManager?.RefreshMiniMap();
 
         // Spawn
         CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
