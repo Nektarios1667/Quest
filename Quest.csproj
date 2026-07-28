@@ -21,6 +21,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+	<Optimize>true</Optimize>
+	<DebugType>pdbonly</DebugType>
+	<DebugSymbols>true</DebugSymbols>
+	<PublishReadyToRun>true</PublishReadyToRun>
+	<SelfContained>true</SelfContained>
+	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="C:\Users\nekta\.nuget\packages\monogui\1.6.10\contentFiles\any\net8.0\Content\bin\DesktopGL\Content\Arial.xnb" />
