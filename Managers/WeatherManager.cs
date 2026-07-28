@@ -1,10 +1,5 @@
 ﻿using Quest.World;
-using ScottPlot.Colormaps;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Quest.Managers;
 
@@ -35,8 +30,8 @@ public class WeatherManager
     };
     private const float WeatherFadeOut = 3;
     private const float WeatherFadeIn = 2;
-    private Dictionary<WeatherSound, float> FadeStartVolume = new();
-    private Dictionary<WeatherSound, float> TimeSinceSound = new()
+    private readonly Dictionary<WeatherSound, float> FadeStartVolume = new();
+    private readonly Dictionary<WeatherSound, float> TimeSinceSound = new()
     {
         { WeatherSound.None, float.MaxValue },
         { WeatherSound.Rain, float.MaxValue },
@@ -94,7 +89,7 @@ public class WeatherManager
     {
         if (StateManager.State == GameState.Game)
 
-        WeatherIntensity = GetWeatherIntensity(GameManager.GameTime);
+            WeatherIntensity = GetWeatherIntensity(GameManager.GameTime);
         WeatherValue = GetWeatherValue(GameManager.GameTime);
 
         UpdateWeatherSounds(gameManager);
@@ -163,7 +158,7 @@ public class WeatherManager
                 if (TimeSinceSound[weatherSound] >= WeatherFadeOut)
                 {
                     // Clear
-                    SoundManager.EndInstance(weatherSound.ToString()); 
+                    SoundManager.EndInstance(weatherSound.ToString());
                     FadeStartVolume.Remove(weatherSound);
                 }
                 else if (instance != null)

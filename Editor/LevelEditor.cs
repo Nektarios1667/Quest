@@ -3,7 +3,6 @@ using MonoGUI.Widgets;
 using Quest.Editor.Generator;
 using Quest.Editor.Managers;
 using Quest.World;
-using System.Linq;
 using System.Text;
 
 namespace Quest.Editor;

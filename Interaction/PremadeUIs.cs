@@ -332,7 +332,8 @@ public partial class UserInterface
             timer.Restart();
         };
 
-        timer.TimerComplete += (_) => {
+        timer.TimerComplete += (_) =>
+        {
             // Convert to cooked
             Item? outputItem = RecipeRegistry.UseRecipe([input.Item!], fuel.Item, RecipeType.Stove);
             if (StoveUI.BoundContainer != null && outputItem != null)

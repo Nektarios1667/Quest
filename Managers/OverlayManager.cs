@@ -1,5 +1,4 @@
 ﻿using Quest.Gui;
-using System.Diagnostics;
 using LM = Quest.Managers.LightingManager;
 
 namespace Quest.Managers;

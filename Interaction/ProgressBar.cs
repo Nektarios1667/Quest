@@ -1,11 +1,4 @@
-﻿using SharpDX.Direct3D11;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Quest.Interaction;
+﻿namespace Quest.Interaction;
 
 public class ProgressBar : UIElement
 {
@@ -13,7 +6,7 @@ public class ProgressBar : UIElement
     public Rectangle Bounds { get; protected set; }
     public Color Background { get; protected set; }
     public Color Foreground { get; protected set; }
-    public int Border { get; protected set;  }
+    public int Border { get; protected set; }
     public ProgressBar(Point location, Point size, Color bg, Color fg, int border) : base(location)
     {
         Bounds = new(location, size);

@@ -1,8 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics.PackedVector;
-using System.Linq;
-using System.Security;
-
-namespace Quest.Utilities;
+﻿namespace Quest.Utilities;
 
 public enum AlphaBlend
 {

@@ -403,12 +403,14 @@ public static class CommandManager
             LightingManager.ClearLights();
             LightingManager.MarkUpdateLighting();
             return true;
-        } else if (parts[1] == "lightgrid")
+        }
+        else if (parts[1] == "lightgrid")
         {
             LightingManager.ClearLights();
             LightingManager.BuildLevelLighting(GameManager!);
             return true;
-        } else if (parts[1] == "level")
+        }
+        else if (parts[1] == "level")
         {
             StateManager.SaveGameStateAsync(GameManager!, PlayerManager!);
             LevelManager!.ReadLevel(GameManager!, LevelManager.Level.LevelPath.ToString(), reload: true);

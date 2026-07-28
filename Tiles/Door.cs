@@ -44,7 +44,7 @@ public class Door : Tile
                 game.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)} needed to unlock", Color.Red, 5);
                 // Sfx
                 SoundManager.PlaySoundInstance("DoorLocked");
-                
+
                 TimerManager.SetTimer(timerName, 5, null);
             }
         }

@@ -1,5 +1,4 @@
-﻿using SharpDX.MediaFoundation;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace Quest.Utilities;
 
