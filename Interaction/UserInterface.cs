@@ -9,6 +9,7 @@ public partial class UserInterface
     public event Action<int, UserInterface>? OnSlotHover;
     public event Action<int, UserInterface>? OnSlotItemChange;
     private List<string> SlotElements { get; set; } = [];
+    public string[] GetSlotElements() => SlotElements.ToArray();
     public Container? BoundContainer { get; private set; }
     private Dictionary<string, UIElement> Elements { get; set; }
     public SpriteBatch Batch { get; private set; }

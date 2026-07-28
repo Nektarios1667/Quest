@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Quest.Interaction;
 
@@ -10,7 +11,7 @@ public class Container
         Items = items ?? [];
     }
     // Item management
-    public static bool MoveItemUI(UserInterface from, int fromIdx, UserInterface to, int toIdx, bool split = false)
+    public static bool MoveItemUI(UserInterface from, int fromIdx, UserInterface to, int toIdx, bool split = false, bool allowSwap = false)
     {
         // Check nulls
         if (from.BoundContainer == null || to.BoundContainer == null) return false;
@@ -18,19 +19,19 @@ public class Container
         // Check acceptance for both slots
         if (!from.GetSlot(fromIdx).CanAccept(to.BoundContainer.Items[toIdx])) return false;
         if (!to.GetSlot(toIdx).CanAccept(from.BoundContainer.Items[fromIdx])) return false;
-        MoveItem(from.BoundContainer, fromIdx, to.BoundContainer, toIdx, split);
+        if (!MoveItem(from.BoundContainer, fromIdx, to.BoundContainer, toIdx, split, allowSwap)) return false;
 
         // Cleanup
         from.BoundContainer.RemoveEmptyItems();
         to.BoundContainer.RemoveEmptyItems();
         return true;
     }
-    public static void MoveItem(Container from, int fromIdx, Container to, int toIdx, bool split = false)
+    public static bool MoveItem(Container from, int fromIdx, Container to, int toIdx, bool split = false, bool allowSwap = true)
     {
         // Get and check
         Item? fromItem = from.Items[fromIdx];
         Item? toItem = to.Items[toIdx];
-        if (fromItem == null) return; // Can't move empty slot
+        if (fromItem == null) return false; // Can't move empty slot
 
         // Move
         if (toItem == null)
@@ -48,17 +49,20 @@ public class Container
         // Merge
         else if (SameItem(fromItem, toItem))
         {
-            MergeItems(from, fromIdx, to, toIdx);
+            if (!MergeItems(from, fromIdx, to, toIdx)) return false;
         }
         // Swap
-        else
+        else if (allowSwap)
         {
             Swap(from, fromIdx, to, toIdx);
         }
+        else
+            return false;
 
         // Cleanup
         from.RemoveEmptyItems();
         to.RemoveEmptyItems();
+        return true;
     }
     public int? GetOpenSlot()
     {
@@ -67,12 +71,12 @@ public class Container
                 return s;
         return null;
     }
-    public static void MergeItems(Container from, int fromIdx, Container to, int toIdx)
+    public static bool MergeItems(Container from, int fromIdx, Container to, int toIdx)
     {
         // Get and check
         Item? fromItem = from.Items[fromIdx];
         Item? destItem = to.Items[toIdx];
-        if (fromItem == null || destItem == null) return; // Can't merge empty slots
+        if (fromItem == null || destItem == null) return false; // Can't merge empty slots
 
         // Merge
         byte moved = (byte)Math.Min(fromItem.Amount, destItem.MaxAmount - destItem.Amount);
@@ -82,6 +86,8 @@ public class Container
         // Cleanup
         from.RemoveEmptyItems();
         to.RemoveEmptyItems();
+
+        return fromItem.Amount <= 0;
     }
     public static void Split(Container from, int fromIdx, Container to, int toIdx)
     {
