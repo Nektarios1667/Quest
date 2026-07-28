@@ -50,8 +50,8 @@ public static class TextureManager
         DeltaCoin,
         GammaCoin,
         GoldKey,
-        ActivePalantir,
-        InactivePalantir,
+        ActiveOrb,
+        InactiveOrb,
         SteelSword,
         DiamondSword,
         WoodKey,
@@ -272,8 +272,8 @@ public static class TextureManager
         Textures[TextureID.DeltaCoin] = content.Load<Texture2D>("Images/Items/DeltaCoin");
         Textures[TextureID.GammaCoin] = content.Load<Texture2D>("Images/Items/GammaCoin");
         Textures[TextureID.GoldKey] = content.Load<Texture2D>("Images/Items/GoldKey");
-        Textures[TextureID.ActivePalantir] = content.Load<Texture2D>("Images/Items/ActivePalantir");
-        Textures[TextureID.InactivePalantir] = content.Load<Texture2D>("Images/Items/InactivePalantir");
+        Textures[TextureID.ActiveOrb] = content.Load<Texture2D>("Images/Items/ActiveOrb");
+        Textures[TextureID.InactiveOrb] = content.Load<Texture2D>("Images/Items/InactiveOrb");
         Textures[TextureID.SteelSword] = content.Load<Texture2D>("Images/Items/SteelSword");
         Textures[TextureID.DiamondSword] = content.Load<Texture2D>("Images/Items/DiamondSword");
         Textures[TextureID.WoodKey] = content.Load<Texture2D>("Images/Items/WoodKey");
@@ -481,8 +481,8 @@ public static class TextureManager
         Metadata[TextureID.DeltaCoin] = new(Textures[TextureID.DeltaCoin].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.GammaCoin] = new(Textures[TextureID.GammaCoin].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.GoldKey] = new(Textures[TextureID.GoldKey].Bounds.Size, new(1, 1), "item");
-        Metadata[TextureID.ActivePalantir] = new(Textures[TextureID.ActivePalantir].Bounds.Size, new(1, 1), "item");
-        Metadata[TextureID.InactivePalantir] = new(Textures[TextureID.InactivePalantir].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.ActiveOrb] = new(Textures[TextureID.ActiveOrb].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.InactiveOrb] = new(Textures[TextureID.InactiveOrb].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.SteelSword] = new(Textures[TextureID.SteelSword].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.DiamondSword] = new(Textures[TextureID.DiamondSword].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.WoodKey] = new(Textures[TextureID.WoodKey].Bounds.Size, new(1, 1), "item");

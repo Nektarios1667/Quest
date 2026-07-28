@@ -1,8 +1,8 @@
 namespace Quest.Items;
 
-public class ActivePalantir : Item
+public class ActiveOrb : Item
 {
-    public ActivePalantir(int amount) : base(ItemTypes.ActivePalantir, amount)
+    public ActiveOrb(int amount) : base(ItemTypes.ActiveOrb, amount)
     {
     }
     public override bool PrimaryUse(GameManager gameManager, PlayerManager player)

@@ -2,12 +2,12 @@ namespace Quest.Items;
 
 public enum ItemTypeID : byte
 {
-    ActivePalantir,
+    ActiveOrb,
     SteelSword,
     DeltaCoin,
     DiamondSword,
     GammaCoin,
-    InactivePalantir,
+    InactiveOrb,
     GoldKey,
     PhiCoin,
     Pickaxe,
@@ -102,12 +102,12 @@ public class ItemTypes
     public static readonly ItemTypeID[] FurnaceableTypes = [ItemTypeID.RawCopper, ItemTypeID.RawGold, ItemTypeID.RawIron];
     public static readonly ItemTypeID[] StoveableTypes = [ItemTypeID.RawBeef, ItemTypeID.RawFish];
     // ItemTypes
-    public static readonly ItemType ActivePalantir = new(ItemTypeID.ActivePalantir, "A seeing stone used to communicate with Sauron.", 1);
+    public static readonly ItemType ActiveOrb = new(ItemTypeID.ActiveOrb, "A magical orb.", 1);
     public static readonly ItemType SteelSword = new(ItemTypeID.SteelSword, "A sturdy steel sword.", 1);
     public static readonly ItemType DeltaCoin = new(ItemTypeID.DeltaCoin, "A gold coin.");
     public static readonly ItemType DiamondSword = new(ItemTypeID.DiamondSword, "A razor sharp sword made with pure diamonds.", 1);
     public static readonly ItemType GammaCoin = new(ItemTypeID.GammaCoin, "A diamond coin.");
-    public static readonly ItemType InactivePalantir = new(ItemTypeID.InactivePalantir, "A seeing stone used to communicate with Sauron.", 1);
+    public static readonly ItemType InactiveOrb = new(ItemTypeID.InactiveOrb, "A magical orb.", 1);
     public static readonly ItemType GoldKey = new(ItemTypeID.GoldKey, "A fancy golden key.", 1);
     public static readonly ItemType PhiCoin = new(ItemTypeID.PhiCoin, "A bronze coin.");
     public static readonly ItemType Pickaxe = new(ItemTypeID.Pickaxe, "A sturdy metal pickaxe used for mining.", 1);
@@ -175,12 +175,12 @@ public class ItemTypes
     public static readonly ItemType LifestealPotion = new(ItemTypeID.LifestealPotion, "A special brew that temporarily causes the player to steal health from enemies.", 1);
     // ITEMS REGISTER
     public static readonly ItemType[] All = [
-    ActivePalantir,
+    ActiveOrb,
     SteelSword,
     DeltaCoin,
     DiamondSword,
     GammaCoin,
-    InactivePalantir,
+    InactiveOrb,
     GoldKey,
     PhiCoin,
     Pickaxe,
