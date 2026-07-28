@@ -48,8 +48,7 @@ public class QuillInstance
             if (IsSleeping)
             {
                 SleepTimer -= GameManager.DeltaTime * 1000; // Convert to ms
-                if (IsSleeping)
-                    return stepsUsed;
+                return stepsUsed;
             }
 
             // Run lines - ensure enough step budget, not done, and line hasn't been run at all or above the allowance
@@ -58,9 +57,7 @@ public class QuillInstance
                 // Run
                 Interpreter.RunLine(this);
                 stepsUsed++;
-                // Optimization to not run same lines in one frame
                 LinesVisited[L] = LinesVisited.TryGetValue(L, out reps) ? reps + 1 : 1;
-
                 L++;
             }
         }

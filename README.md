@@ -61,14 +61,15 @@ These controls are the default keybinds and can be changed in the settings menu 
     - `[` and `]` or `Mouse Wheel` to change the selected tile, biome, or decal.  
     - `Ctrl + O` to open a level.  
     - `Ctrl + F` to flood fill the current tile, biome, or decal.  
-    - `Ctrl + S` to export the current level.  
+    - `Ctrl + W` to set the spawn to the selected tile.  
     - `Ctrl + N` to make a new NPC.  
     - `Ctrl + Shift + L` to delete an NPC.  
     - `Ctrl + L` to create a new Loot.  
     - `Ctrl + Shift + L` to delete a Loot.  
     - `Ctrl + D` to create a new Decal.  
     - `Ctrl + Shift + D` to delete a Decal.  
-    - `Ctrl + S` to set the level spawn to the mouse position.  
+    - `Ctrl + S` to save the current level.  
+    - `Ctrl + Shift + S` to save the current level by opening the file selector dialog.  
     - `Ctrl + T` to set the level tint.  
     - `Ctrl + G` to generate a new level.  
     - `Ctrl + R` to resave the level. This will not write any current changes to disk.  
@@ -78,8 +79,10 @@ These controls are the default keybinds and can be changed in the settings menu 
 ### Tools
 - **Tool Selection**  
 Switch between tile, biome, and decal tools using the buttons at the top of the screen or by pressing `1`, `2`, or `3`.
-- **Tile Palette**  
-Select tiles from the palette to place them in the level. The selected tile can be changed with `mouse wheel` or `[` and `]`.
+- **Tiles**  
+Select tiles from the current tile set to place them in the level. The selected tile can be changed with `mouse wheel` or `[` and `]`.
+- **Tileset**  
+The selected tileset can be changed with `Q` and `E` or by pressing the tileset button on the left side.
 - **Biome Palette**  
 Select biomes from the palette to paint them in the level. The selected biome can be changed with `mouse wheel` or `[` and `]`.
 - **Decal Palette**  
