@@ -4,10 +4,13 @@ namespace Quest;
 public static class Constants
 {
     // Debug
+#if DEBUG
     public const bool COMMANDS = true;
     public const bool DEVMODE = true;
-    public static bool EDITOR = false;
-
+#else
+    public const bool COMMANDS = false;
+    public const bool DEVMODE = false;
+#endif
     // Game
     public static int PlayerBaseSpeed = 300; // normal is 300
     public const int MaxStack = 10;

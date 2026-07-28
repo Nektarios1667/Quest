@@ -99,7 +99,7 @@ public class WeatherManager
     {
         // Weather sounds
         DebugManager.StartBenchmark("WeatherSounds");
-        if (!Constants.EDITOR && WeatherIntensity > 0)
+        if (StateManager.State == GameState.Game && WeatherIntensity > 0)
         {
             // Biome weather ambience
             BiomeType currentBiome = gameManager.LevelManager.GetBiome(CameraManager.TileCoord)!.Value;

@@ -42,7 +42,7 @@ static class Program
     [STAThread]
     static void Main(string[] args)
     {
-        if (args.Contains("--level-editor"))
+        if (args.Contains("--level-editor") || System.IO.Path.GetFileNameWithoutExtension(Environment.ProcessPath)!.Contains("Editor"))
         {
             StateManager.State = GameState.Editor;
             using var levelEditorApp = new LevelEditor();

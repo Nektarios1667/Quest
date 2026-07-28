@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
 using MonoGUI;
+using System.Diagnostics;
 
 namespace Quest.Managers;
 
@@ -39,11 +40,11 @@ public static class SettingsManager
     public static GUI CreateSettingsMenu(IAdjustableWindow window, Game game, SpriteBatch batch, ContentManager content)
     {
         settingsMenu = new(game, batch, PixelOperator);
-        settingsMenu.LoadContent(content, "Images/Gui");
+        settingsMenu.LoadContent();
         Label settingsLabel = new(settingsMenu, new(Constants.Middle.X - 130, 50), Color.White, "Settings", PixelOperatorTitle);
         Button settingsBackButton = new(settingsMenu, new(20, 20), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, StateManager.RevertGameState, [], text: "Back", font: PixelOperator, border: 0);
 
-        // Save button in top rigjht
+        // Save button in top right
         Button saveButton = new(settingsMenu, new(Constants.NativeResolution.X - 120, 20), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, () =>
         {
             WriteSettings();
@@ -53,6 +54,8 @@ public static class SettingsManager
 
         // Binds button in bottom left
         Button bindsButton = new(settingsMenu, new(20, Constants.NativeResolution.Y - 60), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, OpenKeybindsSettings, [], text: "Binds", font: PixelOperator, border: 0);
+        // Editor button bottom right
+        Button editorButton = new(settingsMenu, new(Constants.NativeResolution.X - 120, Constants.NativeResolution.Y - 60), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, () => Process.Start(Environment.ProcessPath!, "--level-editor"), [], text: "Editor", font: PixelOperator, border: 0);
 
         // Sound
         // Music
@@ -119,7 +122,7 @@ public static class SettingsManager
             window.SetFullscreen(SettingsManager.Fullscreen);
         };
 
-        settingsMenu.AddWidgets(saveButton, revertButton, bindsButton, settingsLabel, settingsBackButton, musicSlider, musicLabel, musicValue, soundSlider, soundLabel, soundValue, fpsSlider, fpsLabel, fpsValue, vsyncCheckbox, vsyncLabel, resolutionDropdown, fullscreenCheckbox, fullscreenLabel);
+        settingsMenu.AddWidgets(saveButton, revertButton, bindsButton, editorButton, settingsLabel, settingsBackButton, musicSlider, musicLabel, musicValue, soundSlider, soundLabel, soundValue, fpsSlider, fpsLabel, fpsValue, vsyncCheckbox, vsyncLabel, resolutionDropdown, fullscreenCheckbox, fullscreenLabel);
         LoadSettings(window);
         return settingsMenu;
     }

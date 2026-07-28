@@ -62,7 +62,6 @@ public class LevelEditor : Game, IAdjustableWindow
     // Render targets
     public LevelEditor()
     {
-        Constants.EDITOR = true;
         graphics = new GraphicsDeviceManager(this)
         {
             PreferredBackBufferWidth = SettingsManager.ScreenResolution.X,
