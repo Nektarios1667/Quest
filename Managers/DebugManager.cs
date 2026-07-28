@@ -35,7 +35,7 @@ public static class DebugManager
     static DebugManager()
     {
         DebugWindow = new DebugWindow();
-        DebugWindow.Show();
+        DebugWindow.Hide();
 
         foreach (var stat in Enum.GetValues<Stats>())
             Stats[stat] = 0;
