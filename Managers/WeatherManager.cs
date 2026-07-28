@@ -131,7 +131,10 @@ public class WeatherManager
 
             // Either reset time or count how long in biome
             if (TimeSinceSound[sound] > 0)
+            {
+                FadeStartVolume.Remove(sound);
                 TimeSinceSound[sound] = 0;
+            }
             else
                 TimeSinceSound[sound] -= GameManager.DeltaTime;
 
