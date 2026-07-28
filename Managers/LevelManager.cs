@@ -6,12 +6,46 @@ using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 using IO = System.IO;
 
 namespace Quest.Managers;
 
+
 public class LevelManager
 {
+    private enum LevelManagerTask { Null, World, Level }
+    // Loading
+    private LevelManagerTask _task = LevelManagerTask.Null;
+    private bool StartTask(LevelManagerTask task)
+    {
+        if (_task != LevelManagerTask.Null) return false;
+
+        Console.WriteLine($"{_task} -> {task}");
+        _task = task;
+        _tasksComplete = 0;
+        return true;
+    }
+    private void EndTask(LevelManagerTask task) => _task = task == _task ? LevelManagerTask.Null : _task;
+    public event Action<float>? LoadingProgressed;
+    public int _totalLoadingTasks { get; private set; } = 0;
+    private int _tasksComplete = 0;
+    private void CompleteTask(LevelManagerTask task)
+    {
+        if (task != _task) return;
+
+        _tasksComplete++;
+        LoadingProgressed?.Invoke(LoadingProgress);
+    }
+    private void SetTotalTasks(LevelManagerTask task, int amount) => _totalLoadingTasks = task == _task ? amount : _totalLoadingTasks;
+
+    public int TasksComplete
+    {
+        get { return _tasksComplete; }
+        private set { _tasksComplete = value; LoadingProgressed?.Invoke(LoadingProgress); }
+    }
+    public float LoadingProgress => _totalLoadingTasks <= 0 ? 0 : (float)TasksComplete / _totalLoadingTasks;
+    // Level data
     public List<ILootGenerator> LootGenerators = new();
     public List<Level> Levels { get; private set; }
     public Level Level { get; private set; }
@@ -332,8 +366,21 @@ public class LevelManager
         Logger.Error($"Level '{levelName}' not found in stored levels.");
         return false;
     }
+    public async Task<bool> ReadWorldAsync(GameManager gameManager, string filename, bool reload = false)
+    {
+        return await Task.Run(() =>
+        {
+            return ReadWorld(gameManager, filename, reload);
+        });
+    }
     public bool ReadWorld(GameManager gameManager, string folder, bool reload = false)
     {
+        string[] levelFiles = Directory.GetFiles($"GameData/Worlds/{folder}/levels", "*.qlv");
+
+        // Progress info
+        StartTask(LevelManagerTask.World);
+        SetTotalTasks(LevelManagerTask.World, levelFiles.Length + 1); // Reading all levels + reading loot files
+
         if (!Directory.Exists($"GameData/Worlds/{folder}"))
         {
             Logger.Error($"World '{folder}' does not exist.");
@@ -350,10 +397,16 @@ public class LevelManager
             LootGeneratorHelper.Read(folder, file);
             Logger.System($"Loaded Loot file {file}.");
         }
-        // Read levels
-        foreach (string file in Directory.GetFiles($"GameData/Worlds/{folder}/levels", "*.qlv"))
-            ReadLevel(gameManager, $"{folder}/{IO.Path.GetFileNameWithoutExtension(file)}", reload);
+        CompleteTask(LevelManagerTask.World);
 
+        // Read levels
+        foreach (string file in levelFiles)
+        {
+            ReadLevel(gameManager, $"{folder}/{IO.Path.GetFileNameWithoutExtension(file)}", reload);
+            CompleteTask(LevelManagerTask.World);
+        }
+
+        EndTask(LevelManagerTask.World);
         return true;
     }
     public bool UnloadWorld(string folder)
@@ -368,8 +421,18 @@ public class LevelManager
         Logger.Error(message);
         return false;
     }
+    public async Task<bool> ReadLevelAsync(GameManager gameManager, string filename, bool reload = false)
+    {
+        return await Task.Run(() =>
+        {
+            return ReadLevel(gameManager, filename, reload);
+        });
+    }
     public bool ReadLevel(GameManager gameManager, string filename, bool reload = false)
     {
+        StartTask(LevelManagerTask.Level);
+        SetTotalTasks(LevelManagerTask.Level, 11);
+
         var sw = new Stopwatch();
         sw.Start();
         // File checks
@@ -387,6 +450,7 @@ public class LevelManager
         int totalTiles = Constants.MapSize.X * Constants.MapSize.Y;
         Tile[] tilesBuffer = new Tile[totalTiles];
         BiomeType[] biomeBuffer = new BiomeType[totalTiles];
+        CompleteTask(LevelManagerTask.Level);
 
         // Context
         using FileStream fileStream = File.OpenRead(path);
@@ -400,16 +464,23 @@ public class LevelManager
             byte[] magic = reader.ReadBytes(4);
             if (Encoding.UTF8.GetString(magic) != "QLVL") return Error($"Invalid file format for file '{filename}'.");
             LevelFeatures flags = (LevelFeatures)reader.ReadUInt16();
+            CompleteTask(LevelManagerTask.Level);
 
             // Tint
             Color tint = reader.ReadColor();
+            CompleteTask(LevelManagerTask.Level);
+
             // Spawn
             Point spawn = reader.ReadByteCoord().ToPoint();
+            CompleteTask(LevelManagerTask.Level);
+
 
             // Tiles
             for (int y = 0; y < Constants.MapSize.Y; y++)
                 for (int x = 0; x < Constants.MapSize.X; x++)
                     tilesBuffer[x + y * Constants.MapSize.X] = ReadTile(reader, levelPath, x, y);
+            CompleteTask(LevelManagerTask.Level);
+
 
             // Biomes
             if (flags.HasFlag(LevelFeatures.Biomes))
@@ -419,18 +490,22 @@ public class LevelManager
             }
             else
                 biomeBuffer = [];
+            CompleteTask(LevelManagerTask.Level);
+
 
             // NPCs
             ushort npcCount = reader.ReadUInt16();
             List<NPC> npcBuffer = new(npcCount);
             for (int n = 0; n < npcCount; n++)
                 npcBuffer.Add(reader.ReadNPC());
+            CompleteTask(LevelManagerTask.Level);
 
             // Loot
             ushort lootCount = reader.ReadUInt16();
             List<Loot> lootBuffer = new(lootCount);
             for (int n = 0; n < lootCount; n++)
                 lootBuffer.Add(reader.ReadLoot(gameManager));
+            CompleteTask(LevelManagerTask.Level);
 
             // Decals
             ushort decalCount = reader.ReadUInt16();
@@ -440,12 +515,14 @@ public class LevelManager
                 Decal decal = reader.ReadDecal();
                 decalBuffer[decal.Location] = decal;
             }
+            CompleteTask(LevelManagerTask.Level);
 
             // Enemies
             ushort enemyCount = reader.ReadUInt16();
             List<Enemy> enemyBuffer = new(enemyCount);
             for (int e = 0; e < enemyCount; e++)
                 enemyBuffer.Add(reader.ReadEnemy());
+            CompleteTask(LevelManagerTask.Level);
 
             // Scripts
             List<QuillScript> scriptBuffer = [];
@@ -462,6 +539,7 @@ public class LevelManager
                     scriptBuffer.Add(new QuillScript(name, code));
                 }
             }
+            CompleteTask(LevelManagerTask.Level);
 
             // Make and add the level
             Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, enemyBuffer, [], scriptBuffer, tint);
@@ -469,6 +547,9 @@ public class LevelManager
             Levels.Add(created);
             sw.Stop();
             Logger.System($"Successfully read level '{filename}' in {sw.ElapsedMilliseconds:F0}ms.");
+
+            EndTask(LevelManagerTask.Level);
+
             return true;
         }
         catch (Exception ex)

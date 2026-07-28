@@ -1,6 +1,7 @@
 ﻿using Quest.World;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Quest.Managers;
 
@@ -277,7 +278,7 @@ public static class StateManager
         gameManager.OverlayManager.Notification($"Game Saved", Color.Cyan);
         Logger.System($"Saved game state to '{CurrentSave.LevelName}.qsv'.");
     }
-    public static bool ReadGameState(GameManager gameManager, PlayerManager playerManager, string save)
+    public static async Task<bool> ReadGameState(GameManager gameManager, PlayerManager playerManager, string save)
     {
         LevelPath levelPath = new(save);
         string file = $"GameData/Worlds/{levelPath.WorldName}/saves/{levelPath.LevelName}.qsv";
@@ -288,7 +289,7 @@ public static class StateManager
         }
         CurrentSave = levelPath;
         WriteKeyValueFile("continue", new() { { "save", save } });
-        gameManager.LevelManager.ReadWorld(gameManager, levelPath.WorldName, true);
+        await gameManager.LevelManager.ReadWorldAsync(gameManager, levelPath.WorldName, true);
 
         using (var fs = new FileStream(file, FileMode.Open, FileAccess.Read))
         using (var reader = new BinaryReader(fs))

@@ -3,6 +3,7 @@ using MonoGUI;
 using Quest.Editor;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Quest.Managers;
 
@@ -13,6 +14,7 @@ public class MenuManager
     public GUI SettingsMenu { get; private set; }
     public GUI CreditsMenu { get; private set; }
     public GUI LevelSelectMenu { get; private set; }
+    public GUI LoadingMenu { get; private set; }
     public GUI PauseMenu { get; private set; }
     public GUI DebugMenu { get; private set; }
 
@@ -67,6 +69,19 @@ public class MenuManager
 
         LevelSelectMenu.AddWidgets(levelSelectBackButton, worlds, saves, openButton, deleteButton, renameButton, refreshButton, worldListLabel, saveListLabel);
 
+        // Loading menu
+        LoadingMenu = new(window, batch, PixelOperator);
+        LoadingMenu.LoadContent();
+        Label loadingLabel = new(LoadingMenu, new(Constants.Middle.X - 130, 50), Color.White, "Loading", PixelOperatorTitle);
+        ProgressBar progressBar = new(LoadingMenu, new(Constants.Middle.X - 150, 150), new(300, 40), ColorTools.NearBlack * 0.6f, Color.White * 0.6f, border: 0, textColor: Color.White, showPercentage: true);
+        gameManager.LevelManager.LoadingProgressed += (prog) =>
+        {
+            progressBar.SetValue(prog);
+            Console.WriteLine(prog);
+        };
+
+        LoadingMenu.AddWidgets(loadingLabel, progressBar);
+
         // Pause Menu
         PauseMenu = new(window, batch, PixelOperator);
         PauseMenu.LoadContent();
@@ -93,13 +108,15 @@ public class MenuManager
         StateManager.State = GameState.MainMenu;
         gameManager.LevelManager.UnloadWorld(gameManager.LevelManager.Level.WorldName);
     }
-    public bool ContinueSave()
+    public async Task<bool> ContinueSave()
     {
 
         if (StateManager.ReadKeyValueFile("continue").TryGetValue("save", out var loadSave))
         {
+            StateManager.State = GameState.Loading;
+            bool success = await StateManager.ReadGameState(gameManager, playerManager, loadSave);
             StateManager.State = GameState.Game;
-            return StateManager.ReadGameState(gameManager, playerManager, loadSave);
+            return success;
         }
         // else
         StateManager.State = GameState.LevelSelect;
@@ -125,9 +142,10 @@ public class MenuManager
     {
         if (saves.Selected != null && saves.Selected != "(New Save)")
         {
-            if (Constants.DEVMODE)
+            if (Constants.DEVMODE && File.Exists($"../../../GameData/Worlds/{worlds.Selected}/saves/{saves.Selected}.qsv"))
                 File.Delete($"../../../GameData/Worlds/{worlds.Selected}/saves/{saves.Selected}.qsv");
-            File.Delete($"GameData/Worlds/{worlds.Selected}/saves/{saves.Selected}.qsv");
+            if (File.Exists($"GameData/Worlds/{worlds.Selected}/saves/{saves.Selected}.qsv"))
+                File.Delete($"GameData/Worlds/{worlds.Selected}/saves/{saves.Selected}.qsv");
 
             // Check continue save
             var continueData = StateManager.ReadKeyValueFile("continue");
@@ -150,18 +168,20 @@ public class MenuManager
         saves.AddItems(savesList);
         saves.AddItems("(New Save)");
     }
-    public void OpenSave()
+    public async void OpenSave()
     {
         StateManager.State = GameState.Loading;
         if (saves.Selected == "(New Save)")
         {
             StateManager.CurrentSave = new($"{worlds.Selected}/{DateTime.Now:Save MM-dd-yy HH-mm-ss}");
-            gameManager.LevelManager.ReadWorld(gameManager, worlds.Selected, reload: true);
+
+            await gameManager.LevelManager.ReadWorldAsync(gameManager, worlds.Selected, reload: true);
+
             if (!gameManager.LevelManager.LoadLevel(gameManager, $"{worlds.Selected}/{worlds.Selected}"))
                 gameManager.LevelManager.LoadLevel(gameManager, 0);
         }
         else
-            StateManager.ReadGameState(gameManager, playerManager, $"{worlds.Selected}/{saves.Selected}");
+            await StateManager.ReadGameState(gameManager, playerManager, $"{worlds.Selected}/{saves.Selected}");
 
         StateManager.State = GameState.Game;
     }
@@ -205,6 +225,9 @@ public class MenuManager
             case GameState.LevelSelect:
                 LevelSelectMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
+            case GameState.Loading:
+                LoadingMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                break;
             case GameState.Game:
                 //DebugMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
@@ -237,6 +260,9 @@ public class MenuManager
                 break;
             case GameState.LevelSelect:
                 DrawLevelSelection(batch);
+                break;
+            case GameState.Loading:
+                DrawLoading(batch);
                 break;
             case GameState.Game:
                 //DebugMenu.Draw(batch);
@@ -276,6 +302,12 @@ public class MenuManager
     {
         TextureManager.DrawTexture(batch, TextureID.MenuBackground, Point.Zero, scale: MenuBackgroundScale);
         LevelSelectMenu.Draw();
+    }
+    private void DrawLoading(SpriteBatch batch)
+    {
+        TextureManager.DrawTexture(batch, TextureID.MenuBackground, Point.Zero, scale: MenuBackgroundScale);
+        gameManager.Batch.FillRectangle(new(Vector2.Zero, Constants.NativeResolution), Color.Black * 0.6f);
+        LoadingMenu.Draw();
     }
     private void DrawPauseMenu(SpriteBatch batch)
     {
