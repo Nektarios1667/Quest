@@ -6,6 +6,7 @@
     <PublishReadyToRun>false</PublishReadyToRun>
     <TieredCompilation>false</TieredCompilation>
     <UseWindowsForms>true</UseWindowsForms>
+    <Configurations>Debug;Release;Dev</Configurations>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -17,6 +18,12 @@
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
     <Optimize>False</Optimize>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dev|AnyCPU'">
+    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+    <Optimize>False</Optimize>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>

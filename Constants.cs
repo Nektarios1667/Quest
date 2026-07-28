@@ -6,11 +6,17 @@ public static class Constants
     // Debug
 #if DEBUG
     public const bool COMMANDS = true;
-    public const bool DEVMODE = true;
 #else
     public const bool COMMANDS = false;
+#endif
+
+    // Dev
+#if DEV
+    public const bool DEVMODE = true;
+#else
     public const bool DEVMODE = false;
 #endif
+
     // Game
     public static int PlayerBaseSpeed = 300; // normal is 300
     public const int MaxStack = 10;
