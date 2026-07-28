@@ -178,10 +178,9 @@ public class OverlayManager
 
                 // Draw
                 Rectangle rect = new(new Point(x, y) * LM.LuxelSize + Constants.Middle - CameraManager.Camera.ToPoint(), LM.LuxelSize);
-                Color color = ColorTools.Add(
-                    gameManager.LevelManager.SkyColor * (1 - intensity),
-                    LM.BiomeColors[x / LM.LightDivisions, y / LM.LightDivisions] * (1 - intensity)
-                );
+                Color sky = gameManager.LevelManager.SkyColor * (1 - intensity);
+                Color weather = LM.BiomeColors[x / LM.LightDivisions, y / LM.LightDivisions] * (1 - intensity);
+                Color color = ColorTools.Blend(weather, sky, 0.5f * sky.A / 255, AlphaBlend.Max);
 
                 gameManager.Batch.FillRectangle(rect, color);
             }

@@ -21,7 +21,7 @@ public class WeatherManager
     {
         { WeatherSound.None, 0 },
         { WeatherSound.Rain, 0.5f },
-        { WeatherSound.Snow, 0.5f },
+        { WeatherSound.Snow, 0.4f },
         { WeatherSound.Sandstorm, 0.3f },
     };
     // Weather
@@ -111,6 +111,12 @@ public class WeatherManager
             UpdateAmbientWeatherSound(currentBiome);
             // Biome weather sounds
             UpdateWeatherSfx(currentBiome);
+        }
+        // End sounds
+        else if (WeatherIntensity <= 0)
+        {
+            foreach (var weatherSound in WeatherSounds.Values)
+                SoundManager.GetInstance(weatherSound.ToString())?.Stop();
         }
         DebugManager.EndBenchmark("WeatherSounds");
     }
@@ -209,11 +215,10 @@ public class WeatherManager
         float percent = distDay / (distDay + distNight) * 100;
         return 100 - percent;
     }
-    public Color GetWeatherColor(GameManager gameManager, Point loc, float? blend = null)
+    public Color GetWeatherColor(GameManager gameManager, Point loc, float blend)
     {
         // Calculate sky colors from weather, biome, and time
         BiomeType? currentBiome = gameManager.LevelManager.GetBiome(loc);
-        blend ??= WeatherIntensity;
 
         Color weatherColor = default;
         if (currentBiome == null || currentBiome == BiomeType.Indoors || blend == 0) weatherColor = Color.Transparent;
@@ -222,12 +227,12 @@ public class WeatherManager
             switch (currentBiome)
             {
                 case BiomeType.Temperate: weatherColor = Color.MediumBlue; break;
-                case BiomeType.Snowy: weatherColor = Color.White; break;
+                case BiomeType.Snowy: weatherColor = new(200, 200, 216); break;
                 case BiomeType.Desert: weatherColor = Color.OrangeRed; break;
                 case BiomeType.Ocean: weatherColor = Color.SlateGray; break;
             }
         }
-        weatherColor *= blend.Value;
+        weatherColor *= blend + 1 - (weatherColor.A / 255f); // Use alpha channel to adjust transparancy per biome - lower alpha = more opaque
         return weatherColor;
     }
 }
