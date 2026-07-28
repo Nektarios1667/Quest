@@ -73,26 +73,33 @@ public class MenuManager
         LoadingMenu = new(window, batch, PixelOperator);
         LoadingMenu.LoadContent();
         Label loadingLabel = new(LoadingMenu, new(Constants.Middle.X - 130, 50), Color.White, "Loading", PixelOperatorTitle);
-        ProgressBar progressBar = new(LoadingMenu, new(Constants.Middle.X - 150, 150), new(300, 40), ColorTools.NearBlack * 0.6f, Color.White * 0.6f, border: 0, textColor: Color.White, showPercentage: true);
-        gameManager.LevelManager.LoadingProgressed += (prog) =>
-        {
-            progressBar.SetValue(prog);
-            Console.WriteLine(prog);
-        };
+        ProgressBar progressBar = new(LoadingMenu, new(Constants.Middle.X - 250, 150), new(500, 40), ColorTools.NearBlack * 0.6f, Color.White * 0.6f, border: 0, textColor: Color.White, showPercentage: true);
+        gameManager.LevelManager.LoadingProgressed += (prog) => progressBar.SetValue(prog);
 
         LoadingMenu.AddWidgets(loadingLabel, progressBar);
 
         // Pause Menu
         PauseMenu = new(window, batch, PixelOperator);
         PauseMenu.LoadContent();
-        Label pauseLabel = new(PauseMenu, new(Constants.Middle.X - 110, 150), Color.White, "PAUSED", PixelOperatorTitle);
-        Button resumeButton = new(PauseMenu, new(Constants.Middle.X - 150, 300), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => StateManager.OverlayState = OverlayState.None, [], text: "Resume", font: PixelOperatorSubtitle, border: 0);
-        Button quicksaveButton = new(PauseMenu, new(Constants.Middle.X - 150, 380), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.SaveGameState(gameManager, playerManager); }, [], text: "Quick Save", font: PixelOperatorSubtitle, border: 0);
-        Button pauseSettingsButton = new(PauseMenu, new(Constants.Middle.X - 150, 460), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.State = GameState.Settings; }, [], text: "Settings", font: PixelOperatorSubtitle, border: 0);
-        Button mainMenuButton = new(PauseMenu, new(Constants.Middle.X - 150, 540), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, ExitToMainMenu, [], text: "Main Menu", font: PixelOperatorSubtitle, border: 0);
-        Button quitButton = new(PauseMenu, new(Constants.Middle.X - 150, 620), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => window.Exit(), [], text: "Quit", font: PixelOperatorSubtitle, border: 0);
+        Label pauseLabel = new(PauseMenu, new(Constants.Middle.X - 120, 50), Color.White, "PAUSED", PixelOperatorTitle);
+        Button resumeButton = new(PauseMenu, new(Constants.Middle.X - 150, 200), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => StateManager.OverlayState = OverlayState.None, [], text: "Resume", font: PixelOperatorSubtitle, border: 0);
+        ProgressBar savingProgressBar = new(PauseMenu, new(Constants.Middle.X - 150, 600), new(300, 40), ColorTools.NearBlack * 0.6f, Color.White * 0.6f, border: 0, textColor: Color.White, showPercentage: true);
+        Button quicksaveButton = new(PauseMenu, new(Constants.Middle.X - 150, 280), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.SaveGameStateAsync(gameManager, playerManager); savingProgressBar.Show(); }, [], text: "Quick Save", font: PixelOperatorSubtitle, border: 0);
+        Button pauseSettingsButton = new(PauseMenu, new(Constants.Middle.X - 150, 360), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => { StateManager.OverlayState = OverlayState.None; StateManager.State = GameState.Settings; }, [], text: "Settings", font: PixelOperatorSubtitle, border: 0);
+        Button mainMenuButton = new(PauseMenu, new(Constants.Middle.X - 150, 440), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, ExitToMainMenu, [], text: "Main Menu", font: PixelOperatorSubtitle, border: 0);
+        Button quitButton = new(PauseMenu, new(Constants.Middle.X - 150, 520), new(300, 75), Color.White, Color.Transparent, ColorTools.GrayBlack * 0.5f, () => window.Exit(), [], text: "Quit", font: PixelOperatorSubtitle, border: 0);
+        savingProgressBar.Hide();
+        StateManager.LoadingProgressed += (prog) =>
+        {
+            savingProgressBar.SetValue(prog);
+            if (prog >= 1)
+            {
+                savingProgressBar.Hide();
+                StateManager.OverlayState = OverlayState.None;
+            }
+        };
 
-        PauseMenu.AddWidgets(resumeButton, quicksaveButton, pauseSettingsButton, mainMenuButton, quitButton, pauseLabel);
+        PauseMenu.AddWidgets(resumeButton, quicksaveButton, pauseSettingsButton, mainMenuButton, quitButton, pauseLabel, savingProgressBar);
 
         // In-game debug
         DebugMenu = new(window, batch, PixelOperator);

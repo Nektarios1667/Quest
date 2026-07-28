@@ -1,6 +1,7 @@
 ﻿using Quest.World;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Quest.Managers;
@@ -39,6 +40,16 @@ public enum Mood
 }
 public static class StateManager
 {
+    // Loading
+    public static event Action<float>? LoadingProgressed;
+    public static int TotalTasks { get; private set; }
+    private static int _tasksComplete;
+    public static int TasksComplete
+    {
+        get { return _tasksComplete; }
+        set { _tasksComplete = value; LoadingProgressed?.Invoke(LoadingProgress); }
+    }
+    public static float LoadingProgress => TotalTasks <= 0 ? 0 : (float)TasksComplete / TotalTasks;
     // Weather
     public static readonly FastNoiseLite WeatherNoise = new((int)(DateTime.Now.Ticks ^ (DateTime.Now.Ticks >> 32)));
     private static int _weatherSeed = Environment.TickCount;
@@ -156,12 +167,34 @@ public static class StateManager
         else
             containers[level] = [container];
     }
+    public static async void SaveGameStateAsync(GameManager gameManager, PlayerManager playerMaanger)
+    {
+        await Task.Run(() =>
+        {
+            SaveGameState(gameManager, playerMaanger);
+        });
+    }
     public static void SaveGameState(GameManager gameManager, PlayerManager playerManager)
     {
+        // Continue save
         WriteKeyValueFile("continue", new() { { "save", CurrentSave.ToString() } });
         string worldName = gameManager.LevelManager.Level.WorldName;
         byte[] data;
 
+        // All of the levels with extra data
+        string[] levels = new[] {
+                chests.Keys,
+                openedDoors.Keys,
+                gameManager.LevelManager.Levels.Where(l => l.WorldName == worldName &&
+                (l.Loot.Count > 0 || l.Enemies.Count > 0 || l.Projectiles.Count > 0 || l.NPCs.Count > 0))
+            .Select(l => l.LevelName),
+            }.SelectMany(x => x).Distinct().Take(255).ToArray();
+
+        // Progress
+        TasksComplete = 0;
+        TotalTasks = 5 + levels.Length * 7; // Saving level data has 7 tasks each
+
+        // Context
         using (var ms = new MemoryStream())
         using (var writer = new BinaryWriter(ms))
         {
@@ -171,22 +204,16 @@ public static class StateManager
             writer.Write(GameManager.GameTime);
             writer.Write(WeatherSeed);
             writer.Write(lastWeather);
+            TasksComplete++;
             // Write CameraManager data
             writer.Write(CameraManager.CameraDest.X);
             writer.Write(CameraManager.CameraDest.Y);
+            TasksComplete++;
             // Write PlayerManager data
             writer.Write((byte)playerManager.Health);
             writer.Write((byte)playerManager.MaxHealth);
+            TasksComplete++;
             // Level specific data
-            // All of the levels with extra data
-            string[] levels = new[] {
-                chests.Keys,
-                openedDoors.Keys,
-                gameManager.LevelManager.Levels.Where(l => l.WorldName == worldName &&
-                (l.Loot.Count > 0 || l.Enemies.Count > 0 || l.Projectiles.Count > 0 || l.NPCs.Count > 0))
-            .Select(l => l.LevelName),
-            }.SelectMany(x => x).Distinct().Take(255).ToArray();
-
             writer.Write((byte)levels.Length);
             foreach (string level in levels)
             {
@@ -201,6 +228,8 @@ public static class StateManager
                     writer.Write((ushort)loot.Position.X);
                     writer.Write((ushort)loot.Position.Y);
                 }
+                TasksComplete++;
+
                 // Doors
                 if (openedDoors.TryGetValue(level, out var levelDoors))
                 {
@@ -210,6 +239,8 @@ public static class StateManager
                 }
                 else
                     writer.Write((ushort)0);
+                TasksComplete++;
+
                 // Chests
                 if (chests.TryGetValue(level, out var levelChests))
                 {
@@ -219,6 +250,8 @@ public static class StateManager
                 }
                 else
                     writer.Write((ushort)0);
+                TasksComplete++;
+
                 // Containers
                 if (containers.TryGetValue(level, out var levelContainers))
                 {
@@ -228,15 +261,19 @@ public static class StateManager
                 }
                 else
                     writer.Write((ushort)0);
+                TasksComplete++;
+
                 // Enemies
                 writer.Write((ushort)levelObj.Enemies.Count);
                 foreach (var enemy in levelObj.Enemies.Values)
                     WriteEnemyData(writer, enemy);
+                TasksComplete++;
 
                 // Projectiles
                 writer.Write((ushort)levelObj.Projectiles.Count);
                 foreach (var proj in levelObj.Projectiles)
                     WriteProjectileData(writer, proj);
+                TasksComplete++;
 
                 // NPCs
                 writer.Write((ushort)levelObj.NPCs.Count);
@@ -247,6 +284,7 @@ public static class StateManager
                     foreach (var item in npc.ShopOptions)
                         writer.Write(item.Stock);
                 }
+                TasksComplete++;
             }
 
             // Write Inventory data
@@ -254,6 +292,7 @@ public static class StateManager
             writer.Write((byte)inventory.Items.Length);
             for (int i = 0; i < inventory.Items.Length; i++)
                 WriteItemData(writer, inventory.Items[i]);
+            TasksComplete++;
 
             // Write effects
             byte effectsCount = (byte)Math.Clamp(playerManager.StatusManager.GetStatusEffectsCount(), 0, 255);
@@ -263,6 +302,7 @@ public static class StateManager
                 writer.Write((byte)kv.Key); // effect type - byte
                 writer.Write(kv.Value);     // effect timer - float
             }
+            TasksComplete++;
 
             writer.Flush();
             data = ms.ToArray();

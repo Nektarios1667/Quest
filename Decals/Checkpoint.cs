@@ -13,7 +13,7 @@ public class Checkpoint(Point location) : Decal(location)
     {
         if (cooldown.IsExpired)
         {
-            StateManager.SaveGameState(gameManager, playerManager);
+            StateManager.SaveGameStateAsync(gameManager, playerManager);
             cooldown.Restart();
         }
     }

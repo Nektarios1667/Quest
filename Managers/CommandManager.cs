@@ -410,10 +410,10 @@ public static class CommandManager
             return true;
         } else if (parts[1] == "level")
         {
-            StateManager.SaveGameState(GameManager!, PlayerManager!);
+            StateManager.SaveGameStateAsync(GameManager!, PlayerManager!);
             LevelManager!.ReadLevel(GameManager!, LevelManager.Level.LevelPath.ToString(), reload: true);
             LevelManager!.LoadLevel(GameManager!, LevelManager.Level.LevelPath.ToString());
-            StateManager.ReadGameState(GameManager!, PlayerManager!, StateManager.CurrentSave.ToString());
+            _ = StateManager.ReadGameState(GameManager!, PlayerManager!, StateManager.CurrentSave.ToString());
             return true;
         }
         return false;
