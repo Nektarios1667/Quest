@@ -48,6 +48,8 @@ public static class CodeGenerator
     }
     public static void TestWeatherNoise()
     {
+        WeatherManager weather = new();
+
         const int seconds = 3600;
 
         float[] values = new float[seconds];
@@ -56,18 +58,18 @@ public static class CodeGenerator
         float[] intensity = new float[seconds];
 
         int offset = DateTime.Now.Millisecond;
-        StateManager.SetWeatherPersistent(lastTimeValue: offset);
+        weather.SetWeatherPersistent(lastTimeValue: offset);
         for (int t = 0; t < seconds; t++)
         {
-            values[t] = StateManager.WeatherValue(t + offset);
+            values[t] = weather.GetWeatherValue(t + offset);
             times[t] = t;
-            boost[t] = StateManager.WeatherBoost(t + offset);
-            intensity[t] = StateManager.WeatherIntensity(t + offset);
+            boost[t] = weather.GetWeatherBoost(t + offset);
+            intensity[t] = weather.GetWeatherIntensity(t + offset);
         }
 
-        float weatherPercent = values.Where(f => f >= StateManager.weatherThreshold).Count() / (float)seconds;
-        float lightPercent = values.Where(f => f >= StateManager.weatherThreshold && f < StateManager.weatherThreshold + 0.1f).Count() / (float)seconds;
-        float heavyPercent = values.Where(f => f >= 1 - StateManager.weatherThreshold / 2).Count() / (float)seconds;
+        float weatherPercent = values.Where(f => f >= WeatherManager.weatherThreshold).Count() / (float)seconds;
+        float lightPercent = values.Where(f => f >= WeatherManager.weatherThreshold && f < WeatherManager.weatherThreshold + 0.1f).Count() / (float)seconds;
+        float heavyPercent = values.Where(f => f >= 1 - WeatherManager.weatherThreshold / 2).Count() / (float)seconds;
 
         Console.WriteLine($"Weather: {weatherPercent * 100:0.0}%\n  Light: {lightPercent * 100:0.0}%\n  Heavy: {heavyPercent * 100:0.0}%");
 
@@ -86,11 +88,11 @@ public static class CodeGenerator
         weatherVal.MarkerShape = MarkerShape.None;
         weatherVal.LineWidth = 3;
 
-        var lightLine = plot.Add.HorizontalLine(StateManager.weatherThreshold, pattern: LinePattern.Dotted);
+        var lightLine = plot.Add.HorizontalLine(WeatherManager.weatherThreshold, pattern: LinePattern.Dotted);
         lightLine.Color = Colors.Orange;
         lightLine.LineWidth = 2;
 
-        var heavyLine = plot.Add.HorizontalLine(1 - StateManager.weatherThreshold / 2, pattern: LinePattern.Dotted);
+        var heavyLine = plot.Add.HorizontalLine(1 - WeatherManager.weatherThreshold / 2, pattern: LinePattern.Dotted);
         heavyLine.Color = Colors.Red;
         heavyLine.LineWidth = 2;
 

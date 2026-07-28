@@ -15,6 +15,7 @@ public class Window : Game, IAdjustableWindow
     private GameManager gameManager = null!;
     private PlayerManager playerManager = null!;
     private OverlayManager overlayManager = null!;
+    private WeatherManager weatherManager = null!;
     private LevelManager levelManager = null!;
     private MenuManager menuManager = null!;
     private static Matrix Scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
@@ -123,7 +124,8 @@ public class Window : Game, IAdjustableWindow
         UserInterface.Init(spriteBatch, levelManager);
         playerManager = new();
         overlayManager = new(playerManager);
-        gameManager = new(Content, spriteBatch, levelManager, overlayManager, Grading);
+        weatherManager = new();
+        gameManager = new(Content, spriteBatch, levelManager, overlayManager, weatherManager, Grading);
         menuManager = new(this, spriteBatch, Content, gameManager, playerManager);
         CommandManager.Init(this, gameManager, levelManager, playerManager);
 
@@ -179,6 +181,7 @@ public class Window : Game, IAdjustableWindow
         LightingManager.Update();
 
         gameManager.Update(delta);
+        weatherManager.Update(gameManager);
         playerManager.Update(gameManager);
         levelManager.Update(gameManager);
         menuManager.Update(gameManager);
@@ -313,14 +316,14 @@ public class Window : Game, IAdjustableWindow
         infoSb.Append("\nLevel: ");
         infoSb.Append(levelManager.Level?.Path);
         infoSb.Append("\nDaylight: ");
-        infoSb.AppendFormat("{0:0}%", ColorTools.GetDaylightPercent(gameManager.DayTime));
+        infoSb.AppendFormat("{0:0}%", WeatherManager.GetDaylightPercent(gameManager.DayTime));
         infoSb.Append("\nLighting: ");
         infoSb.AppendFormat("{0}", LightingManager.Lights.Count);
         infoSb.Append("\nLight Cell Updates: ");
         infoSb.AppendFormat("{0}", DebugManager.Stat(Stats.FloodFillCellUpdates));
         infoSb.Append("\nWeather: ");
-        infoSb.Append(StateManager.WeatherIntensity(GameManager.GameTime));
-        infoSb.AppendFormat(" [{0:0.00}]", StateManager.WeatherValue(GameManager.GameTime));
+        infoSb.Append(weatherManager.WeatherIntensity);
+        infoSb.AppendFormat(" [{0:0.00}]", weatherManager.WeatherValue);
         infoSb.Append("\nSave: ");
         infoSb.Append(StateManager.CurrentSave);
         infoSb.Append("\nDraw calls: ");

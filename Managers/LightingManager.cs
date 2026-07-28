@@ -216,7 +216,7 @@ public static class LightingManager
 
         LightGrid.Run(updateRegion);
 
-        float blend = StateManager.WeatherIntensity(GameManager.GameTime);
+        float blend = gameManager.WeatherManager.GetWeatherIntensity(GameManager.GameTime);
         Point start = (LightingStart + Constants.TileDrawPadding);
         Point end = (LightingEnd - Constants.TileDrawPadding + Constants.OnePoint);
         for (int y = start.Y; y < end.Y; y++)
@@ -225,7 +225,7 @@ public static class LightingManager
             {
                 // Biome
                 Point worldLoc = new Point(x, y);
-                BiomeColors[x, y] = gameManager.LevelManager.GetWeatherColor(gameManager, worldLoc, blend);
+                BiomeColors[x, y] = gameManager.WeatherManager.GetWeatherColor(gameManager, worldLoc, blend);
             }
         }
 

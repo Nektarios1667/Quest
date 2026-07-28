@@ -96,36 +96,6 @@ public class LevelManager
             }
         }
         DebugManager.EndBenchmark("LootLighting");
-
-        // Weather sounds
-        DebugManager.StartBenchmark("WeatherSounds");
-        float weatherIntensity = StateManager.WeatherIntensity(GameManager.GameTime);
-        if (!Constants.EDITOR && weatherIntensity > 0)
-        {
-            // Biome weather ambience
-            BiomeType currentBiome = Level.Biome[CameraManager.TileCoord.X + CameraManager.TileCoord.Y * Constants.MapSize.X];
-            switch (currentBiome)
-            {
-                case BiomeType.Temperate: SoundManager.PlaySoundInstance("Rain", volume: weatherIntensity * 0.5f); break;
-                case BiomeType.Ocean: SoundManager.PlaySoundInstance("Rain", volume: weatherIntensity * 0.5f); break;
-                case BiomeType.Indoors: break;
-                case BiomeType.Snowy: SoundManager.PlaySoundInstance("Sandstorm", volume: weatherIntensity * 0.3f); break;
-                case BiomeType.Desert: SoundManager.PlaySoundInstance("Sandstorm", volume: weatherIntensity * 0.5f); break;
-            }
-            // Biome weather sounds
-            if (weatherIntensity > .2f && RandomManager.ChancePerSecond(0.1f))
-            {
-                switch (currentBiome)
-                {
-                    case BiomeType.Temperate: SoundManager.PlaySoundInstance($"Thunder{RandomManager.RandomIntRange(1,6)}", volume: weatherIntensity * 0.75f); break;
-                    case BiomeType.Ocean: SoundManager.PlaySoundInstance($"Thunder{RandomManager.RandomIntRange(1,6)}", volume: weatherIntensity * 0.75f); break;
-                    case BiomeType.Indoors: break;
-                    case BiomeType.Snowy: break;
-                    case BiomeType.Desert: break;
-                }
-            }
-        }
-        DebugManager.EndBenchmark("WeatherSounds");
     }
     public void UpdateSky(GameManager gameManager)
     {
@@ -135,28 +105,7 @@ public class LevelManager
             SkyColor = Level.Tint;
             return;
         }
-        SkyColor = ColorTools.GetSkyColor(gameManager.DayTime) * 0.9f;
-    }
-    public Color GetWeatherColor(GameManager gameManager, Point loc, float? blend = null)
-    {
-        // Calculate sky colors from weather, biome, and time
-        BiomeType? currentBiome = GetBiome(loc);
-        blend ??= StateManager.WeatherIntensity(GameManager.GameTime);
-
-        Color weatherColor = default;
-        if (currentBiome == null || currentBiome == BiomeType.Indoors || blend == 0) weatherColor = Color.Transparent;
-        else
-        {
-            switch (currentBiome)
-            {
-                case BiomeType.Temperate: weatherColor = Color.MediumBlue; break;
-                case BiomeType.Snowy: weatherColor = Color.White; break;
-                case BiomeType.Desert: weatherColor = Color.OrangeRed; break;
-                case BiomeType.Ocean: weatherColor = Color.SlateGray; break;
-            }
-        }
-        weatherColor *= blend.Value;
-        return weatherColor;
+        SkyColor = WeatherManager.GetSkyColor(gameManager.DayTime) * 0.9f;
     }
     public void Draw(GameManager gameManager)
     {

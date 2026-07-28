@@ -18,6 +18,7 @@ public static class SoundManager
         LoadSound(content, "Fire2", "Sounds/Effects/Fire2");
         LoadSound(content, "Rain", "Sounds/Effects/Rain");
         LoadSound(content, "Sandstorm", "Sounds/Effects/Sandstorm");
+        LoadSound(content, "Snow", "Sounds/Effects/Sandstorm"); // TODO FIX 
         LoadSound(content, "Trinkets", "Sounds/Effects/Trinkets");
         LoadSound(content, "Click", "Sounds/Effects/Click");
         LoadSound(content, "DoorLocked", "Sounds/Effects/DoorLocked");
@@ -59,7 +60,7 @@ public static class SoundManager
             sfx.Play(MathHelper.Clamp(volume * SettingsManager.SoundVolume, 0f, 1f), pitch + RandomManager.RandomFloatRange(-pitchVariation, pitchVariation), pan);
     }
 
-    public static void PlaySoundInstance(string key, float volume = 1f, float pitch = 0f, float pan = 0f)
+    public static void PlaySoundInstance(string key, float volume = 1f, float pitch = 0f, float pan = 0f, bool loop = false)
     {
         var instance = GetOrCreateInstance(key);
         if (instance != null)
@@ -67,6 +68,7 @@ public static class SoundManager
             instance.Volume = MathHelper.Clamp(volume * SettingsManager.SoundVolume, 0f, 1f);
             instance.Pitch = pitch;
             instance.Pan = pan;
+            instance.IsLooped = loop;
             if (instance.State != SoundState.Playing)
                 instance.Play();
         }
@@ -75,8 +77,12 @@ public static class SoundManager
     {
         if (soundInstances.TryGetValue(key, out var instance))
             return instance;
-        Logger.Error($"No sound instance '{key}'");
         return null;
+    }
+    public static void EndInstance(string key)
+    {
+        soundInstances.GetValueOrDefault(key)?.Stop();
+        soundInstances.Remove(key);
     }
     public static void SetInstanceVolume(string key, float volume)
     {

@@ -11,12 +11,13 @@ public class GameManager
 
     public LevelManager LevelManager { get; private set; }
     public OverlayManager OverlayManager { get; private set; }
+    public WeatherManager WeatherManager { get; private set; }
     public float DayTime { get; set; } = 0f;
     public SpriteBatch Batch { get; private set; }
     public SpriteBatch MinimapBatch { get; private set; }
     public Effect? GradingEffect { get; private set; }
 
-    public GameManager(ContentManager content, SpriteBatch batch, LevelManager level, OverlayManager? overlay, Effect? gradingEffect)
+    public GameManager(ContentManager content, SpriteBatch batch, LevelManager level, OverlayManager? overlay, WeatherManager? weatherManager, Effect? gradingEffect)
     {
         if (overlay == null && StateManager.State == GameState.Game)
             Logger.Error("No OverlayManager object for the GameManager.");
@@ -26,6 +27,7 @@ public class GameManager
         MinimapBatch = new SpriteBatch(batch.GraphicsDevice);
         LevelManager = level;
         OverlayManager = overlay!; // Allow null OverlayManager for level editor. Not using nullable OverlayManager property just for convenience.
+        WeatherManager = weatherManager!; // Allow null WeatherManager for level editor. Not using nullable WeatherManager property just for convenience.
     }
     public void Update(float deltaTime)
     {

@@ -28,7 +28,7 @@ public class OverlayManager
         }
         else if (StateManager.State == GameState.Game)
             Logger.Error("No PlayerManager object for the OverlayManager");
-        //TimerManager.SetTimer("LightingUpdate", 3f, MarkUpdateLighting, int.MaxValue);
+        TimerManager.SetTimer("LightingUpdate", 0.5f, LM.MarkUpdateLighting, int.MaxValue);
         CameraManager.TileChange += (_, _) => LM.MarkUpdateLighting();
         CameraManager.CameraMove += (_, newCam) =>
         {

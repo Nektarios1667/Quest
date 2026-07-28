@@ -45,7 +45,6 @@ public class PlayerManager : IEntity
         {
             equippedSlot = value;
             EquippedSlotChanged?.Invoke(equippedSlot);
-            Console.WriteLine(value);
         }
     }
     public Item? HoveredItem { get; private set; }

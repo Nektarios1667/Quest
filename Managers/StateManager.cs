@@ -50,13 +50,6 @@ public static class StateManager
         set { _tasksComplete = value; LoadingProgressed?.Invoke(LoadingProgress); }
     }
     public static float LoadingProgress => TotalTasks <= 0 ? 0 : (float)TasksComplete / TotalTasks;
-    // Weather
-    public static readonly FastNoiseLite WeatherNoise = new((int)(DateTime.Now.Ticks ^ (DateTime.Now.Ticks >> 32)));
-    private static int _weatherSeed = Environment.TickCount;
-    public static int WeatherSeed { get => _weatherSeed; set { _weatherSeed = value; WeatherNoise.SetSeed(value); } }
-    public const float weatherThreshold = 0.65f;
-    private static float lastWeather = 0f;
-    private static float lastTime = -1f;
     // States
     public static Action<GameState>? OnStateChanged;
     public static Action<OverlayState>? OnOverlayStateChanged;
@@ -91,21 +84,6 @@ public static class StateManager
     private static readonly Dictionary<string, HashSet<ushort>> openedDoors = [];
     private static readonly Dictionary<string, HashSet<Chest>> chests = [];
     private static readonly Dictionary<string, HashSet<IContainer>> containers = [];
-    static StateManager()
-    {
-        WeatherNoise.SetSeed(WeatherSeed);
-        WeatherNoise.SetNoiseType(FastNoiseLite.NoiseType.ValueCubic);
-        WeatherNoise.SetFrequency(0.005f);
-        WeatherNoise.SetFractalType(FastNoiseLite.FractalType.FBm);
-        WeatherNoise.SetFractalOctaves(3);
-    }
-    public static void SetWeatherPersistent(int seed = -1, float lastWeatherTime = 0f, float lastTimeValue = -1f)
-    {
-        if (seed != -1)
-            WeatherNoise.SetSeed(seed);
-        lastWeather = lastWeatherTime;
-        lastTime = lastTimeValue;
-    }
     public static void RevertGameState()
     {
         State = PreviousState;
@@ -114,30 +92,6 @@ public static class StateManager
     {
         OverlayState = PreviousOverlayState;
     }
-    public static float WeatherValue(float time)
-    {
-        float val = WeatherNoise.GetNoise(time, 0) * 0.5f + 0.5f;
-        val = 1f / (1 + (float)Math.Pow(MathHelper.E, -8 * (val - 0.5f)));
-        float delta = lastTime == -1 ? 0 : (time - lastTime);
-
-        // Weather buildup
-        val += WeatherBoost(time);
-        if (val >= weatherThreshold)
-        {
-            lastWeather += Math.Min(12 * delta * (val - weatherThreshold) / (1 - weatherThreshold), time - lastWeather);
-        }
-
-        lastTime = time;
-
-        return val;
-    }
-    public static float WeatherBoost(float time)
-    {
-        if (time - lastWeather > 600) return Math.Min((time - lastWeather - 600) / 1800f, 0.1f);
-        return 0;
-    }
-    private static float NoiseToIntensity(float noise) => Math.Min((float)Math.Sqrt(Math.Max(noise - weatherThreshold, 0) / (1 - weatherThreshold)), 0.8f);
-    public static float WeatherIntensity(float time) => NoiseToIntensity(WeatherValue(time));
     public static void SaveDoorOpened(ushort idx, string level)
     {
         if (openedDoors.TryGetValue(level, out var levelDoors))
@@ -202,8 +156,8 @@ public static class StateManager
             writer.Write(gameManager.LevelManager.Level.Path);
             writer.Write(gameManager.DayTime);
             writer.Write(GameManager.GameTime);
-            writer.Write(WeatherSeed);
-            writer.Write(lastWeather);
+            writer.Write(gameManager.WeatherManager.WeatherSeed);
+            writer.Write(gameManager.WeatherManager.LastWeather);
             TasksComplete++;
             // Write CameraManager data
             writer.Write(CameraManager.CameraDest.X);
@@ -340,9 +294,9 @@ public static class StateManager
 
             gameManager.DayTime = reader.ReadSingle();
             GameManager.GameTime = reader.ReadSingle();
-            WeatherSeed = reader.ReadInt32();
-            lastWeather = reader.ReadSingle();
-            SetWeatherPersistent(lastWeatherTime: lastWeather, lastTimeValue: GameManager.GameTime);
+            int weatherSeed = reader.ReadInt32();
+            float lastWeather = reader.ReadSingle();
+            gameManager.WeatherManager.SetWeatherPersistent(seed: weatherSeed, lastWeatherTime: lastWeather, lastTimeValue: GameManager.GameTime);
             // Read CameraManager data
             CameraManager.CameraDest = new(reader.ReadSingle(), reader.ReadSingle());
             CameraManager.Camera = CameraManager.CameraDest;
