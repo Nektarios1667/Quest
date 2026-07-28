@@ -262,7 +262,7 @@ public static class TextureManager
         Textures[TextureID.GuiBackground] = content.Load<Texture2D>("Images/Gui/GuiBackground");
         Textures[TextureID.Slot] = content.Load<Texture2D>("Images/Gui/Slot");
         Textures[TextureID.Speech] = content.Load<Texture2D>("Images/Gui/Speech");
-        Textures[TextureID.MenuBackground] = content.Load<Texture2D>("Images/Gui/MenuBackground");
+        Textures[TextureID.MenuBackground] = content.Load<Texture2D>("Images/Gui/MenuBackground3");
         Textures[TextureID.QuestTitle] = content.Load<Texture2D>("Images/Gui/QuestTitle");
         Textures[TextureID.TileOutline] = content.Load<Texture2D>("Images/Gui/TileOutline");
         // GUI INSERT
