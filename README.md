@@ -47,8 +47,8 @@ These controls are the default keybinds and can be changed in the settings menu 
 - `W`, `A`, `S`, `D` to move up, down, left, right.  
 - `Primary Mouse` to use the primary use of the equipped weapon.  
 - `Secondary Mouse` to use the secondary use of the equipped weapon.  
-- `Mouse Wheel Up` to go cycle left on the hotbar.  
-- `Mouse Wheel Down` to go cycle right on the hotbar.  
+- `Mouse Wheel Up` to cycle left on the hotbar.  
+- `Mouse Wheel Down` to cycle right on the hotbar.  
 - `1`, `2`, `3`, ... to switch to hotbar slot 1, 2, 3, ...  
 - `E` to toggle the inventory.  
 - `Escape` or `E` to exit the currently opened interface.  
