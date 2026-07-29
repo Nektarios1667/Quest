@@ -153,6 +153,7 @@ public static class Constants
         new(80, 80, 80), // VolcanicSand
         new(50, 50, 50), // WetVolcanicSand
         Color.White, // WhiteTiles
+        new(56, 22, 0), // Farmland
         // MINIMAPCOLORS
     ];
 }

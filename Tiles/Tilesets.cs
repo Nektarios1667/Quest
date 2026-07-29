@@ -70,6 +70,7 @@ public static class Tilesets
     public static readonly TileTypeID[] Natural = [
         TileTypeID.Grass,
         TileTypeID.Dirt,
+        TileTypeID.Farmland,
         TileTypeID.Path,
         TileTypeID.Sand,
         TileTypeID.WetSand,

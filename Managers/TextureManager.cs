@@ -182,6 +182,7 @@ public static class TextureManager
         VolcanicSand,
         WetVolcanicSand,
         WhiteTiles,
+        Farmland,
         // TILES ENUM INSERT
         Torch,
         BlueTorch,
@@ -211,6 +212,13 @@ public static class TextureManager
         Finish,
         Checkpoint,
         Glass,
+        GoldenRice,
+        Lettuce,
+        Carrots,
+        Potatoes,
+        Raddishes,
+        SmallPlants,
+        Wheat,
         // DECALS ENUM INSERT
         Fireball,
         ArrowProjectile,
@@ -413,6 +421,7 @@ public static class TextureManager
         Textures[TextureID.VolcanicSand] = content.Load<Texture2D>("Images/Tiles/VolcanicSand");
         Textures[TextureID.WetVolcanicSand] = content.Load<Texture2D>("Images/Tiles/WetVolcanicSand");
         Textures[TextureID.WhiteTiles] = content.Load<Texture2D>("Images/Tiles/WhiteTiles");
+        Textures[TextureID.Farmland] = content.Load<Texture2D>("Images/Tiles/Farmland");
         // TILES INSERT
         Textures[TextureID.Torch] = content.Load<Texture2D>("Images/Decals/Torch");
         Textures[TextureID.BlueTorch] = content.Load<Texture2D>("Images/Decals/BlueTorch");
@@ -442,6 +451,13 @@ public static class TextureManager
         Textures[TextureID.Finish] = content.Load<Texture2D>("Images/Decals/Finish");
         Textures[TextureID.Checkpoint] = content.Load<Texture2D>("Images/Decals/Checkpoint");
         Textures[TextureID.Glass] = content.Load<Texture2D>("Images/Decals/Glass");
+        Textures[TextureID.GoldenRice] = content.Load<Texture2D>("Images/Decals/GoldenRice");
+        Textures[TextureID.Lettuce] = content.Load<Texture2D>("Images/Decals/Lettuce");
+        Textures[TextureID.Carrots] = content.Load<Texture2D>("Images/Decals/Carrots");
+        Textures[TextureID.Potatoes] = content.Load<Texture2D>("Images/Decals/Potatoes");
+        Textures[TextureID.Raddishes] = content.Load<Texture2D>("Images/Decals/Raddishes");
+        Textures[TextureID.SmallPlants] = content.Load<Texture2D>("Images/Decals/SmallPlants");
+        Textures[TextureID.Wheat] = content.Load<Texture2D>("Images/Decals/Wheat");
         // DECALS INSERT
         Textures[TextureID.Fireball] = content.Load<Texture2D>("Images/Projectiles/Fireball");
         Textures[TextureID.ArrowProjectile] = content.Load<Texture2D>("Images/Projectiles/Arrow");
@@ -629,6 +645,7 @@ public static class TextureManager
         Metadata[TextureID.VolcanicSand] = new(Textures[TextureID.VolcanicSand].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.WetVolcanicSand] = new(Textures[TextureID.WetVolcanicSand].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.WhiteTiles] = new(Textures[TextureID.WhiteTiles].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.Farmland] = new(Textures[TextureID.Farmland].Bounds.Size, new(4, 4), "tile");
         // TILES METADATA INSERT
         Metadata[TextureID.Torch] = new(Textures[TextureID.Torch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), "decal");
@@ -658,6 +675,13 @@ public static class TextureManager
         Metadata[TextureID.Finish] = new(Textures[TextureID.Finish].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.Checkpoint] = new(Textures[TextureID.Checkpoint].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.Glass] = new(Textures[TextureID.Glass].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.GoldenRice] = new(Textures[TextureID.GoldenRice].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Lettuce] = new(Textures[TextureID.Lettuce].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Carrots] = new(Textures[TextureID.Carrots].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Potatoes] = new(Textures[TextureID.Potatoes].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Raddishes] = new(Textures[TextureID.Raddishes].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.SmallPlants] = new(Textures[TextureID.SmallPlants].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Wheat] = new(Textures[TextureID.Wheat].Bounds.Size, new(1, 1), "decal");
         // DECALS METADATA INSERT
         Metadata[TextureID.Fireball] = new(Textures[TextureID.Fireball].Bounds.Size, new(1, 1), "projectile");
         Metadata[TextureID.ArrowProjectile] = new(Textures[TextureID.ArrowProjectile].Bounds.Size, new(1, 1), "projectile");

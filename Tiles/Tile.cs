@@ -68,6 +68,7 @@ public enum TileTypeID : byte
     VolcanicSand,
     WetVolcanicSand,
     WhiteTiles,
+    Farmland,
     // TILES ID
 }
 
@@ -160,6 +161,7 @@ public static class TileTypes
         new(TileTypeID.VolcanicSand, TextureID.VolcanicSand, true, false),
         new(TileTypeID.WetVolcanicSand, TextureID.WetVolcanicSand, true, false),
         new(TileTypeID.WhiteTiles, TextureID.WhiteTiles, true, false),
+        new(TileTypeID.Farmland, TextureID.Farmland, true, false),
         // TILES REGISTER
     ];
 }

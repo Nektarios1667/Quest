@@ -32,6 +32,13 @@ public enum DecalType : byte
     Finish,
     Checkpoint,
     Glass,
+    GoldenRice,
+    Lettuce,
+    Carrots,
+    Potatoes,
+    Raddishes,
+    SmallPlants,
+    Wheat,
     // DECALS
 }
 public class Decal
