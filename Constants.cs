@@ -146,6 +146,13 @@ public static class Constants
         new(107, 169, 197), // IceWindow
         Color.Beige, // DryWall
         Color.Beige, // DryWallWindow
+        new(100, 100, 100), // Gravel
+        new(200, 200, 0), // WetSand
+        Color.Orange, // RedSand
+        new(225, 125, 0), // WetRedSand
+        new(80, 80, 80), // VolcanicSand
+        new(50, 50, 50), // WetVolcanicSand
+        Color.White, // WhiteTiles
         // MINIMAPCOLORS
     ];
 }

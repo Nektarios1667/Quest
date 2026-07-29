@@ -61,6 +61,13 @@ public enum TileTypeID : byte
     IceWindow,
     DryWall,
     DryWallWindow,
+    Gravel,
+    WetSand,
+    RedSand,
+    WetRedSand,
+    VolcanicSand,
+    WetVolcanicSand,
+    WhiteTiles,
     // TILES ID
 }
 
@@ -146,6 +153,13 @@ public static class TileTypes
         new(TileTypeID.IceWindow, TextureID.IceWindow, false, true, isTransparent: true),
         new(TileTypeID.DryWall, TextureID.DryWall, false, true),
         new(TileTypeID.DryWallWindow, TextureID.DryWallWindow, false, true, isTransparent: true),
+        new(TileTypeID.Gravel, TextureID.Gravel, true, false),
+        new(TileTypeID.WetSand, TextureID.WetSand, true, false),
+        new(TileTypeID.RedSand, TextureID.RedSand, true, false),
+        new(TileTypeID.WetRedSand, TextureID.WetRedSand, true, false),
+        new(TileTypeID.VolcanicSand, TextureID.VolcanicSand, true, false),
+        new(TileTypeID.WetVolcanicSand, TextureID.WetVolcanicSand, true, false),
+        new(TileTypeID.WhiteTiles, TextureID.WhiteTiles, true, false),
         // TILES REGISTER
     ];
 }

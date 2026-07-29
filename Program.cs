@@ -45,12 +45,16 @@ static class Program
         if (args.Contains("--level-editor") || System.IO.Path.GetFileNameWithoutExtension(Environment.ProcessPath)!.Contains("Editor"))
         {
             StateManager.State = GameState.Editor;
+            ConsoleManager.Show();
+
             using var levelEditorApp = new LevelEditor();
             levelEditorApp.Run();
         }
         else if (args.Contains("--code-generator"))
         {
             StateManager.State = GameState.Editor;
+            ConsoleManager.Show();
+
             CodeGenerator.Run("C:/Users/nekta/source/repos/Quest");
         }
         else
