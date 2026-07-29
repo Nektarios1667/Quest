@@ -15,11 +15,14 @@
 - **NPCs**  
   Non-playable characters with custom dialog, shop options, and textures can be placed in the world.
 
+- **Enemies**
+  Different enemies that the player has to fight in order to progress.
+
 - **Loot**  
   Floor loot can be picked up by the player and stored in an inventory.
 
 - **Biomes and Weather**  
-  A dynamic gradient weather system that changes based on the biome the player is in.
+  A dynamic weather system that changes based on the biome the player is in.
 
 - **Saves**  
   The game supports saving and loading player progress.
