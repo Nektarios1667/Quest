@@ -1,4 +1,4 @@
-﻿using Quest.World;
+﻿ using Quest.World;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -56,8 +56,8 @@ public class EditorManager
         {
             var (success, values) = ShowInputForm("Stair Editor", [
                 new("Level", null, placeholder: stairs.DestLevel.LevelName),
-                new("Spawn X", IsByte, placeholder: stairs.Dest.X.ToString()),
-                new("Spawn Y", IsByte, placeholder: stairs.Dest.Y.ToString())]);
+                new("Spawn X", IsByte, placeholder: stairs.Dest.X),
+                new("Spawn Y", IsByte, placeholder: stairs.Dest.Y)]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Stair edit failed.");
@@ -77,8 +77,8 @@ public class EditorManager
         else if (tile is Door door)
         {
             var (success, values) = ShowInputForm("Door Editor", [
-                new("Key", null, ItemsOptionsWNone, door.Key == null ? "NONE" : door.Key.Name.ToString()),
-                new("Amount", IsByte, placeholder: door.Key == null ? "0" : door.Key.Amount.ToString()),
+                new("Key", null, ItemsOptionsWNone, door.Key == null ? "NONE" : door.Key.Name),
+                new("Amount", IsByte, placeholder: door.Key == null ? "0" : door.Key.Amount),
                 new("Consume Key", null, ["True", "False"], door.ConsumeKey.ToString())]);
             if (!success)
             {
@@ -99,9 +99,9 @@ public class EditorManager
             var (success, values) = ShowInputForm("Chest Editor", [
                 new("Loot File Name", null, placeholder: genFile.Split('.')[0]),
                 new("Loot Type", null, ["Loot Preset", "Loot Table"], genFile.Split('.')[1] == "qlt" ? "Loot Table" : "Loot Preset"),
-                new("Key", null, ItemsOptionsWNone, chest.Key == null ? "NONE" : chest.Key.Name.ToString()),
-                new("Amount", IsByte, placeholder: chest.Key == null ? "0" : chest.Key.Amount.ToString()),
-                new("Consume Key", null, ["True", "False"], chest.ConsumeKey.ToString())]);
+                new("Key", null, ItemsOptionsWNone, chest.Key == null ? "NONE" : chest.Key.Name),
+                new("Amount", IsByte, placeholder: chest.Key == null ? "0" : chest.Key.Amount),
+                new("Consume Key", null, ["True", "False"], chest.ConsumeKey)]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Chest edit failed.");
@@ -123,7 +123,7 @@ public class EditorManager
         // Lamp
         else if (tile is Lamp lamp)
         {
-            var (success, values) = ShowInputForm("Lamp Editor", [new("Light Radius", IsByte, placeholder: lamp.LightRadius.ToString())]);
+            var (success, values) = ShowInputForm("Lamp Editor", [new("Light Radius", IsByte, placeholder: lamp.LightRadius)]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Lamp edit failed.");
@@ -135,8 +135,8 @@ public class EditorManager
         else if (tile is DisplayCase displayCase)
         {
             var (success, values) = ShowInputForm("Lamp Editor", [
-                new("Item", null, ItemsOptionsWNone, displayCase.Container.Items[0] == null ? "NONE" : displayCase.Container.Items[0]!.Name.ToString()),
-                new("Amount", IsNonZeroByte, placeholder: displayCase.Container.Items[0]?.Amount.ToString())]);
+                new("Item", null, ItemsOptionsWNone, placeholder: displayCase.Container.Items[0] == null ? "NONE" : displayCase.Container.Items[0]!.Name),
+                new("Amount", IsNonZeroByte, placeholder: displayCase.Container.Items[0]?.Amount)]);
             if (!success)
             {
                 if (!PopupOpen) Logger.Error("Display case edit failed.");
@@ -226,7 +226,11 @@ public class EditorManager
     public void SetTint()
     {
         // Winforms
-        var (success, values) = ShowInputForm("Tint Editor", [new("R", IsByte), new("G", IsByte), new("B", IsByte), new("A", IsByte)]);
+        var (success, values) = ShowInputForm("Tint Editor", [
+            new("R", IsByte, placeholder: LevelManager.Level.Tint.R),
+            new("G", IsByte, placeholder: LevelManager.Level.Tint.G),
+            new("B", IsByte, placeholder: LevelManager.Level.Tint.B),
+            new("A", IsByte, placeholder: LevelManager.Level.Tint.A)]);
         if (!success)
         {
             if (!PopupOpen) Logger.Error("Failed to set tint.");
@@ -439,16 +443,16 @@ public class EditorManager
 
         // Remake
         var (success, values) = ShowInputForm("Enemy Editor", [
-            new("Health", IsUInt16, placeholder: editing.Health.ToString()),
-            new("Damage", IsUInt16, placeholder: editing.Damage.ToString()),
-            new("Attack Speed", IsPositiveFloat, placeholder: editing.AttackSpeed.ToString()),
-            new("Defense", IsUInt16, placeholder: editing.Defense.ToString()),
-            new("Speed", IsUInt16, placeholder: editing.Speed.ToString()),
-            new("Projectile Speed", IsUInt16, placeholder: editing.ProjectileSpeed.ToString()),
-            new("View Range", IsUInt16, placeholder: editing.ViewRange.ToString()),
-            new("Attack Range", IsUInt16, placeholder: editing.AttackRange.ToString()),
-            new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())], placeholder: editing.Texture.ToString()),
-            new("Projectile Texture", null, [.. ProjectileTextures.Select(t => t.ToString())], placeholder: editing.ProjectileTexture.ToString())
+            new("Health", IsUInt16, placeholder: editing.Health),
+            new("Damage", IsUInt16, placeholder: editing.Damage),
+            new("Attack Speed", IsPositiveFloat, placeholder: editing.AttackSpeed),
+            new("Defense", IsUInt16, placeholder: editing.Defense),
+            new("Speed", IsUInt16, placeholder: editing.Speed),
+            new("Projectile Speed", IsUInt16, placeholder: editing.ProjectileSpeed),
+            new("View Range", IsUInt16, placeholder: editing.ViewRange),
+            new("Attack Range", IsUInt16, placeholder: editing.AttackRange),
+            new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())], placeholder: editing.Texture),
+            new("Projectile Texture", null, [.. ProjectileTextures.Select(t => t.ToString())], placeholder: editing.ProjectileTexture)
         ]);
         if (!success)
         {

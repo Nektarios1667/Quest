@@ -3,12 +3,12 @@ using System.Windows.Forms;
 using SysColor = System.Drawing.Color;
 namespace Quest.Editor;
 
-public class InputField(string label, Func<string, bool>? validate = null, string?[]? dropdownOptions = null, string? placeholder = null)
+public class InputField(string label, Func<string, bool>? validate = null, string?[]? dropdownOptions = null, object? placeholder = null)
 {
     public string Label { get; set; } = label;
     public Func<string, bool> Validate { get; set; } = validate ?? (_ => true);
     public string?[]? DropdownOptions { get; set; } = dropdownOptions;
-    public string Placeholder { get; set; } = placeholder ?? "";
+    public string Placeholder { get; set; } = placeholder?.ToString() ?? "";
 }
 
 public static class PopupFactory

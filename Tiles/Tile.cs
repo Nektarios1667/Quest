@@ -169,7 +169,7 @@ public static class TileTypes
 public class Tile
 {
     // Properties
-    public byte TypeID { get; }
+    public TileTypeID TypeID { get; }
     public ByteCoord Location { get; }
     // Computed properties
     public byte X => Location.X;
@@ -179,17 +179,17 @@ public class Tile
     public virtual bool IsTransparent => Type.IsTransparent; // Door changes this depending on if its open/closed
     public virtual float Weight => Type.Weight;
     public ushort TileID => (ushort)(X + Y * Constants.MapSize.X);
-    public TileType Type => TileTypes.All[TypeID];
+    public TileType Type => TileTypes.All[(byte)TypeID];
 
     public Tile(Point location, TileTypeID type)
     {
         Location = new(location);
-        TypeID = (byte)type;
+        TypeID = type;
     }
     public Tile(ByteCoord location, TileTypeID type)
     {
         Location = location;
-        TypeID = (byte)type;
+        TypeID = type;
     }
     public virtual void Draw(GameManager gameManager)
     {
