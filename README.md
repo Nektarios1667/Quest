@@ -42,6 +42,22 @@ Clone the repository:
    cd Quest
    ```
 
+## Controls
+These controls are the default keybinds and can be changed in the settings menu at any time.  
+- `W`, `A`, `S`, `D` to move up, down, left, right.  
+- `Primary Mouse` to use the primary use of the equipped weapon.  
+- `Secondary Mouse` to use the secondary use of the equipped weapon.  
+- `Mouse Wheel Up` to go cycle left on the hotbar.  
+- `Mouse Wheel Down` to go cycle right on the hotbar.  
+- `1`, `2`, `3`, ... to switch to hotbar slot 1, 2, 3, ...  
+- `E` to toggle the inventory.  
+- `Escape` or `E` to exit the currently opened interface.  
+- `Escape` to open the pause menu.  
+- `D` to drop the item that you are currently hovered over in the inventory.  
+- `Primary Mouse` the source slot then `Primary Mouse` the destination slot to swap / move the items.  
+- `Primary Mouse` the source slot then `Secondary Mouse` the destination slot to move half of the items.  
+- `Shift` then `Primary Mouse` to quick move the item in the source slot to the other container.  
+
 ## Level Editor
 The level editor allows you to create and modify game levels with ease.
 ![Quest Editor](GameData/Docs/QuestEditor.PNG)
@@ -52,7 +68,7 @@ The level editor is included in the same project as the game. To run it, run the
 ### Controls
 These controls are the default keybinds and can be changed in the settings menu at any time.
 - **Camera**  
-`W`, `A`, `S`, `D` or `Arrow Keys` to pan the camera around the level. Use `Left Alt` to increase pan speed.
+`W`, `A`, `S`, `D` to pan the camera around the level. Use `Left Alt` to increase pan speed.
 - **Tools**  
 `Left Mouse Button` to draw the selected tile, biome, or decal at the mouse position.
 `Middle Mouse Button` to pick the tile, biome, or decal at the mouse position.
@@ -267,44 +283,44 @@ The following are builtin functions that can be called just like commands:
 Quest Engine provides additional variables that can be accessed in Quill scripts.  
 It is recommended to check in the beginning of the script if the symbol system is ready using `wait =<ready>, 1000`.  
 These include:
-- `<playercoord_x>` – player tile X coordinate
-- `<playercoord_y>` – player tile Y coordinate
-- `<playercoord>` – player tile coordinates formatted as `x;y`
-- `<playerhealth>` – current player health
-- `<playermaxhealth>` – maximum player health
-- `<playerspeed>` – player movement speed constant
-- `<isstuck>` – whether the tile below the player is not walkable (`true` / `false`)
-- `<tilebelow>` – type of the tile directly below the player, or `NUL` if none
-- `<camera_x>` – camera X position
-- `<camera_y>` – camera Y position
-- `<camera>` – camera position formatted as `x;y`
-- `<currentlevel>` – full name of the current level
-- `<currentlevelname>` – name of the current level
-- `<currentworld>` – name of the current world
-- `<spawn>` – spawn point coordinates of the current level
-- `<gametime>` – current game time
-- `<daytime>` – current in-game daytime value
-- `<totaltime>` – total elapsed game time
-- `<gamestate>` – current game state
-- `<inventoryitems>` – list of inventory item names as a `2d-array`
-- `<inventoryamounts>` – list of inventory item amounts as a `2d-array`
-- `<inventorysize_x>` – inventory width
-- `<inventorysize_y>` – inventory height
-- `<inventorysize>` – inventory size formatted as `width;height`
-- `<isinventoryopen>` – whether the inventory UI is open
-- `<equippedslot>` – index of the currently equipped slot
-- `<equippeditem>` – name of the equipped item, or `NUL`
-- `<equippeditemuid>` – unique ID of the equipped item, or `-1` if none
-- `<equippeditemamount>` – amount of the equipped item, or `0` if none
-- `<ready>` – indicates if the symbol system is initialized
-- `<fps>` – current frames per second
-- `<deltatime>` – delta time for the current frame
-- `<ispaused>` – whether the game is currently paused
-- `<vsync>` – whether VSync is enabled
-- `<resolution_x>` – screen resolution width
-- `<resolution_y>` – screen resolution height
-- `<resolution>` – screen resolution formatted as `width;height`
-- `<fpslimit>` – FPS limit setting
+- `<playercoord_x>` Â– player tile X coordinate
+- `<playercoord_y>` Â– player tile Y coordinate
+- `<playercoord>` Â– player tile coordinates formatted as `x;y`
+- `<playerhealth>` Â– current player health
+- `<playermaxhealth>` Â– maximum player health
+- `<playerspeed>` Â– player movement speed constant
+- `<isstuck>` Â– whether the tile below the player is not walkable (`true` / `false`)
+- `<tilebelow>` Â– type of the tile directly below the player, or `NUL` if none
+- `<camera_x>` Â– camera X position
+- `<camera_y>` Â– camera Y position
+- `<camera>` Â– camera position formatted as `x;y`
+- `<currentlevel>` Â– full name of the current level
+- `<currentlevelname>` Â– name of the current level
+- `<currentworld>` Â– name of the current world
+- `<spawn>` Â– spawn point coordinates of the current level
+- `<gametime>` Â– current game time
+- `<daytime>` Â– current in-game daytime value
+- `<totaltime>` Â– total elapsed game time
+- `<gamestate>` Â– current game state
+- `<inventoryitems>` Â– list of inventory item names as a `2d-array`
+- `<inventoryamounts>` Â– list of inventory item amounts as a `2d-array`
+- `<inventorysize_x>` Â– inventory width
+- `<inventorysize_y>` Â– inventory height
+- `<inventorysize>` Â– inventory size formatted as `width;height`
+- `<isinventoryopen>` Â– whether the inventory UI is open
+- `<equippedslot>` Â– index of the currently equipped slot
+- `<equippeditem>` Â– name of the equipped item, or `NUL`
+- `<equippeditemuid>` Â– unique ID of the equipped item, or `-1` if none
+- `<equippeditemamount>` Â– amount of the equipped item, or `0` if none
+- `<ready>` Â– indicates if the symbol system is initialized
+- `<fps>` Â– current frames per second
+- `<deltatime>` Â– delta time for the current frame
+- `<ispaused>` Â– whether the game is currently paused
+- `<vsync>` Â– whether VSync is enabled
+- `<resolution_x>` Â– screen resolution width
+- `<resolution_y>` Â– screen resolution height
+- `<resolution>` Â– screen resolution formatted as `width;height`
+- `<fpslimit>` Â– FPS limit setting
 
 ### Language
 Variables can be accessed with `=variableName`.  
