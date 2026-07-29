@@ -23,7 +23,7 @@ public static class Tilesets
         TileTypeID.PurpleTiles,
         TileTypeID.PinkTiles,
         TileTypeID.BrownTiles,
-        TileTypeID.StoneTiles,
+        TileTypeID.GrayTiles,
         TileTypeID.WhiteTiles,
         TileTypeID.Sandstone,
         TileTypeID.ConcreteFlooring,

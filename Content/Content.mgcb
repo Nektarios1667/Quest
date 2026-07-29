@@ -2320,7 +2320,7 @@
 /processorParam:TextureFormat=Color
 /build:Images/Tiles/Stone.png
 
-#begin Images/Tiles/StoneTiles.png
+#begin Images/Tiles/GrayTiles.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -2330,7 +2330,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Tiles/StoneTiles.png
+/build:Images/Tiles/GrayTiles.png
 
 #begin Images/Tiles/StoneWall.png
 /importer:TextureImporter

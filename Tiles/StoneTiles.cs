@@ -1,8 +1,8 @@
 namespace Quest.Tiles;
 
-public class StoneTiles : Tile
+public class GrayTiles : Tile
 {
-    public StoneTiles(Point location) : base(location, TileTypeID.StoneTiles)
+    public GrayTiles(Point location) : base(location, TileTypeID.GrayTiles)
     {
     }
 }

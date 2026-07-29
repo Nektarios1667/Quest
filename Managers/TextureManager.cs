@@ -134,7 +134,7 @@ public static class TextureManager
         Path,
         Lava,
         LavaBorder,
-        StoneTiles,
+        GrayTiles,
         RedTiles,
         OrangeTiles,
         YellowTiles,
@@ -364,8 +364,8 @@ public static class TextureManager
         Textures[TextureID.Path] = content.Load<Texture2D>("Images/Tiles/Path");
         Textures[TextureID.Lava] = content.Load<Texture2D>("Images/Tiles/Lava");
         Textures[TextureID.LavaBorder] = content.Load<Texture2D>("Images/Tiles/LavaBorder");
-        Textures[TextureID.StoneTiles] = content.Load<Texture2D>("Images/Tiles/StoneTiles");
-        Textures[TextureID.StoneTiles] = content.Load<Texture2D>("Images/Tiles/StoneTiles");
+        Textures[TextureID.GrayTiles] = content.Load<Texture2D>("Images/Tiles/GrayTiles");
+        Textures[TextureID.GrayTiles] = content.Load<Texture2D>("Images/Tiles/GrayTiles");
         Textures[TextureID.RedTiles] = content.Load<Texture2D>("Images/Tiles/RedTiles");
         Textures[TextureID.OrangeTiles] = content.Load<Texture2D>("Images/Tiles/OrangeTiles");
         Textures[TextureID.YellowTiles] = content.Load<Texture2D>("Images/Tiles/YellowTiles");
@@ -580,8 +580,8 @@ public static class TextureManager
         Metadata[TextureID.Path] = new(Textures[TextureID.Path].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Lava] = new(Textures[TextureID.Lava].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.LavaBorder] = new(Textures[TextureID.LavaBorder].Bounds.Size, new(4, 4), "tile");
-        Metadata[TextureID.StoneTiles] = new(Textures[TextureID.StoneTiles].Bounds.Size, new(4, 4), "tile");
-        Metadata[TextureID.StoneTiles] = new(Textures[TextureID.StoneTiles].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.GrayTiles] = new(Textures[TextureID.GrayTiles].Bounds.Size, new(4, 4), "tile");
+        Metadata[TextureID.GrayTiles] = new(Textures[TextureID.GrayTiles].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.RedTiles] = new(Textures[TextureID.RedTiles].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.OrangeTiles] = new(Textures[TextureID.OrangeTiles].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.YellowTiles] = new(Textures[TextureID.YellowTiles].Bounds.Size, new(4, 4), "tile");

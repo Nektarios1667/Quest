@@ -105,7 +105,7 @@ public static class Constants
         new(92, 53, 23), // WoodWall
         new(163, 89, 33), // Path
         Color.OrangeRed, // Lava
-        new(118, 128, 133), // StoneTiles
+        new(118, 128, 133), // GrayTiles
         Color.Red, // RedTiles
         Color.Orange, // OrangeTiles
         Color.Yellow, // YellowTiles
