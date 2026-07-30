@@ -417,11 +417,7 @@ public class LevelEditor : Game, IAdjustableWindow
         // Add tile
         if (currentTool == EditorTool.Tile)
         {
-            Tile tile;
-            if (TileSelection == TileTypeID.Stairs)
-                tile = new Stairs(mouseCoord, LevelPath.Null, Constants.MiddleCoord);
-            else
-                tile = Tile.TileFromId(TileSelection, mouseCoord, "NUL");
+            Tile tile = Tile.TileFromId(TileSelection, mouseCoord, "NUL");
 
             editorManager.SetTile(tile);
         }
