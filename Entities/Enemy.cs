@@ -77,7 +77,7 @@ public class Enemy : IEntity
         {
             if (TimerManager.IsCompleteOrMissing($"EnemyAttack_{UID}"))
             {
-                Vector2 dir = CameraManager.PlayerFoot.ToVector2() - Bounds.Center;
+                Vector2 dir = CameraManager.PlayerCenter.ToVector2() - Bounds.Center;
                 Attack(gameManager, (float)Math.Atan2(dir.Y, dir.X));
                 TimerManager.SetTimer($"EnemyAttack_{UID}", AttackSpeed, null);
                 Path?.Clear();
@@ -89,18 +89,18 @@ public class Enemy : IEntity
             // Update pathfinding
             if (TimerManager.IsCompleteOrMissing($"EnemyPathfind_{UID}"))
             {
-                Point from = LevelManager.TileCoord(FootPosition) - CameraManager.TopLeftTileCoord;
-                Point to = CameraManager.TileCoord - CameraManager.TopLeftTileCoord;
+                Point from = CameraManager.TileToRelativeTile(CameraManager.WorldToTile(FootPosition.ToPoint()), true);
+                Point to = CameraManager.TileToRelativeTile(CameraManager.TileCoord, true);
 
-                var path = PathfindingManager.GetPath(from, to);
+                 var path = PathfindingManager.GetPath(from, to);
 
-                Path = path != null ? [.. path.Select(p => p.ToPoint() + CameraManager.TopLeftTileCoord)] : null;
+                Path = path != null ? [.. path.Select(p => CameraManager.TileRelativeToTile(p.ToPoint(), true))] : null;
                 TimerManager.SetTimer($"EnemyPathfind_{UID}", 0.5f, null);
             }
             // Move along path
             if (Path != null && Path.Count > 0)
             {
-                Vector2 move = LevelManager.WorldCoord(Path[0]) + Constants.TileHalfSize.ToVector2() - FootPosition;
+                Vector2 move = (CameraManager.TileToWorld(Path[0]) + Constants.TileHalfSize).ToVector2() - FootPosition;
                 if (move.LengthSquared() <= 9)
                 {
                     Position += move;

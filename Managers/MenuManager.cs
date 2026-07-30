@@ -1,8 +1,10 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using MonoGUI;
 using Quest.Editor;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Quest.Managers;
@@ -33,7 +35,7 @@ public class MenuManager
         MainMenu = new(window, batch, PixelOperator);
         MainMenu.LoadContent();
         Button startButton = new(MainMenu, new(Constants.Middle.X - 150, 220), new(300, 70), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, LevelSelect, [], text: "Start", font: PixelOperatorSubtitle, border: 0);
-        Button continueButton = new(MainMenu, new(Constants.Middle.X - 150, 310), new(300, 70), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, ContinueSave, [], text: "Continue", font: PixelOperatorSubtitle, border: 0);
+        Button continueButton = new(MainMenu, new(Constants.Middle.X - 150, 310), new(300, 70), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, ContinueSaveButton, [], text: "Continue", font: PixelOperatorSubtitle, border: 0);
         Button settingsButton = new(MainMenu, new(Constants.Middle.X - 150, 400), new(300, 70), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => StateManager.State = GameState.Settings, [], text: "Settings", font: PixelOperatorSubtitle, border: 0);
         Button creditsButton = new(MainMenu, new(Constants.Middle.X - 150, 490), new(300, 70), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => StateManager.State = GameState.Credits, [], text: "Credits", font: PixelOperatorSubtitle, border: 0);
         Button exitButton = new(MainMenu, new(Constants.Middle.X - 150, 580), new(300, 70), Color.White, Color.Black * 0.6f, ColorTools.GrayBlack * 0.6f, () => window.Exit(), [], text: "Exit", font: PixelOperatorSubtitle, border: 0);
@@ -114,6 +116,17 @@ public class MenuManager
         StateManager.OverlayState = OverlayState.None;
         StateManager.State = GameState.MainMenu;
         gameManager.LevelManager.UnloadWorld(gameManager.LevelManager.Level.WorldName);
+    }
+    public async void ContinueSaveButton()
+    {
+        try
+        {
+            await ContinueSave();
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex.ToString(), true);
+        }
     }
     public async Task<bool> ContinueSave()
     {

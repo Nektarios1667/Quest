@@ -109,6 +109,9 @@ public static class Logger
         {
             Directory.CreateDirectory("Logs");
             File.WriteAllText($"Logs/error_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.log", string.Join("\n", DebugManager.GetLogs()));
+            Console.WriteLine("Press Enter to exit...");
+            Console.ReadLine();
+
             Environment.Exit(1);
         }
     }

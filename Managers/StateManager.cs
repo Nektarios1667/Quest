@@ -1,4 +1,5 @@
 ﻿using Quest.World;
+using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -284,6 +285,9 @@ public static class StateManager
         WriteKeyValueFile("Persistent/continue", new() { { "save", save } });
         await gameManager.LevelManager.ReadWorldAsync(gameManager, levelPath.WorldName, true);
 
+        gameManager.LevelManager.TasksComplete = 0;
+        gameManager.LevelManager.TotalTasks = 6;
+
         using (var fs = new FileStream(file, FileMode.Open, FileAccess.Read))
         using (var reader = new BinaryReader(fs))
         {
@@ -296,13 +300,19 @@ public static class StateManager
             int weatherSeed = reader.ReadInt32();
             float lastWeather = reader.ReadSingle();
             gameManager.WeatherManager.SetWeatherPersistent(seed: weatherSeed, lastWeatherTime: lastWeather, lastTimeValue: GameManager.GameTime);
+            gameManager.LevelManager.TasksComplete++;
+
             // Read CameraManager data
             CameraManager.CameraDest = new(reader.ReadSingle(), reader.ReadSingle());
             CameraManager.Camera = CameraManager.CameraDest;
             CameraManager.Update(0); // In bounds check
+            gameManager.LevelManager.TasksComplete++;
+
             // Read PlayerManager data
             playerManager.Health = reader.ReadByte();
             playerManager.MaxHealth = reader.ReadByte();
+            gameManager.LevelManager.TasksComplete++;
+
             // Read LevelManager data
             // Levels
             byte levelCount = reader.ReadByte();
@@ -324,6 +334,7 @@ public static class StateManager
                 ushort doorsCount = reader.ReadUInt16();
                 for (int d = 0; d < doorsCount; d++)
                     if (current.Tiles[reader.ReadUInt16()] is Door door)
+                        //Console.WriteLine();
                         door.Open(gameManager);
 
                 // Chests
@@ -370,6 +381,7 @@ public static class StateManager
                     }
                 }
             }
+            gameManager.LevelManager.TasksComplete++;
 
             // Read Inventory data
             byte invLength = reader.ReadByte();
@@ -378,6 +390,7 @@ public static class StateManager
                 var item = ReadItemData(reader);
                 playerManager.Inventory.SetSlot(i, item);
             }
+            gameManager.LevelManager.TasksComplete++;
 
             // Read Status Effects
             byte effectsCount = reader.ReadByte();
@@ -387,6 +400,7 @@ public static class StateManager
                 float duration = reader.ReadSingle();
                 playerManager.StatusManager.AddStatusEffect(playerManager, effect, duration);
             }
+            gameManager.LevelManager.TasksComplete++;
         }
 
         gameManager.OverlayManager.Notification($"Save Loaded", Color.Cyan);

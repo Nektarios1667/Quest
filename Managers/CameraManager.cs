@@ -23,6 +23,7 @@ public static class CameraManager
     }
     public static Vector2 CameraOffset => CameraDest - Camera;
     public static Point PlayerFoot => CameraDest.ToPoint() + new Point(0, Constants.MageHalfSize.Y);
+    public static Point PlayerCenter => CameraDest.ToPoint() + new Point(0, Constants.MageHalfSize.Y / 2);
     public static Point TileCoord => PlayerFoot / Constants.TileSize;
     public static Point TopLeftTileCoord => (Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
     // Events
@@ -75,4 +76,6 @@ public static class CameraManager
     public static Point ScreenToTile(Point screenCoord) => (screenCoord + Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
     public static Point WorldToScreen(Point worldCoord) => worldCoord - Camera.ToPoint() + Constants.Middle;
     public static Point ScreenToWorld(Point screenCoord) => screenCoord + Camera.ToPoint() - Constants.Middle;
+    public static Point TileToRelativeTile(Point tile, bool includePadding) => tile - CameraManager.TopLeftTileCoord + (includePadding ? Constants.TileDrawPadding : Point.Zero);
+    public static Point TileRelativeToTile(Point tile, bool includePadding) => tile + CameraManager.TopLeftTileCoord - (includePadding ? Constants.TileDrawPadding : Point.Zero);
 }

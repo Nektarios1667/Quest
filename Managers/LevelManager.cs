@@ -16,7 +16,7 @@ public class LevelManager
 {
     // Loading
     public event Action<float>? LoadingProgressed;
-    public int TotalTasks { get; private set; }
+    public int TotalTasks { get; set; }
     private int _tasksComplete;
     public int TasksComplete
     {
@@ -43,28 +43,21 @@ public class LevelManager
         // Empty
         Levels = [];
         Level = EmptyLevel;
-        //TimerManager.SetTimer("UpdatePathfindingGrid", 0.1f, () =>
-        //    PathfindingManager.SetGrid(Level,
-        //        CameraManager.TopLeftTileCoord,
-        //        Constants.NativeResolutionTiles
-        //    ),
-        //    int.MaxValue
-        //);
+        TimerManager.SetTimer("UpdatePathfindingGrid", 1f, () =>
+            PathfindingManager.SetGrid(Level,
+                CameraManager.TopLeftTileCoord - Constants.TileDrawPadding,
+                Constants.NativeResolutionTiles + Constants.TileDrawPadding.Scaled(2)
+            ),
+            int.MaxValue
+        );
     }
     public void Update(GameManager gameManager)
     {
         if (!StateManager.IsPlayingState) return;
 
-        // Pathfinding
-        PathfindingManager.SetGrid(Level,
-            CameraManager.TopLeftTileCoord,
-            Constants.NativeResolutionTiles
-        );
-
         // Entities
         DebugManager.StartBenchmark("LevelEntityUpdates");
         foreach (NPC npc in Level.NPCs.Values) npc.Update(gameManager);
-        foreach (Enemy enemy in Level.Enemies.Values) enemy.Update(gameManager);
         var enemyList = Level.Enemies.Values.ToArray();
         for (int p = enemyList.Length - 1; p >= 0; p--)
         {
@@ -194,28 +187,8 @@ public class LevelManager
 
         // Load the level data
         if (levelIndex < 0) levelIndex = Levels.Count - Math.Abs(levelIndex);
-        Level = Levels[levelIndex];
 
-        // MiniMap
-        if (StateManager.State == GameState.Game)
-            gameManager.OverlayManager.RefreshMiniMap();
-
-        // Close old QuillScripts
-        Interpreter.ClearScripts();
-        Level.RunScripts();
-
-        // Spawn
-        CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
-        CameraManager.Camera = CameraManager.CameraDest;
-        CameraManager.Update(0); // Ensure camera in bounds
-
-        // Lighting
-        LightingManager.ClearLights();
-        LightingManager.BuildLevelLighting(gameManager);
-        LightingManager.MarkUpdateLighting();
-
-        LevelLoaded?.Invoke(Level.Path);
-        return true;
+        return LoadLevelObject(gameManager, Levels[levelIndex]);
     }
     public bool LoadLevel(GameManager gameManager, string name)
     {
@@ -246,6 +219,15 @@ public class LevelManager
 
         // MiniMap
         gameManager.OverlayManager?.RefreshMiniMap();
+
+        // Pathfinding
+        PathfindingManager.SetGrid(Level,
+            CameraManager.TopLeftTileCoord - Constants.TileDrawPadding,           // Start
+            Constants.NativeResolutionTiles + Constants.TileDrawPadding.Scaled(2) // Size
+        );
+
+        // Lighting
+        LightingManager.BuildLevelLighting(gameManager);
 
         // Spawn
         CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
@@ -485,7 +467,6 @@ public class LevelManager
             sw.Stop();
             Logger.System($"Successfully read level '{filename}' in {sw.ElapsedMilliseconds:F0}ms.");
 
-
             return true;
         }
         catch (Exception ex)
@@ -614,7 +595,5 @@ public class LevelManager
         Level.Loot.Add(loot);
         gameManager.OverlayManager.LootNotifications.AddNotification($"-{loot.DisplayName}");
     }
-    public static Point TileCoord(Vector2 loc) => new((int)(loc.X / Constants.TileSize.X), (int)(loc.Y / Constants.TileSize.Y));
-    public static Vector2 WorldCoord(Point tileCoord) => new(tileCoord.X * Constants.TileSize.X, tileCoord.Y * Constants.TileSize.Y);
     public static int Flatten(Point point) => point.X + point.Y * Constants.MapSize.X;
 }

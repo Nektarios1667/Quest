@@ -19,7 +19,9 @@ public static class PathfindingManager
         settings.IsMovementBetweenCornersEnabled = false;
         settings.IsCellWeightEnabled = true;
 
-        Grid = new Cell[Constants.NativeResolutionTiles.X, Constants.NativeResolutionTiles.Y];
+        Grid = new Cell[
+            Constants.NativeResolutionTiles.X + Constants.TileDrawPadding.X * 2,
+            Constants.NativeResolutionTiles.Y + Constants.TileDrawPadding.Y * 2];
 
         Pathfinder = new(Grid, settings);
         Pathfinder.EnablePathCaching();
@@ -30,6 +32,12 @@ public static class PathfindingManager
     public static void SetGrid(Level level, int startX, int startY, int width, int height)
     {
         DebugManager.StartBenchmark($"PathfindingGrid");
+
+        // Clamp
+        startX = Math.Max(startX, 0);
+        startY = Math.Max(startY, 0);
+        width = Math.Min(width, Constants.MapSize.X - startX);
+        height = Math.Min(height, Constants.MapSize.Y - startY);
 
         for (int y = startY; y < startY + height; y++)
             for (int x = startX; x < startX + width; x++)

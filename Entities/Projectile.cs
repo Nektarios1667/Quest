@@ -20,7 +20,7 @@ public class Projectile : IEntity
         Texture = tex;
         Damage = damage;
         Speed = speed;
-        Size = size ?? (TextureManager.Metadata[Texture].Size / (TextureManager.Metadata[Texture].TileMap.ToVector2() * Constants.ProjectileScale).ToPoint());
+        Size = size ?? (TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap).Scaled(Constants.ProjectileScale);
         UID = UIDManager.Get(UIDCategory.Projectiles);
 
         // Update collision 60/s

@@ -200,7 +200,7 @@ public static class LightingManager
         Rectangle updateRegion = new(LightingStart.Scaled(LightDivisions), (LightingEnd - LightingStart).Scaled(LightDivisions));
 
         // Reset
-        LightGrid.Reset(updateRegion);
+        LightGrid!.Reset(updateRegion);
         // Set lights
         foreach (var light in Lights.Values)
         {
