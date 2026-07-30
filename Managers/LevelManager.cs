@@ -373,6 +373,14 @@ public class LevelManager
         int totalTiles = Constants.MapSize.X * Constants.MapSize.Y;
         Tile[] tilesBuffer = new Tile[totalTiles];
         BiomeType[] biomeBuffer = new BiomeType[totalTiles];
+        Point spawn = new();
+        Color tint = new();
+        List<Loot> lootBuffer = new();
+        List<NPC> npcBuffer = new();
+        List<Enemy> enemyBuffer = new();
+        Dictionary<ByteCoord, Decal> decalBuffer = new();
+        List<QuillScript> scriptBuffer = new();
+
         TasksComplete++;
 
         // Context
@@ -380,89 +388,43 @@ public class LevelManager
         using BufferedStream buffer = new(fileStream, 128 * 1024);
         using GZipStream gzipStream = new(buffer, CompressionMode.Decompress);
         using BinaryReader reader = new(gzipStream);
+
+        // Metadata
+        byte[] magic = reader.ReadBytes(4);
+        if (Encoding.ASCII.GetString(magic) != "QLVL") return Error($"invalid file format for file '{filename}'.");
+        TasksComplete++;
+
+        // Reading
         try
         {
-
-            // Metadata
-            byte[] magic = reader.ReadBytes(4);
-            if (Encoding.UTF8.GetString(magic) != "QLVL") return Error($"Invalid file format for file '{filename}'.");
-            LevelFeatures flags = (LevelFeatures)reader.ReadUInt16();
-            TasksComplete++;
-
-            // Tint
-            Color tint = reader.ReadColor();
-            TasksComplete++;
-
-            // Spawn
-            Point spawn = reader.ReadByteCoord().ToPoint();
-            TasksComplete++;
-
-
-            // Tiles
-            for (int y = 0; y < Constants.MapSize.Y; y++)
-                for (int x = 0; x < Constants.MapSize.X; x++)
-                    tilesBuffer[x + y * Constants.MapSize.X] = ReadTile(reader, levelPath, x, y);
-            TasksComplete++;
-
-
-            // Biomes
-            if (flags.HasFlag(LevelFeatures.Biomes))
+            // Read sections
+            while (true)
             {
-                int read = reader.Read(MemoryMarshal.AsBytes(biomeBuffer.AsSpan()));
-                if (read != totalTiles) Error($"Failed to read biome data for level '{filename}' - expected {totalTiles}B got {read}B.");
-            }
-            else
-                biomeBuffer = [];
-            TasksComplete++;
+                string id = reader.ReadString();
+                int length = reader.ReadInt32();
 
 
-            // NPCs
-            ushort npcCount = reader.ReadUInt16();
-            List<NPC> npcBuffer = new(npcCount);
-            for (int n = 0; n < npcCount; n++)
-                npcBuffer.Add(reader.ReadNPC());
-            TasksComplete++;
+                if (id == "_EOF") break;
 
-            // Loot
-            ushort lootCount = reader.ReadUInt16();
-            List<Loot> lootBuffer = new(lootCount);
-            for (int n = 0; n < lootCount; n++)
-                lootBuffer.Add(reader.ReadLoot(gameManager));
-            TasksComplete++;
+                byte[] data = reader.ReadBytes(length);
 
-            // Decals
-            ushort decalCount = reader.ReadUInt16();
-            Dictionary<ByteCoord, Decal> decalBuffer = new(decalCount);
-            for (int n = 0; n < decalCount; n++)
-            {
-                Decal decal = reader.ReadDecal();
-                decalBuffer[decal.Location] = decal;
-            }
-            TasksComplete++;
+                using MemoryStream sectionStream = new MemoryStream(data);
+                using BinaryReader sectionReader = new BinaryReader(sectionStream);
 
-            // Enemies
-            ushort enemyCount = reader.ReadUInt16();
-            List<Enemy> enemyBuffer = new(enemyCount);
-            for (int e = 0; e < enemyCount; e++)
-                enemyBuffer.Add(reader.ReadEnemy());
-            TasksComplete++;
-
-            // Scripts
-            List<QuillScript> scriptBuffer = [];
-            if (flags.HasFlag(LevelFeatures.QuillScripts))
-            {
-                Directory.CreateDirectory($"GameData/Worlds/{levelPath.WorldName}/scripts");
-                byte scriptCount = reader.ReadByte();
-                scriptBuffer = new(scriptCount);
-                for (int s = 0; s < scriptCount; s++)
+                // Section types
+                switch (id)
                 {
-                    string name = reader.ReadString();
-                    string scriptPath = $"GameData/Worlds/{levelPath.WorldName}/scripts/{name}";
-                    string code = File.Exists(scriptPath) ? File.ReadAllText(scriptPath) : "// NUL";
-                    scriptBuffer.Add(new QuillScript(name, code));
+                    case "LEVL": ReadLevelSection(sectionReader); break;
+                    case "TILE": ReadTileSection(sectionReader, levelPath, tilesBuffer); break;
+                    case "BIOM": ReadBiomeSection(sectionReader, filename, totalTiles, biomeBuffer); break;
+                    case "NPCS": ReadNPCSection(sectionReader, npcBuffer); break;
+                    case "LOOT": ReadLootSection(sectionReader, gameManager, lootBuffer); break;
+                    case "DCAL": ReadDecalSection(sectionReader, gameManager, decalBuffer); break;
+                    case "ENEM": ReadEnemySection(sectionReader, enemyBuffer); break;
+                    case "QSCR": ReadScriptSection(sectionReader, levelPath, scriptBuffer); break;
+                    default: Logger.Warning($"Unknown level section '{id}'"); break; // Unknown section - ignore it
                 }
             }
-            TasksComplete++;
 
             // Make and add the level
             Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, enemyBuffer, [], scriptBuffer, meta, tint);
@@ -475,10 +437,102 @@ public class LevelManager
         }
         catch (Exception ex)
         {
-            Logger.Error($"Failed to read level file '{filename}': {ex.Message}");
+            Logger.Error($"Failed to read level file '{filename}': {ex}");
             return false;
         }
+
     }
+    private void ReadLevelSection(BinaryReader reader)
+    {
+        // Tint
+        Color tint = reader.ReadColor();
+        TasksComplete++;
+
+        // Spawn
+        Point spawn = reader.ReadByteCoord().ToPoint();
+        TasksComplete++;
+    }
+    private void ReadTileSection(BinaryReader reader, LevelPath levelPath, Tile[] tilesBuffer)
+    {
+        // Tiles
+        for (int y = 0; y < Constants.MapSize.Y; y++)
+            for (int x = 0; x < Constants.MapSize.X; x++)
+                tilesBuffer[x + y * Constants.MapSize.X] = ReadTile(reader, levelPath, x, y);
+        TasksComplete++;
+    }
+    private void ReadBiomeSection(BinaryReader reader, string filename, int totalTiles, BiomeType[] biomeBuffer)
+    {
+        // Biomes
+        int read = reader.Read(MemoryMarshal.AsBytes(biomeBuffer.AsSpan()));
+        if (read != totalTiles) Error($"Failed to read biome data for level '{filename}' - expected {totalTiles}B got {read}B.");
+        TasksComplete++;
+    }
+    private void ReadNPCSection(BinaryReader reader, List<NPC> npcBuffer)
+    {
+        // NPCs
+        ushort npcCount = reader.ReadUInt16();
+        npcBuffer.Clear();
+        npcBuffer.Capacity = npcCount;
+
+        for (int n = 0; n < npcCount; n++)
+            npcBuffer.Add(reader.ReadNPC());
+        TasksComplete++;
+    }
+    private void ReadLootSection(BinaryReader reader, GameManager gameManager, List<Loot> lootBuffer)
+    {
+        // Loot
+        ushort lootCount = reader.ReadUInt16();
+        lootBuffer.Clear();
+        lootBuffer.Capacity = lootCount;
+
+        for (int n = 0; n < lootCount; n++)
+            lootBuffer.Add(reader.ReadLoot(gameManager));
+        TasksComplete++;
+    }
+    private void ReadDecalSection(BinaryReader reader, GameManager gameManager, Dictionary<ByteCoord, Decal> decalBuffer)
+    {
+        // Decals
+        ushort decalCount = reader.ReadUInt16();
+        decalBuffer.Clear();
+
+        for (int n = 0; n < decalCount; n++)
+        {
+            Decal decal = reader.ReadDecal();
+            decalBuffer[decal.Location] = decal;
+        }
+        TasksComplete++;
+    }
+    private void ReadEnemySection(BinaryReader reader, List<Enemy> enemyBuffer)
+    {
+        // Enemies
+        ushort enemyCount = reader.ReadUInt16();
+        enemyBuffer.Clear();
+        enemyBuffer.Capacity = enemyCount;
+        
+        for (int e = 0; e < enemyCount; e++)
+            enemyBuffer.Add(reader.ReadEnemy());
+        TasksComplete++;
+    }
+    private void ReadScriptSection(BinaryReader reader, LevelPath levelPath, List<QuillScript> scriptBuffer)
+    {
+        // Scripts
+        Directory.CreateDirectory($"GameData/Worlds/{levelPath.WorldName}/scripts");
+
+        byte scriptCount = reader.ReadByte();
+        scriptBuffer.Clear();
+        scriptBuffer.Capacity = scriptCount;
+
+
+        for (int s = 0; s < scriptCount; s++)
+        {
+            string name = reader.ReadString();
+            string scriptPath = $"GameData/Worlds/{levelPath.WorldName}/scripts/{name}";
+            string code = File.Exists(scriptPath) ? File.ReadAllText(scriptPath) : "// NUL";
+            scriptBuffer.Add(new QuillScript(name, code));
+        }
+
+        TasksComplete++;
+    } 
     private static Tile ReadTile(BinaryReader reader, LevelPath levelPath, int x, int y)
     {
         // Helpers

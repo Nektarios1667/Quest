@@ -88,22 +88,66 @@ public class EditorLevelManager
         // Write metadata
         StateManager.WriteKeyValueFile($"Worlds/{path.WorldName}/metadata", metadata.ToDict());
 
+        // Write metadata
+        StateManager.WriteKeyValueFile($"Worlds/{path.WorldName}/metadata", metadata.ToDict());
+
         // Context
         using FileStream fileStream = File.Create($"GameData/Worlds/{path.WorldName}/levels/{path.LevelName}.qlv");
         using GZipStream gzipStream = new(fileStream, CompressionLevel.Optimal);
         using BinaryWriter writer = new(gzipStream);
 
-        // Flags
-        var flags = LevelFeatures.Biomes | LevelFeatures.QuillScripts;
-        writer.Write(Encoding.UTF8.GetBytes("QLVL")); // Magic number
-        writer.Write((ushort)flags); // Flags
+        // Write magic
+        byte[] magic = Encoding.ASCII.GetBytes("QLVL");
+        writer.Write(magic);
 
+        // Write sections
+        WriteSection(writer, "LEVL", WriteLevelSection);
+        WriteSection(writer, "TILE", WriteTileSection);
+        WriteSection(writer, "BIOM", WriteBiomeSection);
+        WriteSection(writer, "NPCS", WriteNPCSection);
+        WriteSection(writer, "LOOT", WriteLootSection);
+        WriteSection(writer, "DCAL", WriteDecalSection);
+        WriteSection(writer, "ENEM", WriteEnemySection);
+        WriteSection(writer, "QSCR", WriteScriptSection);
+        WriteSection(writer, "_EOF", WriteEOFSection);
+
+        writer.Dispose();
+        if (Constants.DEVMODE)
+            File.Copy($"GameData/Worlds/{path.WorldName}/levels/{path.LevelName}.qlv", $"../../../GameData/Worlds/{path.WorldName}/levels/{path.LevelName}.qlv", true);
+
+        // Log
+        Logger.Log($"Exported level to '{path}.qlv'.");
+    }
+    private static void WriteSection(BinaryWriter writer, string id, Action<BinaryWriter> writeData)
+    {
+        using MemoryStream tempStream = new MemoryStream();
+        using BinaryWriter tempWriter = new BinaryWriter(tempStream);
+
+        // Write the section normally
+        writeData(tempWriter);
+
+        tempWriter.Flush();
+
+        // Get byte count
+        byte[] data = tempStream.ToArray();
+
+        // Write 4 char section header
+        writer.Write(id);
+        writer.Write(data.Length);
+
+        // Write section data
+        writer.Write(data);
+    }
+    private void WriteLevelSection(BinaryWriter writer)
+    {
         // Write tint
         writer.Write(LevelManager.Level.Tint);
 
         // Write spawn
         writer.Write(new ByteCoord(LevelManager.Level.Spawn));
-
+    }
+    private void WriteTileSection(BinaryWriter writer)
+    {
         // Tiles
         for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
         {
@@ -134,53 +178,55 @@ public class EditorLevelManager
             else if (tile is DisplayCase displayCase)
                 StateManager.WriteItemData(writer, displayCase.Container.Items[0]);
         }
-
+    }
+    private void WriteBiomeSection(BinaryWriter writer)
+    {
         // Biome
-        if (flags.HasFlag(LevelFeatures.Biomes))
-            for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
-                writer.Write((byte)(int)LevelManager.Level.Biome[i]);
-
+        for (int i = 0; i < Constants.MapSize.X * Constants.MapSize.Y; i++)
+            writer.Write((byte)(int)LevelManager.Level.Biome[i]);
+    }
+    private void WriteNPCSection(BinaryWriter writer)
+    {
         // NPCs
         writer.Write((ushort)Math.Min(LevelManager.Level.NPCs.Count, ushort.MaxValue));
         NPC[] npcs = [.. LevelManager.Level.NPCs.Values];
         for (int n = 0; n < Math.Min(npcs.Length, ushort.MaxValue); n++)
             writer.Write(npcs[n]);
-
+    }
+    private void WriteLootSection(BinaryWriter writer)
+    {
         // Floor loot
         writer.Write((ushort)Math.Min(LevelManager.Level.Loot.Count, ushort.MaxValue));
         for (int n = 0; n < Math.Min(LevelManager.Level.Loot.Count, ushort.MaxValue); n++)
             writer.Write(LevelManager.Level.Loot[n]);
-
+    }
+    private void WriteDecalSection(BinaryWriter writer)
+    {
         // Decals
         writer.Write((ushort)Math.Min(LevelManager.Level.Decals.Count, ushort.MaxValue));
         Decal[] decals = [.. LevelManager.Level.Decals.Values];
         for (int n = 0; n < Math.Min(decals.Length, ushort.MaxValue); n++)
             writer.Write(decals[n]);
-
+    }
+    private void WriteEnemySection(BinaryWriter writer)
+    {
         // Enemies
         writer.Write((ushort)Math.Min(LevelManager.Level.Enemies.Count, ushort.MaxValue));
         Enemy[] enemies = [.. LevelManager.Level.Enemies.Values];
         for (int n = 0; n < Math.Min(enemies.Length, ushort.MaxValue); n++)
             writer.Write(enemies[n]);
-
-        // Scripts
-        if (flags.HasFlag(LevelFeatures.QuillScripts))
-        {
-            writer.Write((byte)LevelManager.Level.Scripts.Count);
-            for (int s = 0; s < LevelManager.Level.Scripts.Count; s++)
-            {
-                QuillScript script = LevelManager.Level.Scripts[s];
-                writer.Write(script.Name);
-            }
-        }
-
-        writer.Dispose();
-        if (Constants.DEVMODE)
-            File.Copy($"GameData/Worlds/{path.WorldName}/levels/{path.LevelName}.qlv", $"../../../GameData/Worlds/{path.WorldName}/levels/{path.LevelName}.qlv", true);
-
-        // Log
-        Logger.Log($"Exported level to '{path}.qlv'.");
     }
+    public void WriteScriptSection(BinaryWriter writer)
+    {
+        // Scripts
+        writer.Write((byte)LevelManager.Level.Scripts.Count);
+        for (int s = 0; s < LevelManager.Level.Scripts.Count; s++)
+        {
+            QuillScript script = LevelManager.Level.Scripts[s];
+            writer.Write(script.Name);
+        }
+    }
+    public void WriteEOFSection(BinaryWriter writer) { }
     public void GenerateLevel()
     {
         // Winforms
