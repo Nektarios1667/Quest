@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using IO = System.IO;
 
@@ -290,6 +291,7 @@ public class LevelManager
         // Progress info
         TasksComplete = 0;
         TotalTasks = levelFiles.Length * 11 + 1; // All levels * 11 tasks per level + reading loot files
+        MenuManager.SetCurrentlyLoading("Loading world...");
 
         if (!Directory.Exists($"GameData/Worlds/{folder}"))
         {
@@ -312,6 +314,7 @@ public class LevelManager
         // Read levels
         foreach (string file in levelFiles)
         {
+            MenuManager.SetCurrentlyLoading($"Loading {IO.Path.GetFileNameWithoutExtension(file)}...");
             ReadLevel(gameManager, $"{folder}/{IO.Path.GetFileNameWithoutExtension(file)}", reload, multiTask: true);
             TasksComplete++;
         }

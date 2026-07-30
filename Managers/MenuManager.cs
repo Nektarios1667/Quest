@@ -26,6 +26,12 @@ public class MenuManager
     private readonly ScrollBox worlds;
     private readonly ScrollBox saves;
     private readonly Label saveListLabel;
+    private static Label currentlyLoadingLabel = null!;
+    public static void SetCurrentlyLoading(string loading)
+    {
+        currentlyLoadingLabel.Text = loading;
+        currentlyLoadingLabel.Location = new((int)(Constants.Middle.X - currentlyLoadingLabel.Font!.MeasureString(loading).X / 2), currentlyLoadingLabel.Location.Y);
+    }
     public MenuManager(Window window, SpriteBatch batch, ContentManager content, GameManager gameManager, PlayerManager playerManager)
     {
         this.gameManager = gameManager;
@@ -76,9 +82,10 @@ public class MenuManager
         LoadingMenu.LoadContent();
         Label loadingLabel = new(LoadingMenu, new(Constants.Middle.X - 130, 50), Color.White, "Loading", PixelOperatorTitle);
         ProgressBar progressBar = new(LoadingMenu, new(Constants.Middle.X - 250, 150), new(500, 40), ColorTools.NearBlack * 0.6f, Color.White * 0.6f, border: 0, textColor: Color.White, showPercentage: true);
+        currentlyLoadingLabel = new(LoadingMenu, new(Constants.Middle.X - 150, 200), Color.White * 0.6f, "", PixelOperator);
         gameManager.LevelManager.LoadingProgressed += (prog) => progressBar.SetValue(prog);
 
-        LoadingMenu.AddWidgets(loadingLabel, progressBar);
+        LoadingMenu.AddWidgets(loadingLabel, progressBar, currentlyLoadingLabel);
 
         // Pause Menu
         PauseMenu = new(window, batch, PixelOperator);

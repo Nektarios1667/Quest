@@ -2,6 +2,7 @@
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Quest.Managers;
@@ -287,6 +288,7 @@ public static class StateManager
 
         gameManager.LevelManager.TasksComplete = 0;
         gameManager.LevelManager.TotalTasks = 6;
+        MenuManager.SetCurrentlyLoading("Loading save file...");
 
         using (var fs = new FileStream(file, FileMode.Open, FileAccess.Read))
         using (var reader = new BinaryReader(fs))
