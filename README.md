@@ -54,6 +54,7 @@ These controls are the default keybinds and can be changed in the settings menu 
 - `Mouse Wheel Down` to cycle right on the hotbar.  
 - `1`, `2`, `3`, ... to switch to hotbar slot 1, 2, 3, ...  
 - `E` to toggle the inventory.  
+- `I` to toggle the world info.  
 - `Escape` or `E` to exit the currently opened interface.  
 - `Escape` to open the pause menu.  
 - `D` to drop the item that you are currently hovered over in the inventory.  
