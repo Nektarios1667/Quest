@@ -295,7 +295,11 @@ public partial class UserInterface
             if (input.Item != null)
                 SoundtrackManager.PlaySoundtrack(input.Item.Name.Replace(" ", ""));
         };
+        Button stop = new(new(Constants.Middle.X - 50, 210), new(100, 35), "Stop", PixelOperatorLarge, Color.Wheat, Color.Red * 0.6f, Color.Red * 0.4f);
+        stop.Clicked += SoundtrackManager.StopSoundtrack;
+
         JukeboxUI.AddElement("play_button", play);
+        JukeboxUI.AddElement("stop_button", stop);
     }
     private static void CreateStoveUI(SpriteBatch batch, LevelManager levelManager)
     {

@@ -100,6 +100,12 @@ public static class SoundtrackManager
         Logger.Error($"No soundtracks found for mood '{mood}'");
         return null;
     }
+    public static void StopSoundtrack()
+    {
+        SoundManager.StopMusic();
+        Playing = null;
+        PlayNextSong.Left = RandomManager.RandomIntRange(180, 240);
+    }
     public static bool PlaySoundtrack(string soundtrack)
     {
         if (Enum.TryParse<Soundtracks>(soundtrack, out var st))
