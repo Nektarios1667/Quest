@@ -43,7 +43,9 @@ public class LevelEditor : Game, IAdjustableWindow
     private BiomeType BiomeSelection;
 
     private Point mouseCoord;
-    private Tile mouseTile = null!;
+    private Tile? mouseTile = null!;
+    private DecalType? mouseDecal = null;
+    private BiomeType? mouseBiome = null;
     private Point mouseSelectionCoord;
     private Point mouseSelection;
     private LevelGenerator levelGenerator = null!;
@@ -119,7 +121,7 @@ public class LevelEditor : Game, IAdjustableWindow
         editorLevelManager = new(gameManager, levelGenerator);
         editorOverlayManager = new(gameManager, spriteBatch, GraphicsDevice);
         TimerManager.SetTimer("UpdateMinimap", 1, editorOverlayManager.FlagRebuildMinimap, int.MaxValue);
-        TimerManager.SetTimer("UpdateEditorWindowTile", 1, () =>
+        TimerManager.SetTimer("UpdateEditorWindowTile", 3, () =>
             Window.Title = editorLevelManager.LevelManager.Level.LevelPath.IsNull() ? "Quest Level Editor" : $"Quest Level Editor - {editorLevelManager.LevelManager.Level.LevelPath}",
         int.MaxValue);
 
@@ -219,7 +221,9 @@ public class LevelEditor : Game, IAdjustableWindow
         mouseCoord = (InputManager.MousePosition + CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
         mouseCoord.X = Math.Clamp(mouseCoord.X, 0, Constants.MapSize.X - 1);
         mouseCoord.Y = Math.Clamp(mouseCoord.Y, 0, Constants.MapSize.Y - 1);
-        mouseTile = GetTile(mouseCoord);
+        mouseTile = levelManager.GetTile(mouseCoord)!;
+        mouseDecal = levelManager.GetDecal(mouseCoord.ToByteCoord())?.Type;
+        mouseBiome = levelManager.Level.Biome[LevelManager.Flatten(mouseCoord)];
 
         // Movement
         DebugManager.StartBenchmark("InputUpdate");
@@ -362,7 +366,12 @@ public class LevelEditor : Game, IAdjustableWindow
         DrawTileGhostCursor(mouseCoordDraw);
 
         // Tile info
-        editorOverlayManager.DrawTileOverlay(spriteBatch, TileSelection, mouseTile);
+        if (currentTool == EditorTool.Tile)
+            EditorOverlayManager.DrawTileOverlay(spriteBatch, TileSelection, mouseTile);
+        else if (currentTool == EditorTool.Decal)
+            EditorOverlayManager.DrawDecalOverlay(spriteBatch, DecalSelection, mouseDecal);
+        else if (currentTool == EditorTool.Biome)
+            EditorOverlayManager.DrawBiomeOverlay(spriteBatch, BiomeSelection, mouseBiome);
 
         // Gui
         if (StateManager.State == GameState.Settings)
@@ -430,7 +439,7 @@ public class LevelEditor : Game, IAdjustableWindow
             if (current != null && current.Type != DecalSelection) levelManager.Level.Decals.Remove(mouseCoord.ToByteCoord()); // Remove current one
 
             // Add
-            if (!alreadyThere && levelManager.Level.Decals.Count < 255)
+            if (!alreadyThere && levelManager.Level.Decals.Count < ushort.MaxValue)
                 levelManager.Level.Decals[mouseCoord.ToByteCoord()] = LevelManager.DecalFromId(DecalSelection, mouseCoord);
         }
         // Set biome
@@ -442,7 +451,7 @@ public class LevelEditor : Game, IAdjustableWindow
     }
     public void PickTile()
     {
-        if (currentTool == EditorTool.Tile)
+        if (currentTool == EditorTool.Tile && mouseTile != null)
         {
             foreach (var (type, set) in Tilesets.TypeToArray)
             {
@@ -465,18 +474,13 @@ public class LevelEditor : Game, IAdjustableWindow
     {
         mouseSelection = CameraManager.Camera.ToPoint() + InputManager.MousePosition - Constants.Middle;
         mouseSelectionCoord = mouseCoord;
+        editorManager.Update(TileSelection, BiomeSelection, currentTool, delta, mouseTile, mouseCoord, mouseSelection, mouseSelectionCoord);
     }
     public static byte IntToByte(int value)
     {
         if (value < 0 || value > 255)
             throw new ArgumentOutOfRangeException(nameof(value), "Value must be between 0 and 255.");
         return (byte)value;
-    }
-    public Tile GetTile(Point coord)
-    {
-        if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
-            throw new ArgumentOutOfRangeException(nameof(coord), "Coordinates are out of bounds of the level.");
-        return levelManager.Level.Tiles[coord.X + coord.Y * Constants.MapSize.X];
     }
 
 }

@@ -594,6 +594,11 @@ public class LevelManager
             return null;
         return Level.Tiles[x + y * Constants.MapSize.X];
     }
+    public Decal? GetDecal(ByteCoord coord)
+    {
+        if (Level.Decals.TryGetValue(coord, out var dec)) return dec;
+        return null;
+    }
     public void DropLoot(GameManager gameManager, Loot loot)
     {
         Level.Loot.Add(loot);

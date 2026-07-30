@@ -36,24 +36,25 @@ public class EditorOverlayManager
         if (RebuildMiniMapFlag)
             RebuildMiniMap();
     }
-    public void DrawTileOverlay(SpriteBatch spriteBatch, TileTypeID selection, Tile? mouseTile)
+    public static void DrawTileOverlay(SpriteBatch spriteBatch, TileTypeID selection, Tile? mouseTile)
     {
         if (mouseTile is Stairs stair)
-            DrawBottomInfo(spriteBatch, selection, $"[Stairs] dest: '{stair.DestLevel.LevelName}' @ {stair.Dest}");
+            DrawBottomInfo(spriteBatch, $"{selection} | [Stairs] dest: '{stair.DestLevel.LevelName}' @ {stair.Dest}");
         else if (mouseTile is Door door)
-            DrawBottomInfo(spriteBatch, selection, $"[Door] key: {(door.Key == null ? "NUL" : $"'{door.Key.Name}' x{door.Key.Amount}")} consume: {door.ConsumeKey}");
+            DrawBottomInfo(spriteBatch, $"{selection} | [Door] key: {(door.Key == null ? "NUL" : $"'{door.Key.Name}' x{door.Key.Amount}")} consume: {door.ConsumeKey}");
         else if (mouseTile is Chest chest)
-            DrawBottomInfo(spriteBatch, selection, $"[Chest] gen: '{chest.LootGenerator.FileName}' key: {(chest.Key == null ? "NUL" : $"'{chest.Key.Name}' x{chest.Key.Amount}")} consume: {chest.ConsumeKey}");
+            DrawBottomInfo(spriteBatch, $"{selection} | [Chest] gen: '{chest.LootGenerator.FileName}' key: {(chest.Key == null ? "NUL" : $"'{chest.Key.Name}' x{chest.Key.Amount}")} consume: {chest.ConsumeKey}");
         else if (mouseTile is Lamp lamp)
-            DrawBottomInfo(spriteBatch, selection, $"[Lamp] radius: {lamp.LightRadius}");
+            DrawBottomInfo(spriteBatch, $"{selection} | [Lamp] radius: {lamp.LightRadius}");
         else if (mouseTile is DisplayCase displayCase)
-            DrawBottomInfo(spriteBatch, selection, $"[Display Case] item: {displayCase.Container.Items[0]?.Name} x{displayCase.Container.Items[0]?.Amount}");
+            DrawBottomInfo(spriteBatch, $"{selection} | [Display Case] item: {displayCase.Container.Items[0]?.Name} x{displayCase.Container.Items[0]?.Amount}");
         else
-            DrawBottomInfo(spriteBatch, selection, $"[{mouseTile?.Type.Texture}]");
+            DrawBottomInfo(spriteBatch, $"{selection} | [{mouseTile?.Type.Texture}]");
     }
-    public static void DrawBottomInfo(SpriteBatch spriteBatch, TileTypeID tileSelection, string text)
+    public static void DrawDecalOverlay(SpriteBatch spriteBatch, DecalType selection, DecalType? mouseDecal) => DrawBottomInfo(spriteBatch, $"{selection} | [{mouseDecal}]");
+    public static void DrawBiomeOverlay(SpriteBatch spriteBatch, BiomeType selection, BiomeType? mouseBiome) => DrawBottomInfo(spriteBatch, $"{selection} | [{mouseBiome}]");
+    public static void DrawBottomInfo(SpriteBatch spriteBatch, string text)
     {
-        text = $"{tileSelection} | {text}";
         Vector2 textSize = Arial.MeasureString(text);
         Vector2 pos = new Vector2(MathF.Round(Constants.Middle.X - textSize.X / 2), MathF.Round(Constants.NativeResolution.Y - textSize.Y - 3));
         spriteBatch.FillRectangle(new(pos - Vector2.One * 4, textSize + Vector2.One * 8), Color.Gray * 0.5f);
