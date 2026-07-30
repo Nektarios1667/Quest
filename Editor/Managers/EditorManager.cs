@@ -169,7 +169,7 @@ public class EditorManager
                 Tile current = queue.Dequeue();
                 if (current.Type.ID == TileSelection || visited.Contains(current.Location)) continue; // Skip if already filled
                 count++;
-                SetTile(new Tile(current.Location, TileSelection));
+                SetTile(Tile.TileFromId(TileSelection, current.Location.ToPoint(), LevelManager.Level.LevelName));
                 visited.Add(current.Location); // Mark as visited
 
                 // Check neighbors
