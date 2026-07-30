@@ -2818,11 +2818,35 @@
 /processorParam:Quality=Best
 /build:Sounds/Music/Beauty.mp3
 
+#begin Sounds/Music/Beauty.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/Beauty.mp3
+
+#begin Sounds/Music/Bells.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/Bells.mp3
+
 #begin Sounds/Music/CavesOfDawn.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:Sounds/Music/CavesOfDawn.mp3
+
+#begin Sounds/Music/CavesOfDawn.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/CavesOfDawn.mp3
+
+#begin Sounds/Music/Clouds.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/Clouds.mp3
 
 #begin Sounds/Music/Clouds.mp3
 /importer:Mp3Importer
@@ -2836,11 +2860,53 @@
 /processorParam:Quality=Best
 /build:Sounds/Music/DuskToDawn.mp3
 
+#begin Sounds/Music/DuskToDawn.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/DuskToDawn.mp3
+
+#begin Sounds/Music/Euphoria.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/Euphoria.mp3
+
+#begin Sounds/Music/Everlost.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/Everlost.mp3
+
+#begin Sounds/Music/Exotic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/Exotic.mp3
+
 #begin Sounds/Music/Maps.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:Sounds/Music/Maps.mp3
+
+#begin Sounds/Music/Maps.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/Maps.mp3
+
+#begin Sounds/Music/Mourning.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/Mourning.mp3
+
+#begin Sounds/Music/Mystical.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/Mystical.mp3
 
 #begin Sounds/Music/Mystical.mp3
 /importer:Mp3Importer
@@ -2854,11 +2920,29 @@
 /processorParam:Quality=Best
 /build:Sounds/Music/NightmareAlley.mp3
 
+#begin Sounds/Music/NightmareAlley.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/NightmareAlley.mp3
+
 #begin Sounds/Music/OldDevil.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:Sounds/Music/OldDevil.mp3
+
+#begin Sounds/Music/OldDevil.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/OldDevil.mp3
+
+#begin Sounds/Music/Pulse.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/Pulse.mp3
 
 #begin Sounds/Music/Pulse.mp3
 /importer:Mp3Importer
@@ -2872,11 +2956,29 @@
 /processorParam:Quality=Best
 /build:Sounds/Music/SacredGarden.mp3
 
+#begin Sounds/Music/SacredGarden.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/SacredGarden.mp3
+
 #begin Sounds/Music/TerrorHeights.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:Sounds/Music/TerrorHeights.mp3
+
+#begin Sounds/Music/TerrorHeights.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/TerrorHeights.mp3
+
+#begin Sounds/Music/WanderingWind.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/Music/WanderingWind.mp3
 
 #begin Sounds/Music/WanderingWind.mp3
 /importer:Mp3Importer

@@ -17,6 +17,11 @@ public enum Soundtracks
     DuskToDawn,
     Maps,
     OldDevil,
+    Bells,
+    Euphoria,
+    Everlost,
+    Exotic,
+    Mourning,
 }
 public class Soundtrack(Soundtracks track, Mood mood)
 {
@@ -48,6 +53,12 @@ public static class SoundtrackManager
                 Soundtracks.Clouds,
                 Soundtracks.SacredGarden,
                 Soundtracks.Mystical,
+                Soundtracks.Beauty,
+                Soundtracks.Bells,
+                Soundtracks.Euphoria,
+                Soundtracks.Everlost,
+                Soundtracks.Exotic,
+                Soundtracks.Mourning,
             ]},
             { Mood.Epic, [
                 Soundtracks.DuskToDawn,
@@ -99,7 +110,7 @@ public static class SoundtrackManager
     {
         if (SoundManager.TryPlayMusic(soundtrack.ToString()!))
         {
-            PlayNextSong.Left = (int)MediaPlayer.Queue.ActiveSong.Duration.TotalSeconds + RandomManager.RandomIntRange(60, 120);
+            PlayNextSong.Left = (int)MediaPlayer.Queue.ActiveSong.Duration.TotalSeconds + RandomManager.RandomIntRange(180, 240);
             Playing = soundtrack;
             SoundtrackChanged?.Invoke(soundtrack);
             QueueNextSong = false;
