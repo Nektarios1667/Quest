@@ -147,16 +147,20 @@ public class OverlayManager
         }
         else if (StateManager.OverlayState == OverlayState.Finished)
         {
-            TimerManager.NewTimer("FinishedFade", 2, null);
-            float fade = TimerManager.GetTimer("FinishedFade").Progress * 0.5f;
+            TimerManager.NewTimer("ScreenFadeOut", 2, null);
 
-            gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * fade);
+            float fade = TimerManager.GetTimer("ScreenFadeOut").Progress;
             gameManager.Batch.DrawString(PixelOperator, "LEVEL FINISHED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("LEVEL FINISHED!") * 2, Color.White * fade, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
             gameManager.Batch.DrawString(PixelOperator, "Press space to close", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to close") / 2 + new Vector2(0, 80), Color.White * fade);
 
             if (InputManager.KeyPressed(Keys.Space))
                 StateManager.OverlayState = OverlayState.None;
         }
+        // Fading - for general purpose
+        if (TimerManager.Exists("ScreenFadeOut"))
+            gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * TimerManager.GetTimer("ScreenFadeOut").Progress);
+        if (TimerManager.Exists("ScreenFadeIn"))
+            gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * (1 - TimerManager.GetTimer("ScreenFadeIn").Progress));
 
         DebugManager.EndBenchmark("PostProcessing");
     }

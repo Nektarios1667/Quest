@@ -13,6 +13,11 @@ public class Stairs : Tile
     {
         if (DestLevel.IsNull()) return;
 
+        TimerManager.SetTimer("ScreenFadeOut", 1.5f, null);
+        TimerManager.SetTimer("StairsTeleport", 1.5f, () => Teleport(game));
+    }
+    private void Teleport(GameManager game)
+    {
         // Load another level
         bool read = game.LevelManager.ReadLevel(game, DestLevel.ToString(), reload: false);
         bool loaded = game.LevelManager.LoadLevel(game, DestLevel.ToString());
@@ -25,6 +30,8 @@ public class Stairs : Tile
         CameraManager.CameraDest = (Dest * Constants.TileSize).ToVector2() + new Vector2(Constants.TileSize.X / 2, 0);
         CameraManager.Camera = CameraManager.CameraDest;
         CameraManager.Update(0f); // Force update to avoid visual glitches
+
+        TimerManager.SetTimer("ScreenFadeIn", 1.5f, null);
 
         Logger.System($"Teleporting to level '{DestLevel.LevelName}' @ {Dest}");
     }

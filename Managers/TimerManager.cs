@@ -1,4 +1,6 @@
-﻿namespace Quest.Managers;
+﻿using System.Linq;
+
+namespace Quest.Managers;
 
 public class Timer
 {
@@ -22,8 +24,11 @@ public class Timer
     }
     public void Update(GameManager gameManager)
     {
+        if (IsExpired) return;
+
         if (Left > 0)
             Left -= GameManager.DeltaTime;
+
         if (Left <= 0f)
         {
             Completions++;
@@ -41,13 +46,21 @@ public class Timer
 public static class TimerManager
 {
     private static readonly Dictionary<string, Timer> timers = [];
+    private static List<string> expiredTimers = [];
     public static void Update(GameManager gameManager)
     {
         DebugManager.StartBenchmark("TimerUpdates");
 
-        // Update timers
-        foreach (var timer in timers.Values)
+        // Update timers - create copy to allow modification while updating
+        foreach (var (name, timer) in new Dictionary<string, Timer>(timers)) {
             timer.Update(gameManager);
+            if (timer.IsExpired)
+                expiredTimers.Add(name);
+        }
+        // Clear expired
+        foreach (string expired in expiredTimers)
+            timers.Remove(expired);
+        expiredTimers.Clear();
 
         DebugManager.EndBenchmark("TimerUpdates");
     }
