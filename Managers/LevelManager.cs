@@ -228,6 +228,7 @@ public class LevelManager
         );
 
         // Lighting
+        LightingManager.ClearLights();
         LightingManager.BuildLevelLighting(gameManager);
 
         // Spawn
