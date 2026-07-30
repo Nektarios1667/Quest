@@ -44,35 +44,56 @@ public class EditorLevelManager
         if (LevelManager.Level.LevelPath.IsNull())
             SaveLevelAs();
         else
-            SaveLevel(LevelManager.Level.LevelPath);
+            SaveLevel(LevelManager.Level.LevelPath, LevelManager.Level.Metadata);
     }
     public void SaveLevelAs()
     {
         // Winforms
-        var (success, values) = ShowInputForm("Save As", [new("World", null), new("Level", null)]);
+        var (success, values) = ShowInputForm("Save As", [
+            new("World", null),
+            new("Level", null),
+            new("Author", null),
+            new("Description", null),
+        ]);
         if (!success)
         {
             if (!PopupOpen) Logger.Error("Failed to save level.");
             return;
         }
         LevelPath path = new(values[0], values[1]);
-        SaveLevel(path);
+        SaveLevel(path, new WorldMetadata(values[2], values[3]));
         LevelManager.Level.Rename(path);
     }
-    public void SaveLevel(LevelPath path)
+    public void SaveLevel(LevelPath path, WorldMetadata? metadata = null)
     {
-        string prefix = Constants.DEVMODE ? "../../../" : "";
+        metadata = metadata ?? LevelManager.Level.Metadata;
 
-        Directory.CreateDirectory($"{prefix}GameData/Worlds/{path.WorldName}");
-        Directory.CreateDirectory($"{prefix}GameData/Worlds/{path.WorldName}/levels");
-        Directory.CreateDirectory($"{prefix}GameData/Worlds/{path.WorldName}/loot");
-        Directory.CreateDirectory($"{prefix}GameData/Worlds/{path.WorldName}/saves");
-        Directory.CreateDirectory($"{prefix}GameData/Worlds/{path.WorldName}/scripts");
-        using FileStream fileStream = File.Create($"{prefix}GameData/Worlds/{path.WorldName}/levels/{path.LevelName}.qlv");
+        // Create folders
+        Directory.CreateDirectory($"GameData/Worlds/{path.WorldName}");
+        Directory.CreateDirectory($"GameData/Worlds/{path.WorldName}/levels");
+        Directory.CreateDirectory($"GameData/Worlds/{path.WorldName}/loot");
+        Directory.CreateDirectory($"GameData/Worlds/{path.WorldName}/saves");
+        Directory.CreateDirectory($"GameData/Worlds/{path.WorldName}/scripts");
+        if (Constants.DEVMODE)
+        {
+            const string prefix = "../../../";
+            Directory.CreateDirectory($"{prefix}GameData/Worlds/{path.WorldName}");
+            Directory.CreateDirectory($"{prefix}GameData/Worlds/{path.WorldName}/levels");
+            Directory.CreateDirectory($"{prefix}GameData/Worlds/{path.WorldName}/loot");
+            Directory.CreateDirectory($"{prefix}GameData/Worlds/{path.WorldName}/saves");
+            Directory.CreateDirectory($"{prefix}GameData/Worlds/{path.WorldName}/scripts");
+        }
+
+
+        // Write metadata
+        StateManager.WriteKeyValueFile($"Worlds/{path.WorldName}/metadata", metadata.ToDict());
+
+        // Context
+        using FileStream fileStream = File.Create($"GameData/Worlds/{path.WorldName}/levels/{path.LevelName}.qlv");
         using GZipStream gzipStream = new(fileStream, CompressionLevel.Optimal);
         using BinaryWriter writer = new(gzipStream);
 
-        // Metadata
+        // Flags
         var flags = LevelFeatures.Biomes | LevelFeatures.QuillScripts;
         writer.Write(Encoding.UTF8.GetBytes("QLVL")); // Magic number
         writer.Write((ushort)flags); // Flags
@@ -153,6 +174,10 @@ public class EditorLevelManager
             }
         }
 
+        writer.Dispose();
+        if (Constants.DEVMODE)
+            File.Copy($"GameData/Worlds/{path.WorldName}/levels/{path.LevelName}.qlv", $"../../../GameData/Worlds/{path.WorldName}/levels/{path.LevelName}.qlv", true);
+
         // Log
         Logger.Log($"Exported level to '{path}.qlv'.");
     }
@@ -172,7 +197,7 @@ public class EditorLevelManager
         Tile[] tiles = LevelGenerator.GenerateLevel(Constants.MapSize, int.Parse(values[2]));
 
         Level current = LevelManager.Level;
-        Level level = new(current.Path, tiles, [], current.Spawn, [.. current.NPCs.Values], current.Loot, current.Decals, [.. current.Enemies.Values], current.Projectiles, [], current.Tint);
+        Level level = new(current.Path, tiles, [], current.Spawn, [.. current.NPCs.Values], current.Loot, current.Decals, [.. current.Enemies.Values], current.Projectiles, [], current.Metadata, current.Tint);
 
         LevelManager.LoadLevelObject(GameManager, level);
     }
@@ -212,7 +237,7 @@ public class EditorLevelManager
         // Make blank level
         Tile[] grassTiles = new Tile[256 * 256];
         for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) grassTiles[t] = new Grass(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
-        LevelManager.LoadLevelObject(GameManager, new("NUL/NUL", grassTiles, [], new(128, 128), [], [], [], [], [], []));
+        LevelManager.LoadLevelObject(GameManager, new("NUL/NUL", grassTiles, [], new(128, 128), [], [], [], [], [], [], WorldMetadata.Null));
     }
     public bool WarnSave()
     {

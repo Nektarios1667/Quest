@@ -130,7 +130,7 @@ public static class StateManager
     public static void SaveGameState(GameManager gameManager, PlayerManager playerManager)
     {
         // Continue save
-        WriteKeyValueFile("continue", new() { { "save", CurrentSave.ToString() } });
+        WriteKeyValueFile("Persistent/continue", new() { { "save", CurrentSave.ToString() } });
         string worldName = gameManager.LevelManager.Level.WorldName;
         byte[] data;
 
@@ -281,7 +281,8 @@ public static class StateManager
             return false;
         }
         CurrentSave = levelPath;
-        WriteKeyValueFile("continue", new() { { "save", save } });
+        WriteKeyValueFile("Persistent/continue", new() { { "save", save } });
+        Console.Write("test");
         await gameManager.LevelManager.ReadWorldAsync(gameManager, levelPath.WorldName, true);
 
         using (var fs = new FileStream(file, FileMode.Open, FileAccess.Read))
@@ -550,13 +551,13 @@ public static class StateManager
         Projectile proj = new(gameManager, ownerUID, position, direction, tex, damage, speed, size);
         gameManager.LevelManager.Level.Projectiles.Add(proj);
     }
-    public static Dictionary<string, string> ReadKeyValueFile(string name)
+    public static Dictionary<string, string> ReadKeyValueFile(string path)
     {
         // Check if file exists
-        Directory.CreateDirectory("GameData/Persistent");
-        if (!File.Exists($"GameData/Persistent/{name}.qkv"))
+        Directory.CreateDirectory("GameData/");
+        if (!File.Exists($"GameData/{path}.qkv"))
         {
-            Logger.Error($"Quest Key Value file '{name}.qkv' not found in GameData/Persistent.");
+            Logger.Error($"Quest Key Value file '{path}.qkv' not found in GameData/.");
             return [];
         }
 
@@ -564,7 +565,7 @@ public static class StateManager
         try
         {
             Dictionary<string, string> data = [];
-            using (var fs = new FileStream($"GameData/Persistent/{name}.qkv", FileMode.Open, FileAccess.Read))
+            using (var fs = new FileStream($"GameData/{path}.qkv", FileMode.Open, FileAccess.Read))
             using (var reader = new BinaryReader(fs))
             {
 
@@ -583,10 +584,10 @@ public static class StateManager
             return [];
         }
     }
-    public static void WriteKeyValueFile(string name, Dictionary<string, string> data)
+    public static void WriteKeyValueFile(string path, Dictionary<string, string> data)
     {
         // Write key-value pairs to file
-        using (var fs = new FileStream($"GameData/Persistent/{name}.qkv", FileMode.Create, FileAccess.Write))
+        using (var fs = new FileStream($"GameData/{path}.qkv", FileMode.Create, FileAccess.Write))
         using (var writer = new BinaryWriter(fs))
         {
             writer.Write((uint)data.Count);
@@ -598,6 +599,6 @@ public static class StateManager
         }
         // Copy back to source code
         if (Constants.DEVMODE)
-            File.Copy($"GameData/Persistent/{name}.qkv", $"../../../GameData/Persistent/{name}.qkv", true);
+            File.Copy($"GameData/{path}.qkv", $"../../../GameData/{path}.qkv", true);
     }
 }

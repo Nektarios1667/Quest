@@ -36,7 +36,7 @@ public class LevelManager
     {
         Tile[] grassTiles = new Tile[256 * 256];
         for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) grassTiles[t] = new Grass(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
-        EmptyLevel = new("NUL/NUL", grassTiles, [], new(128, 128), [], [], [], [], [], []);
+        EmptyLevel = new("NUL/NUL", grassTiles, [], new(128, 128), [], [], [], [], [], [], WorldMetadata.Null);
     }
     public LevelManager()
     {
@@ -174,7 +174,7 @@ public class LevelManager
             if (level.Path == name)
                 return level;
         Logger.Error($"Level '{name}' not found in stored levels.");
-        return new("", [], [], new Point(128, 128), [], [], [], [], [], []);
+        return new("", [], [], new Point(128, 128), [], [], [], [], [], [], WorldMetadata.Null);
     }
     public bool LoadLevel(GameManager gameManager, int levelIndex)
     {
@@ -360,7 +360,7 @@ public class LevelManager
         if (!multiTask)
         {
             TasksComplete = 0;
-            TotalTasks = 11;
+            TotalTasks = 12;
         }
 
         var sw = new Stopwatch();
@@ -372,6 +372,13 @@ public class LevelManager
 
         if (levelPath.IsNull()) return Error($"Invalid file format '{filename}.'");
         if (!File.Exists(path)) return Error($"Level file '{filename}' does not exist.");
+
+        // Read metadata
+        WorldMetadata meta = WorldMetadata.Null;
+        var kvDict = StateManager.ReadKeyValueFile($"Worlds/{levelPath.WorldName}/metadata");
+        meta.Author = kvDict.GetValueOrDefault("Author", defaultValue: "Unknown");
+        meta.Description = kvDict.GetValueOrDefault("Description", defaultValue: "None");
+        TasksComplete++;
 
         // Check if already read
         if (!reload && Levels.Any(l => l.Path == filename)) return true;
@@ -472,7 +479,7 @@ public class LevelManager
             TasksComplete++;
 
             // Make and add the level
-            Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, enemyBuffer, [], scriptBuffer, tint);
+            Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, enemyBuffer, [], scriptBuffer, meta, tint);
             if (reload) Levels.RemoveAll(l => l.Path == filename);
             Levels.Add(created);
             sw.Stop();

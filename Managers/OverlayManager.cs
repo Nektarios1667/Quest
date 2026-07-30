@@ -1,4 +1,5 @@
 ﻿using Quest.Gui;
+using Quest.World;
 using LM = Quest.Managers.LightingManager;
 
 namespace Quest.Managers;
@@ -8,6 +9,7 @@ public class OverlayManager
     public Gui.Overlay Gui { get; private set; } // GUI handler
     public NotificationArea LootNotifications { get; private set; } // Loot pickup notifications
     public StatusBar HealthBar { get; private set; }
+    public Dialog WorldInfobox { get; private set; }
     public static readonly Point lootStackOffset = new(4, 4);
     private RenderTarget2D? minimap;
     public OverlayManager(PlayerManager? playerManager)
@@ -15,7 +17,8 @@ public class OverlayManager
         Gui = new();
         Gui.Widgets = [
             HealthBar = new StatusBar(new(10, Constants.NativeResolution.Y - 35), new(300, 25), Color.Green * 0.7f, Color.Red * 0.7f, 100, 100),
-                LootNotifications = new NotificationArea(Constants.Middle - new Point(0, Constants.MageHalfSize.Y + 15), 5, PixelOperatorBold)
+            LootNotifications = new NotificationArea(Constants.Middle - new Point(0, Constants.MageHalfSize.Y + 15), 5, PixelOperatorBold),
+            WorldInfobox = new Dialog(Gui, new(1200, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false }
         ];
 
         // Trigger lighting updates
@@ -35,7 +38,16 @@ public class OverlayManager
                 LM.MarkUpdateLighting();
         };
     }
-
+    public void ToggleWorldInfobox(WorldMetadata metadata)
+    {
+        if (WorldInfobox.IsVisible)
+            WorldInfobox.IsVisible = false;
+        else
+        {
+            WorldInfobox.IsVisible = true;
+            WorldInfobox.SetText($"Author: {metadata.Author}\nDescription: {metadata.Description}", respeak: DialogRespeak.Instant);
+        }
+    }
 
     public void Update(GameManager gameManager, PlayerManager? playerManager)
     {

@@ -2,6 +2,23 @@
 
 namespace Quest.World;
 
+public class WorldMetadata
+{
+    public static WorldMetadata Null => new("Unknown", "None");
+    public string Author { get; set; }
+    public string Description { get; set; }
+    public WorldMetadata(string author, string description)
+    {
+        Author = author;
+        Description = description;
+    }
+    public Dictionary<string, string> ToDict() => new()
+    {
+        { "Author", Author  },
+        { "Description", Description },
+    };
+}
+
 public class QuillScript
 {
     public string Name { get; private set; }
@@ -23,13 +40,14 @@ public class Level
     public string Path => LevelPath.Path;
     public string WorldName => LevelPath.WorldName;
     public string LevelName => LevelPath.LevelName;
+    public WorldMetadata Metadata { get; private set; }
     public List<Loot> Loot { get; private set; }
     public Tile[] Tiles { get; private set; }
     public BiomeType[] Biome { get; private set; }
     public Point Spawn { get; set; }
     public Color Tint { get; set; }
     public List<QuillScript> Scripts { get; private set; }
-    public Level(string name, Tile[] tiles, BiomeType[] biome, Point spawn, List<NPC> npcs, List<Loot> loot, Dictionary<ByteCoord, Decal> decals, List<Enemy> enemies, List<Projectile> projectiles, List<QuillScript> scripts, Color? tint = null)
+    public Level(string name, Tile[] tiles, BiomeType[] biome, Point spawn, List<NPC> npcs, List<Loot> loot, Dictionary<ByteCoord, Decal> decals, List<Enemy> enemies, List<Projectile> projectiles, List<QuillScript> scripts, WorldMetadata meta, Color? tint = null)
     {
         // Initialize the level
         LevelPath = new(name);
@@ -42,6 +60,7 @@ public class Level
         Enemies = enemies.ToDictionary(enemy => enemy.UID, enemy => enemy);
         Projectiles = [.. projectiles];
         Scripts = [.. scripts];
+        Metadata = meta;
         Tint = tint ?? Color.Transparent;
     }
     public void RunScripts()

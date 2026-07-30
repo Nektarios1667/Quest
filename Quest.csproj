@@ -60,7 +60,7 @@
     </ItemGroup>
 	<ItemGroup>
 	    <None Update="GameData\**\*">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
     <Target Name="RestoreDotnetTools" BeforeTargets="Restore">

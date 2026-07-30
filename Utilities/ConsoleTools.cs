@@ -1,5 +1,4 @@
-﻿#if DEBUG
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 class ConsoleManager
 {
@@ -11,4 +10,3 @@ class ConsoleManager
         AllocConsole();
     }
 }
-#endif

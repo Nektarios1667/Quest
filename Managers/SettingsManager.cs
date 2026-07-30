@@ -155,12 +155,12 @@ public static class SettingsManager
             settings[$"Bind_{kv.Key}"] = kv.Value.ToString();
 
         // Write to settings.qkv in GameData/Persistent
-        StateManager.WriteKeyValueFile("settings", settings);
+        StateManager.WriteKeyValueFile("Persistent/settings", settings);
     }
     public static void LoadSettings(IAdjustableWindow window)
     {
         // Read from settings.qkv in GameData/Persistent
-        var settings = StateManager.ReadKeyValueFile("settings");
+        var settings = StateManager.ReadKeyValueFile("Persistent/settings");
         if (settings.TryGetValue("ScreenResolution", out string? res))
         {
             var parts = res.Split('x');

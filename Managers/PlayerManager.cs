@@ -100,6 +100,11 @@ public class PlayerManager : IEntity
             CloseInterface();
         }
 
+        // Toggle info
+        if (InputManager.BindPressed(InputAction.ToggleWorldInfo) && StateManager.OverlayState != OverlayState.Typing)
+            gameManager.OverlayManager.ToggleWorldInfobox(gameManager.LevelManager.Level.Metadata);
+
+
         // Loot
         DebugManager.StartBenchmark("UpdateLoot");
         CheckForLoot(gameManager);
