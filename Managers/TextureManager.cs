@@ -222,6 +222,13 @@ public static class TextureManager
         // DECALS ENUM INSERT
         Fireball,
         ArrowProjectile,
+        DeleriumSpell,
+        HealingSpell,
+        PoisonSpell,
+        SlownessSpell,
+        VulnerabilitySpell,
+        WeaknessSpell,
+        LifestealSpell,
         // PROJECTILES ENUM INSERT
         Glow,
         Slash,
@@ -461,6 +468,13 @@ public static class TextureManager
         // DECALS INSERT
         Textures[TextureID.Fireball] = content.Load<Texture2D>("Images/Projectiles/Fireball");
         Textures[TextureID.ArrowProjectile] = content.Load<Texture2D>("Images/Projectiles/Arrow");
+        Textures[TextureID.DeleriumSpell] = content.Load<Texture2D>("Images/Projectiles/DeleriumSpell");
+        Textures[TextureID.HealingSpell] = content.Load<Texture2D>("Images/Projectiles/HealingSpell");
+        Textures[TextureID.PoisonSpell] = content.Load<Texture2D>("Images/Projectiles/PoisonSpell");
+        Textures[TextureID.SlownessSpell] = content.Load<Texture2D>("Images/Projectiles/SlownessSpell");
+        Textures[TextureID.VulnerabilitySpell] = content.Load<Texture2D>("Images/Projectiles/VulnerabilitySpell");
+        Textures[TextureID.WeaknessSpell] = content.Load<Texture2D>("Images/Projectiles/WeaknessSpell");
+        Textures[TextureID.LifestealSpell] = content.Load<Texture2D>("Images/Projectiles/LifestealSpell");
         // PROJECTILES INSERT
         Textures[TextureID.Glow] = content.Load<Texture2D>("Images/Effects/Glow");
         Textures[TextureID.Slash] = content.Load<Texture2D>("Images/Effects/Slash");
@@ -685,6 +699,13 @@ public static class TextureManager
         // DECALS METADATA INSERT
         Metadata[TextureID.Fireball] = new(Textures[TextureID.Fireball].Bounds.Size, new(1, 1), "projectile");
         Metadata[TextureID.ArrowProjectile] = new(Textures[TextureID.ArrowProjectile].Bounds.Size, new(1, 1), "projectile");
+        Metadata[TextureID.DeleriumSpell] = new(Textures[TextureID.DeleriumSpell].Bounds.Size, new(4, 1), "projectile");
+        Metadata[TextureID.HealingSpell] = new(Textures[TextureID.HealingSpell].Bounds.Size, new(4, 1), "projectile");
+        Metadata[TextureID.PoisonSpell] = new(Textures[TextureID.PoisonSpell].Bounds.Size, new(4, 1), "projectile");
+        Metadata[TextureID.SlownessSpell] = new(Textures[TextureID.SlownessSpell].Bounds.Size, new(4, 1), "projectile");
+        Metadata[TextureID.VulnerabilitySpell] = new(Textures[TextureID.VulnerabilitySpell].Bounds.Size, new(4, 1), "projectile");
+        Metadata[TextureID.WeaknessSpell] = new(Textures[TextureID.WeaknessSpell].Bounds.Size, new(4, 1), "projectile");
+        Metadata[TextureID.LifestealSpell] = new(Textures[TextureID.LifestealSpell].Bounds.Size, new(4, 1), "projectile");
         // PROJECTILES METADATA INSERT
         Metadata[TextureID.Glow] = new(Textures[TextureID.Glow].Bounds.Size, new(1, 1), "effect");
         Metadata[TextureID.Slash] = new(Textures[TextureID.Slash].Bounds.Size, new(1, 1), "effect");

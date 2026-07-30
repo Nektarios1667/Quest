@@ -1,4 +1,6 @@
-﻿namespace Quest.Entities;
+﻿using System.Reflection.Metadata.Ecma335;
+
+namespace Quest.Entities;
 
 public class Projectile : IEntity
 {
@@ -58,5 +60,19 @@ public class Projectile : IEntity
             (gameManager.LevelManager.Level.Tiles[tileCoord.Y * Constants.MapSize.X + tileCoord.X].IsWall &&
             !gameManager.LevelManager.Level.Tiles[tileCoord.Y * Constants.MapSize.X + tileCoord.X].IsWalkable))
             Destroy();
+    }
+    public (StatusEffect effect, float duration)? GetProjectileEffect()
+    {
+        return Texture switch
+        {
+            TextureID.Fireball => (StatusEffect.Burning, 5),
+            TextureID.DeleriumSpell => (StatusEffect.Delerium, 5),
+            TextureID.HealingSpell => (StatusEffect.Regeneration, 5),
+            TextureID.PoisonPotion => (StatusEffect.Poison, 3),
+            TextureID.SlownessSpell => (StatusEffect.Slowness, 10),
+            TextureID.VulnerabilitySpell => (StatusEffect.Vulnerability, 5),
+            TextureID.WeaknessSpell => (StatusEffect.Weakness, 10),
+            _ => null,
+        };
     }
 }

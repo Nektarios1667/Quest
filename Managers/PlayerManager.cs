@@ -200,7 +200,12 @@ public class PlayerManager : IEntity
                         Heal(gameManager, (int)(proj.Damage * StatusManager.GetLifestealMult()));
                     }
                     else if (entity is PlayerManager)
+                    {
                         Hurt(gameManager, (int)(proj.Damage * StatusManager.GetDefenseMult()));
+                        var projEffect = proj.GetProjectileEffect();
+                        if (projEffect != null)
+                            StatusManager.AddStatusEffect(this, projEffect.Value.effect, projEffect.Value.duration);
+                    }
 
                     // Destroy
                     proj.Destroy();

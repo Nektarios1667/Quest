@@ -7,6 +7,7 @@ public class Enemy : IEntity
 {
     public ushort UID { get; set; }
     public bool IsAlive => Health > 0;
+    public int MaxHealth { get; set; }
     public int Health { get; set; }
     public ushort Damage { get; set; }
     public float AttackSpeed { get; set; } // Attacks per second
@@ -46,6 +47,7 @@ public class Enemy : IEntity
 
         // Stats
         Health = health;
+        MaxHealth = health;
         Damage = damage;
         AttackSpeed = attackSpeed;
         Defense = defense;
@@ -133,7 +135,12 @@ public class Enemy : IEntity
 
         if (damage <= Defense) damage /= 2;
         Health -= damage;
-        DamageNotifs.AddNotification($"-{damage}", duration: 2);
+        DamageNotifs.AddNotification($"-{damage}", duration: 2, color: Color.Red);
+    }
+    public virtual void Heal(int health)
+    {
+        Health += Math.Min(health, MaxHealth - Health);
+        DamageNotifs.AddNotification($"+{health}", duration: 2, color: Color.Green);
     }
     public virtual void Attack(GameManager gameManager, float direction)
     {

@@ -14,6 +14,7 @@ public enum StatusEffect : byte
     Vulnerability,
     Delerium,
     Lifesteal,
+    Burning,
 }
 
 public class StatusManager
@@ -98,12 +99,12 @@ public class StatusManager
         gameManager.GradingEffect?.Parameters["Contrast"].SetValue(1f);
 
         // Status effects
-        if (HasStatusEffect(StatusEffect.Poison))
+        if (HasStatusEffect(StatusEffect.Poison) || HasStatusEffect(StatusEffect.Burning))
         {
-            if (TimerManager.IsCompleteOrMissing("PlayerPoisonTick"))
+            if (TimerManager.IsCompleteOrMissing("PlayerDOTTick"))
             {
-                player.Hurt(gameManager, 10);
-                TimerManager.SetTimer("PlayerPoisonTick", 1, null);
+                player.Hurt(gameManager, 5);
+                TimerManager.SetTimer("PlayerDOTTick", 1, null);
             }
             gameManager.GradingEffect?.Parameters["Tint"].SetValue(new Vector3(.8f, 1, .8f));
         }
