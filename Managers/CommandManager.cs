@@ -98,6 +98,7 @@ public static class CommandManager
             new("kill [enemy|projectile] <ushort>", CKill, "Killed |1| with UID |2|", "Failed to kill |1| with UID |2|"),
             new("effect <effect> {1:999}", CEffect, "Applied effect '|1|' for |2| seconds.", "Failed to apply effect '|1|' for |2| seconds."),
             new("reload [lights|lightgrid|level]", CReload, "Reloaded |1|.", "Failed to reload |1|."),
+            new("music *", CMusic, "Playing music |1|.", "Failed to play music |1|."),
         ];
     }
     public static (bool success, string output) Execute(string command)
@@ -418,6 +419,17 @@ public static class CommandManager
             _ = StateManager.ReadGameState(GameManager!, PlayerManager!, StateManager.CurrentSave.ToString());
             return true;
         }
+        return false;
+    }
+    private static bool CMusic(string command)
+    {
+        string[] parts = command.Split(' ');
+        if (Enum.TryParse<Soundtracks>(parts[1], out Soundtracks track))
+        {
+            SoundtrackManager.PlaySoundtrack(track);
+            return true;
+        }
+
         return false;
     }
 }

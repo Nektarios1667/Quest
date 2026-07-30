@@ -108,7 +108,7 @@ public static class SoundtrackManager
     }
     public static bool PlaySoundtrack(Soundtracks soundtrack)
     {
-        if (SoundManager.TryPlayMusic(soundtrack.ToString()!))
+        if (SoundManager.TryPlayMusic(soundtrack.ToString()))
         {
             PlayNextSong.Left = (int)MediaPlayer.Queue.ActiveSong.Duration.TotalSeconds + RandomManager.RandomIntRange(180, 240);
             Playing = soundtrack;
