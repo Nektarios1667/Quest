@@ -59,6 +59,10 @@ static class Program
         }
         else
         {
+# if DEBUG || DEV
+            ConsoleManager.Show();
+#endif
+
             using var gameApp = new Quest.Window();
             gameApp.Run();
         }

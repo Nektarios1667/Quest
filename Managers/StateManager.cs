@@ -282,7 +282,6 @@ public static class StateManager
         }
         CurrentSave = levelPath;
         WriteKeyValueFile("Persistent/continue", new() { { "save", save } });
-        Console.Write("test");
         await gameManager.LevelManager.ReadWorldAsync(gameManager, levelPath.WorldName, true);
 
         using (var fs = new FileStream(file, FileMode.Open, FileAccess.Read))
