@@ -118,7 +118,7 @@ public class EditorLevelManager
         // Log
         Logger.Log($"Exported level to '{path}.qlv'.");
     }
-    private static void WriteSection(BinaryWriter writer, string id, Action<BinaryWriter> writeData)
+    public static void WriteSection(BinaryWriter writer, string id, Action<BinaryWriter> writeData)
     {
         using MemoryStream tempStream = new MemoryStream();
         using BinaryWriter tempWriter = new BinaryWriter(tempStream);

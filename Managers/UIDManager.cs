@@ -7,6 +7,7 @@ public enum UIDCategory
     Enemies,
     Projectiles,
     NPCs,
+    Levels,
 }
 
 public static class UIDManager

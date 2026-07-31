@@ -32,6 +32,7 @@ public class QuillScript
 
 public class Level
 {
+    public ushort UID;
     public Dictionary<ushort, Enemy> Enemies { get; private set; }
     public List<Projectile> Projectiles { get; private set; }
     public Dictionary<ByteCoord, Decal> Decals { get; private set; }
@@ -47,7 +48,7 @@ public class Level
     public Point Spawn { get; set; }
     public Color Tint { get; set; }
     public List<QuillScript> Scripts { get; private set; }
-    public Level(string name, Tile[] tiles, BiomeType[] biome, Point spawn, List<NPC> npcs, List<Loot> loot, Dictionary<ByteCoord, Decal> decals, List<Enemy> enemies, List<Projectile> projectiles, List<QuillScript> scripts, WorldMetadata meta, Color? tint = null)
+    public Level(string name, Tile[] tiles, BiomeType[] biome, Point spawn, List<NPC> npcs, List<Loot> loot, Dictionary<ByteCoord, Decal> decals, List<Enemy> enemies, List<Projectile> projectiles, List<QuillScript> scripts, WorldMetadata meta, Color? tint = null, ushort? uid = null)
     {
         // Initialize the level
         LevelPath = new(name);
@@ -62,6 +63,7 @@ public class Level
         Scripts = [.. scripts];
         Metadata = meta;
         Tint = tint ?? Color.Transparent;
+        UID = uid ?? UIDManager.Get(UIDCategory.Levels);
     }
     public void RunScripts()
     {
