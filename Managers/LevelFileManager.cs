@@ -91,7 +91,7 @@ public static class LevelFileManager
         gameManager.LevelManager.TasksComplete++;
 
         // Check if already read
-        if (!reload && gameManager.LevelManager.Levels.Any(l => l.Path == filename)) return false;
+        if (!reload && gameManager.LevelManager.Levels.Any(l => l.Path == filename)) return true;
 
         // Make buffers
         int totalTiles = Constants.MapSize.X * Constants.MapSize.Y;
