@@ -30,6 +30,7 @@ public class PlayerManager : IEntity
             Game.OverlayManager.HealthBar.MaxValue = value;
         }
     }
+    public bool IsAlive => _health > 0;
     public int Speed => (int)(Constants.PlayerBaseSpeed * StatusManager.GetSpeedMult());
     // Inventory and UI
     public NotificationArea StatusArea { get; } = new(new(5, 5), 400, PixelOperatorSubtitle, color: Color.Gray, hAlign: HorizontalAlignment.Left, vAlign: VerticalAlignment.Top);
@@ -72,7 +73,7 @@ public class PlayerManager : IEntity
     {
         Game = gameManager;
         if (StateManager.State != GameState.Game && StateManager.State != GameState.Editor) return;
-        if (StateManager.OverlayState == OverlayState.Pause) return;
+        if (StateManager.OverlayState is OverlayState.Pause or OverlayState.Death) return;
 
         // Potions
         StatusManager.Update(gameManager, this);
@@ -498,9 +499,20 @@ public class PlayerManager : IEntity
         gameManager.OverlayManager.LootNotifications.AddNotification($"-{damage}", Color.Orange, duration: 2);
         if (Health <= 0)
         {
-            Health = 0;
-            StateManager.OverlayState = OverlayState.Death;
+            Die();
+
         }
+    }
+    public void Die()
+    {
+        Health = 0;
+
+        CloseInterface();
+        CloseInventory();
+
+        TimerManager.SetTimer("ScreenFadeOut", 2f, null);
+
+        StateManager.OverlayState = OverlayState.Death;
     }
     public void Heal(GameManager gameManager, int health)
     {

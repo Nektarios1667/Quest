@@ -95,7 +95,7 @@ public static class CommandManager
             new("notif <int> <int> <int> <number> **", CNotif, "Notification |*| created.", "Failed to create notification |*|."),
             new("enemy", CEnemy, "Spawned enemy.", "Failed to spawn enemy."),
             new("freecam <bool>", CFreecam, "Set freecam to |1|", "Failed to set freecam to |1|"),
-            new("kill [enemy|projectile] <ushort>", CKill, "Killed |1| with UID |2|", "Failed to kill |1| with UID |2|"),
+            new("kill [enemy|projectile|player] <ushort>", CKill, "Killed |1| with UID |2|", "Failed to kill |1| with UID |2|"),
             new("effect <effect> {1:999}", CEffect, "Applied effect '|1|' for |2| seconds.", "Failed to apply effect '|1|' for |2| seconds."),
             new("reload [lights|lightgrid|level]", CReload, "Reloaded |1|.", "Failed to reload |1|."),
             new("music *", CMusic, "Playing music |1|.", "Failed to play music |1|."),
@@ -243,12 +243,12 @@ public static class CommandManager
             }
             else if (parts[1] == "read")
             {
-                LevelManager!.ReadLevel(GameManager!, parts[2], reload: true);
+                LevelFileManager.ReadLevel(GameManager!, parts[2], reload: true);
                 return true;
             }
             else if (parts[1] == "open")
             {
-                LevelManager!.ReadLevel(GameManager!, parts[2]);
+                LevelFileManager.ReadLevel(GameManager!, parts[2]);
                 LevelManager!.LoadLevel(GameManager!, parts[2]);
                 return true;
             }
@@ -385,6 +385,10 @@ public static class CommandManager
                 projectile.Destroy();
                 return true;
             }
+        } else if (type == "player" && uid == 0)
+        {
+            PlayerManager!.Hurt(GameManager!, int.MaxValue);
+            return true;
         }
         return false;
     }
@@ -414,7 +418,7 @@ public static class CommandManager
         else if (parts[1] == "level")
         {
             StateManager.SaveGameStateAsync(GameManager!, PlayerManager!);
-            LevelManager!.ReadLevel(GameManager!, LevelManager.Level.LevelPath.ToString(), reload: true);
+            LevelFileManager.ReadLevel(GameManager!, LevelManager!.Level.LevelPath.ToString(), reload: true);
             LevelManager!.LoadLevel(GameManager!, LevelManager.Level.LevelPath.ToString());
             _ = StateManager.ReadGameState(GameManager!, PlayerManager!, StateManager.CurrentSave.ToString());
             return true;

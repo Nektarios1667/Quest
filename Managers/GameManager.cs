@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Content;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Quest.Managers;
 
@@ -47,7 +49,7 @@ public class GameManager
         }
 
         // Time
-        if (StateManager.OverlayState != OverlayState.Pause && StateManager.OverlayState != OverlayState.Death)
+        if (StateManager.OverlayState != OverlayState.Pause)
         {
             DeltaTime = deltaTime;
             GameTime += deltaTime;
@@ -58,9 +60,22 @@ public class GameManager
         else
             DeltaTime = 0f;
     }
-    public void Respawn(PlayerManager playerManager)
+    private bool respawning = false;
+    public async Task Respawn(PlayerManager playerManager)
     {
-        StateManager.ReadGameState(this, playerManager, StateManager.CurrentSave.ToString());
-        StateManager.OverlayState = OverlayState.None;
+        if (respawning) return;
+        respawning = true;
+
+        try
+        {
+            StateManager.OverlayState = OverlayState.None;
+            await StateManager.ReadGameState(this, playerManager, StateManager.CurrentSave.ToString());
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e.ToString());
+        }
+
+        respawning = false;
     }
 }

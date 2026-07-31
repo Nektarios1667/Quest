@@ -60,7 +60,10 @@ public class OverlayManager
 
         // Respawn
         if (playerManager != null && StateManager.OverlayState == OverlayState.Death && InputManager.KeyPressed(Keys.Space))
-            gameManager.Respawn(playerManager);
+            _ = gameManager.Respawn(playerManager);
+        // Exit finished
+        if (StateManager.OverlayState == OverlayState.Finished && InputManager.KeyPressed(Keys.Space))
+            StateManager.OverlayState = OverlayState.None;
     }
     public void Draw(GraphicsDevice device, GameManager gameManager, PlayerManager? playerManager)
     {
@@ -73,17 +76,19 @@ public class OverlayManager
         DrawPostProcessing(gameManager, playerManager);
 
         // Widgets
-        LootNotifications.Offset = (CameraManager.CameraDest - CameraManager.Camera).ToPoint();
-        Gui.Draw(gameManager.Batch);
+        if (StateManager.OverlayState != OverlayState.Death)
+        {
+            LootNotifications.Offset = (CameraManager.CameraDest - CameraManager.Camera).ToPoint();
+            Gui.Draw(gameManager.Batch);
 
-        // Minimap
-        if (StateManager.OverlayState != OverlayState.None)
-            DrawMiniMap(device, gameManager);
+            // Minimap
+            if (StateManager.OverlayState != OverlayState.None)
+                DrawMiniMap(device, gameManager);
+        }
 
         // Inventories
-        if (playerManager != null)
+        if (playerManager != null && playerManager.IsAlive)
             DrawUI(gameManager, playerManager);
-
     }
     public void DrawUI(GameManager gameManager, PlayerManager playerManager)
     {
@@ -138,31 +143,30 @@ public class OverlayManager
         if (StateManager.OverlayState == OverlayState.Container || StateManager.OverlayState == OverlayState.Pause || StateManager.OverlayState == OverlayState.Typing)
             gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * 0.6f);
 
-        // Death
-        if (StateManager.OverlayState == OverlayState.Death)
-        {
-            gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black);
-            gameManager.Batch.DrawString(PixelOperator, "YOU DIED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("You died!") * 2, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
-            gameManager.Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White);
-        }
-        else if (StateManager.OverlayState == OverlayState.Finished)
-        {
-            TimerManager.NewTimer("ScreenFadeOut", 2, null);
-
-            float fade = TimerManager.GetTimer("ScreenFadeOut").Progress;
-            gameManager.Batch.DrawString(PixelOperator, "LEVEL FINISHED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("LEVEL FINISHED!") * 2, Color.White * fade, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
-            gameManager.Batch.DrawString(PixelOperator, "Press space to close", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to close") / 2 + new Vector2(0, 80), Color.White * fade);
-
-            if (InputManager.KeyPressed(Keys.Space))
-                StateManager.OverlayState = OverlayState.None;
-        }
         // Fading - for general purpose
         if (TimerManager.Exists("ScreenFadeOut"))
             gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * TimerManager.GetTimer("ScreenFadeOut").Progress);
         if (TimerManager.Exists("ScreenFadeIn"))
             gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * (1 - TimerManager.GetTimer("ScreenFadeIn").Progress));
 
+        // Death
+        if (StateManager.OverlayState == OverlayState.Death)
+            DrawBlackScreen(gameManager, "YOU DIED!", "Press space to respawn");
+        // Finished
+        else if (StateManager.OverlayState == OverlayState.Finished)
+            DrawBlackScreen(gameManager, "LEVEL FINISHED!", "Press space to close");
+
         DebugManager.EndBenchmark("PostProcessing");
+    }
+    private static void DrawBlackScreen(GameManager gameManager, string title, string message)
+    {
+        Timer? timer = TimerManager.TryGetTimer("ScreenFadeOut");
+        float fade = timer != null ? timer.Progress : 1;
+        if (timer == null)
+            gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black);
+
+        gameManager.Batch.DrawString(PixelOperator, "YOU DIED!", Constants.Middle.ToVector2() - PixelOperator.MeasureString("You died!") * 2, Color.White * fade, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0f);
+        gameManager.Batch.DrawString(PixelOperator, "Press space to respawn", Constants.Middle.ToVector2() - PixelOperator.MeasureString("Press space to respawn") / 2 + new Vector2(0, 80), Color.White * fade);
     }
     public void DrawLighting(GameManager gameManager)
     {

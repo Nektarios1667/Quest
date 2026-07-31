@@ -19,7 +19,7 @@ public class Stairs : Tile
     private void Teleport(GameManager game)
     {
         // Load another level
-        bool read = game.LevelManager.ReadLevel(game, DestLevel.ToString(), reload: false);
+        bool read = LevelFileManager.ReadLevel(game, DestLevel.ToString(), reload: false);
         bool loaded = game.LevelManager.LoadLevel(game, DestLevel.ToString());
         if (!read || !loaded)
         {

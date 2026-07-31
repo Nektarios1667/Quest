@@ -78,20 +78,22 @@ public static class TimerManager
     public static void Remove(string name)
     {
         if (!timers.Remove(name))
-            throw new KeyNotFoundException($"No timer with name '{name}' found");
+            Logger.Error($"No timer with name '{name}' found");
     }
     public static void TryRemove(string name) { timers.Remove(name); }
     public static float TimeLeft(string name)
     {
         if (timers.TryGetValue(name, out var timer))
             return timer.Left;
-        throw new KeyNotFoundException($"No timer with name '{name}' found");
+        Logger.Error($"No timer with name '{name}' found");
+        return 0;
     }
     public static Timer GetTimer(string name)
     {
         if (timers.TryGetValue(name, out var timer))
             return timer;
-        throw new KeyNotFoundException($"No timer with name '{name}' found");
+        Logger.Error($"No timer with name '{name}' found");
+        return new(0, null);
     }
     public static Dictionary<string, Timer> GetAllTimers() => timers;
 
@@ -111,7 +113,10 @@ public static class TimerManager
     {
         if (timers.TryGetValue(name, out var timer))
             return timer.Left <= 0;
-        throw new KeyNotFoundException($"No timer with name '{name}' found");
+        Logger.Error($"No timer with name '{name}' found", true);
+
+        // Won't reach here since Logger.Error will exit
+        return false;
     }
     public static bool IsCompleteOrMissing(string name)
     {

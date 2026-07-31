@@ -202,7 +202,7 @@ public class MenuManager
         {
             StateManager.CurrentSave = new($"{worlds.Selected}/{DateTime.Now:Save MM-dd-yy HH-mm-ss}");
 
-            await gameManager.LevelManager.ReadWorldAsync(gameManager, worlds.Selected, reload: true);
+            await LevelFileManager.ReadWorldAsync(gameManager, worlds.Selected, reload: true);
 
             if (!gameManager.LevelManager.LoadLevel(gameManager, $"{worlds.Selected}/{worlds.Selected}"))
                 gameManager.LevelManager.LoadLevel(gameManager, 0);

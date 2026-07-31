@@ -206,8 +206,8 @@ public class Window : Game, IAdjustableWindow
         playerManager.Draw(gameManager);
 
         // Draw overlays
-        overlayManager.Draw(GraphicsDevice, gameManager, playerManager);
         playerManager.StatusArea.Draw(spriteBatch);
+        overlayManager.Draw(GraphicsDevice, gameManager, playerManager);
         menuManager.Draw(spriteBatch);
 
         // Text info

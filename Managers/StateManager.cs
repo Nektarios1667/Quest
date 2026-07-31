@@ -284,7 +284,7 @@ public static class StateManager
         }
         CurrentSave = levelPath;
         WriteKeyValueFile("Persistent/continue", new() { { "save", save } });
-        await gameManager.LevelManager.ReadWorldAsync(gameManager, levelPath.WorldName, true);
+        await LevelFileManager.ReadWorldAsync(gameManager, levelPath.WorldName, true);
 
         gameManager.LevelManager.TasksComplete = 0;
         gameManager.LevelManager.TotalTasks = 6;

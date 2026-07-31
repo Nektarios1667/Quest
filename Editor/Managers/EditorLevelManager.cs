@@ -270,7 +270,7 @@ public class EditorLevelManager
         if (filename.EndsWith('/'))
             filename = $"{filename[..^1]}/{filename[..^1]}";
 
-        GameManager.LevelManager.ReadLevel(GameManager, filename, reload: true);
+        LevelFileManager.ReadLevel(GameManager, filename, reload: true);
         GameManager.LevelManager.LoadLevel(GameManager, filename);
 
         Logger.Log($"Opened level '{filename}'.");
