@@ -34,6 +34,18 @@ public static class TextureManager
         PinkVillager,
         PurpleVillager,
         YellowVillager,
+        BlackMage,
+        BlackVillager,
+        DarkBlueMage,
+        GrayVillager,
+        GreenMage,
+        OrangeMage,
+        PinkMage,
+        PurpleMage,
+        RedMage,
+        RoyalGuard,
+        WhiteVillager,
+        YellowMage,
         // CHARACTERS ENUM INSERT
         CursorArrow,
         DialogBox,
@@ -278,6 +290,18 @@ public static class TextureManager
         Textures[TextureID.PinkVillager] = content.Load<Texture2D>("Images/Characters/PinkVillager");
         Textures[TextureID.PurpleVillager] = content.Load<Texture2D>("Images/Characters/PurpleVillager");
         Textures[TextureID.YellowVillager] = content.Load<Texture2D>("Images/Characters/YellowVillager");
+        Textures[TextureID.BlackMage] = content.Load<Texture2D>("Images/Characters/BlackMage");
+        Textures[TextureID.BlackVillager] = content.Load<Texture2D>("Images/Characters/BlackVillager");
+        Textures[TextureID.DarkBlueMage] = content.Load<Texture2D>("Images/Characters/DarkBlueMage");
+        Textures[TextureID.GrayVillager] = content.Load<Texture2D>("Images/Characters/GrayVillager");
+        Textures[TextureID.GreenMage] = content.Load<Texture2D>("Images/Characters/GreenMage");
+        Textures[TextureID.OrangeMage] = content.Load<Texture2D>("Images/Characters/OrangeMage");
+        Textures[TextureID.PinkMage] = content.Load<Texture2D>("Images/Characters/PinkMage");
+        Textures[TextureID.PurpleMage] = content.Load<Texture2D>("Images/Characters/PurpleMage");
+        Textures[TextureID.RedMage] = content.Load<Texture2D>("Images/Characters/RedMage");
+        Textures[TextureID.RoyalGuard] = content.Load<Texture2D>("Images/Characters/RoyalGuard");
+        Textures[TextureID.WhiteVillager] = content.Load<Texture2D>("Images/Characters/WhiteVillager");
+        Textures[TextureID.YellowMage] = content.Load<Texture2D>("Images/Characters/YellowMage");
         // CHARACTERS INSERT
         Textures[TextureID.CursorArrow] = content.Load<Texture2D>("Images/Gui/CursorArrow");
         Textures[TextureID.DialogBox] = content.Load<Texture2D>("Images/Gui/DialogBox");
@@ -509,6 +533,18 @@ public static class TextureManager
         Metadata[TextureID.PinkVillager] = new(Textures[TextureID.PinkVillager].Bounds.Size, new(2, 1), "character");
         Metadata[TextureID.PurpleVillager] = new(Textures[TextureID.PurpleVillager].Bounds.Size, new(2, 1), "character");
         Metadata[TextureID.YellowVillager] = new(Textures[TextureID.YellowVillager].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.BlackMage] = new(Textures[TextureID.BlackMage].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.BlackVillager] = new(Textures[TextureID.BlackVillager].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.DarkBlueMage] = new(Textures[TextureID.DarkBlueMage].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.GrayVillager] = new(Textures[TextureID.GrayVillager].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.GreenMage] = new(Textures[TextureID.GreenMage].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.OrangeMage] = new(Textures[TextureID.OrangeMage].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.PinkMage] = new(Textures[TextureID.PinkMage].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.PurpleMage] = new(Textures[TextureID.PurpleMage].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.RedMage] = new(Textures[TextureID.RedMage].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.RoyalGuard] = new(Textures[TextureID.RoyalGuard].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.WhiteVillager] = new(Textures[TextureID.WhiteVillager].Bounds.Size, new(2, 1), "character");
+        Metadata[TextureID.YellowMage] = new(Textures[TextureID.YellowMage].Bounds.Size, new(2, 1), "character");
         // CHARACTERS METADATA INSERT
         Metadata[TextureID.CursorArrow] = new(Textures[TextureID.CursorArrow].Bounds.Size, new(1, 1), "gui");
         Metadata[TextureID.DialogBox] = new(Textures[TextureID.DialogBox].Bounds.Size, new(1, 1), "gui");
