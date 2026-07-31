@@ -143,7 +143,7 @@ public static class LevelFileManager
                 // Section types
                 switch (id)
                 {
-                    case "LEVL": ReadLevelSection(gameManager, sectionReader); break;
+                    case "LEVL": ReadLevelSection(gameManager, sectionReader, ref tint, ref spawn); break;
                     case "TILE": ReadTileSection(gameManager, sectionReader, levelPath, tilesBuffer); break;
                     case "BIOM": ReadBiomeSection(gameManager, sectionReader, filename, totalTiles, biomeBuffer); break;
                     case "NPCS": ReadNPCSection(gameManager, sectionReader, npcBuffer); break;
@@ -171,14 +171,14 @@ public static class LevelFileManager
         }
 
     }
-    private static void ReadLevelSection(GameManager gameManager, BinaryReader reader)
+    private static void ReadLevelSection(GameManager gameManager, BinaryReader reader, ref Color tint, ref Point spawn)
     {
         // Tint
-        Color tint = reader.ReadColor();
+        tint = reader.ReadColor();
         gameManager.LevelManager.TasksComplete++;
 
         // Spawn
-        Point spawn = reader.ReadByteCoord().ToPoint();
+        spawn = reader.ReadByteCoord().ToPoint();
         gameManager.LevelManager.TasksComplete++;
     }
     private static void ReadTileSection(GameManager gameManager, BinaryReader reader, LevelPath levelPath, Tile[] tilesBuffer)
