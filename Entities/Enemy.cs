@@ -94,7 +94,7 @@ public class Enemy : IEntity
                 Point from = CameraManager.TileToRelativeTile(CameraManager.WorldToTile(FootPosition.ToPoint()), true);
                 Point to = CameraManager.TileToRelativeTile(CameraManager.TileCoord, true);
 
-                 var path = PathfindingManager.GetPath(from, to);
+                var path = PathfindingManager.GetPath(from, to);
 
                 Path = path != null ? [.. path.Select(p => CameraManager.TileRelativeToTile(p.ToPoint(), true))] : null;
                 TimerManager.SetTimer($"EnemyPathfind_{UID}", 0.5f, null);

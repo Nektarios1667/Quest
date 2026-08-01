@@ -4,7 +4,6 @@ namespace Quest.Interaction;
 
 public partial class UserInterface
 {
-    public static Point TilePixelLocation = Point.Zero; // Used for juxebox and other tiles that need the UI to know where they are located in the world
     public static UserInterface ChestUI { get; private set; } = null!;
     public static UserInterface CrafterUI { get; private set; } = null!;
     public static UserInterface CrateUI { get; private set; } = null!;
@@ -25,7 +24,7 @@ public partial class UserInterface
         CreateFurnaceUI(batch, levelManager);
         CreateInscriberUI(batch);
         CreateInventoryUI(batch);
-        CreateJukeboxUI(batch);
+        CreateJukeboxUI(batch, levelManager);
         CreateStoveUI(batch, levelManager);
     }
 
@@ -274,7 +273,7 @@ public partial class UserInterface
             }
         }
     }
-    private static void CreateJukeboxUI(SpriteBatch batch)
+    private static void CreateJukeboxUI(SpriteBatch batch, LevelManager levelManager)
     {
         // ----- Jukebox -----
         JukeboxUI = new(batch);
@@ -293,8 +292,8 @@ public partial class UserInterface
         play.Clicked += () =>
         {
             // Get the disc in the first slot
-            if (input.Item != null)
-                SoundtrackManager.PlaySoundtrack(input.Item.Name.Replace(" ", ""));
+            if (input.Item != null && Enum.TryParse<Soundtracks>(input.Item.Name.Replace(" ", ""), out var soundtrack))
+                SoundtrackManager.PlaySoundtrack(soundtrack, (CameraManager.PlayerFoot, 15, levelManager.Level.LevelName));
         };
         Button stop = new(new(Constants.Middle.X - 50, 210), new(100, 35), "Stop", PixelOperatorLarge, Color.Wheat, Color.Red * 0.6f, Color.Red * 0.4f);
         stop.Clicked += SoundtrackManager.StopSoundtrack;

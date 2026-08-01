@@ -46,7 +46,7 @@ public static class PathfindingManager
         Pathfinder.InvalidateCache();
         DebugManager.EndBenchmark($"PathfindingGrid");
     }
-    private static void SetNode(Tile tile, int x, int y)
+    public static void SetNode(Tile tile, int x, int y)
     {
         // Set properties - a weight of 1000 or more is assumed to be unwalkable by a non-player
         Grid[x, y].IsWalkable = tile.IsWalkable && tile.Weight < 1000;
@@ -56,7 +56,8 @@ public static class PathfindingManager
     public static Coordinate[]? GetPath(Point from, Point to) => GetPath(from.X, from.Y, to.X, to.Y);
     public static Coordinate[]? GetPath(int fromX, int fromY, int toX, int toY)
     {
-        if (fromX < 0 || fromY < 0 || toX >= Grid.GetLength(0) || toY >= Grid.GetLength(1))
+        if (fromX < 0 || fromY < 0 || fromX >= Grid.GetLength(0) || fromY >= Grid.GetLength(1) ||
+            toX < 0 || toY < 0 || toX >= Grid.GetLength(0) || toY >= Grid.GetLength(1))
         {
             Logger.Error("Pathfinding calculation is off grid.");
             return null;
@@ -64,6 +65,7 @@ public static class PathfindingManager
         }
 
         var result = Pathfinder.GetPath(PathAgent, new(fromX, fromY), new(toX, toY));
-        return result.Path?.ToArray();
+        if (result.Path == null || !result.IsSuccess) return null;
+        return result.Path.ToArray();
     }
 }

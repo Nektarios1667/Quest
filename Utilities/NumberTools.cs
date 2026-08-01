@@ -56,6 +56,7 @@ public static class NumberTools
             (flags & (1 << 7)) != 0,
         ];
     }
+    public static float Square(float num) => num * num;
 }
 
 public static class IntExtensions

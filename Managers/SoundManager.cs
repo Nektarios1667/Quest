@@ -39,7 +39,6 @@ public static class SoundManager
         LoadSound(content, "Thunder4", "Sounds/Effects/Thunder4");
         LoadSound(content, "Thunder5", "Sounds/Effects/Thunder5");
     }
-
     public static bool IsMusicPlaying => MediaPlayer.State == MediaState.Playing;
 
     public static void LoadSound(ContentManager content, string key, string path)
@@ -59,7 +58,7 @@ public static class SoundManager
         if (soundEffects.TryGetValue(key, out var sfx))
             sfx.Play(MathHelper.Clamp(volume * SettingsManager.SoundVolume, 0f, 1f), pitch + RandomManager.RandomFloatRange(-pitchVariation, pitchVariation), pan);
     }
-
+    // Only one instance of a sound can be played at a time, but its properties can be changed while it is playing
     public static void PlaySoundInstance(string key, float volume = 1f, float pitch = 0f, float pan = 0f, bool loop = false)
     {
         var instance = GetOrCreateInstance(key);
@@ -84,12 +83,6 @@ public static class SoundManager
         soundInstances.GetValueOrDefault(key)?.Stop();
         soundInstances.Remove(key);
     }
-    public static void SetInstanceVolume(string key, float volume)
-    {
-        var inst = GetInstance(key);
-        if (inst != null)
-            inst.Volume = volume;
-    }
     private static SoundEffectInstance? GetOrCreateInstance(string key)
     {
         if (!soundEffects.TryGetValue(key, out var sfx))
@@ -105,12 +98,6 @@ public static class SoundManager
         return instance;
     }
 
-    public static void StopSoundInstance(string key)
-    {
-        if (soundInstances.TryGetValue(key, out var instance))
-            instance.Stop();
-    }
-
     public static bool TryPlayMusic(string key, bool loop = false)
     {
         if (songs.TryGetValue(key, out var song))
@@ -123,20 +110,9 @@ public static class SoundManager
         return false;
     }
 
-    public static void StopMusic()
-    {
-        MediaPlayer.Stop();
-    }
+    public static void StopMusic() => MediaPlayer.Stop();
 
-    public static void PauseMusic()
-    {
-        if (IsMusicPlaying)
-            MediaPlayer.Pause();
-    }
+    public static void PauseMusic() => MediaPlayer.Pause();
 
-    public static void ResumeMusic()
-    {
-        if (MediaPlayer.State == MediaState.Paused)
-            MediaPlayer.Resume();
-    }
+    public static void ResumeMusic() => MediaPlayer.Resume();
 }

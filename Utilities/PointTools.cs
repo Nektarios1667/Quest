@@ -12,6 +12,8 @@ public static class PointExtensions
     {
         return PointTools.DistanceSquared(point, other);
     }
+    public static float Length(this Point point) => PointTools.Distance(point, Point.Zero);
+    public static float LengthSquared(this Point point) => PointTools.DistanceSquared(point, Point.Zero);
     public static Point Scaled(this Point point, float scale)
     {
         return new((int)(point.X * scale), (int)(point.Y * scale));

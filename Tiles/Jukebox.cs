@@ -13,7 +13,6 @@ public class Jukebox : Tile, IContainer
     public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
     {
         UserInterface.JukeboxUI.BindContainer(Container);
-        UserInterface.TilePixelLocation = Location * Constants.TileSize;
         player.OpenInterface(gameManager, UserInterface.JukeboxUI);
         gameManager.StateManager.OverlayState = OverlayState.Container;
     }
