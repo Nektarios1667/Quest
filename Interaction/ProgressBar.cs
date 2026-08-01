@@ -14,7 +14,7 @@ public class ProgressBar : UIElement
         Foreground = fg;
         Border = border;
     }
-    public override void Update(UserInterface ui)
+    public override void Update(UserInterface ui, GameManager gameManager)
     {
     }
     public override void Draw(UserInterface ui)

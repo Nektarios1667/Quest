@@ -264,9 +264,9 @@ public static class CommandManager
     private static bool CMood(string command)
     {
         string mood = command.Split(' ')[1];
-        if (mood == "calm") { StateManager.Mood = Mood.Calm; return true; }
-        else if (mood == "dark") { StateManager.Mood = Mood.Dark; return true; }
-        else if (mood == "epic") { StateManager.Mood = Mood.Epic; return true; }
+        if (mood == "calm") { GameManager!.StateManager.Mood = Mood.Calm; return true; }
+        else if (mood == "dark") { GameManager!.StateManager.Mood = Mood.Dark; return true; }
+        else if (mood == "epic") { GameManager!.StateManager.Mood = Mood.Epic; return true; }
         return false;
     }
     private static bool CDaytime(string command)
@@ -417,10 +417,10 @@ public static class CommandManager
         }
         else if (parts[1] == "level")
         {
-            StateManager.SaveGameStateAsync(GameManager!, PlayerManager!);
+            SaveManager.SaveGameStateAsync(GameManager!, PlayerManager!);
             LevelFileManager.ReadLevel(GameManager!, LevelManager!.Level.LevelPath.ToString(), reload: true);
             LevelManager!.LoadLevel(GameManager!, LevelManager.Level.LevelPath.ToString());
-            _ = StateManager.ReadGameState(GameManager!, PlayerManager!, StateManager.CurrentSave.ToString());
+            _ = SaveManager.ReadGameState(GameManager!, PlayerManager!, SaveManager.CurrentSave.ToString());
             return true;
         }
         return false;

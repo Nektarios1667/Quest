@@ -12,7 +12,7 @@ public class Image : UIElement
         BorderThickness = borderThickness;
         Texture = tex;
     }
-    public override void Update(UserInterface ui) { }
+    public override void Update(UserInterface ui, GameManager gameManager) { }
     public override void Draw(UserInterface ui)
     {
         // Border

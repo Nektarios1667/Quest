@@ -85,7 +85,7 @@ public static class LevelFileManager
 
         // Read metadata
         WorldMetadata meta = WorldMetadata.Null;
-        var kvDict = StateManager.ReadKeyValueFile($"Worlds/{levelPath.WorldName}/metadata");
+        var kvDict = SaveManager.ReadKeyValueFile($"Worlds/{levelPath.WorldName}/metadata");
         meta.Author = kvDict.GetValueOrDefault("Author", defaultValue: "Unknown");
         meta.Description = kvDict.GetValueOrDefault("Description", defaultValue: "None");
         gameManager.LevelManager.TasksComplete++;
@@ -271,11 +271,11 @@ public static class LevelFileManager
             ILootGenerator lootGen = LootGeneratorHelper.Read(levelPath.WorldName, lootGenFile);
             lootGen = (lootGen.FileName.IsNUL() || lootGen.FileName == "_") ? LootPreset.EmptyPreset : lootGen;
 
-            return new Chest(loc, lootGen, levelPath.LevelName, StateManager.ReadItemData(reader)?.GetItemRef(), reader.ReadBoolean());
+            return new Chest(loc, lootGen, levelPath.LevelName, SaveManager.ReadItemData(reader)?.GetItemRef(), reader.ReadBoolean());
         }
         DisplayCase ReadDisplayCase(Point loc)
         {
-            Item? item = StateManager.ReadItemData(reader);
+            Item? item = SaveManager.ReadItemData(reader);
             DisplayCase displayCase = new(loc, levelPath.LevelName);
             displayCase.Container.Items[0] = item;
             return displayCase;
@@ -292,7 +292,7 @@ public static class LevelFileManager
         return type switch
         {
             TileTypeID.Stairs => new Stairs(loc, new LevelPath(levelPath.WorldName, reader.ReadString()), new(reader.ReadByte(), reader.ReadByte())),
-            TileTypeID.Door => new Door(loc, StateManager.ReadItemData(reader)?.GetItemRef(), reader.ReadBoolean()),
+            TileTypeID.Door => new Door(loc, SaveManager.ReadItemData(reader)?.GetItemRef(), reader.ReadBoolean()),
             TileTypeID.Chest => ReadChest(loc),
             TileTypeID.Lamp => new Lamp(loc, reader.ReadByte()),
             TileTypeID.DisplayCase => ReadDisplayCase(loc),

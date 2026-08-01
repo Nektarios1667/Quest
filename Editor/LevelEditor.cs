@@ -102,7 +102,7 @@ public class LevelEditor : Game, IAdjustableWindow
     {
         base.Initialize();
 
-        StateManager.State = GameState.Editor;
+        gameManager.StateManager.State = GameState.Editor;
     }
 
     protected override void LoadContent()
@@ -117,6 +117,7 @@ public class LevelEditor : Game, IAdjustableWindow
         levelManager = new();
         //overlayManager = new(null);
         gameManager = new(Content, spriteBatch, levelManager, null, null, null); // No WeatherManager or OverlayManager
+        gameManager.StateManager.State = GameState.Editor;
         editorManager = new(gameManager);
         editorLevelManager = new(gameManager, levelGenerator);
         editorOverlayManager = new(gameManager, spriteBatch, GraphicsDevice);
@@ -125,11 +126,11 @@ public class LevelEditor : Game, IAdjustableWindow
             Window.Title = editorLevelManager.LevelManager.Level.LevelPath.IsNull() ? "Quest Level Editor" : $"Quest Level Editor - {editorLevelManager.LevelManager.Level.LevelPath}",
         int.MaxValue);
 
-        StateManager.State = GameState.Editor;
+        gameManager.StateManager.State = GameState.Editor;
         Logger.System("Initialized managers.");
 
         // Settings gui
-        SettingsMenu = SettingsManager.CreateSettingsMenu(this, this, spriteBatch, Content);
+        SettingsMenu = SettingsManager.CreateSettingsMenu(this, this, gameManager, spriteBatch, Content);
         SettingsMenu.LoadContent();
 
         // Editor gui
@@ -170,7 +171,7 @@ public class LevelEditor : Game, IAdjustableWindow
         mouseMenu.AddItem("Spawn", editorManager.SetSpawn, []);
         mouseMenu.AddItem("Tint", editorManager.SetTint, []);
         mouseMenu.AddItem("Generate", editorLevelManager.GenerateLevel, []);
-        mouseMenu.AddItem("Settings", () => StateManager.State = GameState.Settings, []);
+        mouseMenu.AddItem("Settings", () => gameManager.StateManager.State = GameState.Settings, []);
         mouseMenu.AddItem("Exit", Exit, []);
         gui.AddWidget(mouseMenu);
 
@@ -309,7 +310,7 @@ public class LevelEditor : Game, IAdjustableWindow
         // Managers
         if (!PopupFactory.PopupOpen) InputManager.Update(this);
         DebugManager.Update(editorOverlayManager.GetDebugString().Replace("\n", "\r\n"), memoryDebugSb.ToString().Split("\n"));
-        CameraManager.Update(delta);
+        CameraManager.Update(gameManager, delta);
         CameraManager.CameraDest = Vector2.Clamp(CameraManager.CameraDest, Constants.Middle.ToVector2(), (Constants.MapSize * Constants.TileSize - Constants.Middle).ToVector2());
 
         // Gui
@@ -374,7 +375,7 @@ public class LevelEditor : Game, IAdjustableWindow
             EditorOverlayManager.DrawBiomeOverlay(spriteBatch, BiomeSelection, mouseBiome);
 
         // Gui
-        if (StateManager.State == GameState.Settings)
+        if (gameManager.StateManager.State == GameState.Settings)
         {
             TextureManager.DrawTexture(spriteBatch, TextureID.MenuBackground, Point.Zero, scale: MenuManager.MenuBackgroundScale);
             SettingsMenu.Draw();
@@ -398,7 +399,7 @@ public class LevelEditor : Game, IAdjustableWindow
     public void DrawTileGhostCursor(Point mouseCoordDraw)
     {
         // Check skip
-        if (StateManager.State != GameState.Editor) return;
+        if (gameManager.StateManager.State != GameState.Editor) return;
 
         // Tool ghosts
         if (currentTool == EditorTool.Tile)
@@ -421,7 +422,7 @@ public class LevelEditor : Game, IAdjustableWindow
     public void UpdateTilePlacing()
     {
         // Check skip
-        if (!InputManager.LMouseDown || mouseMenu.Visible || StateManager.State != GameState.Editor) return;
+        if (!InputManager.LMouseDown || mouseMenu.Visible || gameManager.StateManager.State != GameState.Editor) return;
 
         // Add tile
         if (currentTool == EditorTool.Tile)

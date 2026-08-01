@@ -9,7 +9,7 @@ public class DisplayCase : Tile, IContainer
     public DisplayCase(Point location, string levelName) : base(location, TileTypeID.DisplayCase)
     {
         Container = new([null]);
-        StateManager.SaveContainer(this, levelName);
+        SaveManager.SaveContainer(this, levelName);
     }
     public override void Draw(GameManager gameManager)
     {
@@ -21,11 +21,11 @@ public class DisplayCase : Tile, IContainer
         if (Container.Items[0] != null)
             DrawTexture(gameManager.Batch, Container.Items[0]!.Texture, dest + Constants.TileHalfSize + new Point(0, (int)(Math.Sin(GameManager.GameTime) * 2)), scale: new(3), origin: new Vector2(8, 8));
     }
-    public override void OnPlayerCollide(GameManager game, PlayerManager player)
+    public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
     {
         UserInterface.DisplayCaseUI.BindContainer(Container);
-        player.OpenInterface(UserInterface.DisplayCaseUI);
-        StateManager.OverlayState = OverlayState.Container;
+        player.OpenInterface(gameManager, UserInterface.DisplayCaseUI);
+        gameManager.StateManager.OverlayState = OverlayState.Container;
     }
 }
 

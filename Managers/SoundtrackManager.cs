@@ -83,11 +83,11 @@ public static class SoundtrackManager
             }
         }
     }
-    public static void Update()
+    public static void Update(GameManager gameManager)
     {
-        if (!SoundManager.IsMusicPlaying && QueueNextSong && StateManager.IsPlayingState)
+        if (!SoundManager.IsMusicPlaying && QueueNextSong && gameManager.StateManager.IsPlayingState)
         {
-            Soundtracks? soundtrack = GetRandomSoundtrack(StateManager.Mood);
+            Soundtracks? soundtrack = GetRandomSoundtrack(gameManager.StateManager.Mood);
             if (soundtrack != null)
                 PlaySoundtrack(soundtrack.Value);
         }

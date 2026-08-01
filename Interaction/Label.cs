@@ -19,7 +19,7 @@ public class Label : UIElement
         BorderThickness = borderThickness;
         Bounds = new Rectangle(Location, Font.MeasureString(Text).ToPoint()).Inflated(BorderThickness, BorderThickness);
     }
-    public override void Update(UserInterface ui) { }
+    public override void Update(UserInterface ui, GameManager gameManager) { }
     public override void Draw(UserInterface ui)
     {
         // Background

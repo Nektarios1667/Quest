@@ -8,13 +8,14 @@ public class Jukebox : Tile, IContainer
     public Jukebox(Point location, string levelName) : base(location, TileTypeID.Jukebox)
     {
         Container = new([null]);
-        StateManager.SaveContainer(this, levelName);
+        SaveManager.SaveContainer(this, levelName);
     }
-    public override void OnPlayerCollide(GameManager game, PlayerManager player)
+    public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
     {
         UserInterface.JukeboxUI.BindContainer(Container);
-        player.OpenInterface(UserInterface.JukeboxUI);
-        StateManager.OverlayState = OverlayState.Container;
+        UserInterface.TilePixelLocation = Location * Constants.TileSize;
+        player.OpenInterface(gameManager, UserInterface.JukeboxUI);
+        gameManager.StateManager.OverlayState = OverlayState.Container;
     }
     public override void Draw(GameManager gameManager)
     {

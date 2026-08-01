@@ -37,7 +37,7 @@ public class QuillInstance
         Lines = script.SourceCode.Split('\n');
     }
 
-    public int Step(GameManager game, int budget)
+    public int Step(GameManager gameManager,int budget)
     {
         int stepsUsed = 0;
         int allowedReps = PerformanceMode == QuillPerformanceMode.High ? 3 : 1;
@@ -108,11 +108,11 @@ public static partial class Interpreter
     private static readonly Dictionary<string, string> ExternalSymbols = new() {
         { "<ready>", "false" },
     };
-    public static void UpdateSymbols(GameManager game, PlayerManager player)
+    public static void UpdateSymbols(GameManager gameManager,PlayerManager player)
     {
         DebugManager.StartBenchmark("QuillSymbolsUpdate");
 
-        if (!StateManager.IsPlayingState) return;
+        if (!gameManager.StateManager.IsPlayingState) return;
 
         // Player
         ExternalSymbols["<playercoord_x>"] = CameraManager.TileCoord.X.ToString();
@@ -127,15 +127,15 @@ public static partial class Interpreter
         ExternalSymbols["<camera_y>"] = CameraManager.Camera.Y.ToString();
         ExternalSymbols["<camera>"] = $"{CameraManager.Camera.X};{CameraManager.Camera.Y}";
         // Level
-        ExternalSymbols["<currentlevel>"] = game.LevelManager.Level.Path.WrapSingleQuotes();
-        ExternalSymbols["<currentlevelname>"] = game.LevelManager.Level.LevelName.WrapSingleQuotes();
-        ExternalSymbols["<currentworld>"] = game.LevelManager.Level.WorldName.WrapSingleQuotes();
-        ExternalSymbols["<spawn>"] = game.LevelManager.Level.Spawn.CoordString();
+        ExternalSymbols["<currentlevel>"] = gameManager.LevelManager.Level.Path.WrapSingleQuotes();
+        ExternalSymbols["<currentlevelname>"] = gameManager.LevelManager.Level.LevelName.WrapSingleQuotes();
+        ExternalSymbols["<currentworld>"] = gameManager.LevelManager.Level.WorldName.WrapSingleQuotes();
+        ExternalSymbols["<spawn>"] = gameManager.LevelManager.Level.Spawn.CoordString();
         // Game
         ExternalSymbols["<gametime>"] = GameManager.GameTime.ToString();
-        ExternalSymbols["<daytime>"] = game.DayTime.ToString();
+        ExternalSymbols["<daytime>"] = gameManager.DayTime.ToString();
         ExternalSymbols["<totaltime>"] = GameManager.GameTime.ToString();
-        ExternalSymbols["<gamestate>"] = StateManager.State.ToString().WrapSingleQuotes();
+        ExternalSymbols["<gamestate>"] = gameManager.StateManager.State.ToString().WrapSingleQuotes();
         // Inventory
         ExternalSymbols["<inventoryitems>"] = Utilities.ItemNamesQist(player.Inventory.Items, Chest.Size.X).WrapSingleQuotes();
         ExternalSymbols["<inventoryamounts>"] = Utilities.ItemAmountsQist(player.Inventory.Items, Chest.Size.X).WrapSingleQuotes();
@@ -153,7 +153,7 @@ public static partial class Interpreter
         ExternalSymbols["<datetime>"] = DateTime.Now.ToString("yyyy;MM;dd/HH;mm;ss");
         ExternalSymbols["<fps>"] = (1f / GameManager.DeltaTime).ToString();
         ExternalSymbols["<deltatime>"] = GameManager.DeltaTime.ToString();
-        ExternalSymbols["<ispaused>"] = (StateManager.OverlayState == OverlayState.Pause).ToString();
+        ExternalSymbols["<ispaused>"] = (gameManager.StateManager.OverlayState == OverlayState.Pause).ToString();
         ExternalSymbols["<vsync>"] = SettingsManager.VSYNC.ToString().ToLower();
         ExternalSymbols["<resolution_x>"] = SettingsManager.ScreenResolution.X.ToString();
         ExternalSymbols["<resolution_y>"] = SettingsManager.ScreenResolution.X.ToString();
@@ -237,11 +237,11 @@ public static partial class Interpreter
         Scripts.Add(inst);
     }
 
-    public static void Update(GameManager game, PlayerManager player)
+    public static void Update(GameManager gameManager,PlayerManager player)
     {
         if (Scripts.Count == 0) return;
 
-        UpdateSymbols(game, player);
+        UpdateSymbols(gameManager, player);
 
         DebugManager.StartBenchmark("QuillUpdate");
         // Run scripts
@@ -261,7 +261,7 @@ public static partial class Interpreter
             steps = Math.Clamp(steps, 1, Math.Min(budget, Constants.QuillScriptMaxUpdatesPerFrame));
 
             // Run script
-            int stepsUsed = script.Step(game, steps);
+            int stepsUsed = script.Step(gameManager, steps);
             // Cleanup
             if (script.Done)
                 Scripts.RemoveAt(s);

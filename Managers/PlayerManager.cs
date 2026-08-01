@@ -72,8 +72,8 @@ public class PlayerManager : IEntity
     public void Update(GameManager gameManager)
     {
         Game = gameManager;
-        if (StateManager.State != GameState.Game && StateManager.State != GameState.Editor) return;
-        if (StateManager.OverlayState is OverlayState.Pause or OverlayState.Death) return;
+        if (gameManager.StateManager.State != GameState.Game && gameManager.StateManager.State != GameState.Editor) return;
+        if (gameManager.StateManager.OverlayState is OverlayState.Pause or OverlayState.Death) return;
 
         // Potions
         StatusManager.Update(gameManager, this);
@@ -86,23 +86,23 @@ public class PlayerManager : IEntity
         CheckProjectiles(gameManager);
 
         // Toggle inventory
-        if (InputManager.BindPressed(InputAction.ToggleInventory) && StateManager.OverlayState != OverlayState.Typing)
+        if (InputManager.BindPressed(InputAction.ToggleInventory) && gameManager.StateManager.OverlayState != OverlayState.Typing)
         {
             if (InventoryOpen)
             {
-                CloseInventory();
+                CloseInventory(gameManager);
                 CloseInterface();
             }
-            else OpenInventory();
+            else OpenInventory(gameManager);
         }
         if (InputManager.KeyPressed(Keys.Escape))
         {
-            CloseInventory();
+            CloseInventory(gameManager);
             CloseInterface();
         }
 
         // Toggle info
-        if (InputManager.BindPressed(InputAction.ToggleWorldInfo) && StateManager.OverlayState != OverlayState.Typing)
+        if (InputManager.BindPressed(InputAction.ToggleWorldInfo) && gameManager.StateManager.OverlayState != OverlayState.Typing)
             gameManager.OverlayManager.ToggleWorldInfobox(gameManager.LevelManager.Level.Metadata);
 
 
@@ -148,8 +148,8 @@ public class PlayerManager : IEntity
         HoveredItem = null;
 
         // Inventory updates
-        InventoryUI.Update(InventoryOpen ? null : "hotbar");
-        OpenedInterface?.Update();
+        InventoryUI.Update(gameManager, InventoryOpen ? null : "hotbar");
+        OpenedInterface?.Update(gameManager);
 
         DebugManager.EndBenchmark("InventoryUpdate");
 
@@ -292,7 +292,7 @@ public class PlayerManager : IEntity
     }
     public void Draw(GameManager gameManager)
     {
-        if (StateManager.State != GameState.Game) return;
+        if (gameManager.StateManager.State != GameState.Game) return;
 
         // Draw player
         DrawPlayer(gameManager);
@@ -402,20 +402,20 @@ public class PlayerManager : IEntity
             }
         }
     }
-    public void OpenInventory()
+    public void OpenInventory(GameManager gameManager)
     {
         InventoryOpen = true;
-        StateManager.OverlayState = OverlayState.Container;
+        gameManager.StateManager.OverlayState = OverlayState.Container;
         SoundManager.PlaySound("Click");
     }
-    public void CloseInventory()
+    public void CloseInventory(GameManager gameManager)
     {
         InventoryOpen = false;
-        StateManager.OverlayState = OverlayState.None;
+        gameManager.StateManager.OverlayState = OverlayState.None;
         SoundManager.PlaySound("Click");
     }
 
-    public void OpenInterface(UserInterface ui)
+    public void OpenInterface(GameManager gameManager, UserInterface ui)
     {
         CloseInterface();
         InventoryOpen = true;
@@ -425,7 +425,7 @@ public class PlayerManager : IEntity
         OpenedInterface.OnSlotDrop += SlotDropped;
         OpenedInterface.OnSlotHover += SlotHovered;
 
-        StateManager.OverlayState = OverlayState.Container;
+        gameManager.StateManager.OverlayState = OverlayState.Container;
         SoundManager.PlaySound("Click");
     }
     public void CloseInterface()
@@ -499,20 +499,20 @@ public class PlayerManager : IEntity
         gameManager.OverlayManager.LootNotifications.AddNotification($"-{damage}", Color.Orange, duration: 2);
         if (Health <= 0)
         {
-            Die();
+            Die(gameManager);
 
         }
     }
-    public void Die()
+    public void Die(GameManager gameManager)
     {
         Health = 0;
 
         CloseInterface();
-        CloseInventory();
+        CloseInventory(gameManager);
 
         TimerManager.SetTimer("ScreenFadeOut", 2f, null);
 
-        StateManager.OverlayState = OverlayState.Death;
+        gameManager.StateManager.OverlayState = OverlayState.Death;
     }
     public void Heal(GameManager gameManager, int health)
     {

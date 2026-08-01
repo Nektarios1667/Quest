@@ -137,6 +137,6 @@ partial class KeybindsSettings
     private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
     private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
     private Button SaveButton;
-    private Button CancelButton;
+    private new Button CancelButton;
     private Label PressKeyLabel;
 }

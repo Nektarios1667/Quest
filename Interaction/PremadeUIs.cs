@@ -4,6 +4,7 @@ namespace Quest.Interaction;
 
 public partial class UserInterface
 {
+    public static Point TilePixelLocation = Point.Zero; // Used for juxebox and other tiles that need the UI to know where they are located in the world
     public static UserInterface ChestUI { get; private set; } = null!;
     public static UserInterface CrafterUI { get; private set; } = null!;
     public static UserInterface CrateUI { get; private set; } = null!;

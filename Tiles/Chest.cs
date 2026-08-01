@@ -14,16 +14,16 @@ public class Chest : Tile, IContainer
     public Chest(Point location, ILootGenerator lootGenerator, string levelPath, ItemRef? key = null, bool consumeKey = true) : base(location, TileTypeID.Chest)
     {
         LootGenerator = lootGenerator;
-        StateManager.SaveChestGenerator(this, levelPath);
+        SaveManager.SaveChestGenerator(this, levelPath);
         Key = key;
         ConsumeKey = consumeKey;
     }
-    public override void OnPlayerCollide(GameManager game, PlayerManager player)
+    public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
     {
         // Unlocked
         if (Generated)
         {
-            Open(player);
+            Open(gameManager, player);
             return;
         }
 
@@ -33,20 +33,20 @@ public class Chest : Tile, IContainer
         {
             if (Key != null && ConsumeKey)
             {
-                game.OverlayManager.Notification($"-{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
+                gameManager.OverlayManager.Notification($"-{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
                 player.Inventory.Consume(Key, ignoreCheck: true);
             }
             else if (Key != null)
-                game.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Gray, 2);
+                gameManager.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Gray, 2);
 
             SoundManager.PlaySoundInstance("ChestUnlock");
-            Open(player);
+            Open(gameManager, player);
         }
         // No key
         else
         {
             // Notif
-            game.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)} needed to unlock", Color.Red, 5);
+            gameManager.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)} needed to unlock", Color.Red, 5);
 
             // Sound fx
             string timerName = $"ChestLocked_{X + Y * Constants.MapSize.X}";
@@ -58,12 +58,12 @@ public class Chest : Tile, IContainer
         }
 
     }
-    private void Open(PlayerManager player)
+    private void Open(GameManager gameManager, PlayerManager player)
     {
         TryGenerateLoot();
         UserInterface.ChestUI.BindContainer(Container);
-        player.OpenInterface(UserInterface.ChestUI);
-        StateManager.OverlayState = OverlayState.Container;
+        player.OpenInterface(gameManager, UserInterface.ChestUI);
+        gameManager.StateManager.OverlayState = OverlayState.Container;
     }
     public void RegenerateLoot(ILootGenerator lootGenerator)
     {

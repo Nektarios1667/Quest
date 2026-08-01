@@ -15,7 +15,7 @@ public class TimerBar : ProgressBar
         IsRunning = false;
         MaxRepeatCount = reps;
     }
-    public override void Update(UserInterface ui)
+    public override void Update(UserInterface ui, GameManager gameManager)
     {
         // Running
         if (IsRunning)

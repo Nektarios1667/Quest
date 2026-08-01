@@ -86,10 +86,10 @@ public class EditorLevelManager
 
 
         // Write metadata
-        StateManager.WriteKeyValueFile($"Worlds/{path.WorldName}/metadata", metadata.ToDict());
+        SaveManager.WriteKeyValueFile($"Worlds/{path.WorldName}/metadata", metadata.ToDict());
 
         // Write metadata
-        StateManager.WriteKeyValueFile($"Worlds/{path.WorldName}/metadata", metadata.ToDict());
+        SaveManager.WriteKeyValueFile($"Worlds/{path.WorldName}/metadata", metadata.ToDict());
 
         // Context
         using FileStream fileStream = File.Create($"GameData/Worlds/{path.WorldName}/levels/{path.LevelName}.qlv");
@@ -164,19 +164,19 @@ public class EditorLevelManager
             else if (tile is Door door)
             {
                 // Write door key
-                StateManager.WriteItemData(writer, door.Key);
+                SaveManager.WriteItemData(writer, door.Key);
                 writer.Write(door.ConsumeKey);
             }
             else if (tile is Chest chest)
             {
                 writer.Write(chest.LootGenerator);
-                StateManager.WriteItemData(writer, chest.Key);
+                SaveManager.WriteItemData(writer, chest.Key);
                 writer.Write(chest.ConsumeKey);
             }
             else if (tile is Lamp lamp)
                 writer.Write(lamp.LightRadius);
             else if (tile is DisplayCase displayCase)
-                StateManager.WriteItemData(writer, displayCase.Container.Items[0]);
+                SaveManager.WriteItemData(writer, displayCase.Container.Items[0]);
         }
     }
     private void WriteBiomeSection(BinaryWriter writer)

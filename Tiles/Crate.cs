@@ -10,12 +10,12 @@ public class Crate : Tile, IContainer
     public Crate(Point location, string levelName) : base(location, TileTypeID.Crate)
     {
         Container = new(new Item?[Size.X * Size.Y]);
-        StateManager.SaveContainer(this, levelName);
+        SaveManager.SaveContainer(this, levelName);
     }
-    public override void OnPlayerCollide(GameManager game, PlayerManager player)
+    public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
     {
         UserInterface.CrateUI.BindContainer(Container);
-        player.OpenInterface(UserInterface.CrateUI);
-        StateManager.OverlayState = OverlayState.Container;
+        player.OpenInterface(gameManager, UserInterface.CrateUI);
+        gameManager.StateManager.OverlayState = OverlayState.Container;
     }
 }

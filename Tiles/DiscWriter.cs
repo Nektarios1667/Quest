@@ -8,12 +8,12 @@ public class DiscWriter : Tile, IContainer
     public DiscWriter(Point location, string levelName) : base(location, TileTypeID.DiscWriter)
     {
         Container = new([null]);
-        StateManager.SaveContainer(this, levelName);
+        SaveManager.SaveContainer(this, levelName);
     }
-    public override void OnPlayerCollide(GameManager game, PlayerManager player)
+    public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
     {
         UserInterface.DiscWriterUI.BindContainer(Container);
-        player.OpenInterface(UserInterface.DiscWriterUI);
-        StateManager.OverlayState = OverlayState.Container;
+        player.OpenInterface(gameManager, UserInterface.DiscWriterUI);
+        gameManager.StateManager.OverlayState = OverlayState.Container;
     }
 }

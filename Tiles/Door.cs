@@ -20,20 +20,20 @@ public class Door : Tile
         Rectangle source = new(IsWalkable ? 16 : 0, 0, 16, 16);
         DrawTexture(gameManager.Batch, TextureID.Door, dest, source: source, scale: Constants.TileSizeScale);
     }
-    public override void OnPlayerCollide(GameManager game, PlayerManager player)
+    public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
     {
         if (Key == null || player.Inventory.Count(Key.Type) >= Key.Amount)
         {
             if (Key != null && ConsumeKey)
             {
-                game.OverlayManager.Notification($"-{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
+                gameManager.OverlayManager.Notification($"-{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Red, 3);
                 player.Inventory.Consume(Key, ignoreCheck: true);
             }
             else if (Key != null)
-                game.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Gray, 2);
+                gameManager.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)}", Color.Gray, 2);
 
             SoundManager.PlaySoundInstance("DoorUnlock");
-            Open(game);
+            Open(gameManager);
         }
         else
         {
@@ -41,7 +41,7 @@ public class Door : Tile
             if (TimerManager.IsCompleteOrMissing(timerName))
             {
                 // Notif
-                game.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)} needed to unlock", Color.Red, 5);
+                gameManager.OverlayManager.Notification($"{Key.Amount} {StringTools.FillCamelSpaces(Key.Name)} needed to unlock", Color.Red, 5);
                 // Sfx
                 SoundManager.PlaySoundInstance("DoorLocked");
 
@@ -53,6 +53,6 @@ public class Door : Tile
     {
         IsOpened = true;
         LightingManager.SetLightGridBlocking(Location.ToPoint(), false);
-        StateManager.SaveDoorOpened(TileID, game.LevelManager.Level.LevelName);
+        SaveManager.SaveDoorOpened(TileID, game.LevelManager.Level.LevelName);
     }
 }

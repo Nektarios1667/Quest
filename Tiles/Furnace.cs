@@ -9,12 +9,12 @@ public class Furnace : Tile, IContainer
     public Furnace(Point location, string levelName) : base(location, TileTypeID.Furnace)
     {
         Container = new([null, null, null]);
-        StateManager.SaveContainer(this, levelName);
+        SaveManager.SaveContainer(this, levelName);
     }
-    public override void OnPlayerCollide(GameManager game, PlayerManager player)
+    public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
     {
         UserInterface.FurnaceUI.BindContainer(Container);
-        player.OpenInterface(UserInterface.FurnaceUI);
-        StateManager.OverlayState = OverlayState.Container;
+        player.OpenInterface(gameManager, UserInterface.FurnaceUI);
+        gameManager.StateManager.OverlayState = OverlayState.Container;
     }
 }

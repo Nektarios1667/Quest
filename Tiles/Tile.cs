@@ -206,8 +206,8 @@ public class Tile
         gameManager.Batch.DrawPoint(dest.ToVector2() + new Vector2(Constants.TileSize.X / 2, Constants.TileSize.Y), (mask & 2) == 0 ? Color.Red : Color.Green, size: 5); // Down
     }
 
-    public virtual void OnPlayerEnter(GameManager game, PlayerManager player) { }
-    public virtual void OnPlayerCollide(GameManager game, PlayerManager player) { }
+    public virtual void OnPlayerEnter(GameManager gameManager,PlayerManager player) { }
+    public virtual void OnPlayerCollide(GameManager gameManager,PlayerManager player) { }
     public static Tile TileFromId(TileTypeID type, Point location, string levelName)
     {
         // Create a tile from an id

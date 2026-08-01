@@ -11,12 +11,12 @@ public class Crafter : Tile, IContainer
     {
         // w x h + 1 slots
         Container = new(new Item?[IngredientsSize.X * IngredientsSize.Y + 1]);
-        StateManager.SaveContainer(this, levelName);
+        SaveManager.SaveContainer(this, levelName);
     }
-    public override void OnPlayerCollide(GameManager game, PlayerManager player)
+    public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
     {
         UserInterface.CrafterUI.BindContainer(Container);
-        player.OpenInterface(UserInterface.CrafterUI);
-        StateManager.OverlayState = OverlayState.Container;
+        player.OpenInterface(gameManager, UserInterface.CrafterUI);
+        gameManager.StateManager.OverlayState = OverlayState.Container;
     }
 }

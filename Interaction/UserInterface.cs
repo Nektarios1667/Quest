@@ -20,14 +20,14 @@ public partial class UserInterface
         Batch = batch;
         Elements = elements ?? [];
     }
-    public void Update(string? tag = null)
+    public void Update(GameManager gameManager, string? tag = null)
     {
         if (!IsEnabled || !IsVisible) return;
 
         foreach (var element in Elements.Values)
         {
             if (element.IsVisible && element.IsEnabled && (tag == null || element.Tags.Contains(tag)))
-                element.Update(this);
+                element.Update(this, gameManager);
         }
         Reload();
     }
@@ -85,7 +85,8 @@ public partial class UserInterface
         Elements.Remove(name);
         SlotElements.Remove(name);
     }
-    public Dictionary<string, UIElement> GetElements(string? tag = null) => tag == null ? Elements : Elements.Where(kv => kv.Value.Tags.Contains(tag)).ToDictionary(kv => kv.Key, kv => kv.Value);
+    public Dictionary<string, UIElement> GetAllElements(string? tag = null) => tag == null ? Elements : Elements.Where(kv => kv.Value.Tags.Contains(tag)).ToDictionary(kv => kv.Key, kv => kv.Value);
+    public UIElement GetElement(string name) => Elements[name] ?? throw new Exception($"Element '{name}' not found.");
     public Slot GetSlot(string name) => Elements[name] as Slot ?? throw new Exception($"Element '{name}' is not a Slot.");
     public Slot GetSlot(int idx) => GetSlot(SlotElements[idx]);
     public Item? AddItem(Item? item)

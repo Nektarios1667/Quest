@@ -109,9 +109,6 @@ public class Window : Game, IAdjustableWindow
         Grading.Parameters["Contrast"].SetValue(1f);
         Grading.Parameters["Tint"].SetValue(new Vector3(1, 1, 1));
 
-        // State Manager
-        StateManager.Mood = Mood.Calm;
-
         // Textures
         LoadTextures(Content);
 
@@ -126,7 +123,7 @@ public class Window : Game, IAdjustableWindow
         overlayManager = new(playerManager);
         weatherManager = new();
         gameManager = new(Content, spriteBatch, levelManager, overlayManager, weatherManager, Grading);
-        menuManager = new(this, spriteBatch, Content, gameManager, playerManager);
+        menuManager = new(this, spriteBatch, Content, this, gameManager, playerManager);
         CommandManager.Init(this, gameManager, levelManager, playerManager);
 
         Logger.System("Initialized managers.");
@@ -172,12 +169,13 @@ public class Window : Game, IAdjustableWindow
         delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
         // Managers
+        //SoundManager.Update();
         Quill.Interpreter.Update(gameManager, playerManager);
         InputManager.Update(this);
         DebugManager.Update(infoSb.ToString().Replace("\n", "\r\n"), memoryDebugSb.ToString().Split("\n"));
-        CameraManager.Update(delta);
+        CameraManager.Update(gameManager, delta);
         TimerManager.Update(gameManager);
-        SoundtrackManager.Update();
+        SoundtrackManager.Update(gameManager);
         LightingManager.Update();
 
         gameManager.Update(delta);
@@ -325,7 +323,7 @@ public class Window : Game, IAdjustableWindow
         infoSb.Append(weatherManager.WeatherIntensity);
         infoSb.AppendFormat(" [{0:0.00}]", weatherManager.WeatherValue);
         infoSb.Append("\nSave: ");
-        infoSb.Append(StateManager.CurrentSave);
+        infoSb.Append(SaveManager.CurrentSave);
         infoSb.Append("\nDraw calls: ");
         infoSb.AppendFormat("{0:0} / {1:0}", DebugManager.Stat(Stats.UnculledDrawCalls), DebugManager.Stat(Stats.DrawCalls));
 

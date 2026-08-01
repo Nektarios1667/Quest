@@ -9,12 +9,12 @@ public class Stove : Tile, IContainer
     public Stove(Point location, string levelName) : base(location, TileTypeID.Stove)
     {
         Container = new([null, null, null]);
-        StateManager.SaveContainer(this, levelName);
+        SaveManager.SaveContainer(this, levelName);
     }
-    public override void OnPlayerCollide(GameManager game, PlayerManager player)
+    public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
     {
         UserInterface.StoveUI.BindContainer(Container);
-        player.OpenInterface(UserInterface.StoveUI);
-        StateManager.OverlayState = OverlayState.Container;
+        player.OpenInterface(gameManager, UserInterface.StoveUI);
+        gameManager.StateManager.OverlayState = OverlayState.Container;
     }
 }

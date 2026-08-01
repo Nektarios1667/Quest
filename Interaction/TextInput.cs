@@ -36,13 +36,13 @@ public class TextInput : UIElement
         BorderThickness = borderThickness;
         Bounds = new Rectangle(Location, Size).Inflated(BorderThickness, BorderThickness);
 
-        StateManager.OnOverlayStateChanged += (state) =>
-        {
-            if (state == OverlayState.None)
-                State = ButtonState.Normal;
-        };
+        //gameManager.StateManager.OnOverlayStateChanged += (state) =>
+        //{
+        //    if (state == OverlayState.None)
+        //        State = ButtonState.Normal;
+        //};
     }
-    public override void Update(UserInterface ui)
+    public override void Update(UserInterface ui, GameManager gameManager)
     {
         // State
         if (InputManager.LMouseClicked)
@@ -50,12 +50,12 @@ public class TextInput : UIElement
             if (Bounds.Contains(InputManager.MousePosition))
             {
                 State = ButtonState.Pressed;
-                StateManager.OverlayState = OverlayState.Typing;
+                gameManager.StateManager.OverlayState = OverlayState.Typing;
                 Clicked?.Invoke();
             }
             else if (State != ButtonState.Normal)
             {
-                StateManager.RevertOverlayState();
+                gameManager.StateManager.RevertOverlayState();
                 State = ButtonState.Normal;
             }
         }

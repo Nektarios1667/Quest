@@ -10,7 +10,7 @@ public abstract class UIElement
     {
         Location = location;
     }
-    public abstract void Update(UserInterface ui);
+    public abstract void Update(UserInterface ui, GameManager gameManager);
     public abstract void Draw(UserInterface ui);
     public virtual void Tag(string name) => Tags.Add(name);
     public virtual void Untag(string name) => Tags.Remove(name);

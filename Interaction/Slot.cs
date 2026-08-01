@@ -19,7 +19,7 @@ public class Slot : UIElement
     {
         Bounds = new Rectangle(Location, SlotSize);
     }
-    public override void Update(UserInterface ui)
+    public override void Update(UserInterface ui, GameManager gameManager)
     {
         // Clicking
         if (Bounds.Contains(InputManager.MousePosition))

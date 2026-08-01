@@ -30,7 +30,6 @@ public class LevelManager
     public List<Level> Levels { get; private set; }
     public Level Level { get; private set; }
     public Color SkyColor { get; set; }
-    public event Action<string>? LevelLoaded;
     public static readonly Point lootStackOffset = new(4, 4);
     public static readonly Level EmptyLevel;
     static LevelManager()
@@ -54,7 +53,7 @@ public class LevelManager
     }
     public void Update(GameManager gameManager)
     {
-        if (!StateManager.IsPlayingState) return;
+        if (!gameManager.StateManager.IsPlayingState) return;
 
         // Entities
         DebugManager.StartBenchmark("LevelEntityUpdates");
@@ -102,7 +101,7 @@ public class LevelManager
     }
     public void Draw(GameManager gameManager)
     {
-        if (!StateManager.IsPlayingState) return;
+        if (!gameManager.StateManager.IsPlayingState) return;
 
         DrawTiles(gameManager);
         DrawDecals(gameManager);

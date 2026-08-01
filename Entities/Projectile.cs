@@ -30,7 +30,7 @@ public class Projectile : IEntity
     }
     public void Update(GameManager gameManager)
     {
-        if (StateManager.State != GameState.Game) return;
+        if (gameManager.StateManager.State != GameState.Game) return;
 
         // Move
         Position += new Vector2(MathF.Cos(Direction), MathF.Sin(Direction)) * Speed * GameManager.DeltaTime;

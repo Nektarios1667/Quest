@@ -9,36 +9,36 @@ public class Group : UIElement
         Elements = elements ?? [];
         UI = ui;
     }
-    public override void Update(UserInterface ui) { }
+    public override void Update(UserInterface ui, GameManager gameManager) { }
     public override void Draw(UserInterface ui) { }
     public override void Enable()
     {
         foreach (string element in Elements)
-            UI.GetElements()[element].Enable();
+            UI.GetAllElements()[element].Enable();
     }
     public override void Disable()
     {
         foreach (string element in Elements)
-            UI.GetElements()[element].Disable();
+            UI.GetAllElements()[element].Disable();
     }
     public override void ToggleEnable()
     {
         foreach (string element in Elements)
-            UI.GetElements()[element].ToggleEnable();
+            UI.GetAllElements()[element].ToggleEnable();
     }
     public override void Show()
     {
         foreach (string element in Elements)
-            UI.GetElements()[element].Show();
+            UI.GetAllElements()[element].Show();
     }
     public override void Hide()
     {
         foreach (string element in Elements)
-            UI.GetElements()[element].Hide();
+            UI.GetAllElements()[element].Hide();
     }
     public override void ToggleShow()
     {
         foreach (string element in Elements)
-            UI.GetElements()[element].ToggleShow();
+            UI.GetAllElements()[element].ToggleShow();
     }
 }

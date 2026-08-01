@@ -30,25 +30,24 @@ public static class SettingsManager
     public static float SoundVolume { get; set; } = 1f;
     // GUI / Widgets
     private static GUI settingsMenu = null!;
-    private static readonly GUI bindsMenu = null!;
     private static HorizontalSlider musicSlider = null!;
     private static HorizontalSlider soundSlider = null!;
     private static HorizontalSlider fpsSlider = null!;
     private static Checkbox vsyncCheckbox = null!;
     private static Checkbox fullscreenCheckbox = null!;
     private static Dropdown resolutionDropdown = null!;
-    public static GUI CreateSettingsMenu(IAdjustableWindow window, Game game, SpriteBatch batch, ContentManager content)
+    public static GUI CreateSettingsMenu(IAdjustableWindow window, Game game, GameManager gameManager, SpriteBatch batch, ContentManager content)
     {
         settingsMenu = new(game, batch, PixelOperator);
         settingsMenu.LoadContent();
         Label settingsLabel = new(settingsMenu, new(Constants.Middle.X - 130, 50), Color.White, "Settings", PixelOperatorTitle);
-        Button settingsBackButton = new(settingsMenu, new(20, 20), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, StateManager.RevertGameState, [], text: "Back", font: PixelOperator, border: 0);
+        Button settingsBackButton = new(settingsMenu, new(20, 20), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, gameManager.StateManager.RevertGameState, [], text: "Back", font: PixelOperator, border: 0);
 
         // Save button in top right
         Button saveButton = new(settingsMenu, new(Constants.NativeResolution.X - 120, 20), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, () =>
         {
             WriteSettings();
-            StateManager.RevertGameState();
+            gameManager.StateManager.RevertGameState();
         }, [], text: "Save", font: PixelOperator, border: 0);
         Button revertButton = new(settingsMenu, new(Constants.NativeResolution.X - 240, 20), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, () => LoadSettings(window), [], text: "Revert", font: PixelOperator, border: 0);
 
@@ -155,12 +154,12 @@ public static class SettingsManager
             settings[$"Bind_{kv.Key}"] = kv.Value.ToString();
 
         // Write to settings.qkv in GameData/Persistent
-        StateManager.WriteKeyValueFile("Persistent/settings", settings);
+        SaveManager.WriteKeyValueFile("Persistent/settings", settings);
     }
     public static void LoadSettings(IAdjustableWindow window)
     {
         // Read from settings.qkv in GameData/Persistent
-        var settings = StateManager.ReadKeyValueFile("Persistent/settings");
+        var settings = SaveManager.ReadKeyValueFile("Persistent/settings");
         if (settings.TryGetValue("ScreenResolution", out string? res))
         {
             var parts = res.Split('x');

@@ -87,7 +87,7 @@ public class WeatherManager
     // Updates
     public void Update(GameManager gameManager)
     {
-        if (StateManager.State == GameState.Game)
+        if (gameManager.StateManager.State == GameState.Game)
 
             WeatherIntensity = GetWeatherIntensity(GameManager.GameTime);
         WeatherValue = GetWeatherValue(GameManager.GameTime);
@@ -99,7 +99,7 @@ public class WeatherManager
     {
         // Weather sounds
         DebugManager.StartBenchmark("WeatherSounds");
-        if (StateManager.State == GameState.Game && WeatherIntensity > 0)
+        if (gameManager.StateManager.State == GameState.Game && WeatherIntensity > 0)
         {
             // Biome weather ambience
             BiomeType currentBiome = gameManager.LevelManager.GetBiome(CameraManager.TileCoord)!.Value;

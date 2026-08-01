@@ -30,9 +30,9 @@ public static class CameraManager
     public static event Action<Vector2, Vector2>? CameraMove;
     public static event Action<Vector2, Vector2>? CameraDestMove;
     public static event Action<Point, Point>? TileChange;
-    public static void Update(float deltaTime)
+    public static void Update(GameManager gameManager, float deltaTime)
     {
-        if (StateManager.OverlayState == OverlayState.Pause) return;
+        if (gameManager.StateManager.OverlayState == OverlayState.Pause) return;
 
         DebugManager.StartBenchmark("CameraUpdate");
 

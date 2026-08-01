@@ -33,7 +33,7 @@ public class Button : UIElement
         Bounds = new Rectangle(Location, Size).Inflated(BorderThickness, BorderThickness);
         textPosition = Location + Size.Scaled(0.5f) - Font.MeasureString(Text).ToPoint().Scaled(0.5f);
     }
-    public override void Update(UserInterface ui)
+    public override void Update(UserInterface ui, GameManager gameManager)
     {
         if (Bounds.Contains(InputManager.MousePosition))
         {

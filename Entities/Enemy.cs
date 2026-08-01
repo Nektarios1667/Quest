@@ -65,7 +65,7 @@ public class Enemy : IEntity
     }
     public virtual void Update(GameManager gameManager)
     {
-        if (StateManager.State != GameState.Game) return;
+        if (gameManager.StateManager.State != GameState.Game) return;
 
         // Check death
         if (!IsAlive)
