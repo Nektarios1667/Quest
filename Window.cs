@@ -29,6 +29,7 @@ public class Window : Game, IAdjustableWindow
     public Texture2D CursorArrow { get; private set; } = null!;
     // Shaders
     public Effect Grading = null!;
+    public Effect Pixelize = null!;
 
     // Movements
     public int moveX;
@@ -108,6 +109,10 @@ public class Window : Game, IAdjustableWindow
         Grading.Parameters["Saturation"].SetValue(1f);
         Grading.Parameters["Contrast"].SetValue(1f);
         Grading.Parameters["Tint"].SetValue(new Vector3(1, 1, 1));
+
+        Pixelize = Content.Load<Effect>("Shaders/Pixelize");
+        Pixelize.Parameters["PixelSize"].SetValue(4);
+        Pixelize.Parameters["TexSize"].SetValue(new Vector2(GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight));
 
         // Textures
         LoadTextures(Content);
@@ -213,7 +218,7 @@ public class Window : Game, IAdjustableWindow
         DrawTextInfo();
 
         // Program info
-        DrawProgramInfo(memoryDebugSb, spriteBatch);
+        DrawMemoryInfo(memoryDebugSb, spriteBatch);
 
         // Frame info
         DrawFrameInfo();
@@ -258,7 +263,7 @@ public class Window : Game, IAdjustableWindow
         FillRectangle(spriteBatch, new(Constants.NativeResolution.X - 200, 0, 200, (int)boxHeight), Color.Black * 0.8f);
         spriteBatch.DrawString(Arial, frameTimesSb.ToString(), new Vector2(Constants.NativeResolution.X - 190, 0), Color.White);
     }
-    public static void DrawProgramInfo(StringBuilder memoryDebugSb, SpriteBatch spriteBatch)
+    public static void DrawMemoryInfo(StringBuilder memoryDebugSb, SpriteBatch spriteBatch)
     {
         if (TimerManager.IsCompleteOrMissing("UpdateProgramInfo"))
         {
@@ -296,9 +301,9 @@ public class Window : Game, IAdjustableWindow
 
         infoSb.Clear();
         infoSb.Append("FPS: ");
-        infoSb.AppendFormat("{0:0.0}", cacheDelta != 0 ? 1f / cacheDelta : 0);
+        infoSb.AppendFormat("{0:0.0} (1% {1:0.0})", DebugManager.AverageDelta != 0 ? 1f / DebugManager.AverageDelta : 0, DebugManager.OnePercentLow != 0 ? 1f / DebugManager.OnePercentLow : 0);
         infoSb.Append("\nFrame time: ");
-        infoSb.AppendFormat("{0:0.0} ms", cacheDelta * 1000);
+        infoSb.AppendFormat("{0:0.0} ms (1% {1:0.0} ms)", DebugManager.AverageDelta * 1000, DebugManager.OnePercentLow * 1000);
         infoSb.Append("\nGameTime: ");
         infoSb.AppendFormat("{0:0.00}", GameManager.GameTime);
         infoSb.Append("\nDayTime: ");

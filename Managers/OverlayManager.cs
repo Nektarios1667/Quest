@@ -136,7 +136,7 @@ public class OverlayManager
         }
 
         // Guis
-        if (gameManager.StateManager.OverlayState == OverlayState.Container || gameManager.StateManager.OverlayState == OverlayState.Pause || gameManager.StateManager.OverlayState == OverlayState.Typing)
+        if (gameManager.StateManager.OverlayState == OverlayState.Container || gameManager.StateManager.OverlayState == OverlayState.Pause || gameManager.StateManager.OverlayState == OverlayState.GUI)
             gameManager.Batch.FillRectangle(Constants.WindowRect, Color.Black * 0.6f);
 
         // Fading - for general purpose

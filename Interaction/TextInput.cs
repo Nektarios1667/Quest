@@ -50,7 +50,7 @@ public class TextInput : UIElement
             if (Bounds.Contains(InputManager.MousePosition))
             {
                 State = ButtonState.Pressed;
-                gameManager.StateManager.OverlayState = OverlayState.Typing;
+                gameManager.StateManager.OverlayState = OverlayState.GUI;
                 Clicked?.Invoke();
             }
             else if (State != ButtonState.Normal)

@@ -39,17 +39,17 @@ public class EditorOverlayManager
     public static void DrawTileOverlay(SpriteBatch spriteBatch, TileTypeID selection, Tile? mouseTile)
     {
         if (mouseTile is Stairs stair)
-            DrawBottomInfo(spriteBatch, $"{selection} | [Stairs] dest: '{stair.DestLevel.LevelName}' @ {stair.Dest}");
+            DrawBottomInfo(spriteBatch, $"{selection} @ {mouseTile.Location} | [Stairs] dest: '{stair.DestLevel.LevelName}' @ {stair.Dest}");
         else if (mouseTile is Door door)
-            DrawBottomInfo(spriteBatch, $"{selection} | [Door] key: {(door.Key == null ? "NUL" : $"'{door.Key.Name}' x{door.Key.Amount}")} consume: {door.ConsumeKey}");
+            DrawBottomInfo(spriteBatch, $"{selection} @ {mouseTile.Location} | [Door] key: {(door.Key == null ? "NUL" : $"'{door.Key.Name}' x{door.Key.Amount}")} consume: {door.ConsumeKey}");
         else if (mouseTile is Chest chest)
-            DrawBottomInfo(spriteBatch, $"{selection} | [Chest] gen: '{chest.LootGenerator.FileName}' key: {(chest.Key == null ? "NUL" : $"'{chest.Key.Name}' x{chest.Key.Amount}")} consume: {chest.ConsumeKey}");
+            DrawBottomInfo(spriteBatch, $"{selection} @ {mouseTile.Location} | [Chest] gen: '{chest.LootGenerator.FileName}' key: {(chest.Key == null ? "NUL" : $"'{chest.Key.Name}' x{chest.Key.Amount}")} consume: {chest.ConsumeKey}");
         else if (mouseTile is Lamp lamp)
-            DrawBottomInfo(spriteBatch, $"{selection} | [Lamp] radius: {lamp.LightRadius}");
+            DrawBottomInfo(spriteBatch, $"{selection} @ {mouseTile.Location} | [Lamp] radius: {lamp.LightRadius}");
         else if (mouseTile is DisplayCase displayCase)
-            DrawBottomInfo(spriteBatch, $"{selection} | [Display Case] item: {displayCase.Container.Items[0]?.Name} x{displayCase.Container.Items[0]?.Amount}");
+            DrawBottomInfo(spriteBatch, $"{selection} @ {mouseTile.Location} | [Display Case] item: {displayCase.Container.Items[0]?.Name} x{displayCase.Container.Items[0]?.Amount}");
         else
-            DrawBottomInfo(spriteBatch, $"{selection} | [{mouseTile?.Type.Texture}]");
+            DrawBottomInfo(spriteBatch, $"{selection} @ {mouseTile?.Location} | [{mouseTile?.Type.Texture}]");
     }
     public static void DrawDecalOverlay(SpriteBatch spriteBatch, DecalType selection, DecalType? mouseDecal) => DrawBottomInfo(spriteBatch, $"{selection} | [{mouseDecal}]");
     public static void DrawBiomeOverlay(SpriteBatch spriteBatch, BiomeType selection, BiomeType? mouseBiome) => DrawBottomInfo(spriteBatch, $"{selection} | [{mouseBiome}]");

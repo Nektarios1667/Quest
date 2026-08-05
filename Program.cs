@@ -15,7 +15,7 @@ using Quest.Editor;
 using Quest.Editor.Generator;
 using System.Linq;
 
-
+// Get-ChildItem -Recurse -Filter *.cs -Exclude "FastNoiseLite.cs" | Get-Content | Measure-Object -Line
 /*
      __    __                   _____               
      |  \/  |                  / ____|              

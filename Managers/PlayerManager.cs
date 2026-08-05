@@ -86,7 +86,7 @@ public class PlayerManager : IEntity
         CheckProjectiles(gameManager);
 
         // Toggle inventory
-        if (InputManager.BindPressed(InputAction.ToggleInventory) && gameManager.StateManager.OverlayState != OverlayState.Typing)
+        if (InputManager.BindPressed(InputAction.ToggleInventory) && gameManager.StateManager.OverlayState != OverlayState.GUI)
         {
             if (InventoryOpen)
             {
@@ -102,7 +102,7 @@ public class PlayerManager : IEntity
         }
 
         // Toggle info
-        if (InputManager.BindPressed(InputAction.ToggleWorldInfo) && gameManager.StateManager.OverlayState != OverlayState.Typing)
+        if (InputManager.BindPressed(InputAction.ToggleWorldInfo) && gameManager.StateManager.OverlayState != OverlayState.GUI)
             gameManager.OverlayManager.ToggleWorldInfobox(gameManager.LevelManager.Level.Metadata);
 
 

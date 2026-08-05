@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
+using Migs.MPath.Core.Data;
 using Quest.World;
 using SharpDX.MediaFoundation.DirectX;
 
@@ -110,7 +111,9 @@ public static class SoundtrackManager
             if (TimerManager.IsCompleteOrMissing("LocationalMusicPathfind"))
             {
                 // --- A* Sound Pathfinding ---
-                //// Update pathfinding grid
+                // Something is making it choose an inefficient path. Moving one tile over makes it go through two walls for a cost of 15,
+                // instead of just going around the one wall for a cost of like 11.
+                // Update pathfinding grid
                 //PathfindingManager.SetGrid(gameManager.LevelManager.Level,
                 //    CameraManager.TopLeftTileCoord - Constants.TileDrawPadding,
                 //    Constants.NativeResolutionTiles + Constants.TileDrawPadding.Scaled(2)
@@ -119,10 +122,11 @@ public static class SoundtrackManager
                 //// Pathfind to the music source
                 //Point source = CameraManager.TileToRelativeTile(CameraManager.TileCoord, true);
                 //Point dest = CameraManager.TileToRelativeTile(musicSource.Value.source / Constants.TileSize, true);
-                //int pathLength = PathfindingManager.GetPath(source, dest)?.Length ?? int.MaxValue;
+                //var (path, cost) = PathfindingManager.GetPath(source, dest, false) ?? (new Coordinate[0], float.MaxValue);
 
                 //// Adjust
-                //MediaPlayer.Volume = Math.Clamp(1 - pathLength / ((float)musicSource.Value.radius / Constants.TileSize.X), 0, 1);
+                //Console.WriteLine($"{path.Length}, {cost}");
+                //MediaPlayer.Volume = Math.Clamp(1 - cost / musicSource.Value.radius, 0, 1);
 
                 // --- Simple Distance Check ---
                 Vector2 vec = (CameraManager.PlayerCenter - musicSource.Value.source).ToVector2() / Constants.TileSize.ToVector2();

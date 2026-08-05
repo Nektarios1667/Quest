@@ -15,6 +15,9 @@ public static class DebugManager
     // Stats
     public static readonly Dictionary<Stats, int> Stats = [];
     // Debugging
+    public static float[] DeltaHistory = new float[100];
+    public static float AverageDelta => DeltaHistory.Average();
+    public static float OnePercentLow => DeltaHistory.OrderBy(x => x).ElementAt((int)(DeltaHistory.Length * 0.99f));
     public static Stopwatch Watch { get; private set; } = new();
     public static Dictionary<string, float> FrameTimes { get; private set; } = [];
     private static readonly Dictionary<string, float> benchmarkTimes = [];

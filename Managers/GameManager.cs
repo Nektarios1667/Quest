@@ -7,6 +7,7 @@ namespace Quest.Managers;
 public class GameManager
 {
     // Static times
+    public static ulong FrameCount { get; private set; } = 0;
     public static float DeltaTime { get; private set; } = 0f;
     public static float GameTime { get; set; } = 0f;
     public static float TotalTime { get; private set; } = 0f;
@@ -34,6 +35,7 @@ public class GameManager
     }
     public void Update(float deltaTime)
     {
+        FrameCount++;
         TotalTime += deltaTime;
 
         // Escape button
@@ -60,6 +62,7 @@ public class GameManager
         }
         else
             DeltaTime = 0f;
+        DebugManager.DeltaHistory[FrameCount % (ulong)DebugManager.DeltaHistory.Length] = deltaTime;
     }
     private bool respawning = false;
     public async Task Respawn(PlayerManager playerManager)

@@ -76,6 +76,7 @@ These controls are the default keybinds and can be changed in the settings menu 
 - **Tools**  
 `Left Mouse Button` to draw the selected tile, biome, or decal at the mouse position.
 `Middle Mouse Button` to pick the tile, biome, or decal at the mouse position.
+`Left Shift + Left Mouse Button` to delete the decal at the current mouse position.
 - **Shortcuts**  
     - `1`, `2`, `3` to switch between tile, biome, and decal tools.  
     - `[` and `]` or `Mouse Wheel` to change the selected tile, biome, or decal.  

@@ -34,6 +34,18 @@ public class StatusManager
             _notifications[effect] = newNotif;
         }
     }
+    public void ClearStatusEffect(StatusEffect effect)
+    {
+        _statusEffects.Remove(effect);
+        if (_notifications.TryGetValue(effect, out var notif))
+            notif.Duration = 0;
+    }
+    public void ClearAllStatusEffects()
+    {
+        _statusEffects.Clear();
+        foreach (var notif in _notifications.Values)
+            notif.Duration = 0;
+    }
     public bool HasStatusEffect(StatusEffect effect)
     {
         return _statusEffects.ContainsKey(effect);

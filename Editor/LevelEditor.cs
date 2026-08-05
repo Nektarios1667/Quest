@@ -25,6 +25,8 @@ public class LevelEditor : Game, IAdjustableWindow
     private GUI SettingsMenu = null!;
     private Group tilesetGroup = null!;
     private RectangleShape tilesetHighlight = null!;
+    private RectangleShape toolHighlight = null!;
+    private bool buttonClicked = false;
 
     // Editing
     private int TileSelectionIdx = 0;
@@ -179,7 +181,8 @@ public class LevelEditor : Game, IAdjustableWindow
         Button tileDrawSelect = new(gui, new(Constants.Middle.X - 100, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Tile, [], "Tiles", border: 0);
         Button decalDrawSelect = new(gui, new(Constants.Middle.X, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.5f, () => currentTool = EditorTool.Decal, [], "Decals", border: 0);
         Button biomeDrawSelect = new(gui, new(Constants.Middle.X + 100, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Biome, [], "Biomes", border: 0);
-        gui.AddWidgets(tileDrawSelect, decalDrawSelect, biomeDrawSelect);
+        toolHighlight = new(gui, new(Constants.Middle.X - 100, 10), new(90, 30), Color.Transparent, Color.White, 2);
+        gui.AddWidgets(tileDrawSelect, decalDrawSelect, biomeDrawSelect, toolHighlight);
 
         // Palette selection
         tilesetGroup = new(gui);
@@ -347,7 +350,7 @@ public class LevelEditor : Game, IAdjustableWindow
         editorOverlayManager.DrawTextInfo();
 
         // Program info
-        Quest.Window.DrawProgramInfo(memoryDebugSb, spriteBatch);
+        Quest.Window.DrawMemoryInfo(memoryDebugSb, spriteBatch);
 
         // Frame info
         editorOverlayManager.DrawFrameInfo();
@@ -385,6 +388,7 @@ public class LevelEditor : Game, IAdjustableWindow
             // Main gui
             tilesetGroup.Visible = currentTool == EditorTool.Tile;
             tilesetHighlight.Location = new Point(10, (int)TilesetSelection * 35 + 10);
+            toolHighlight.Location = new Point(Constants.Middle.X - 100 + (int)currentTool * 100, 10);
 
             gui.Draw();
         }
@@ -409,7 +413,12 @@ public class LevelEditor : Game, IAdjustableWindow
         }
         else if (currentTool == EditorTool.Decal)
         {
-            TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), DecalSelection.ToString());
+            TextureID texture;
+            if (InputManager.BindDown(InputAction.DeleteDecalMode))
+                texture = TextureID.RedX;
+            else
+                texture = (TextureID)Enum.Parse(typeof(TextureID), DecalSelection.ToString());
+
             DrawTexture(spriteBatch, texture, mouseCoordDraw, source: new(Point.Zero, Constants.TilePixelSize), scale: Constants.TileSizeScale, color: Constants.SemiTransparent);
         }
         else if (currentTool == EditorTool.Biome)
@@ -432,16 +441,25 @@ public class LevelEditor : Game, IAdjustableWindow
             editorManager.SetTile(tile);
         }
         // Add decal
-        else if (currentTool == EditorTool.Decal && InputManager.LMouseClicked)
+        else if (currentTool == EditorTool.Decal)
         {
-            // Check existing decal
             Decal? current = levelManager.Level.Decals.TryGetValue(mouseCoord.ToByteCoord(), out var dec) ? dec : null;
-            bool alreadyThere = current != null && current.Type == DecalSelection;
-            if (current != null && current.Type != DecalSelection) levelManager.Level.Decals.Remove(mouseCoord.ToByteCoord()); // Remove current one
+            // Delete mode
+            if (InputManager.BindDown(InputAction.DeleteDecalMode))
+            {
+                levelManager.Level.Decals.Remove(mouseCoord.ToByteCoord());
+            }
+            // Add mode
+            else
+            {
+                // Check existing decal
+                bool alreadyThere = current != null && current.Type == DecalSelection;
+                if (current != null && current.Type != DecalSelection) levelManager.Level.Decals.Remove(mouseCoord.ToByteCoord()); // Remove current one
 
-            // Add
-            if (!alreadyThere && levelManager.Level.Decals.Count < ushort.MaxValue)
-                levelManager.Level.Decals[mouseCoord.ToByteCoord()] = LevelManager.DecalFromId(DecalSelection, mouseCoord);
+                // Add
+                if (!alreadyThere && levelManager.Level.Decals.Count < ushort.MaxValue)
+                    levelManager.Level.Decals[mouseCoord.ToByteCoord()] = LevelManager.DecalFromId(DecalSelection, mouseCoord);
+            }
         }
         // Set biome
         else if (currentTool == EditorTool.Biome)

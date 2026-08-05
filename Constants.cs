@@ -93,7 +93,7 @@ public static class Constants
         Color.Blue, // Water
         Color.DarkGray, // StoneWall
         new(117, 66, 13), // Stairs
-        new(155, 155, 235), // Flooring
+        new(158, 186, 197), // Flooring
         Color.Yellow, // Sand
         new(48, 25, 0), // Dirt
         new(18, 18, 18), // Darkness
@@ -115,7 +115,7 @@ public static class Constants
         Color.Blue, // BlueTiles
         Color.Purple, // PurpleTiles
         Color.Pink, // PinkTiles
-        Color.DarkGray, // BlackTiles
+        Color.Black, // BlackTiles
         Color.SaddleBrown, // BrownTiles
         new(168, 159, 151), // IronWall
         Color.White, // Snow
@@ -140,9 +140,9 @@ public static class Constants
         new(92, 53, 23), // WoodWindow
         new(107, 169, 197), // IceWall
         new(24, 15, 0), // MudWall
-        Color.Gray, // SnowWall
+        new(220, 220, 220), // SnowWall
         new(24, 15, 0), // MudWindow
-        Color.Gray, // SnowWindow
+        new(220, 220, 220), // SnowWindow
         new(107, 169, 197), // IceWindow
         Color.Beige, // DryWall
         Color.Beige, // DryWallWindow

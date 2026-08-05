@@ -53,8 +53,8 @@ public static class PathfindingManager
         Grid[x, y].Coordinate = new(x, y);
         Grid[x, y].Weight = tile.Weight;
     }
-    public static Coordinate[]? GetPath(Point from, Point to) => GetPath(from.X, from.Y, to.X, to.Y);
-    public static Coordinate[]? GetPath(int fromX, int fromY, int toX, int toY)
+    public static (Coordinate[] Path, float Cost)? GetPath(Point from, Point to, bool walkabilityChecks = true) => GetPath(from.X, from.Y, to.X, to.Y, walkabilityChecks);
+    public static (Coordinate[] Path, float Cost)? GetPath(int fromX, int fromY, int toX, int toY, bool walkabilityChecks = true)
     {
         if (fromX < 0 || fromY < 0 || fromX >= Grid.GetLength(0) || fromY >= Grid.GetLength(1) ||
             toX < 0 || toY < 0 || toX >= Grid.GetLength(0) || toY >= Grid.GetLength(1))
@@ -64,8 +64,18 @@ public static class PathfindingManager
 
         }
 
+        // Check walkability
+        if (!walkabilityChecks)
+        {
+            // Iterate through each tile and set it to walkable
+            for (int y = 0; y < Grid.GetLength(1); y++)
+                for (int x = 0; x < Grid.GetLength(0); x++)
+                    Grid[x, y].IsWalkable = true;
+        }
+
+        // Run
         var result = Pathfinder.GetPath(PathAgent, new(fromX, fromY), new(toX, toY));
         if (result.Path == null || !result.IsSuccess) return null;
-        return result.Path.ToArray();
+        return (result.Path.ToArray(), result.Path.Sum(n => Grid[n.X, n.Y].Weight));
     }
 }

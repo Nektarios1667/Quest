@@ -33,7 +33,7 @@ public enum OverlayState
     None,
     Container,
     Pause,
-    Typing,
+    GUI,
     Finished,
     Death,
 }

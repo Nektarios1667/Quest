@@ -96,7 +96,7 @@ public class Enemy : IEntity
 
                 var path = PathfindingManager.GetPath(from, to);
 
-                Path = path != null ? [.. path.Select(p => CameraManager.TileRelativeToTile(p.ToPoint(), true))] : null;
+                Path = path != null ? [.. path.Value.Path.Select(p => CameraManager.TileRelativeToTile(p.ToPoint(), true))] : null;
                 TimerManager.SetTimer($"EnemyPathfind_{UID}", 0.5f, null);
             }
             // Move along path
