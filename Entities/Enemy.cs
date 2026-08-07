@@ -12,10 +12,10 @@ public class Enemy : IEntity
     public ushort Damage { get; set; }
     public float AttackSpeed { get; set; } // Attacks per second
     public ushort Defense { get; set; } // If damage <= Defense, damage /= 2
-    public ushort Speed { get; set; } // Pixels per second
-    public ushort ProjectileSpeed { get; set; } // Pixels per second
-    public ushort ViewRange { get; set; } // Pixels
-    public ushort AttackRange { get; set; } // Pixels
+    public float Speed { get; set; } // Tiles per second
+    public float ProjectileSpeed { get; set; } // Tiles per second
+    public float ViewRange { get; set; } // Tiles
+    public float AttackRange { get; set; } // Tiles
     public TextureID Texture { get; set; }
     public TextureID ProjectileTexture { get; set; }
     public Vector2 Position { get; set; }
@@ -32,10 +32,10 @@ public class Enemy : IEntity
         ushort damage,
         float attackSpeed,
         ushort defense,
-        ushort speed,
-        ushort projectileSpeed,
-        ushort viewRange,
-        ushort attackRange,
+        float speed,
+        float projectileSpeed,
+        float viewRange,
+        float attackRange,
         TextureID texture,
         TextureID projectileTexture,
         ushort? uid = null)
@@ -75,7 +75,10 @@ public class Enemy : IEntity
         float playerDistSq = Vector2.DistanceSquared(FootPosition, CameraManager.CameraDest);
 
         // Attack
-        if (playerDistSq < AttackRange * AttackRange)
+        float pixelRangeSq = AttackRange * AttackRange * Constants.TileSize.X * Constants.TileSize.X;
+        float pixelViewRangeSq = ViewRange * ViewRange * Constants.TileSize.X * Constants.TileSize.X;
+
+        if (playerDistSq < pixelRangeSq)
         {
             if (TimerManager.IsCompleteOrMissing($"EnemyAttack_{UID}"))
             {
@@ -86,7 +89,7 @@ public class Enemy : IEntity
             }
         }
         // Move
-        else if (playerDistSq < ViewRange * ViewRange && playerDistSq != 0)
+        else if (playerDistSq < pixelViewRangeSq && playerDistSq != 0)
         {
             // Update pathfinding
             if (TimerManager.IsCompleteOrMissing($"EnemyPathfind_{UID}"))
@@ -109,7 +112,7 @@ public class Enemy : IEntity
                     Path.RemoveAt(0);
                 }
                 else
-                    Position += Vector2.Normalize(move) * Speed * GameManager.DeltaTime;
+                    Position += Vector2.Normalize(move) * Speed * Constants.TileSize.ToVector2() * GameManager.DeltaTime;
             }
         }
 

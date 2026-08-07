@@ -18,6 +18,6 @@ public class StatusBar : Widget
     public override void Draw(SpriteBatch batch)
     {
         FillRectangle(batch, new(Position, Size), Background); // Background
-        FillRectangle(batch, new(Position.X, Position.Y, Size.X * CurrentValue / MaxValue, Size.Y), Foreground); // Foreground
+        FillRectangle(batch, new(Position.X, Position.Y, (int)(Size.X * (float)CurrentValue / MaxValue), Size.Y), Foreground); // Foreground
     }
 }

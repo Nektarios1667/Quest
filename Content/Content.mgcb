@@ -1612,6 +1612,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/DiamondAxe.png
 
+#begin Images/Items/DiamondAxe.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/DiamondAxe.png
+
 #begin Images/Items/DiamondKey.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1659,6 +1671,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Items/DiamondMedal.png
+
+#begin Images/Items/DiamondSpear.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/DiamondSpear.png
 
 #begin Images/Items/DiamondSpear.png
 /importer:TextureImporter
@@ -2044,6 +2068,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/IronAxe.png
 
+#begin Images/Items/IronAxe.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/IronAxe.png
+
 #begin Images/Items/IronKey.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -2104,6 +2140,42 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/IronSpear.png
 
+#begin Images/Items/IronSpear.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/IronSpear.png
+
+#begin Images/Items/IronSword.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/IronSword.png
+
+#begin Images/Items/IronSword.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/IronSword.png
+
 #begin Images/Items/Lantern.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -2199,6 +2271,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Items/MagicKey.png
+
+#begin Images/Items/NinjaStar.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/NinjaStar.png
 
 #begin Images/Items/NinjaStar.png
 /importer:TextureImporter
@@ -2692,30 +2776,6 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/SpeedPotion.png
 
-#begin Images/Items/IronSword.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Items/IronSword.png
-
-#begin Images/Items/IronSword.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Items/IronSword.png
-
 #begin Images/Items/StrengthPotion.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -2920,6 +2980,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Projectiles/Arrow.png
 
+#begin Images/Projectiles/Arrow.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Projectiles/Arrow.png
+
 #begin Images/Projectiles/DeleriumSpell.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -2931,6 +3003,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Projectiles/DeleriumSpell.png
+
+#begin Images/Projectiles/DeleriumSpell.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Projectiles/DeleriumSpell.png
+
+#begin Images/Projectiles/Fireball.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Projectiles/Fireball.png
 
 #begin Images/Projectiles/Fireball.png
 /importer:TextureImporter
@@ -2956,6 +3052,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Projectiles/HealingSpell.png
 
+#begin Images/Projectiles/HealingSpell.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Projectiles/HealingSpell.png
+
 #begin Images/Projectiles/LifestealSpell.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -2967,6 +3075,42 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Projectiles/LifestealSpell.png
+
+#begin Images/Projectiles/LifestealSpell.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Projectiles/LifestealSpell.png
+
+#begin Images/Projectiles/NinjaStar.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Projectiles/NinjaStar.png
+
+#begin Images/Projectiles/PoisonSpell.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Projectiles/PoisonSpell.png
 
 #begin Images/Projectiles/PoisonSpell.png
 /importer:TextureImporter
@@ -2992,6 +3136,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Projectiles/SlownessSpell.png
 
+#begin Images/Projectiles/SlownessSpell.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Projectiles/SlownessSpell.png
+
 #begin Images/Projectiles/VulnerabilitySpell.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -3003,6 +3159,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Projectiles/VulnerabilitySpell.png
+
+#begin Images/Projectiles/VulnerabilitySpell.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Projectiles/VulnerabilitySpell.png
+
+#begin Images/Projectiles/WeaknessSpell.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Projectiles/WeaknessSpell.png
 
 #begin Images/Projectiles/WeaknessSpell.png
 /importer:TextureImporter

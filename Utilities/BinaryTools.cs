@@ -73,10 +73,10 @@ public static class BinaryWriterExtensions
         writer.Write(enemy.Damage); // ushort
         writer.Write(enemy.AttackSpeed); // float
         writer.Write(enemy.Defense); // ushort
-        writer.Write(enemy.Speed); // ushort
-        writer.Write(enemy.ProjectileSpeed); // ushort
-        writer.Write(enemy.ViewRange); // ushort
-        writer.Write(enemy.AttackRange); // ushort
+        writer.Write(enemy.Speed); // float
+        writer.Write(enemy.ProjectileSpeed); // float
+        writer.Write(enemy.ViewRange); // float
+        writer.Write(enemy.AttackRange); // float
         writer.Write((ushort)enemy.Texture);
         writer.Write((ushort)enemy.ProjectileTexture);
         writer.Write((ushort)Math.Round(enemy.Position.X));
@@ -134,10 +134,10 @@ public static class BinaryReaderExtensions
         ushort damage = reader.ReadUInt16();
         float attackSpeed = reader.ReadSingle();
         ushort defense = reader.ReadUInt16();
-        ushort speed = reader.ReadUInt16();
-        ushort projectileSpeed = reader.ReadUInt16();
-        ushort viewRange = reader.ReadUInt16();
-        ushort attackRange = reader.ReadUInt16();
+        float speed = reader.ReadSingle();
+        float projectileSpeed = reader.ReadSingle();
+        float viewRange = reader.ReadSingle();
+        float attackRange = reader.ReadSingle();
 
         ushort texID = reader.ReadUInt16();
         if (!Enum.IsDefined(typeof(TextureID), texID))

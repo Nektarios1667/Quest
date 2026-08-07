@@ -384,10 +384,10 @@ public class EditorManager
             new("Damage", IsUInt16),
             new("Attack Speed", IsPositiveFloat),
             new("Defense", IsUInt16),
-            new("Speed", IsUInt16),
-            new("Projectile Speed", IsUInt16),
-            new("View Range", IsUInt16),
-            new("Attack Range", IsUInt16),
+            new("Speed (tiles/s)", IsUInt16),
+            new("Projectile Speed (tiles/s)", IsUInt16),
+            new("View Range (tiles)", IsUInt16),
+            new("Attack Range (tiles)", IsUInt16),
             new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())]),
             new("Projectile Texture", null, [.. ProjectileTextures.Select(t => t.ToString())])
         ]);

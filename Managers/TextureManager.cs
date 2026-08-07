@@ -247,6 +247,7 @@ public static class TextureManager
         VulnerabilitySpell,
         WeaknessSpell,
         LifestealSpell,
+        NinjaStarProjectile,
         // PROJECTILES ENUM INSERT
         Glow,
         Slash,
@@ -511,6 +512,7 @@ public static class TextureManager
         Textures[TextureID.VulnerabilitySpell] = content.Load<Texture2D>("Images/Projectiles/VulnerabilitySpell");
         Textures[TextureID.WeaknessSpell] = content.Load<Texture2D>("Images/Projectiles/WeaknessSpell");
         Textures[TextureID.LifestealSpell] = content.Load<Texture2D>("Images/Projectiles/LifestealSpell");
+        Textures[TextureID.NinjaStarProjectile] = content.Load<Texture2D>("Images/Projectiles/NinjaStar");
         // PROJECTILES INSERT
         Textures[TextureID.Glow] = content.Load<Texture2D>("Images/Effects/Glow");
         Textures[TextureID.Slash] = content.Load<Texture2D>("Images/Effects/Slash");
@@ -760,6 +762,7 @@ public static class TextureManager
         Metadata[TextureID.VulnerabilitySpell] = new(Textures[TextureID.VulnerabilitySpell].Bounds.Size, new(4, 1), "projectile");
         Metadata[TextureID.WeaknessSpell] = new(Textures[TextureID.WeaknessSpell].Bounds.Size, new(4, 1), "projectile");
         Metadata[TextureID.LifestealSpell] = new(Textures[TextureID.LifestealSpell].Bounds.Size, new(4, 1), "projectile");
+        Metadata[TextureID.NinjaStarProjectile] = new(Textures[TextureID.NinjaStarProjectile].Bounds.Size, new(1, 1), "projectile");
         // PROJECTILES METADATA INSERT
         Metadata[TextureID.Glow] = new(Textures[TextureID.Glow].Bounds.Size, new(1, 1), "effect");
         Metadata[TextureID.Slash] = new(Textures[TextureID.Slash].Bounds.Size, new(1, 1), "effect");
