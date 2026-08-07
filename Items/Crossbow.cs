@@ -3,7 +3,7 @@ namespace Quest.Items;
 
 public class Crossbow : RangedWeapon
 {
-    public Crossbow(byte amount, string? customName = null) : base(ItemTypes.Crossbow, amount, 1.8f, 800, 25, TextureID.ArrowProjectile, customName)
+    public Crossbow(byte amount, string? customName = null) : base(ItemTypes.Crossbow, amount, 1.8f, 13f, 25, TextureID.ArrowProjectile, customName)
     {
         Ammo = new(ItemTypes.Arrow, 1);
     }

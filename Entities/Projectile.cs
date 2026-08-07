@@ -12,9 +12,9 @@ public class Projectile : IEntity
     public ushort UID { get; }
     public TextureID Texture { get; private set; }
     public ushort Damage { get; private set; }
-    public ushort Speed { get; private set; }
+    public float Speed { get; private set; } // Tiles
     public bool IsAlive { get; private set; } = true;
-    public Projectile(GameManager gameManager, ushort ownerUID, Vector2 position, float direction, TextureID tex, ushort damage, ushort speed, Point? size = null)
+    public Projectile(GameManager gameManager, ushort ownerUID, Vector2 position, float direction, TextureID tex, ushort damage, float speed, Point? size = null)
     {
         OwnerUID = ownerUID;
         Position = position;
@@ -33,7 +33,7 @@ public class Projectile : IEntity
         if (gameManager.StateManager.State != GameState.Game) return;
 
         // Move
-        Position += new Vector2(MathF.Cos(Direction), MathF.Sin(Direction)) * Speed * GameManager.DeltaTime;
+        Position += new Vector2(MathF.Cos(Direction), MathF.Sin(Direction)) * Speed * Constants.TileSize.ToVector2() * GameManager.DeltaTime;
     }
     public void Draw(GameManager gameManager)
     {

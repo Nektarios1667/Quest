@@ -73,6 +73,11 @@ public enum ItemTypeID : byte
     VulnerabilityPotion,
     DeleriumPotion,
     LifestealPotion,
+    IronSpear,
+    DiamondSpear,
+    IronAxe,
+    DiamondAxe,
+    NinjaStar,
     // ITEMS ENUM
 }
 
@@ -173,6 +178,11 @@ public class ItemTypes
     public static readonly ItemType VulnerabilityPotion = new(ItemTypeID.VulnerabilityPotion, "A special brew that temporarily increases damage taken by the player.", 1);
     public static readonly ItemType DeleriumPotion = new(ItemTypeID.DeleriumPotion, "A special brew that temporarily causes delerious vision.", 1);
     public static readonly ItemType LifestealPotion = new(ItemTypeID.LifestealPotion, "A special brew that temporarily causes the player to steal health from enemies.", 1);
+    public static readonly ItemType IronSpear = new(ItemTypeID.IronSpear, "Long ranged weapon made of iron and wood.", 1);
+    public static readonly ItemType DiamondSpear = new(ItemTypeID.DiamondSpear, "Long ranged weapon made of diamond and wood.", 1);
+    public static readonly ItemType IronAxe = new(ItemTypeID.IronAxe, "Iron weapon with short range but high damage.", 1);
+    public static readonly ItemType DiamondAxe = new(ItemTypeID.DiamondAxe, "Diamond weapon with short range but high damage.", 1);
+    public static readonly ItemType NinjaStar = new(ItemTypeID.NinjaStar, "Sharpened blades that can be thrown.");
     // ITEMS REGISTER
     public static readonly ItemType[] All = [
     ActiveOrb,
@@ -246,6 +256,11 @@ public class ItemTypes
     VulnerabilityPotion,
     DeleriumPotion,
     LifestealPotion,
+    IronSpear,
+    DiamondSpear,
+    IronAxe,
+    DiamondAxe,
+    NinjaStar,
     // ITEMS ENUM
     ];
 }
@@ -338,6 +353,11 @@ public class Item
             ItemTypeID.StrengthPotion => new StrengthPotion(amount, customName),
             ItemTypeID.VulnerabilityPotion => new VulnerabilityPotion(amount, customName),
             ItemTypeID.WeaknessPotion => new WeaknessPotion(amount, customName),
+            ItemTypeID.DiamondAxe => new DiamondAxe(amount, customName),
+            ItemTypeID.DiamondSpear => new DiamondSpear(amount, customName),
+            ItemTypeID.IronAxe => new IronAxe(amount, customName),
+            ItemTypeID.IronSpear => new IronSpear(amount, customName),
+            ItemTypeID.NinjaStar => new NinjaStar(amount, customName),
             // ITEMFROMID
             _ => new Item(type, amount, customName),
         };

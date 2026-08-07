@@ -128,6 +128,11 @@ public static class TextureManager
         VulnerabilityPotion,
         DeleriumPotion,
         LifestealPotion,
+        IronSpear,
+        DiamondSpear,
+        IronAxe,
+        DiamondAxe,
+        NinjaStar,
         // ITEMS ENUM INSERT
         Dirt,
         Flooring,
@@ -386,6 +391,11 @@ public static class TextureManager
         Textures[TextureID.VulnerabilityPotion] = content.Load<Texture2D>("Images/Items/VulnerabilityPotion");
         Textures[TextureID.DeleriumPotion] = content.Load<Texture2D>("Images/Items/DeleriumPotion");
         Textures[TextureID.LifestealPotion] = content.Load<Texture2D>("Images/Items/LifestealPotion");
+        Textures[TextureID.IronSpear] = content.Load<Texture2D>("Images/Items/IronSpear");
+        Textures[TextureID.DiamondSpear] = content.Load<Texture2D>("Images/Items/DiamondSpear");
+        Textures[TextureID.IronAxe] = content.Load<Texture2D>("Images/Items/IronAxe");
+        Textures[TextureID.DiamondAxe] = content.Load<Texture2D>("Images/Items/DiamondAxe");
+        Textures[TextureID.NinjaStar] = content.Load<Texture2D>("Images/Items/NinjaStar");
         // ITEMS INSERT
         Textures[TextureID.Dirt] = content.Load<Texture2D>("Images/Tiles/Dirt");
         Textures[TextureID.Flooring] = content.Load<Texture2D>("Images/Tiles/Flooring");
@@ -630,6 +640,11 @@ public static class TextureManager
         Metadata[TextureID.VulnerabilityPotion] = new(Textures[TextureID.VulnerabilityPotion].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.DeleriumPotion] = new(Textures[TextureID.DeleriumPotion].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.LifestealPotion] = new(Textures[TextureID.LifestealPotion].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.IronSpear] = new(Textures[TextureID.IronSpear].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.DiamondSpear] = new(Textures[TextureID.DiamondSpear].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.IronAxe] = new(Textures[TextureID.IronAxe].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.DiamondAxe] = new(Textures[TextureID.DiamondAxe].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.NinjaStar] = new(Textures[TextureID.NinjaStar].Bounds.Size, new(1, 1), "item");
         // ITEMS METADATA INSERT
         Metadata[TextureID.Dirt] = new(Textures[TextureID.Dirt].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Flooring] = new(Textures[TextureID.Flooring].Bounds.Size, new(4, 4), "tile");
