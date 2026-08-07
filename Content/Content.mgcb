@@ -2692,7 +2692,7 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/SpeedPotion.png
 
-#begin Images/Items/SteelSword.png
+#begin Images/Items/IronSword.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -2702,9 +2702,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Items/SteelSword.png
+/build:Images/Items/IronSword.png
 
-#begin Images/Items/SteelSword.png
+#begin Images/Items/IronSword.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -2714,7 +2714,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Items/SteelSword.png
+/build:Images/Items/IronSword.png
 
 #begin Images/Items/StrengthPotion.png
 /importer:TextureImporter

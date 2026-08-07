@@ -3,7 +3,7 @@ namespace Quest.Items;
 public enum ItemTypeID : byte
 {
     ActiveOrb,
-    SteelSword,
+    IronSword,
     DeltaCoin,
     DiamondSword,
     GammaCoin,
@@ -108,7 +108,7 @@ public class ItemTypes
     public static readonly ItemTypeID[] StoveableTypes = [ItemTypeID.RawBeef, ItemTypeID.RawFish];
     // ItemTypes
     public static readonly ItemType ActiveOrb = new(ItemTypeID.ActiveOrb, "A magical orb.", 1);
-    public static readonly ItemType SteelSword = new(ItemTypeID.SteelSword, "A sturdy steel sword.", 1);
+    public static readonly ItemType IronSword = new(ItemTypeID.IronSword, "A sturdy steel sword.", 1);
     public static readonly ItemType DeltaCoin = new(ItemTypeID.DeltaCoin, "A gold coin.");
     public static readonly ItemType DiamondSword = new(ItemTypeID.DiamondSword, "A razor sharp sword made with pure diamonds.", 1);
     public static readonly ItemType GammaCoin = new(ItemTypeID.GammaCoin, "A diamond coin.");
@@ -186,7 +186,7 @@ public class ItemTypes
     // ITEMS REGISTER
     public static readonly ItemType[] All = [
     ActiveOrb,
-    SteelSword,
+    IronSword,
     DeltaCoin,
     DiamondSword,
     GammaCoin,
@@ -339,7 +339,7 @@ public class Item
         return itemType switch
         {
             ItemTypeID.Lantern => new Lantern(amount, customName),
-            ItemTypeID.SteelSword => new SteelSword(amount, customName),
+            ItemTypeID.IronSword => new IronSword(amount, customName),
             ItemTypeID.DiamondSword => new DiamondSword(amount, customName),
             ItemTypeID.Crossbow => new Crossbow(amount, customName),
             ItemTypeID.HealthPotion => new HealthPotion(amount, customName),

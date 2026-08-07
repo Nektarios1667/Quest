@@ -65,7 +65,7 @@ public static class TextureManager
         GoldKey,
         ActiveOrb,
         InactiveOrb,
-        SteelSword,
+        IronSword,
         DiamondSword,
         WoodKey,
         IronKey,
@@ -327,7 +327,7 @@ public static class TextureManager
         Textures[TextureID.GoldKey] = content.Load<Texture2D>("Images/Items/GoldKey");
         Textures[TextureID.ActiveOrb] = content.Load<Texture2D>("Images/Items/ActiveOrb");
         Textures[TextureID.InactiveOrb] = content.Load<Texture2D>("Images/Items/InactiveOrb");
-        Textures[TextureID.SteelSword] = content.Load<Texture2D>("Images/Items/SteelSword");
+        Textures[TextureID.IronSword] = content.Load<Texture2D>("Images/Items/IronSword");
         Textures[TextureID.DiamondSword] = content.Load<Texture2D>("Images/Items/DiamondSword");
         Textures[TextureID.WoodKey] = content.Load<Texture2D>("Images/Items/WoodKey");
         Textures[TextureID.IronKey] = content.Load<Texture2D>("Images/Items/IronKey");
@@ -576,7 +576,7 @@ public static class TextureManager
         Metadata[TextureID.GoldKey] = new(Textures[TextureID.GoldKey].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.ActiveOrb] = new(Textures[TextureID.ActiveOrb].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.InactiveOrb] = new(Textures[TextureID.InactiveOrb].Bounds.Size, new(1, 1), "item");
-        Metadata[TextureID.SteelSword] = new(Textures[TextureID.SteelSword].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.IronSword] = new(Textures[TextureID.IronSword].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.DiamondSword] = new(Textures[TextureID.DiamondSword].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.WoodKey] = new(Textures[TextureID.WoodKey].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.IronKey] = new(Textures[TextureID.IronKey].Bounds.Size, new(1, 1), "item");
