@@ -217,14 +217,18 @@ public static class LightingManager
         LightGrid.Run(updateRegion);
 
         float blend = gameManager.WeatherManager.GetWeatherIntensity(GameManager.GameTime);
+        // Positioning
         Point start = (LightingStart + Constants.TileDrawPadding);
         Point end = (LightingEnd - Constants.TileDrawPadding + Constants.OnePoint);
-        for (int y = start.Y; y < end.Y; y++)
-        {
-            for (int x = start.X; x < end.X; x++)
-            {
-                if (x < 0 || y < 0 || x >= BiomeColors.GetLength(0) || y >= BiomeColors.GetLength(1)) continue;
+        int startX = Math.Max(0, start.X);
+        int startY = Math.Max(0, start.Y);
+        int endX = Math.Min(BiomeColors.GetLength(0), end.X);
+        int endY = Math.Min(BiomeColors.GetLength(1), end.Y);
 
+        for (int y = startY; y < endY; y++)
+        {
+            for (int x = startX; x < endX; x++)
+            {
                 // Biome
                 Point worldLoc = new Point(x, y);
                 BiomeColors[x, y] = gameManager.WeatherManager.GetWeatherColor(gameManager, worldLoc, blend);

@@ -67,7 +67,8 @@ public static class IntExtensions
     }
     public static float Pow(this float num, int pow)
     {
-        if (pow <= 0) return 1;
+        if (pow < 0) throw new ArgumentOutOfRangeException(nameof(pow));
+        if (pow == 0) return 1;
 
         float total = num;
         for (int i = 0; i < pow - 1; i++)

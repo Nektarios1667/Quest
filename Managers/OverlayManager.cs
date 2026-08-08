@@ -174,17 +174,18 @@ public class OverlayManager
         // Draw lighting - do not draw the offscreen lighting
         Point start = (LM.LightingStart + Constants.TileDrawPadding).Scaled(LM.LightDivisions);
         Point end = (LM.LightingEnd - Constants.TileDrawPadding + Constants.OnePoint).Scaled(LM.LightDivisions);
-        for (int y = start.Y; y < end.Y; y++)
-        {
-            for (int x = start.X; x < end.X; x++)
-            {
-                // Check bounds
-                if (x < 0 || y < 0 || x >= LM.LightGrid.Grid.GetLength(0) || y >= LM.LightGrid.Grid.GetLength(1))
-                    continue;
+        int startX = Math.Max(0, start.X);
+        int startY = Math.Max(0, start.Y);
+        int endX = Math.Min(LM.LightGrid.Grid.GetLength(0), end.X);
+        int endY = Math.Min(LM.LightGrid.Grid.GetLength(1), end.Y);
 
+        for (int y = startY; y < endY; y++)
+        {
+            for (int x = startX; x < endX; x++)
+            {
                 // Light
                 float light = LM.LightGrid.Grid[x, y].LightLevel;
-                int intensityLookup = Math.Clamp((int)Math.Floor(light * LM.LightDivisions), 0, LM.LightMax * LM.LightDivisions);
+                int intensityLookup = Math.Clamp((int)(light * LM.LightDivisions), 0, LM.LightMax * LM.LightDivisions);
                 float intensity = LM.LightToIntensityCache[intensityLookup];
 
                 // Skip full light
