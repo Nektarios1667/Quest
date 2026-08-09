@@ -1,8 +1,8 @@
 namespace Quest.Items;
 
-public class Cheese : Item
+public class Cheese : Consumable
 {
-    public Cheese(int amount) : base(ItemTypes.Cheese, amount)
+    public Cheese(int amount, string? customName = null) : base(ItemTypes.Cheese, amount, 7, customName: customName)
     {
     }
 }

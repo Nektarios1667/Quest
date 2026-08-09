@@ -22,6 +22,8 @@ public static class Constants
     public const int MaxStack = 10;
     public const int DayLength = 600; // Length of a day in seconds
     public const int PlayerBaseHealth = 100;
+    public const int PlayerBaseHunger = 20;
+    public const int SecondsPerHungerLoss = 60; // How many seconds it takes to lose 1 hunger point
 
     // Tile and map
     public static readonly Point TileSize = new(64, 64); // In-game tile size

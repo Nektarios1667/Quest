@@ -1,7 +1,7 @@
 namespace Quest.Items;
 
-public class CookedFish : Item
+public class CookedFish : Consumable
 {
-    public CookedFish(int amount) : base(ItemTypes.CookedFish, amount)
+    public CookedFish(int amount, string? customName = null) : base(ItemTypes.CookedFish, amount, 11, customName: customName)
     { }
 }

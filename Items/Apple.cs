@@ -1,8 +1,8 @@
 namespace Quest.Items;
 
-public class Apple : Item
+public class Apple : Consumable
 {
-    public Apple(int amount) : base(ItemTypes.Apple, amount)
+    public Apple(int amount, string? customName = null) : base(ItemTypes.Apple, amount, 4, customName: customName)
     {
     }
 }

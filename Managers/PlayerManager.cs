@@ -10,25 +10,29 @@ public class PlayerManager : IEntity
     // Properties
     // Player stats
     public StatusManager StatusManager { get; } = new();
+    // Health
     private int _health = Constants.PlayerBaseHealth;
-    public int Health
-    {
+    public int Health {
         get => _health;
-        set
-        {
-            _health = value;
-            Game.OverlayManager.HealthBar.CurrentValue = value;
-        }
+        set { _health = value; Game.OverlayManager.HealthBar.CurrentValue = value; }
     }
     private int _maxHealth = Constants.PlayerBaseHealth;
-    public int MaxHealth
-    {
+    public int MaxHealth {
         get => _maxHealth;
-        set
-        {
-            _maxHealth = value;
-            Game.OverlayManager.HealthBar.MaxValue = value;
-        }
+        set { _maxHealth = value; Game.OverlayManager.HealthBar.MaxValue = value; }
+    }
+    // Hunger
+    private int _hunger = Constants.PlayerBaseHunger;
+    public int Hunger
+    {
+        get => _hunger;
+        set { _hunger = value; Game.OverlayManager.HungerBar.CurrentValue = value; }
+    }
+    private int _maxHunger = Constants.PlayerBaseHunger;
+    public int MaxHunger
+    {
+        get => _maxHunger;
+        set { _maxHunger = value; Game.OverlayManager.HungerBar.MaxValue = value; }
     }
     public bool IsAlive => _health > 0;
     public int Speed => (int)(Constants.PlayerBaseSpeed * StatusManager.GetSpeedMult());
@@ -67,6 +71,8 @@ public class PlayerManager : IEntity
         InventoryUI.OnSlotClick += SlotClicked;
         InventoryUI.OnSlotDrop += SlotDropped;
         InventoryUI.OnSlotHover += SlotHovered;
+
+        TimerManager.SetTimer("PlayerHungerLoss", Constants.SecondsPerHungerLoss, null);
     }
 
     public void Update(GameManager gameManager)
@@ -77,6 +83,12 @@ public class PlayerManager : IEntity
 
         // Potions
         StatusManager.Update(gameManager, this);
+        // Hunger
+        if (TimerManager.IsCompleteOrMissing("PlayerHungerLoss"))
+        {
+            TimerManager.SetTimer("PlayerHungerLoss", Constants.SecondsPerHungerLoss, null);
+            Hunger -= StatusManager.GetCravingsMult();
+        }
 
         // Update player position
         TileBumps.Clear();
@@ -520,5 +532,12 @@ public class PlayerManager : IEntity
         Health += health;
         if (health > 0)
             gameManager.OverlayManager.LootNotifications.AddNotification($"+{health}", Color.Green, duration: 2);
+    }
+    public void Eat(GameManager gameManager, int hunger)
+    {
+        hunger = Math.Min(hunger, Constants.PlayerBaseHunger - Hunger);
+        Hunger += hunger;
+        if (hunger > 0)
+            gameManager.OverlayManager.LootNotifications.AddNotification($"+{hunger}", Color.Goldenrod, duration: 2);
     }
 }

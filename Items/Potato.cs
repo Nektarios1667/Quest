@@ -1,7 +1,7 @@
 namespace Quest.Items;
 
-public class Potato : Item
+public class Potato : Consumable
 {
-    public Potato(int amount) : base(ItemTypes.Potato, amount)
+    public Potato(int amount, string? customName = null) : base(ItemTypes.Potato, amount, 6, customName: customName)
     { }
 }

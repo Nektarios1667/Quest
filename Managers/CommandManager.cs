@@ -81,6 +81,7 @@ public static class CommandManager
         Commands = [
             new("teleport <coordinate>", CTeleport, "Teleported player to |1|.", "Failed to teleport player to |1|."),
             new("health <modify> {0:999}", CHealth, "Player health |1| [|2|].", "Failed to |1| player health [|2|]."),
+            new("hunger <modify> {0:999}", CHunger, "Player hunger |1| [|2|].", "Failed to |1| player hunger [|2|]."),
             new("move_speed {0:999}", CMoveSpeed, "Set player speed to |1|.", "Failed to set player speed to |1|."),
             new("force_quit", CForceQuit, "Force quit application.", "Failed to force quit application."),
             new("quit", CQuit, "Quit application.", "Failed to quit application."),
@@ -221,6 +222,13 @@ public static class CommandManager
         string[] parts = command.Split(' ');
         if (parts[1] == "set") { PlayerManager!.Health = int.Parse(parts[2]); return true; }
         if (parts[1] == "change") { PlayerManager!.Health += int.Parse(parts[2]); return true; }
+        return false;
+    }
+    private static bool CHunger(string command)
+    {
+        string[] parts = command.Split(' ');
+        if (parts[1] == "set") { PlayerManager!.Hunger = int.Parse(parts[2]); return true; }
+        if (parts[1] == "change") { PlayerManager!.Hunger += int.Parse(parts[2]); return true; }
         return false;
     }
     private static bool CMoveSpeed(string command)

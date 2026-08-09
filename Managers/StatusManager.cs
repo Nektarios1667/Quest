@@ -15,6 +15,8 @@ public enum StatusEffect : byte
     Delerium,
     Lifesteal,
     Burning,
+    Cravings,
+    Fullness,
 }
 
 public class StatusManager
@@ -67,6 +69,8 @@ public class StatusManager
             StatusEffect.Vulnerability => HasStatusEffect(effect) ? 1.5f : 1f,
             StatusEffect.Protection => HasStatusEffect(effect) ? 0.5f : 1f,
             StatusEffect.Lifesteal => HasStatusEffect(effect) ? 0.3f : 0f,
+            StatusEffect.Cravings => HasStatusEffect(effect) ? 3.0f : 1f,
+            StatusEffect.Fullness => HasStatusEffect(effect) ? 0.67f : 1f,
             _ => 1f
         };
     }
@@ -79,12 +83,14 @@ public class StatusManager
             StatusEffect.Regeneration => true,
             StatusEffect.Protection => true,
             StatusEffect.Lifesteal => true,
+            StatusEffect.Fullness => true,
             _ => false
         };
     }
     public float GetSpeedMult() => GetEffectMult(StatusEffect.Speed) * GetEffectMult(StatusEffect.Slowness);
     public float GetDamageMult() => GetEffectMult(StatusEffect.Strength) * GetEffectMult(StatusEffect.Weakness);
     public float GetDefenseMult() => GetEffectMult(StatusEffect.Protection) * GetEffectMult(StatusEffect.Vulnerability);
+    public int GetCravingsMult() => (int)(GetEffectMult(StatusEffect.Cravings) * GetEffectMult(StatusEffect.Fullness));
     public float GetLifestealMult() => GetEffectMult(StatusEffect.Lifesteal);
     public void Update(GameManager gameManager, PlayerManager player)
     {
