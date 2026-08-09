@@ -264,6 +264,7 @@ public static class TextureManager
     // Fonts
     public static SpriteFont PixelOperator { get; private set; } = null!;
     public static SpriteFont PixelOperatorSmall { get; private set; } = null!;
+    public static SpriteFont PixelOperatorVerySmall { get; private set; } = null!;
     public static Point PixelOperatorCharSize { get; private set; }
     public static SpriteFont PixelOperatorLarge { get; private set; } = null!;
     public static SpriteFont PixelOperatorBold { get; private set; } = null!;
@@ -787,6 +788,7 @@ public static class TextureManager
         PixelOperator.LineSpacing -= 8;
         PixelOperator.Spacing = -2;
         PixelOperatorSmall = Content.Load<SpriteFont>("Fonts/PixelOperatorSmall");
+        PixelOperatorVerySmall = Content.Load<SpriteFont>("Fonts/PixelOperatorVerySmall");
         PixelOperatorCharSize = PixelOperator.MeasureString("#").ToPoint();
         PixelOperatorLarge = Content.Load<SpriteFont>("Fonts/PixelOperatorLarge");
         PixelOperatorBold = Content.Load<SpriteFont>("Fonts/PixelOperatorBold");

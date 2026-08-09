@@ -30,6 +30,9 @@ public class Consumable : Item
         if (Leftover != null)
             player.Inventory.AddItem(new(Leftover, CustomName));
 
+        // TODO Hunger system or direct healing
+        // player.ReduceHunger(HungerRestored);
+
         // Sound
         SoundManager.PlaySound("Gulp", pitchVariation: 0.25f);
 

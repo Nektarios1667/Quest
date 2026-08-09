@@ -17,7 +17,7 @@ public class OverlayManager
     {
         Gui = new();
         Gui.Widgets = [
-            HealthBar = new StatusBar(new(10, Constants.NativeResolution.Y - 35), new(300, 25), Color.Green * 0.7f, Color.Red * 0.7f, 100, 100),
+            HealthBar = new StatusBar(new(10, Constants.NativeResolution.Y - 35), new(300, 25), Color.Green * 0.7f, Color.Red * 0.7f, 100, 100, textType: StatusTextType.Fraction),
             LootNotifications = new NotificationArea(Constants.Middle - new Point(0, Constants.MageHalfSize.Y + 15), 5, PixelOperatorBold),
             WorldInfobox = new Dialog(Gui, null, new(1200, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false },
             ItemInfobox = new Dialog(Gui, new(Constants.NativeResolution.X - 370, Constants.NativeResolution.Y - 200), new(350, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false }

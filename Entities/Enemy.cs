@@ -60,7 +60,7 @@ public class Enemy : IEntity
         TimerManager.SetTimer($"EnemyAttack_{UID}", AttackSpeed, null);
         Size = (TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap).Scaled(Scale);
 
-        HealthBar = new(Point.Zero, new(Size.X, 10), Color.Green * 0.7f, Color.Red * 0.7f, Health, Health);
+        HealthBar = new(Point.Zero, new(Size.X, 10), Color.Green * 0.7f, Color.Red * 0.7f, Health, Health, textType: StatusTextType.Fraction, font: PixelOperatorVerySmall);
         DamageNotifs = new(Point.Zero, 50, PixelOperatorSubtitle, Color.Orange);
     }
     public virtual void Update(GameManager gameManager)
