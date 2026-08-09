@@ -351,7 +351,7 @@ public static class CommandManager
     }
     private static bool CEnemy(string command)
     {
-        Enemy enemy = new(CameraManager.PlayerFoot.ToVector2(), 200, 30, 2f, 25, 100, 4f, 10f, 6f, TextureID.WhiteWizard, TextureID.Fireball);
+        Enemy enemy = new(CameraManager.PlayerFoot.ToVector2(), 200, 30, 2f, 25, 3, 4f, 10f, 6f, TextureID.WhiteWizard, TextureID.Fireball);
         GameManager!.LevelManager.Level.Enemies[enemy.UID] = enemy;
         return true;
     }
