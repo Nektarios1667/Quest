@@ -86,14 +86,14 @@ public static class TimerManager
         if (timers.TryGetValue(name, out var timer))
             return timer.Left;
         Logger.Error($"No timer with name '{name}' found");
-        return 0;
+        return -1;
     }
     public static Timer GetTimer(string name)
     {
         if (timers.TryGetValue(name, out var timer))
             return timer;
         Logger.Error($"No timer with name '{name}' found");
-        return new(0, null);
+        return new(-1, null);
     }
     public static Dictionary<string, Timer> GetAllTimers() => timers;
 

@@ -81,14 +81,9 @@ public class PlayerManager : IEntity
         if (gameManager.StateManager.State != GameState.Game && gameManager.StateManager.State != GameState.Editor) return;
         if (gameManager.StateManager.OverlayState is OverlayState.Pause or OverlayState.Death) return;
 
-        // Potions
+        // Health and hunger
         StatusManager.Update(gameManager, this);
-        // Hunger
-        if (TimerManager.IsCompleteOrMissing("PlayerHungerLoss"))
-        {
-            TimerManager.SetTimer("PlayerHungerLoss", Constants.SecondsPerHungerLoss, null);
-            Hunger -= StatusManager.GetCravingsMult();
-        }
+        UpdateHealth(gameManager);
 
         // Update player position
         TileBumps.Clear();
@@ -173,6 +168,31 @@ public class PlayerManager : IEntity
             LightingManager.SetLight("PlayerLightItem", CameraManager.TileCoord, light.LightStrength);
         else
             LightingManager.RemoveLight("PlayerLightItem");
+    }
+    public void UpdateHealth(GameManager gameManager)
+    {
+        // Hunger
+        if (TimerManager.IsCompleteOrMissing("PlayerHungerLoss"))
+        {
+            TimerManager.SetTimer("PlayerHungerLoss", Constants.SecondsPerHungerLoss, null);
+            Hunger -= StatusManager.GetCravingsMult();
+        }
+        // Natural regen
+        if (Hunger > MaxHunger * 0.8f && Health < MaxHealth && TimerManager.IsCompleteOrMissing("PlayerNaturalRegen"))
+        {
+            TimerManager.SetTimer("PlayerNaturalRegen", Constants.SecondsPerNaturalRegen, null);
+            Heal(gameManager, Constants.NaturalRegenRate);
+            Hunger -= 1;
+        }
+        // Starvation
+        if (Hunger < MaxHunger * 0.2f && TimerManager.IsCompleteOrMissing("PlayerStarvation"))
+        {
+            StatusManager.AddStatusEffect(this, StatusEffect.Weakness, Constants.SecondsPerStarvation + 1);
+            StatusManager.AddStatusEffect(this, StatusEffect.Slowness, Constants.SecondsPerStarvation + 1);
+            TimerManager.SetTimer("PlayerStarvation", Constants.SecondsPerStarvation, null);
+            if (Hunger <= 0)
+                Hurt(gameManager, Constants.StarvationRate);
+        }
     }
     public void UpdateMovements(GameManager gameManager)
     {

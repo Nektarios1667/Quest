@@ -169,6 +169,11 @@ public class SaveManager
         // Write PLYR data
         writer.Write((byte)playerManager.Health);
         writer.Write((byte)playerManager.MaxHealth);
+        writer.Write((byte)playerManager.Hunger);
+        writer.Write((byte)playerManager.MaxHunger);
+        writer.Write(TimerManager.TimeLeft("PlayerHungerLoss"));   // float
+        writer.Write(TimerManager.TimeLeft("PlayerNaturalRegen")); // float
+        writer.Write(TimerManager.TimeLeft("PlayerStarvation"));   // float
 
         TasksComplete++;
     }
@@ -398,6 +403,15 @@ public class SaveManager
         playerManager.Health = reader.ReadByte();
         playerManager.MaxHealth = reader.ReadByte();
         gameManager.LevelManager.TasksComplete++;
+
+        float hungerLossTimer = reader.ReadSingle();
+        if (hungerLossTimer >= 0) TimerManager.SetTimer("PlayerHungerLoss", hungerLossTimer, null);
+
+        float regenTimer = reader.ReadSingle();
+        if (regenTimer >= 0) TimerManager.SetTimer("PlayerNaturalRegen", regenTimer, null);
+
+        float starvationTimer = reader.ReadSingle();
+        if (starvationTimer >= 0) TimerManager.SetTimer("PlayerStarvation", starvationTimer, null);
     }
     private static void ReadLevelSection(GameManager gameManager, PlayerManager playerManager, LevelPath levelPath, BinaryReader reader)
     {
@@ -421,7 +435,6 @@ public class SaveManager
             ushort doorsCount = reader.ReadUInt16();
             for (int d = 0; d < doorsCount; d++)
                 if (current.Tiles[reader.ReadUInt16()] is Door door)
-                    //Console.WriteLine();
                     door.Open(gameManager);
 
             // Chests
