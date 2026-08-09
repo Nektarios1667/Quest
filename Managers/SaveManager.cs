@@ -484,7 +484,7 @@ public class SaveManager
     private static void ReadEffectsSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader)
     {
         // Read Status Effects
-        playerManager.StatusManager.ClearAllStatusEffects();
+        playerManager.StatusManager.ClearAllStatusEffects(gameManager);
         byte effectsCount = reader.ReadByte();
         for (int i = 0; i < effectsCount; i++)
         {

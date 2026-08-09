@@ -40,8 +40,10 @@ public class StatusManager
         if (_notifications.TryGetValue(effect, out var notif))
             notif.Duration = 0;
     }
-    public void ClearAllStatusEffects()
+    public void ClearAllStatusEffects(GameManager gameManager)
     {
+        gameManager.GradingEffect?.Parameters["Saturation"].SetValue(1);
+
         _statusEffects.Clear();
         foreach (var notif in _notifications.Values)
             notif.Duration = 0;
@@ -129,6 +131,6 @@ public class StatusManager
         {
             gameManager.GradingEffect?.Parameters["Saturation"].SetValue(0.1f + (0.9f / (0.4f * GetStatusEffectDuration(StatusEffect.Delerium) + 1)));
             CameraManager.Camera += RandomManager.RandomUnitVec2() * Math.Clamp(0.1f * GetStatusEffectDuration(StatusEffect.Delerium), 0, 4);
-        }
+        } 
     }
 }

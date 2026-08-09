@@ -120,9 +120,13 @@ public class MenuManager
     }
     public void ExitToMainMenu()
     {
+        playerManager.StatusManager.ClearAllStatusEffects(gameManager);
+
         gameManager.StateManager.OverlayState = OverlayState.None;
         gameManager.StateManager.State = GameState.MainMenu;
+
         SoundtrackManager.StopSoundtrack();
+        
         gameManager.LevelManager.UnloadWorld(gameManager.LevelManager.Level.WorldName);
     }
     public async void ContinueSaveButton()

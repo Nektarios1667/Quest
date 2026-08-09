@@ -73,7 +73,7 @@ public class GameManager
         try
         {
             StateManager.OverlayState = OverlayState.None;
-            playerManager.StatusManager.ClearAllStatusEffects();
+            playerManager.StatusManager.ClearAllStatusEffects(this);
 
             await SaveManager.ReadGameState(this, playerManager, SaveManager.CurrentSave.ToString());
 
