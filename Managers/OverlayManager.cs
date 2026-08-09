@@ -10,6 +10,7 @@ public class OverlayManager
     public NotificationArea LootNotifications { get; private set; } // Loot pickup notifications
     public StatusBar HealthBar { get; private set; }
     public Dialog WorldInfobox { get; private set; }
+    public Dialog ItemInfobox { get; private set; }
     public static readonly Point lootStackOffset = new(4, 4);
     private RenderTarget2D? minimap;
     public OverlayManager(PlayerManager playerManager)
@@ -18,7 +19,8 @@ public class OverlayManager
         Gui.Widgets = [
             HealthBar = new StatusBar(new(10, Constants.NativeResolution.Y - 35), new(300, 25), Color.Green * 0.7f, Color.Red * 0.7f, 100, 100),
             LootNotifications = new NotificationArea(Constants.Middle - new Point(0, Constants.MageHalfSize.Y + 15), 5, PixelOperatorBold),
-            WorldInfobox = new Dialog(Gui, new(1200, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false }
+            WorldInfobox = new Dialog(Gui, null, new(1200, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false },
+            ItemInfobox = new Dialog(Gui, new(Constants.NativeResolution.X - 370, Constants.NativeResolution.Y - 200), new(350, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false }
         ];
 
         // Trigger lighting updates
@@ -44,10 +46,19 @@ public class OverlayManager
             WorldInfobox.SetText($"Author: {metadata.Author}\nDescription: {metadata.Description}", respeak: DialogRespeak.Instant);
         }
     }
-
     public void Update(GameManager gameManager, PlayerManager? playerManager)
     {
         if (gameManager.StateManager.State != GameState.Game) return;
+
+        // Set item infobox
+        if (playerManager?.HoveredItem != null)
+        {
+            ItemInfobox.IsVisible = true;
+            Item item = playerManager.HoveredItem;
+            ItemInfobox.SetText($"--- {item.Name} ---\n{item.Description}", respeak: DialogRespeak.Auto);
+        }
+        else
+            ItemInfobox.IsVisible = false;
 
         // Gui
         DebugManager.StartBenchmark("GuiUpdate");

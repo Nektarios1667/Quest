@@ -4,7 +4,6 @@ namespace Quest.Gui;
 
 public enum DialogRespeak
 {
-    Never,
     Auto,
     Instant,
     Always,
@@ -14,7 +13,7 @@ public class Dialog : Widget
     public bool HasSpoken => Displayed == Text;
     public bool IsSpeaking => Displayed != "" && Displayed != Text;
     public Overlay Gui { get; private set; }
-    public Vector2 Dimensions { get; private set; }
+    public Point Dimensions { get; private set; }
     public Rectangle Rect { get; private set; }
     public Color Color { get; private set; }
     public int Border { get; private set; }
@@ -27,10 +26,11 @@ public class Dialog : Widget
     public const float CharDelay = .03f;
     public float charWait { get; set; } = 0;
     // Private
-    public Dialog(Overlay gui, Vector2 dimensions, Color color, Color foreground, string text, SpriteFont font, int border = 6, Color? borderColor = null) : base(Point.Zero)
+    public Dialog(Overlay gui, Point? pos, Point dimensions, Color color, Color foreground, string text, SpriteFont font, int border = 6, Color? borderColor = null) : base(Point.Zero)
     {
         Gui = gui;
         Dimensions = dimensions;
+        Position = pos ?? new(Constants.Middle.X - Dimensions.X / 2, Constants.NativeResolution.Y - Dimensions.Y - TextureManager.Metadata[TextureID.Slot].Size.Y - Border - 5);
         Color = color;
         Border = border;
         BorderColor = borderColor == null ? Color.Black : (Color)borderColor;
@@ -49,19 +49,17 @@ public class Dialog : Widget
             charWait -= deltaTime;
             if (charWait <= 0)
             {
-                Displayed += Text[Displayed.Length];
-                Displayed = SoftwrapWords(Displayed, Font, Inside);
-                SoundManager.PlaySoundInstance("Typing", pitch: RandomManager.RandomFloat() / 4 - .125f, volume: .5f);
+                Displayed = SoftwrapWords(Text, Font, Inside)[..(Displayed.Length + 1)];
+                SoundManager.PlaySoundInstance("Typing", pitch: RandomManager.RandomFloat() / 3 - .125f, volume: .4f);
                 charWait = CharDelay;
             }
         }
     }
     public void UpdateSize()
     {
-        Dimensions = new(Dimensions.X, Font.MeasureString(LimitLines(SoftwrapWords(Text, Font, Dimensions), Font, 200)).Y + 20);
-        Position = new((int)(Constants.Middle.X - Dimensions.X / 2), (int)(Constants.NativeResolution.Y - Dimensions.Y - TextureManager.Metadata[TextureID.Slot].Size.Y - Border - 5));
+        Dimensions = new(Dimensions.X, (int)Font.MeasureString(LimitLines(SoftwrapWords(Text, Font, Dimensions.ToVector2()), Font, 200)).Y + 20);
         Inside = new(Dimensions.X - Border * 2 - 2, Dimensions.Y - Border * 2 - 2);
-        Rect = new(Position.X, Position.Y, (int)Dimensions.X, (int)Dimensions.Y);
+        Rect = new(Position.X, Position.Y, Dimensions.X, Dimensions.Y);
     }
     public override void Draw(SpriteBatch batch)
     {
