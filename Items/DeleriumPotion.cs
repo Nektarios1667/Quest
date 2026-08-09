@@ -1,16 +1,7 @@
 namespace Quest.Items;
 
-public class DeleriumPotion : Item
+public class DeleriumPotion : Consumable
 {
-    public DeleriumPotion(byte amount, string? customName = null) : base(ItemTypes.DeleriumPotion, amount, customName)
+    public DeleriumPotion(byte amount, string? customName = null) : base(ItemTypes.DeleriumPotion, amount, 0, new(ItemTypes.GlassBottle, 1), (StatusEffect.Delerium, 1f, 30f), customName)
     { }
-    public override bool PrimaryUse(GameManager gameManager, PlayerManager player)
-    {
-        player.StatusManager.AddStatusEffect(player, StatusEffect.Delerium, 30);
-        player.Inventory.Consume(GetItemRef());
-        player.Inventory.AddItem(new(ItemTypes.GlassBottle, 1, CustomName));
-
-        SoundManager.PlaySound("Gulp", pitchVariation: 0.25f);
-        return true;
-    }
 }

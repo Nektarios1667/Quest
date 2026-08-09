@@ -1,16 +1,7 @@
 namespace Quest.Items;
 
-public class LifestealPotion : Item
+public class LifestealPotion : Consumable
 {
-    public LifestealPotion(byte amount, string? customName = null) : base(ItemTypes.LifestealPotion, amount, customName)
+    public LifestealPotion(byte amount, string? customName = null) : base(ItemTypes.LifestealPotion, amount, 0, new(ItemTypes.GlassBottle, 1), (StatusEffect.Lifesteal, 1f, 30f), customName)
     { }
-    public override bool PrimaryUse(GameManager gameManager, PlayerManager player)
-    {
-        player.StatusManager.AddStatusEffect(player, StatusEffect.Lifesteal, 30);
-        player.Inventory.Consume(GetItemRef());
-        player.Inventory.AddItem(new(ItemTypes.GlassBottle, 1, CustomName));
-
-        SoundManager.PlaySound("Gulp", pitchVariation: 0.25f);
-        return true;
-    }
 }

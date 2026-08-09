@@ -1,17 +1,7 @@
 namespace Quest.Items;
 
-public class ProtectionPotion : Item
+public class ProtectionPotion : Consumable
 {
-    public ProtectionPotion(byte amount, string? customName = null) : base(ItemTypes.ProtectionPotion, amount, customName)
+    public ProtectionPotion(byte amount, string? customName = null) : base(ItemTypes.ProtectionPotion, amount, 0, new(ItemTypes.GlassBottle, 1), (StatusEffect.Protection, 1f, 30f), customName)
     { }
-    public override bool PrimaryUse(GameManager gameManager, PlayerManager player)
-    {
-        player.StatusManager.AddStatusEffect(player, StatusEffect.Protection, 30);
-        player.Inventory.Consume(GetItemRef());
-        player.Inventory.AddItem(new(ItemTypes.GlassBottle, 1, CustomName));
-
-        SoundManager.PlaySound("Gulp", pitchVariation: 0.25f);
-
-        return true;
-    }
 }

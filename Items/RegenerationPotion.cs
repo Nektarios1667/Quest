@@ -1,17 +1,7 @@
 namespace Quest.Items;
 
-public class RegenerationPotion : Item
+public class RegenerationPotion : Consumable
 {
-    public RegenerationPotion(byte amount, string? customName = null) : base(ItemTypes.RegenerationPotion, amount, customName)
+    public RegenerationPotion(byte amount, string? customName = null) : base(ItemTypes.RegenerationPotion, amount, 0, new(ItemTypes.GlassBottle, 1), (StatusEffect.Regeneration, 1f, 10f), customName)
     { }
-    public override bool PrimaryUse(GameManager gameManager, PlayerManager player)
-    {
-        player.StatusManager.AddStatusEffect(player, StatusEffect.Regeneration, 10);
-        player.Inventory.Consume(GetItemRef());
-        player.Inventory.AddItem(new(ItemTypes.GlassBottle, 1, CustomName));
-
-        SoundManager.PlaySound("Gulp", pitchVariation: 0.25f);
-
-        return true;
-    }
 }

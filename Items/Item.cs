@@ -10,7 +10,6 @@ public enum ItemTypeID : byte
     InactiveOrb,
     GoldKey,
     PhiCoin,
-    Pickaxe,
     WoodKey,
     IronKey,
     DiamondKey,

@@ -97,7 +97,7 @@ public static class CommandManager
             new("freecam <bool>", CFreecam, "Set freecam to |1|", "Failed to set freecam to |1|"),
             new("kill [enemy|projectile|player] <ushort>", CKill, "Killed |1| with UID |2|", "Failed to kill |1| with UID |2|"),
             new("effect <effect> {1:999}", CEffect, "Applied effect '|1|' for |2| seconds.", "Failed to apply effect '|1|' for |2| seconds."),
-            new("reload [lights|lightgrid|level]", CReload, "Reloaded |1|.", "Failed to reload |1|."),
+            new("reload [lights|lightgrid|level|inventory]", CReload, "Reloaded |1|.", "Failed to reload |1|."),
             new("music *", CMusic, "Playing music |1|.", "Failed to play music |1|."),
         ];
     }
@@ -421,6 +421,10 @@ public static class CommandManager
             LevelFileManager.ReadLevel(GameManager!, LevelManager!.Level.LevelPath.ToString(), reload: true);
             LevelManager!.LoadLevel(GameManager!, LevelManager.Level.LevelPath.ToString());
             _ = SaveManager.ReadGameState(GameManager!, PlayerManager!, SaveManager.CurrentSave.ToString());
+            return true;
+        } else if (parts[1] == "inventory")
+        {
+            PlayerManager!.Inventory.Clear();
             return true;
         }
         return false;

@@ -1,17 +1,7 @@
 namespace Quest.Items;
 
-public class SlownessPotion : Item
+public class SlownessPotion : Consumable
 {
-    public SlownessPotion(byte amount, string? customName = null) : base(ItemTypes.SlownessPotion, amount, customName)
+    public SlownessPotion(byte amount, string? customName = null) : base(ItemTypes.SlownessPotion, amount, 0, new(ItemTypes.GlassBottle, 1), (StatusEffect.Slowness, 1f, 30f), customName)
     { }
-    public override bool PrimaryUse(GameManager gameManager, PlayerManager player)
-    {
-        player.StatusManager.AddStatusEffect(player, StatusEffect.Slowness, 30);
-        player.Inventory.Consume(GetItemRef());
-        player.Inventory.AddItem(new(ItemTypes.GlassBottle, 1, CustomName));
-
-        SoundManager.PlaySound("Gulp", pitchVariation: 0.25f);
-
-        return true;
-    }
 }
