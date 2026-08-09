@@ -153,6 +153,7 @@ public class EditorLevelManager
         {
             Tile tile = LevelManager.Level.Tiles[i];
             // Write tile data
+            //writer.Write((byte)EnumTools.ConvertEnum<TileTypeID, TileTypeIDNew>(tile.Type.ID));
             writer.Write((byte)tile.Type.ID);
             // Extra properties
             if (tile is Stairs stairs)

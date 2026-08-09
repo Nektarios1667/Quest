@@ -88,23 +88,46 @@ public static class Constants
 
     // Minimap pixel colors
     public static readonly Color[] MiniMapColors = [
+        new(18, 18, 18), // Darkness
         new(92, 221, 241), // Sky
         Color.Green, // Grass
-        Color.Blue, // Water
+        new(48, 25, 0), // Dirt
+        Color.Yellow, // Sand
+        Color.Orange, // RedSand
+        new(200, 200, 0), // WetSand
+        new(225, 125, 0), // WetRedSand
+        new(80, 80, 80), // VolcanicSand
+        new(50, 50, 50), // WetVolcanicSand
+        new(100, 100, 100), // Gravel
+        new(56, 22, 0), // Farmland
+        new(163, 89, 33), // Path
+        Color.Gray, // Stone
         Color.DarkGray, // StoneWall
         new(117, 66, 13), // Stairs
-        new(158, 186, 197), // Flooring
-        Color.Yellow, // Sand
-        new(48, 25, 0), // Dirt
-        new(18, 18, 18), // Darkness
-        new(41, 15, 0), // Door
-        new(102, 60, 14), // WoodFlooring
-        Color.Gray, // Stone
-        Color.Tan, // Chest
+        new(225, 180, 0), // Sandstone
+        new(255, 255, 90), // SandstoneWall
+        new(255, 255, 90), // SandstoneWindow
+        Color.Gray, // StoneWindow
         Color.LightGray, // ConcreteWall
+        Color.Gray, // ConcreteFlooring
+        Color.Gray, // ConcreteWindow
         new(92, 53, 23), // WoodWall
-        new(163, 89, 33), // Path
-        Color.OrangeRed, // Lava
+        new(102, 60, 14), // WoodFlooring
+        new(92, 53, 23), // WoodWindow
+        Color.Beige, // DryWall
+        Color.Beige, // DryWallWindow
+        new(24, 15, 0), // MudWall
+        new(24, 15, 0), // MudWindow
+        Color.White, // Snow
+        new(230, 255, 230), // SnowyGrass
+        new(220, 220, 220), // SnowWall
+        new(220, 220, 220), // SnowWindow
+        new(107, 169, 197), // Ice
+        new(107, 169, 197), // IceWall
+        new(107, 169, 197), // IceWindow
+        new(168, 159, 151), // IronWall
+        new(168, 159, 151), // IronWindow
+        new(158, 186, 197), // Flooring
         new(118, 128, 133), // GrayTiles
         Color.Red, // RedTiles
         Color.Orange, // OrangeTiles
@@ -117,43 +140,20 @@ public static class Constants
         Color.Pink, // PinkTiles
         Color.Black, // BlackTiles
         Color.SaddleBrown, // BrownTiles
-        new(168, 159, 151), // IronWall
-        Color.White, // Snow
-        new(107, 169, 197), // Ice
-        new(230, 255, 230), // SnowyGrass
+        Color.White, // WhiteTiles
+        Color.Blue, // Water
+        Color.OrangeRed, // Lava
+        new(41, 15, 0), // Door
+        Color.Tan, // Chest
+        new(158, 114, 17), // Crate
+        new(89, 55, 18), // DisplayCase
         new(247, 255, 199), // Lamp
-        new(225, 180, 0), // Sandstone
-        new(255, 255, 90), // SandstoneWall
         new(237, 103, 19), // Jukebox
         Color.Gray, // DiscWriter
         new(172, 179, 157), // Inscriber
         Color.Gray, // Stove
-        new(80,80,80), // Furnace
-        new(89, 55, 18), // DisplayCase
-        new(158, 114, 17), // Crate
+        new(80, 80, 80), // Furnace
         Color.Brown, // Crafter
-        Color.Gray, // ConcreteFlooring
-        Color.Gray, // StoneWindow
-        Color.Gray, // ConcreteWindow
-        new(168, 159, 151), // IronWindow
-        new(255, 255, 90), // SandstoneWindow
-        new(92, 53, 23), // WoodWindow
-        new(107, 169, 197), // IceWall
-        new(24, 15, 0), // MudWall
-        new(220, 220, 220), // SnowWall
-        new(24, 15, 0), // MudWindow
-        new(220, 220, 220), // SnowWindow
-        new(107, 169, 197), // IceWindow
-        Color.Beige, // DryWall
-        Color.Beige, // DryWallWindow
-        new(100, 100, 100), // Gravel
-        new(200, 200, 0), // WetSand
-        Color.Orange, // RedSand
-        new(225, 125, 0), // WetRedSand
-        new(80, 80, 80), // VolcanicSand
-        new(50, 50, 50), // WetVolcanicSand
-        Color.White, // WhiteTiles
-        new(56, 22, 0), // Farmland
         // MINIMAPCOLORS
     ];
 }

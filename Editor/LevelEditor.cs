@@ -26,7 +26,6 @@ public class LevelEditor : Game, IAdjustableWindow
     private Group tilesetGroup = null!;
     private RectangleShape tilesetHighlight = null!;
     private RectangleShape toolHighlight = null!;
-    private bool buttonClicked = false;
 
     // Editing
     private int TileSelectionIdx = 0;
@@ -269,9 +268,6 @@ public class LevelEditor : Game, IAdjustableWindow
 
         // Edit options
         if (InputManager.BindPressed(InputAction.EditTile)) editorManager.EditTile();
-
-        // Erase (set to sky)
-        if (InputManager.RMouseDown) MouseSelect();
 
         // Pick
         if (InputManager.BindPressed(InputAction.PickTile)) PickTile();

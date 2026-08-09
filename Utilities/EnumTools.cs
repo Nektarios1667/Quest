@@ -1,4 +1,6 @@
-﻿namespace Quest.Utilities;
+﻿using SharpDX.MediaFoundation.DirectX;
+
+namespace Quest.Utilities;
 
 public static class EnumTools
 {
@@ -8,5 +10,9 @@ public static class EnumTools
         int intLower = Convert.ToInt32(lower);
         int intUpper = Convert.ToInt32(upper);
         return intValue >= intLower && intValue <= intUpper;
+    }
+    public static N ConvertEnum<T, N>(T value) where N : Enum where T : Enum
+    {
+        return (N)Enum.Parse(typeof(N), value.ToString());
     }
 }
