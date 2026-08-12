@@ -343,7 +343,7 @@ public static class CommandManager
         if (item == null) return false;
         Item leftover = PlayerManager!.Inventory.AddItem(item);
         if (leftover.Amount > 0)
-            LevelManager!.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), CameraManager.PlayerFoot, GameManager.GameTime));
+            LevelManager!.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), CameraManager.PlayerFoot));
         return true;
     }
     private static bool CNotif(string command)

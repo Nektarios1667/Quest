@@ -178,6 +178,12 @@ public class EditorLevelManager
                 writer.Write(lamp.LightRadius);
             else if (tile is DisplayCase displayCase)
                 SaveManager.WriteItemData(writer, displayCase.Container.Items[0]);
+            else if (tile is TriggerTile trig)
+            {
+                writer.Write((byte)trig.EffectType);
+                writer.Write(trig.EffectCoord);
+                writer.Write(trig.EffectLevel.LevelName);
+            }
         }
     }
     private void WriteBiomeSection(BinaryWriter writer)

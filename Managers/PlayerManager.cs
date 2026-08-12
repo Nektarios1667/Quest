@@ -261,13 +261,13 @@ public class PlayerManager : IEntity
             NPC.DialogBox = new Dialog(gameManager.OverlayManager.Gui, null, new(1200, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false };
             gameManager.OverlayManager.Gui.Widgets.Add(NPC.DialogBox);
         }
-        (NPC npc, float dist) interacting = new(NPC.Null, float.MaxValue);
+        (NPC npc, float distSq) interacting = new(NPC.Null, float.MaxValue);
         if (NPC.NPCsNearby.Count > 0)
         {
             interacting = NPC.NPCsNearby[0];
             for (int n = 1; n < NPC.NPCsNearby.Count; n++)
             {
-                if (NPC.NPCsNearby[n].dist < interacting.dist)
+                if (NPC.NPCsNearby[n].distSq < interacting.distSq)
                     interacting = NPC.NPCsNearby[n];
             }
             // Same NPC
@@ -513,7 +513,7 @@ public class PlayerManager : IEntity
         Item? item = ui.BoundContainer.Items[slot];
         if (item == null) return;
 
-        Game.LevelManager.Level.Loot.Add(new Loot(new(item.Type, item.Amount, item.CustomName), CameraManager.PlayerFoot + new Point(0, 20), GameManager.GameTime));
+        Game.LevelManager.Level.Loot.Add(new Loot(new(item.Type, item.Amount, item.CustomName), CameraManager.PlayerFoot + new Point(0, 20)));
         ui.BoundContainer.SetSlot(slot, null);
     }
     public void SlotHovered(int slot, UserInterface ui)

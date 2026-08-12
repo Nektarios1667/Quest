@@ -243,6 +243,9 @@ public class LevelEditor : Game, IAdjustableWindow
         editorManager.Update(TileSelection, BiomeSelection, currentTool, delta, mouseTile, mouseCoord, mouseSelection, mouseSelectionCoord);
         SettingsMenu.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
 
+        // Mouse selection coord
+        if (InputManager.RMouseClicked) MouseSelect();
+
         // Change material
         if (InputManager.ScrolledUp || InputManager.BindPressed(InputAction.CycleToolNext))
         {

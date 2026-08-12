@@ -246,4 +246,9 @@ public static class PopupFactory
         if (string.IsNullOrWhiteSpace(value)) return false;
         return value.All(char.IsLetterOrDigit);
     }
+    public static bool IsItemID(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        return Enum.TryParse<ItemTypeID>(value, false, out var _);
+    }
 }

@@ -2627,6 +2627,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Tiles/Path.png
 
+#begin Images/Tiles/Pedestal.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Tiles/Pedestal.png
+
 #begin Images/Tiles/PinkTiles.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -2638,6 +2650,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Tiles/PinkTiles.png
+
+#begin Images/Tiles/PressurePlate.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Tiles/PressurePlate.png
 
 #begin Images/Tiles/PurpleTiles.png
 /importer:TextureImporter

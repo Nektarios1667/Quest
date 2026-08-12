@@ -13,6 +13,7 @@ public partial class UserInterface
     public static UserInterface InscriberUI { get; private set; } = null!;
     public static UserInterface InventoryUI { get; private set; } = null!;
     public static UserInterface JukeboxUI { get; private set; } = null!;
+    public static UserInterface PedestalUI { get; private set; } = null!;
     public static UserInterface StoveUI { get; private set; } = null!;
     public static void Init(SpriteBatch batch, LevelManager levelManager)
     {
@@ -25,6 +26,7 @@ public partial class UserInterface
         CreateInscriberUI(batch);
         CreateInventoryUI(batch);
         CreateJukeboxUI(batch, levelManager);
+        CreatePedestalUI(batch);
         CreateStoveUI(batch, levelManager);
     }
 
@@ -85,7 +87,7 @@ public partial class UserInterface
                 SoundManager.PlaySound("Hammer");
                 Item? leftover = CrafterUI.BoundContainer.AddItem(crafted, Crafter.IngredientsSize.X * Crafter.IngredientsSize.Y);
                 if (leftover != null && leftover.Amount > 0)
-                    levelManager.Level.Loot.Add(new(leftover.GetItemRef(), CameraManager.PlayerFoot, GameManager.GameTime));
+                    levelManager.Level.Loot.Add(new(leftover.GetItemRef(), CameraManager.PlayerFoot));
             }
         };
         CrafterUI.AddElement("craft", craft);
@@ -206,7 +208,7 @@ public partial class UserInterface
             {
                 Item? leftover = FurnaceUI.AddItem(outputItem);
                 if (leftover != null && leftover.Amount > 0)
-                    levelManager.Level.Loot.Add(new(leftover.GetItemRef(), CameraManager.PlayerFoot, GameManager.GameTime));
+                    levelManager.Level.Loot.Add(new(leftover.GetItemRef(), CameraManager.PlayerFoot));
             }
         };
         FurnaceUI.AddElement("smelt", smelt);
@@ -301,6 +303,20 @@ public partial class UserInterface
         JukeboxUI.AddElement("play_button", play);
         JukeboxUI.AddElement("stop_button", stop);
     }
+    private static void CreatePedestalUI(SpriteBatch batch)
+    {
+        // ----- Pedestal -----
+        PedestalUI = new(batch);
+
+        // Title
+        Point titleSize = PixelOperatorLarge.MeasureString("PEDESTAL").ToPoint();
+        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "PEDESTAL", PixelOperatorLarge, Color.White);
+        DisplayCaseUI.AddElement("title", title);
+
+        // Display item
+        Slot display = new(new(Constants.Middle.X - Slot.SlotSize.X / 2, 75));
+        PedestalUI.AddElement("display", display);
+    }
     private static void CreateStoveUI(SpriteBatch batch, LevelManager levelManager)
     {
         // ----- Jukebox -----
@@ -345,7 +361,7 @@ public partial class UserInterface
                 SoundManager.PlaySound("Fire");
                 Item? leftover = StoveUI.AddItem(outputItem);
                 if (leftover != null && leftover.Amount > 0)
-                    levelManager.Level.Loot.Add(new(leftover.GetItemRef(), CameraManager.PlayerFoot, GameManager.GameTime));
+                    levelManager.Level.Loot.Add(new(leftover.GetItemRef(), CameraManager.PlayerFoot));
             }
         };
 

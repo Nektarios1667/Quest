@@ -162,6 +162,8 @@ public static class Constants
         Color.Gray, // Stove
         new(80, 80, 80), // Furnace
         Color.Brown, // Crafter
+        Color.Gray, // PressurePlate
+        Color.Gray, // Pedestal
         // MINIMAPCOLORS
     ];
 }

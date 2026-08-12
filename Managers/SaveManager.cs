@@ -22,16 +22,16 @@ public class SaveManager
     }
     public static float LoadingProgress => TotalTasks <= 0 ? 0 : (float)TasksComplete / TotalTasks;
     // Save State changes
-    private static readonly Dictionary<string, HashSet<ushort>> openedDoors = [];
+    private static readonly Dictionary<string, HashSet<IHasState>> stateTiles = [];
     private static readonly Dictionary<string, HashSet<Chest>> chests = [];
     private static readonly Dictionary<string, HashSet<IContainer>> containers = [];
     public static LevelPath CurrentSave { get; set; } = new();
-    public static void SaveDoorOpened(ushort idx, string level)
+    public static void SaveStateTile(IHasState tile, string levelName)
     {
-        if (openedDoors.TryGetValue(level, out var levelDoors))
-            levelDoors.Add(idx);
+        if (stateTiles.TryGetValue(levelName, out var levelDoors))
+            levelDoors.Add(tile);
         else
-            openedDoors[level] = [idx];
+            stateTiles[levelName] = [tile];
     }
     public static void SaveChestGenerator(Chest chest, string level)
     {
@@ -72,7 +72,7 @@ public class SaveManager
         // All of the levels with extra data
         string[] levels = new[] {
                 chests.Keys,
-                openedDoors.Keys,
+                stateTiles.Keys,
                 gameManager.LevelManager.Levels.Where(l => l.WorldName == worldName &&
                 (l.Loot.Count > 0 || l.Enemies.Count > 0 || l.Projectiles.Count > 0 || l.NPCs.Count > 0))
             .Select(l => l.LevelName),
@@ -184,7 +184,7 @@ public class SaveManager
         string[] levels = new[]
         {
         chests.Keys,
-        openedDoors.Keys,
+        stateTiles.Keys,
         gameManager.LevelManager.Levels
             .Where(l => l.WorldName == worldName &&
                 (l.Loot.Count > 0 ||
@@ -218,13 +218,16 @@ public class SaveManager
             TasksComplete++;
 
 
-            // Doors
-            if (openedDoors.TryGetValue(level, out var levelDoors))
+            // State tiles - let IHasState handle its own info
+            if (stateTiles.TryGetValue(level, out var levelStateTiles))
             {
-                writer.Write((ushort)levelDoors.Count);
+                writer.Write((ushort)levelStateTiles.Count);
 
-                foreach (ushort door in levelDoors)
-                    writer.Write(door);
+                foreach (var stateTile in levelStateTiles)
+                {
+                    writer.Write((byte)stateTile.TypeID);
+                    stateTile.WriteState(writer, gameManager);
+                }
             }
             else
                 writer.Write((ushort)0);
@@ -428,14 +431,14 @@ public class SaveManager
                 byte typeID = (byte)(reader.ReadByte() - 1);
                 byte amount = reader.ReadByte();
                 Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
-                current.Loot.Add(new Loot(new(ItemTypes.All[typeID], amount), location, 0f));
+                current.Loot.Add(new Loot(new(ItemTypes.All[typeID], amount), location));
             }
 
-            // Doors
-            ushort doorsCount = reader.ReadUInt16();
-            for (int d = 0; d < doorsCount; d++)
-                if (current.Tiles[reader.ReadUInt16()] is Door door)
-                    door.Open(gameManager);
+            // State tiles IHasState
+            ushort stateTileCount = reader.ReadUInt16();
+            for (int s = 0; s < stateTileCount; s++)
+                if (current.Tiles[reader.ReadUInt16()] is IHasState stateTile)
+                    stateTile.ReadState(reader, gameManager);
 
             // Chests
             ushort chestCount = reader.ReadUInt16();
@@ -510,7 +513,7 @@ public class SaveManager
     #endregion
     private static void ClearSavedState()
     {
-        openedDoors.Clear();
+        stateTiles.Clear();
         chests.Clear();
     }
     #region WriteHelpers

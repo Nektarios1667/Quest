@@ -13,11 +13,11 @@ public struct Loot : IEntity
     public readonly string DisplayName => $"{Item.Amount} {StringTools.FillCamelSpaces(Item.Name)}";
     // Helpers
     public static readonly Point lootStackOffset = new(4, 4);
-    public Loot(ItemRef item, Point location, float time)
+    public Loot(ItemRef item, Point location)
     {
         Item = item;
         Position = location;
-        Birth = time;
+        Birth = GameManager.GameTime;
     }
     public readonly void Dispose()
     {

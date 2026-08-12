@@ -144,6 +144,32 @@ public class EditorManager
             }
             displayCase.Container.Items[0] = new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[0])], byte.Parse(values[1]));
         }
+        // PTrigger tiles
+        else if (tile is TriggerTile trig)
+        {
+            // Input fields
+            List<InputField> fields = [
+                new("Tile Effect", null, dropdownOptions: Enum.GetNames<TileEffect>(), placeholder: trig.EffectType),
+                new("Effected Tile Coord X", IsByte, placeholder: trig.EffectCoord.X),
+                new("Effected Tile Coord Y", IsByte, placeholder: trig.EffectCoord.Y),
+                new("Effected Tile Level", null, placeholder: trig.EffectLevel.LevelName)
+            ];
+
+
+            // Window
+            var (success, values) = ShowInputForm("Pressure Plate Editor", fields.ToArray());
+            if (!success)
+            {
+                if (!PopupOpen) Logger.Error("Pressure plate edit failed.");
+                return;
+            }
+
+            // Shared fields
+            trig.EffectType = Enum.Parse<TileEffect>(values[0]);
+            trig.EffectCoord = new(byte.Parse(values[1]), byte.Parse(values[2]));
+            trig.EffectLevel = new(trig.EffectLevel.WorldName, values[3]);
+
+        }
     }
     public void FloodFill()
     {
@@ -527,7 +553,7 @@ public class EditorManager
 
         ItemType name = ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[0])];
         byte amount = byte.Parse(values[1]);
-        LevelManager.Level.Loot.Add(new Loot(new ItemRef(name, amount), MouseSelection, GameManager.GameTime));
+        LevelManager.Level.Loot.Add(new Loot(new ItemRef(name, amount), MouseSelection));
     }
     public void DeleteLoot()
     {

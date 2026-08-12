@@ -1,5 +1,6 @@
 using Quest.Quill;
 using Quest.World;
+using SharpDX.MediaFoundation;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -161,6 +162,7 @@ public class LevelManager
         foreach (Projectile projectile in Level.Projectiles) projectile.Draw(gameManager);
         DebugManager.EndBenchmark("CharacterDraws");
     }
+    public Level GetLevel(LevelPath level) => GetLevel(level.ToString());
     public Level GetLevel(string name)
     {
         foreach (Level level in Levels)
@@ -354,17 +356,21 @@ public class LevelManager
             return null;
         return Level.Biome[x + y * Constants.MapSize.X];
     }
-    public Tile? GetTile(Point coord)
+    public Tile? GetTile(Point coord) => GetTile(Level, coord);
+    public Tile? GetTile(int x, int y) => GetTile(Level, x, y);
+    public Tile? GetTile(LevelPath level, Point coord) => GetTile(GetLevel(level), coord);
+    public Tile? GetTile(LevelPath level, int x, int y) => GetTile(GetLevel(level), x, y);
+    public static Tile? GetTile(Level level, Point coord)
     {
         if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
             return null;
-        return Level.Tiles[coord.X + coord.Y * Constants.MapSize.X];
+        return level.Tiles[coord.X + coord.Y * Constants.MapSize.X];
     }
-    public Tile? GetTile(int x, int y)
+    public static Tile? GetTile(Level level, int x, int y)
     {
         if (x < 0 || x >= Constants.MapSize.X || y < 0 || y >= Constants.MapSize.Y)
             return null;
-        return Level.Tiles[x + y * Constants.MapSize.X];
+        return level.Tiles[x + y * Constants.MapSize.X];
     }
     public Decal? GetDecal(ByteCoord coord)
     {

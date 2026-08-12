@@ -1,6 +1,8 @@
+using System.IO;
+
 namespace Quest.Tiles;
 
-public class Door : Tile
+public class Door : Tile, IHasState
 {
     public ItemRef? Key { get; set; }
     public bool ConsumeKey { get; set; }
@@ -53,6 +55,15 @@ public class Door : Tile
     {
         IsOpened = true;
         LightingManager.SetLightGridBlocking(Location.ToPoint(), false);
-        SaveManager.SaveDoorOpened(TileID, game.LevelManager.Level.LevelName);
+        SaveManager.SaveStateTile(this, game.LevelManager.Level.LevelName);
+    }
+    public void WriteState(BinaryWriter writer, GameManager gameManager)
+    {
+        // If a door is even written to the save, then it means it's open
+    }
+    public void ReadState(BinaryReader reader, GameManager gameManager)
+    {
+        // If a door is even written to the save, then it means it's open
+        Open(gameManager);
     }
 }

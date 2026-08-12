@@ -64,7 +64,7 @@ public class NPC : IEntity
 {
     public static readonly NPC Null = new(TextureID.Null, Point.Zero, "NUL_NAME", "NUL_DIALOG");
     public static Dialog? DialogBox { get; set; }
-    public static List<(NPC npc, float dist)> NPCsNearby { get; set; } = [];
+    public static List<(NPC npc, float distSq)> NPCsNearby { get; set; } = [];
     public ushort UID { get; }
     public List<ShopOption> ShopOptions { get; private set; } = [];
     public Point Position { get; set; }
@@ -105,9 +105,9 @@ public class NPC : IEntity
     public void Update(GameManager gameManager)
     {
         // Mark as dialogue possibility
-        float dist = Vector2.DistanceSquared(CameraManager.PlayerFoot.ToVector2() / Constants.TileSize.ToVector2(), Position.ToVector2() + Constants.HalfVec);
-        if (dist <= 4)
-            NPCsNearby.Add((this, dist));
+        float distSq = Vector2.DistanceSquared(CameraManager.PlayerFoot.ToVector2() / Constants.TileSize.ToVector2(), Position.ToVector2() + Constants.HalfVec);
+        if (distSq <= 4)
+            NPCsNearby.Add((this, distSq));
     }
     public void AddShopOption(ShopOption option)
     {
@@ -151,7 +151,7 @@ public class NPC : IEntity
         {
             Item leftover = cont.AddItem(new(option.Item));
             if (leftover.Amount > 0)
-                gameManager.LevelManager.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), CameraManager.TileToWorld(Position), GameManager.GameTime));
+                gameManager.LevelManager.Level.Loot.Add(new(new(leftover.Type, leftover.Amount), CameraManager.TileToWorld(Position)));
             SoundManager.PlaySound("Trinkets", pitchVariation: 0.25f);
             option.Stock -= 1;
         }

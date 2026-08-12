@@ -280,6 +280,14 @@ public static class LevelFileManager
             displayCase.Container.Items[0] = item;
             return displayCase;
         }
+        PressurePlate ReadPressurePlate(Point loc)
+        {
+            TileEffect effect = (TileEffect)reader.ReadByte();
+            ByteCoord effectCoord = reader.ReadByteCoord();
+            string effectLevel = reader.ReadString();
+
+            return new PressurePlate(loc, levelPath.LevelName, effect, effectCoord, new(levelPath.WorldName, effectLevel));
+        }
 
         // Read tile data
         Point loc = new(x, y);
@@ -296,6 +304,7 @@ public static class LevelFileManager
             TileTypeID.Chest => ReadChest(loc),
             TileTypeID.Lamp => new Lamp(loc, reader.ReadByte()),
             TileTypeID.DisplayCase => ReadDisplayCase(loc),
+            TileTypeID.PressurePlate => ReadPressurePlate(loc),
             _ => Tile.TileFromId(type, loc, levelPath.LevelName),
         };
     }

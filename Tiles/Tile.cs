@@ -69,6 +69,7 @@ public enum TileTypeIDOld : byte
     WetVolcanicSand,
     WhiteTiles,
     Farmland,
+    PressurePlate,
     // TILES ID
 }
 public enum TileTypeID : byte
@@ -139,6 +140,7 @@ public enum TileTypeID : byte
     Stove,
     Furnace,
     Crafter,
+    PressurePlate,
     // TILES ID
 }
 public class TileType
@@ -230,6 +232,7 @@ public static class TileTypes
         new(TileTypeID.Stove, TextureID.Stove, false, false, weight: 0),
         new(TileTypeID.Furnace, TextureID.Furnace, false, false, weight: 0),
         new(TileTypeID.Crafter, TextureID.Crafter, false, false, weight: 0),
+        new(TileTypeID.PressurePlate, TextureID.PressurePlate, true, false),
         // TILES REGISTER
     ];
 }
@@ -295,6 +298,7 @@ public class Tile
             TileTypeID.DisplayCase => new DisplayCase(location, levelName),
             TileTypeID.Crate => new Crate(location, levelName),
             TileTypeID.Crafter => new Crafter(location, levelName),
+            TileTypeID.PressurePlate => new PressurePlate(location, levelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null),
             // TILEFROMID
             _ => new(location, type)
         };

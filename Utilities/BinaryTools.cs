@@ -91,6 +91,11 @@ public static class BinaryWriterExtensions
         else
             writer.Write(file);
     }
+    public static void Write(this BinaryWriter writer, ItemRef item)
+    {
+        writer.Write((byte)item.Type.TypeID);
+        writer.Write(item.Amount);
+    }
 }
 
 public static class BinaryReaderExtensions
@@ -197,13 +202,19 @@ public static class BinaryReaderExtensions
         byte amount = reader.ReadByte();
         ushort x = reader.ReadUInt16();
         ushort y = reader.ReadUInt16();
-        return new Loot(new ItemRef(type, amount), new Point(x, y), GameManager.GameTime);
+        return new Loot(new ItemRef(type, amount), new Point(x, y));
     }
     public static Decal ReadDecal(this BinaryReader reader)
     {
         DecalType type = (DecalType)reader.ReadByte();
         Point location = reader.ReadByteCoord().ToPoint();
         return Decal.CreateDecal(type, location);
+    }
+    public static ItemRef ReadItemRef(this BinaryReader reader)
+    {
+        byte itemType = reader.ReadByte();
+        byte amount = reader.ReadByte();
+        return new ItemRef(ItemTypes.All[itemType], amount);
     }
 }
 
