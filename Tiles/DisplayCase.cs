@@ -1,3 +1,5 @@
+using Quest.Editor.Managers;
+using Quest.Editor;
 using Quest.Interaction;
 using System.ComponentModel;
 
@@ -26,6 +28,18 @@ public class DisplayCase : Tile, IContainer
         UserInterface.DisplayCaseUI.BindContainer(Container);
         player.OpenInterface(gameManager, UserInterface.DisplayCaseUI);
         gameManager.StateManager.OverlayState = OverlayState.Container;
+    }
+    public void Edit(EditorManager editorManager)
+    {
+        var (success, values) = PopupFactory.ShowInputForm("Lamp Editor", [
+        new("Item", null, EditorManager.ItemsOptionsWNone, placeholder: Container.Items[0] == null ? "NONE" : Container.Items[0]!.Name),
+                new("Amount", PopupFactory.IsNonZeroByte, placeholder: Container.Items[0]?.Amount)]);
+        if (!success)
+        {
+            if (!PopupFactory.PopupOpen) Logger.Error("Display case edit failed.");
+            return;
+        }
+        Container.Items[0] = new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[0])], byte.Parse(values[1]));
     }
 }
 

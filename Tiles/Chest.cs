@@ -1,8 +1,10 @@
+using Quest.Editor;
+using Quest.Editor.Managers;
 using Quest.Interaction;
 
 namespace Quest.Tiles;
 
-public class Chest : Tile, IContainer
+public class Chest : Tile, IContainer, IEditableTile
 {
     public readonly static Point Size = new(6, 3);
     public ILootGenerator LootGenerator { get; private set; }
@@ -83,4 +85,33 @@ public class Chest : Tile, IContainer
         Container = new(new Item?[Chest.Size.X * Chest.Size.Y]);
     }
     public void SetSeed(int seed) => Seed = seed;
+    public void Edit(EditorManager editorManager)
+    {
+        string genFile = LootGenerator.FileName;
+        genFile = genFile.Contains('.') ? genFile : "NUL.qlt";
+
+        var (success, values) = PopupFactory.ShowInputForm("Chest Editor", [
+            new("Loot File Name", null, placeholder: genFile.Split('.')[0]),
+                new("Loot Type", null, ["Loot Preset", "Loot Table"], genFile.Split('.')[1] == "qlt" ? "Loot Table" : "Loot Preset"),
+                new("Key", null, EditorManager.ItemsOptionsWNone, Key == null ? "NONE" : Key.Name),
+                new("Amount", PopupFactory.IsByte, placeholder: Key == null ? "0" : Key.Amount),
+                new("Consume Key", null, ["True", "False"], ConsumeKey)]);
+        if (!success)
+        {
+            if (!PopupFactory.PopupOpen) Logger.Error("Chest edit failed.");
+            return;
+        }
+        // Loot
+        if (values[1] == "Loot Table")
+            RegenerateLoot(LootTable.ReadLootTable(editorManager.CurrentLevel.WorldName, $"{values[0]}.qlt"));
+        else if (values[1] == "Loot Preset")
+            RegenerateLoot(LootPreset.ReadLootPreset(editorManager.CurrentLevel.WorldName, $"{values[0]}.qlp"));
+        else
+            Logger.Error("Chest loot edit failed.");
+        // Key
+        Key = values[2].Equals("none", StringComparison.CurrentCultureIgnoreCase) ? null : new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[2])], byte.Parse(values[3]));
+        if (Key?.Amount <= 0)
+            Key = null;
+        ConsumeKey = bool.Parse(values[4]);
+    }
 }

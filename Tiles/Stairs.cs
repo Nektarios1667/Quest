@@ -1,6 +1,10 @@
+using Quest.Editor.Managers;
+using Quest.Editor;
+using System.ComponentModel;
+
 namespace Quest.Tiles;
 
-public class Stairs : Tile
+public class Stairs : Tile, IEditableTile
 {
     public LevelPath DestLevel { get; set; }
     public ByteCoord Dest { get; set; }
@@ -34,5 +38,26 @@ public class Stairs : Tile
         TimerManager.SetTimer("ScreenFadeIn", 1.5f, null);
 
         Logger.System($"Teleporting to level '{DestLevel.LevelName}' @ {Dest}");
+    }
+    public void Edit(EditorManager editorManager)
+    {
+        var (success, values) = PopupFactory.ShowInputForm("Stair Editor", [
+        new("Level", null, placeholder: DestLevel.LevelName),
+                new("Spawn X", PopupFactory.IsByte, placeholder: Dest.X),
+                new("Spawn Y", PopupFactory.IsByte, placeholder: Dest.Y)]);
+        if (!success)
+        {
+            if (!PopupFactory.PopupOpen) Logger.Error("Stair edit failed.");
+            return;
+        }
+        if (values[0].Contains('\\') || values[0].Contains('/'))
+        {
+            Logger.Error("Invalid level format. Stairs can not go to other worlds.");
+            return;
+        }
+
+        // Level
+        DestLevel = new(editorManager.CurrentLevel.WorldName, values[0]);
+        Dest = new(byte.Parse(values[1]), byte.Parse(values[2]));
     }
 }

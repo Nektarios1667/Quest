@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Quest.Editor;
+using Quest.Editor.Managers;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,7 +17,7 @@ public enum TileEffect : byte
     SpawnItem,
 }
 
-public abstract class TriggerTile : Tile, IHasState
+public abstract class TriggerTile : Tile, IHasState, IEditableTile
 {
     public TileEffect EffectType { get; set; }
     public ByteCoord EffectCoord { get; set; }
@@ -54,4 +57,28 @@ public abstract class TriggerTile : Tile, IHasState
     }
     public abstract void WriteState(BinaryWriter writer, GameManager gameManager);
     public abstract void ReadState(BinaryReader reader, GameManager gameManager);
+    public virtual void Edit(EditorManager editorManager)
+    {
+        // Input fields
+        List<InputField> fields = [
+            new("Tile Effect", null, dropdownOptions: Enum.GetNames<TileEffect>(), placeholder: EffectType),
+                new("Effected Tile Coord X", PopupFactory.IsByte, placeholder: EffectCoord.X),
+                new("Effected Tile Coord Y", PopupFactory.IsByte, placeholder: EffectCoord.Y),
+                new("Effected Tile Level", null, placeholder: EffectLevel.LevelName)
+        ];
+
+
+        // Window
+        var (success, values) = PopupFactory.ShowInputForm("Pressure Plate Editor", fields.ToArray());
+        if (!success)
+        {
+            if (!PopupFactory.PopupOpen) Logger.Error("Pressure plate edit failed.");
+            return;
+        }
+
+        // Shared fields
+        EffectType = Enum.Parse<TileEffect>(values[0]);
+        EffectCoord = new(byte.Parse(values[1]), byte.Parse(values[2]));
+        EffectLevel = new(EffectLevel.WorldName, values[3]);
+    }
 }

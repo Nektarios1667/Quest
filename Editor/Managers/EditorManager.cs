@@ -1,4 +1,4 @@
-﻿ using Quest.World;
+﻿using Quest.World;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -17,10 +17,10 @@ public class EditorManager
     // Static
     public static Tile? MouseTile { get; private set; }
     public static Point MouseCoord { get; private set; }
+    public static string[] ItemsOptionsWNone = ["NONE", .. Constants.ItemTypeNames];
     // Settings
     public bool ShowBiomeMarkers = true;
     // Helper
-    public string[] ItemsOptionsWNone = ["NONE", .. Constants.ItemTypeNames];
     // Public
     public GameManager GameManager { get; private set; }
     public LevelManager LevelManager => GameManager.LevelManager;
@@ -51,125 +51,8 @@ public class EditorManager
     public void EditTile()
     {
         Tile? tile = LevelManager.GetTile(MouseSelectionCoord);
-        // Stair
-        if (tile is Stairs stairs)
-        {
-            var (success, values) = ShowInputForm("Stair Editor", [
-                new("Level", null, placeholder: stairs.DestLevel.LevelName),
-                new("Spawn X", IsByte, placeholder: stairs.Dest.X),
-                new("Spawn Y", IsByte, placeholder: stairs.Dest.Y)]);
-            if (!success)
-            {
-                if (!PopupOpen) Logger.Error("Stair edit failed.");
-                return;
-            }
-            if (values[0].Contains('\\') || values[0].Contains('/'))
-            {
-                Logger.Error("Invalid level format. Stairs can not go to other worlds.");
-                return;
-            }
-
-            // Level
-            stairs.DestLevel = new(CurrentLevel.WorldName, values[0]);
-            stairs.Dest = new(byte.Parse(values[1]), byte.Parse(values[2]));
-        }
-        // Door
-        else if (tile is Door door)
-        {
-            var (success, values) = ShowInputForm("Door Editor", [
-                new("Key", null, ItemsOptionsWNone, door.Key == null ? "NONE" : door.Key.Name),
-                new("Amount", IsByte, placeholder: door.Key == null ? "0" : door.Key.Amount),
-                new("Consume Key", null, ["True", "False"], door.ConsumeKey.ToString())]);
-            if (!success)
-            {
-                if (!PopupOpen) Logger.Error("Stair edit failed.");
-                return;
-            }
-            door.Key = values[0].Equals("none", StringComparison.CurrentCultureIgnoreCase) ? null : new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[0])], byte.Parse(values[1]));
-            if (door.Key?.Amount <= 0)
-                door.Key = null;
-            door.ConsumeKey = bool.Parse(values[2]);
-        }
-        // Chest
-        else if (tile is Chest chest)
-        {
-            string genFile = chest.LootGenerator.FileName;
-            genFile = genFile.Contains('.') ? genFile : "NUL.qlt";
-
-            var (success, values) = ShowInputForm("Chest Editor", [
-                new("Loot File Name", null, placeholder: genFile.Split('.')[0]),
-                new("Loot Type", null, ["Loot Preset", "Loot Table"], genFile.Split('.')[1] == "qlt" ? "Loot Table" : "Loot Preset"),
-                new("Key", null, ItemsOptionsWNone, chest.Key == null ? "NONE" : chest.Key.Name),
-                new("Amount", IsByte, placeholder: chest.Key == null ? "0" : chest.Key.Amount),
-                new("Consume Key", null, ["True", "False"], chest.ConsumeKey)]);
-            if (!success)
-            {
-                if (!PopupOpen) Logger.Error("Chest edit failed.");
-                return;
-            }
-            // Loot
-            if (values[1] == "Loot Table")
-                chest.RegenerateLoot(LootTable.ReadLootTable(CurrentLevel.WorldName, $"{values[0]}.qlt"));
-            else if (values[1] == "Loot Preset")
-                chest.RegenerateLoot(LootPreset.ReadLootPreset(CurrentLevel.WorldName, $"{values[0]}.qlp"));
-            else
-                Logger.Error("Chest loot edit failed.");
-            // Key
-            chest.Key = values[2].Equals("none", StringComparison.CurrentCultureIgnoreCase) ? null : new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[2])], byte.Parse(values[3]));
-            if (chest.Key?.Amount <= 0)
-                chest.Key = null;
-            chest.ConsumeKey = bool.Parse(values[4]);
-        }
-        // Lamp
-        else if (tile is Lamp lamp)
-        {
-            var (success, values) = ShowInputForm("Lamp Editor", [new("Light Radius", IsByte, placeholder: lamp.LightRadius)]);
-            if (!success)
-            {
-                if (!PopupOpen) Logger.Error("Lamp edit failed.");
-                return;
-            }
-            lamp.LightRadius = byte.Parse(values[0]);
-        }
-        // Display case
-        else if (tile is DisplayCase displayCase)
-        {
-            var (success, values) = ShowInputForm("Lamp Editor", [
-                new("Item", null, ItemsOptionsWNone, placeholder: displayCase.Container.Items[0] == null ? "NONE" : displayCase.Container.Items[0]!.Name),
-                new("Amount", IsNonZeroByte, placeholder: displayCase.Container.Items[0]?.Amount)]);
-            if (!success)
-            {
-                if (!PopupOpen) Logger.Error("Display case edit failed.");
-                return;
-            }
-            displayCase.Container.Items[0] = new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[0])], byte.Parse(values[1]));
-        }
-        // PTrigger tiles
-        else if (tile is TriggerTile trig)
-        {
-            // Input fields
-            List<InputField> fields = [
-                new("Tile Effect", null, dropdownOptions: Enum.GetNames<TileEffect>(), placeholder: trig.EffectType),
-                new("Effected Tile Coord X", IsByte, placeholder: trig.EffectCoord.X),
-                new("Effected Tile Coord Y", IsByte, placeholder: trig.EffectCoord.Y),
-                new("Effected Tile Level", null, placeholder: trig.EffectLevel.LevelName)
-            ];
-
-
-            // Window
-            var (success, values) = ShowInputForm("Pressure Plate Editor", fields.ToArray());
-            if (!success)
-            {
-                if (!PopupOpen) Logger.Error("Pressure plate edit failed.");
-                return;
-            }
-
-            // Shared fields
-            trig.EffectType = Enum.Parse<TileEffect>(values[0]);
-            trig.EffectCoord = new(byte.Parse(values[1]), byte.Parse(values[2]));
-            trig.EffectLevel = new(trig.EffectLevel.WorldName, values[3]);
-
-        }
+        if (tile is IEditableTile editable)
+            editable.Edit(this);
     }
     public void FloodFill()
     {

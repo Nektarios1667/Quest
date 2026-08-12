@@ -1,8 +1,11 @@
+using Quest.Editor.Managers;
+using Quest.Editor;
+using System.ComponentModel;
 using System.IO;
 
 namespace Quest.Tiles;
 
-public class Door : Tile, IHasState
+public class Door : Tile, IHasState, IEditableTile
 {
     public ItemRef? Key { get; set; }
     public bool ConsumeKey { get; set; }
@@ -66,4 +69,21 @@ public class Door : Tile, IHasState
         // If a door is even written to the save, then it means it's open
         Open(gameManager);
     }
+    public void Edit(EditorManager editorManager)
+    {
+        var (success, values) = PopupFactory.ShowInputForm("Door Editor", [
+        new("Key", null, EditorManager.ItemsOptionsWNone, Key == null ? "NONE" : Key.Name),
+                new("Amount", PopupFactory.IsByte, placeholder: Key == null ? "0" : Key.Amount),
+                new("Consume Key", null, ["True", "False"], ConsumeKey.ToString())]);
+        if (!success)
+        {
+            if (!PopupFactory.PopupOpen) Logger.Error("Stair edit failed.");
+            return;
+        }
+        Key = values[0].Equals("none", StringComparison.CurrentCultureIgnoreCase) ? null : new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[0])], byte.Parse(values[1]));
+        if (Key?.Amount <= 0)
+            Key = null;
+        ConsumeKey = bool.Parse(values[2]);
+    }
+
 }
