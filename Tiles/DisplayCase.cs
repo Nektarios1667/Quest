@@ -1,11 +1,12 @@
-using Quest.Editor.Managers;
 using Quest.Editor;
+using Quest.Editor.Managers;
 using Quest.Interaction;
 using System.ComponentModel;
+using System.IO;
 
 namespace Quest.Tiles;
 
-public class DisplayCase : Tile, IContainer
+public class DisplayCase : Tile, IContainer, IHasLevelData
 {
     public Interaction.Container Container { get; private set; }
     public DisplayCase(Point location, string levelName) : base(location, TileTypeID.DisplayCase)
@@ -40,6 +41,15 @@ public class DisplayCase : Tile, IContainer
             return;
         }
         Container.Items[0] = new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[0])], byte.Parse(values[1]));
+    }
+    public void WriteLevelData(BinaryWriter writer)
+    {
+        SaveManager.WriteItemData(writer, Container.Items[0]);
+    }
+    public void ReadLevelData(BinaryReader reader, LevelPath levelPath)
+    {
+        Item? item = SaveManager.ReadItemData(reader);
+        Container.Items[0] = item;
     }
 }
 

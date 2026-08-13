@@ -3,10 +3,11 @@ using Quest.Editor;
 using Quest.Editor.Managers;
 using ScottPlot.Colormaps;
 using System.ComponentModel;
+using System.IO;
 
 namespace Quest.Tiles;
 
-public class Lamp : Tile, IDynamicTile, IEditableTile
+public class Lamp : Tile, IDynamicTile, IEditableTile, IHasLevelData
 {
     public byte LightRadius { get; set; }
     public Lamp(Point location, byte lightRadius = 10) : base(location, TileTypeID.Lamp)
@@ -31,5 +32,13 @@ public class Lamp : Tile, IDynamicTile, IEditableTile
             return;
         }
         LightRadius = byte.Parse(values[0]);
+    }
+    public void WriteLevelData(BinaryWriter writer)
+    {
+        writer.Write(LightRadius);
+    }
+    public void ReadLevelData(BinaryReader reader, LevelPath levelPath)
+    {
+        LightRadius = reader.ReadByte();
     }
 }

@@ -249,7 +249,7 @@ public class Tile
     public virtual bool IsWalkable => Type.IsWalkable; // Door changes this depending on if its open/closed
     public virtual bool IsTransparent => Type.IsTransparent; // Door changes this depending on if its open/closed
     public virtual float Weight => Type.Weight;
-    public ushort TileID => (ushort)(X + Y * Constants.MapSize.X);
+    public ushort UID => (ushort)(X + Y * Constants.MapSize.X);
     public TileType Type => TileTypes.All[(byte)TypeID];
 
     public Tile(Point location, TileTypeID type)
@@ -288,7 +288,7 @@ public class Tile
             TileTypeID.Lava => new Lava(location),
             TileTypeID.Stairs => new Stairs(location, LevelPath.Null, location),
             TileTypeID.Door => new Door(location, null),
-            TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, "_"),
+            TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, levelName),
             TileTypeID.Lamp => new Lamp(location),
             TileTypeID.Jukebox => new Jukebox(location, levelName),
             TileTypeID.DiscWriter => new DiscWriter(location, levelName),

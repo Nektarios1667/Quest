@@ -17,7 +17,7 @@ public enum TileEffect : byte
     SpawnItem,
 }
 
-public abstract class TriggerTile : Tile, IHasState, IEditableTile
+public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelData
 {
     public TileEffect EffectType { get; set; }
     public ByteCoord EffectCoord { get; set; }
@@ -25,8 +25,6 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile
     public bool Activated { get; protected set; } = false;
     // Optional
     public ItemRef? SpawnItem { get; set; } = null;
-    public bool? LockPedestalItem { get; set; } = null;
-    public ItemRef? PedestalItem { get; set; } = null;
     public TriggerTile(TileTypeID type, Point location, string levelName, TileEffect effectType, ByteCoord effectCoord, LevelPath effectLevel) : base(location, type)
     {
         EffectType = effectType;
@@ -80,5 +78,17 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile
         EffectType = Enum.Parse<TileEffect>(values[0]);
         EffectCoord = new(byte.Parse(values[1]), byte.Parse(values[2]));
         EffectLevel = new(EffectLevel.WorldName, values[3]);
+    }
+    public void WriteLevelData(BinaryWriter writer)
+    {
+        writer.Write((byte)EffectType);
+        writer.Write(EffectCoord);
+        writer.Write(EffectLevel.LevelName);
+    }
+    public void ReadLevelData(BinaryReader reader, LevelPath levelPath)
+    {
+        EffectType = (TileEffect)reader.ReadByte();
+        EffectCoord = reader.ReadByteCoord();
+        EffectLevel = new(levelPath.WorldName, reader.ReadString());
     }
 }

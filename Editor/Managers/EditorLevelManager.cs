@@ -153,37 +153,10 @@ public class EditorLevelManager
         {
             Tile tile = LevelManager.Level.Tiles[i];
             // Write tile data
-            //writer.Write((byte)EnumTools.ConvertEnum<TileTypeID, TileTypeIDNew>(tile.Type.ID));
             writer.Write((byte)tile.Type.ID);
             // Extra properties
-            if (tile is Stairs stairs)
-            {
-                // Write destination
-                writer.Write(stairs.DestLevel.LevelName ?? "");
-                writer.Write(stairs.Dest);
-            }
-            else if (tile is Door door)
-            {
-                // Write door key
-                SaveManager.WriteItemData(writer, door.Key);
-                writer.Write(door.ConsumeKey);
-            }
-            else if (tile is Chest chest)
-            {
-                writer.Write(chest.LootGenerator);
-                SaveManager.WriteItemData(writer, chest.Key);
-                writer.Write(chest.ConsumeKey);
-            }
-            else if (tile is Lamp lamp)
-                writer.Write(lamp.LightRadius);
-            else if (tile is DisplayCase displayCase)
-                SaveManager.WriteItemData(writer, displayCase.Container.Items[0]);
-            else if (tile is TriggerTile trig)
-            {
-                writer.Write((byte)trig.EffectType);
-                writer.Write(trig.EffectCoord);
-                writer.Write(trig.EffectLevel.LevelName);
-            }
+            if (tile is IHasLevelData hasLevelData)
+                hasLevelData.WriteLevelData(writer);
         }
     }
     private void WriteBiomeSection(BinaryWriter writer)

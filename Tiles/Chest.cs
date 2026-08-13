@@ -1,10 +1,11 @@
 using Quest.Editor;
 using Quest.Editor.Managers;
 using Quest.Interaction;
+using System.IO;
 
 namespace Quest.Tiles;
 
-public class Chest : Tile, IContainer, IEditableTile
+public class Chest : Tile, IContainer, IEditableTile, IHasLevelData
 {
     public readonly static Point Size = new(6, 3);
     public ILootGenerator LootGenerator { get; private set; }
@@ -113,5 +114,23 @@ public class Chest : Tile, IContainer, IEditableTile
         if (Key?.Amount <= 0)
             Key = null;
         ConsumeKey = bool.Parse(values[4]);
+    }
+    public void WriteLevelData(BinaryWriter writer)
+    {
+        writer.Write(LootGenerator);
+        SaveManager.WriteItemData(writer, Key);
+        writer.Write(ConsumeKey);
+    }
+    public void ReadLevelData(BinaryReader reader, LevelPath levelPath)
+    {
+        // Loot gen
+        string lootGenFile = reader.ReadString();
+        ILootGenerator lootGen = LootGeneratorHelper.Read(levelPath.WorldName, lootGenFile);
+        lootGen = (lootGen.FileName.IsNUL() || lootGen.FileName == "_") ? LootPreset.EmptyPreset : lootGen;
+        LootGenerator = lootGen;
+
+        // Key
+        Key = SaveManager.ReadItemData(reader)?.GetItemRef();
+        ConsumeKey = reader.ReadBoolean();
     }
 }

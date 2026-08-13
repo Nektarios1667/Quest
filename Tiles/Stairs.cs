@@ -1,10 +1,11 @@
-using Quest.Editor.Managers;
 using Quest.Editor;
+using Quest.Editor.Managers;
 using System.ComponentModel;
+using System.IO;
 
 namespace Quest.Tiles;
 
-public class Stairs : Tile, IEditableTile
+public class Stairs : Tile, IEditableTile, IHasLevelData
 {
     public LevelPath DestLevel { get; set; }
     public ByteCoord Dest { get; set; }
@@ -59,5 +60,16 @@ public class Stairs : Tile, IEditableTile
         // Level
         DestLevel = new(editorManager.CurrentLevel.WorldName, values[0]);
         Dest = new(byte.Parse(values[1]), byte.Parse(values[2]));
+    }
+    public void WriteLevelData(BinaryWriter writer)
+    {
+        // Write destination
+        writer.Write(DestLevel.LevelName ?? "");
+        writer.Write(Dest);
+    }
+    public void ReadLevelData(BinaryReader reader, LevelPath levelPath)
+    {
+        DestLevel = new LevelPath(levelPath.WorldName, reader.ReadString());
+        Dest = new(reader.ReadByte(), reader.ReadByte());
     }
 }

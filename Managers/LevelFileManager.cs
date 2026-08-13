@@ -264,48 +264,22 @@ public static class LevelFileManager
     }
     private static Tile ReadTile(BinaryReader reader, LevelPath levelPath, int x, int y)
     {
-        // Helpers
-        Chest ReadChest(Point loc)
-        {
-            string lootGenFile = reader.ReadString();
-            ILootGenerator lootGen = LootGeneratorHelper.Read(levelPath.WorldName, lootGenFile);
-            lootGen = (lootGen.FileName.IsNUL() || lootGen.FileName == "_") ? LootPreset.EmptyPreset : lootGen;
-
-            return new Chest(loc, lootGen, levelPath.LevelName, SaveManager.ReadItemData(reader)?.GetItemRef(), reader.ReadBoolean());
-        }
-        DisplayCase ReadDisplayCase(Point loc)
-        {
-            Item? item = SaveManager.ReadItemData(reader);
-            DisplayCase displayCase = new(loc, levelPath.LevelName);
-            displayCase.Container.Items[0] = item;
-            return displayCase;
-        }
-        PressurePlate ReadPressurePlate(Point loc)
-        {
-            TileEffect effect = (TileEffect)reader.ReadByte();
-            ByteCoord effectCoord = reader.ReadByteCoord();
-            string effectLevel = reader.ReadString();
-
-            return new PressurePlate(loc, levelPath.LevelName, effect, effectCoord, new(levelPath.WorldName, effectLevel));
-        }
-
-        // Read tile data
         Point loc = new(x, y);
+
+        // Type
         if (!Enum.TryParse(reader.ReadByte().ToString(), out TileTypeID type))
         {
             Logger.Error($"Invalid tile type at {x}, {y} in level file.");
             return new Sky(loc);
         }
 
-        return type switch
-        {
-            TileTypeID.Stairs => new Stairs(loc, new LevelPath(levelPath.WorldName, reader.ReadString()), new(reader.ReadByte(), reader.ReadByte())),
-            TileTypeID.Door => new Door(loc, SaveManager.ReadItemData(reader)?.GetItemRef(), reader.ReadBoolean()),
-            TileTypeID.Chest => ReadChest(loc),
-            TileTypeID.Lamp => new Lamp(loc, reader.ReadByte()),
-            TileTypeID.DisplayCase => ReadDisplayCase(loc),
-            TileTypeID.PressurePlate => ReadPressurePlate(loc),
-            _ => Tile.TileFromId(type, loc, levelPath.LevelName),
-        };
+        // Make generic tile
+        Tile tile = Tile.TileFromId(type, loc, levelPath.LevelName);
+
+        // Extra data
+        if (tile is IHasLevelData data)
+            data.ReadLevelData(reader, levelPath);
+
+        return tile;
     }
 }

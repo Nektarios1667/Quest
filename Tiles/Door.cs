@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Quest.Tiles;
 
-public class Door : Tile, IHasState, IEditableTile
+public class Door : Tile, IHasState, IEditableTile, IHasLevelData
 {
     public ItemRef? Key { get; set; }
     public bool ConsumeKey { get; set; }
@@ -85,5 +85,15 @@ public class Door : Tile, IHasState, IEditableTile
             Key = null;
         ConsumeKey = bool.Parse(values[2]);
     }
-
+    public void WriteLevelData(BinaryWriter writer)
+    {
+        // Write door key
+        SaveManager.WriteItemData(writer, Key);
+        writer.Write(ConsumeKey);
+    }
+    public void ReadLevelData(BinaryReader reader, LevelPath levelPath)
+    {
+        Key = SaveManager.ReadItemData(reader)?.GetItemRef();
+        ConsumeKey = reader.ReadBoolean();
+    }
 }

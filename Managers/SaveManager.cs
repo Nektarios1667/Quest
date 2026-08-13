@@ -225,7 +225,9 @@ public class SaveManager
 
                 foreach (var stateTile in levelStateTiles)
                 {
-                    writer.Write((byte)stateTile.TypeID);
+                    // Write tile index
+                    ushort idx = stateTile.UID;
+                    writer.Write(idx);
                     stateTile.WriteState(writer, gameManager);
                 }
             }
@@ -327,10 +329,10 @@ public class SaveManager
         MenuManager.SetCurrentlyLoading("Loading save file...");
 
         // Level table - uid <--> levelName
-        Dictionary<ushort, string> levelTable = new Dictionary<ushort, string>();
+        Dictionary<ushort, string> levelTable = [];
 
         // Read sections
-        string id;
+        string id = "";
         using (var fs = new FileStream(file, FileMode.Open, FileAccess.Read))
         using (var reader = new BinaryReader(fs))
         {
@@ -342,8 +344,10 @@ public class SaveManager
                 return false;
             }
 
-            while (true)
+            // Arbitrary limit of 200
+            for (int i = 0; i < 200; i++)
             {
+
                 id = reader.ReadString();
                 int length = reader.ReadInt32();
 
@@ -355,16 +359,22 @@ public class SaveManager
                 using BinaryReader sectionReader = new BinaryReader(sectionStream);
 
                 // Section types
-                switch (id)
+                try
                 {
-                    case "TABL": ReadTableSection(gameManager, sectionReader, levelTable); break;
-                    case "WHTR": ReadWeatherSection(gameManager, sectionReader); break;
-                    case "CAMR": ReadCameraSection(gameManager, sectionReader); break;
-                    case "PLYR": ReadPlayerSection(gameManager, playerManager, sectionReader); break;
-                    case "LEVL": ReadLevelSection(gameManager, playerManager, levelPath, sectionReader); break;
-                    case "INVT": ReadInventorySection(gameManager, playerManager, sectionReader); break;
-                    case "EFFX": ReadEffectsSection(gameManager, playerManager, sectionReader); break;
-                    default: Logger.Warning($"Unknown level section '{id}'"); break; // Unknown section - ignore it
+                    switch (id)
+                    {
+                        case "TABL": ReadTableSection(gameManager, sectionReader, levelTable); break;
+                        case "WHTR": ReadWeatherSection(gameManager, sectionReader); break;
+                        case "CAMR": ReadCameraSection(gameManager, sectionReader); break;
+                        case "PLYR": ReadPlayerSection(gameManager, playerManager, sectionReader); break;
+                        case "LEVL": ReadLevelSection(gameManager, playerManager, levelPath, sectionReader); break;
+                        case "INVT": ReadInventorySection(gameManager, playerManager, sectionReader); break;
+                        case "EFFX": ReadEffectsSection(gameManager, playerManager, sectionReader); break;
+                        default: Logger.Warning($"Unknown level section '{id}'"); break; // Unknown section - ignore it
+                    }
+                } catch (Exception e)
+                {
+                    Logger.Error($"Save Error | {id}\n{e}");
                 }
             }
         }
@@ -437,8 +447,14 @@ public class SaveManager
             // State tiles IHasState
             ushort stateTileCount = reader.ReadUInt16();
             for (int s = 0; s < stateTileCount; s++)
-                if (current.Tiles[reader.ReadUInt16()] is IHasState stateTile)
+            {
+                ushort idx = reader.ReadUInt16();
+                if (current.Tiles[idx] is IHasState stateTile)
                     stateTile.ReadState(reader, gameManager);
+                else
+                    Logger.Error($"Tile {idx} is not a IHasState tile");
+            }
+
 
             // Chests
             ushort chestCount = reader.ReadUInt16();
@@ -519,7 +535,7 @@ public class SaveManager
     #region WriteHelpers
     public static void WriteChestData(BinaryWriter writer, Chest chest)
     {
-        writer.Write(chest.TileID); // TileID - ushort
+        writer.Write(chest.UID); // TileID - ushort
         writer.Write(chest.Generated); // IsGenerated - bool
         if (chest.Generated)
         {
