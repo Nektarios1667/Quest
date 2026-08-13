@@ -39,6 +39,9 @@ public enum DecalType : byte
     Raddishes,
     SmallPlants,
     Wheat,
+    Damage,
+    Kill,
+    Heal,
     // DECALS
 }
 public class Decal

@@ -278,6 +278,7 @@ public class ItemRef
         CustomName = name;
     }
     public ItemRef Copy() => new(Type, Amount, CustomName);
+    public override string ToString() => $"{Name}{(CustomName != null ? $" [{CustomName}]" : "")} x{Amount}";
 }
 public class Item
 {
@@ -400,5 +401,5 @@ public class Item
         return tags;
     }
     public ItemRef GetItemRef() => new(Type, Amount, CustomName);
-    public override string ToString() => $"{Name}{(CustomName != null ? $" [{CustomName}]" : "")} x{Amount} {Tags()}";
+    public override string ToString() => $"{Name}{(CustomName != null ? $" [{CustomName}]" : "")} x{Amount}";
 }

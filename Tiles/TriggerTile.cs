@@ -1,5 +1,6 @@
 ﻿using Quest.Editor;
 using Quest.Editor.Managers;
+using ScottPlot.Interactivity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,6 +16,8 @@ public enum TileEffect : byte
     None,
     OpenDoor,
     SpawnItem,
+    SpawnEnemy,
+    RunCommand,
 }
 
 public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelData
@@ -25,6 +28,8 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
     public bool Activated { get; protected set; } = false;
     // Optional
     public ItemRef? SpawnItem { get; set; } = null;
+    public Enemy? SpawnEnemy { get; set; } = null;
+    public string? Command { get; set; } = null;
     public TriggerTile(TileTypeID type, Point location, string levelName, TileEffect effectType, ByteCoord effectCoord, LevelPath effectLevel) : base(location, type)
     {
         EffectType = effectType;
@@ -52,6 +57,23 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
             if (SpawnItem != null)
                 gameManager.LevelManager.Level.Loot.Add(new(SpawnItem, (tile.Location + Constants.TileHalfSize) * Constants.TileSize));
         }
+        // Spawn enemy
+        else if (EffectType == TileEffect.SpawnEnemy)
+        {
+            if (SpawnEnemy != null)
+            {
+                SpawnEnemy.Reset();
+                gameManager.LevelManager.Level.Enemies[SpawnEnemy.UID] = SpawnEnemy;
+            }
+        }
+        // Run command
+        else if (EffectType == TileEffect.RunCommand)
+        {
+            if (Command != null)
+            {
+                CommandManager.Execute(Command);
+            }
+        }
     }
     public abstract void WriteState(BinaryWriter writer, GameManager gameManager);
     public abstract void ReadState(BinaryReader reader, GameManager gameManager);
@@ -60,9 +82,13 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
         // Input fields
         List<InputField> fields = [
             new("Tile Effect", null, dropdownOptions: Enum.GetNames<TileEffect>(), placeholder: EffectType),
-                new("Effected Tile Coord X", PopupFactory.IsByte, placeholder: EffectCoord.X),
-                new("Effected Tile Coord Y", PopupFactory.IsByte, placeholder: EffectCoord.Y),
-                new("Effected Tile Level", null, placeholder: EffectLevel.LevelName)
+            new("Effected Tile Coord X", PopupFactory.IsByte, placeholder: EffectCoord.X),
+            new("Effected Tile Coord Y", PopupFactory.IsByte, placeholder: EffectCoord.Y),
+            new("Effected Tile Level", null, placeholder: EffectLevel.LevelName),
+            new("[Optional] Spawn Item Type", null, EditorManager.ItemsOptionsWNone, placeholder: SpawnItem?.Type),
+            new("[Optional] Spawn Item Amount", PopupFactory.IsNonZeroByte, placeholder: SpawnItem?.Amount),
+            //new("[Optional] Spawn Enemy", null, placeholder: SpawnEnemy),
+            new("[Optional] Command", null, placeholder: SpawnEnemy),
         ];
 
 
@@ -78,6 +104,14 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
         EffectType = Enum.Parse<TileEffect>(values[0]);
         EffectCoord = new(byte.Parse(values[1]), byte.Parse(values[2]));
         EffectLevel = new(EffectLevel.WorldName, values[3]);
+        // Optional
+        if (values[4] != "" && values[5] != "") SpawnItem = new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[4])], byte.Parse(values[5]));
+        else SpawnItem = null;
+
+        //if (values[6] != "") // TODO
+        
+        if (values[6] != "") Command = values[6];
+        else Command = null;
     }
     public void WriteLevelData(BinaryWriter writer)
     {

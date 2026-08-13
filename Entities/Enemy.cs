@@ -63,6 +63,15 @@ public class Enemy : IEntity
         HealthBar = new(Point.Zero, new(Size.X, 10), Color.Green * 0.7f, Color.Red * 0.7f, Health, Health, textType: StatusTextType.Fraction, font: PixelOperatorVerySmall);
         DamageNotifs = new(Point.Zero, 50, PixelOperatorSubtitle, Color.Orange);
     }
+    public void Reset()
+    {
+        Health = MaxHealth;
+
+        UIDManager.Release(UIDCategory.Enemies, UID);
+        UID = UIDManager.Get(UIDCategory.Enemies);
+
+        TimerManager.SetTimer($"EnemyAttack_{UID}", AttackSpeed, null);
+    }
     public virtual void Update(GameManager gameManager)
     {
         if (gameManager.StateManager.State != GameState.Game) return;

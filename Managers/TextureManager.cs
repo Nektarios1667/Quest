@@ -238,6 +238,9 @@ public static class TextureManager
         Raddishes,
         SmallPlants,
         Wheat,
+        Damage,
+        Kill,
+        Heal,
         // DECALS ENUM INSERT
         Fireball,
         ArrowProjectile,
@@ -505,6 +508,9 @@ public static class TextureManager
         Textures[TextureID.Raddishes] = content.Load<Texture2D>("Images/Decals/Raddishes");
         Textures[TextureID.SmallPlants] = content.Load<Texture2D>("Images/Decals/SmallPlants");
         Textures[TextureID.Wheat] = content.Load<Texture2D>("Images/Decals/Wheat");
+        Textures[TextureID.Damage] = content.Load<Texture2D>("Images/Decals/Damage");
+        Textures[TextureID.Kill] = content.Load<Texture2D>("Images/Decals/Kill");
+        Textures[TextureID.Heal] = content.Load<Texture2D>("Images/Decals/Heal");
         // DECALS INSERT
         Textures[TextureID.Fireball] = content.Load<Texture2D>("Images/Projectiles/Fireball");
         Textures[TextureID.ArrowProjectile] = content.Load<Texture2D>("Images/Projectiles/Arrow");
@@ -756,6 +762,9 @@ public static class TextureManager
         Metadata[TextureID.Raddishes] = new(Textures[TextureID.Raddishes].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.SmallPlants] = new(Textures[TextureID.SmallPlants].Bounds.Size, new(1, 1), "decal");
         Metadata[TextureID.Wheat] = new(Textures[TextureID.Wheat].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Damage] = new(Textures[TextureID.Damage].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Kill] = new(Textures[TextureID.Kill].Bounds.Size, new(1, 1), "decal");
+        Metadata[TextureID.Heal] = new(Textures[TextureID.Heal].Bounds.Size, new(1, 1), "decal");
         // DECALS METADATA INSERT
         Metadata[TextureID.Fireball] = new(Textures[TextureID.Fireball].Bounds.Size, new(1, 1), "projectile");
         Metadata[TextureID.ArrowProjectile] = new(Textures[TextureID.ArrowProjectile].Bounds.Size, new(1, 1), "projectile");
