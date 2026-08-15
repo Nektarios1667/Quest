@@ -407,15 +407,8 @@ public class EditorManager
     }
     public void DeleteDecal()
     {
-        foreach (Decal decal in LevelManager.Level.Decals.Values)
-        {
-            if (decal.Location == MouseSelectionCoord)
-            {
-                LevelManager.Level.Decals.Remove(decal.Location);
-                Logger.Log($"Deleted decal '{decal.Type}' @ {MouseSelectionCoord.X}, {MouseSelectionCoord.Y}.");
-                break;
-            }
-        }
+        LevelManager.Level.Decals.Remove(MouseSelectionCoord.ToByteCoord());
+        Logger.Log($"Deleted decal @ {MouseSelectionCoord.X}, {MouseSelectionCoord.Y}.");
     }
     public void NewLoot()
     {

@@ -70,6 +70,7 @@ public enum TileTypeIDOld : byte
     WhiteTiles,
     Farmland,
     PressurePlate,
+    TimedPressurePlate,
     // TILES ID
 }
 public enum TileTypeID : byte
@@ -141,6 +142,7 @@ public enum TileTypeID : byte
     Furnace,
     Crafter,
     PressurePlate,
+    TimedPressurePlate,
     // TILES ID
 }
 public class TileType
@@ -233,6 +235,7 @@ public static class TileTypes
         new(TileTypeID.Furnace, TextureID.Furnace, false, false, weight: 0),
         new(TileTypeID.Crafter, TextureID.Crafter, false, false, weight: 0),
         new(TileTypeID.PressurePlate, TextureID.PressurePlate, true, false),
+        new(TileTypeID.TimedPressurePlate, TextureID.TimedPressurePlate, true, false),
         // TILES REGISTER
     ];
 }
@@ -299,6 +302,7 @@ public class Tile
             TileTypeID.Crate => new Crate(location, levelName),
             TileTypeID.Crafter => new Crafter(location, levelName),
             TileTypeID.PressurePlate => new PressurePlate(location, levelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null),
+            TileTypeID.TimedPressurePlate => new TimedPressurePlate(location, levelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null, 10f),
             // TILEFROMID
             _ => new(location, type)
         };

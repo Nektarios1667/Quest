@@ -36,7 +36,7 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
         EffectCoord = effectCoord;
         EffectLevel = effectLevel;
     }
-    public virtual void RunAction(GameManager gameManager, PlayerManager player)
+    public virtual void RunAction(GameManager gameManager)
     {
         if (Activated) return;
         Activated = true;
@@ -85,18 +85,18 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
             new("Effected Tile Coord X", PopupFactory.IsByte, placeholder: EffectCoord.X),
             new("Effected Tile Coord Y", PopupFactory.IsByte, placeholder: EffectCoord.Y),
             new("Effected Tile Level", null, placeholder: EffectLevel.LevelName),
-            new("[Optional] Spawn Item Type", null, EditorManager.ItemsOptionsWNone, placeholder: SpawnItem?.Type),
-            new("[Optional] Spawn Item Amount", PopupFactory.IsNonZeroByte, placeholder: SpawnItem?.Amount),
+            new("[Optional] Spawn Item Type", null, EditorManager.ItemsOptionsWNone, placeholder: SpawnItem == null ? "NONE" : SpawnItem.Type),
+            new("[Optional] Spawn Item Amount", PopupFactory.IsByte, placeholder: SpawnItem == null ? "0" : SpawnItem.Type),
             //new("[Optional] Spawn Enemy", null, placeholder: SpawnEnemy),
             new("[Optional] Command", null, placeholder: SpawnEnemy),
         ];
 
 
         // Window
-        var (success, values) = PopupFactory.ShowInputForm("Pressure Plate Editor", fields.ToArray());
+        var (success, values) = PopupFactory.ShowInputForm("Trigger Tile Editor", fields.ToArray());
         if (!success)
         {
-            if (!PopupFactory.PopupOpen) Logger.Error("Pressure plate edit failed.");
+            if (!PopupFactory.PopupOpen) Logger.Error("Trigger tile edit failed.");
             return;
         }
 
@@ -105,7 +105,7 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
         EffectCoord = new(byte.Parse(values[1]), byte.Parse(values[2]));
         EffectLevel = new(EffectLevel.WorldName, values[3]);
         // Optional
-        if (values[4] != "" && values[5] != "") SpawnItem = new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[4])], byte.Parse(values[5]));
+        if (values[4] != "" && values[4] != "NONE" && values[5] != "" && values[5] != "0") SpawnItem = new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[4])], byte.Parse(values[5]));
         else SpawnItem = null;
 
         //if (values[6] != "") // TODO
@@ -113,13 +113,13 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
         if (values[6] != "") Command = values[6];
         else Command = null;
     }
-    public void WriteLevelData(BinaryWriter writer)
+    public virtual void WriteLevelData(BinaryWriter writer)
     {
         writer.Write((byte)EffectType);
         writer.Write(EffectCoord);
         writer.Write(EffectLevel.LevelName);
     }
-    public void ReadLevelData(BinaryReader reader, LevelPath levelPath)
+    public virtual void ReadLevelData(BinaryReader reader, LevelPath levelPath)
     {
         EffectType = (TileEffect)reader.ReadByte();
         EffectCoord = reader.ReadByteCoord();

@@ -17,7 +17,7 @@ public class PressurePlate : TriggerTile
     }
     public override void OnPlayerEnter(GameManager gameManager, PlayerManager player)
     {
-        RunAction(gameManager, player);
+        RunAction(gameManager);
     }
     public override void WriteState(BinaryWriter writer, GameManager gameManager)
     {

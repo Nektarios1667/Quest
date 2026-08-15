@@ -164,6 +164,7 @@ public static class Constants
         Color.Brown, // Crafter
         Color.Gray, // PressurePlate
         Color.Gray, // Pedestal
+        Color.Gray, // TimedPressurePlate
         // MINIMAPCOLORS
     ];
 }

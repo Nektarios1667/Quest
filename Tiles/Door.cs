@@ -72,12 +72,12 @@ public class Door : Tile, IHasState, IEditableTile, IHasLevelData
     public void Edit(EditorManager editorManager)
     {
         var (success, values) = PopupFactory.ShowInputForm("Door Editor", [
-        new("Key", null, EditorManager.ItemsOptionsWNone, Key == null ? "NONE" : Key.Name),
-                new("Amount", PopupFactory.IsByte, placeholder: Key == null ? "0" : Key.Amount),
-                new("Consume Key", null, ["True", "False"], ConsumeKey.ToString())]);
+            new("Key", null, EditorManager.ItemsOptionsWNone, Key == null ? "NONE" : Key.Name),
+            new("Amount", PopupFactory.IsByte, placeholder: Key == null ? "0" : Key.Amount),
+            new("Consume Key", null, ["True", "False"], ConsumeKey.ToString())]);
         if (!success)
         {
-            if (!PopupFactory.PopupOpen) Logger.Error("Stair edit failed.");
+            if (!PopupFactory.PopupOpen) Logger.Error("Door edit failed.");
             return;
         }
         Key = values[0].Equals("none", StringComparison.CurrentCultureIgnoreCase) ? null : new(ItemTypes.All[(byte)Enum.Parse(typeof(ItemTypeID), values[0])], byte.Parse(values[1]));

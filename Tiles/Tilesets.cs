@@ -67,6 +67,7 @@ public static class Tilesets
         TileTypeID.Stairs,
         TileTypeID.Stove,
         TileTypeID.PressurePlate,
+        TileTypeID.TimedPressurePlate,
     ];
     public static readonly TileTypeID[] Natural = [
         TileTypeID.Grass,

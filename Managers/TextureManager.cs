@@ -202,6 +202,7 @@ public static class TextureManager
         WhiteTiles,
         Farmland,
         PressurePlate,
+        TimedPressurePlate,
         // TILES ENUM INSERT
         Torch,
         BlueTorch,
@@ -472,6 +473,7 @@ public static class TextureManager
         Textures[TextureID.WhiteTiles] = content.Load<Texture2D>("Images/Tiles/WhiteTiles");
         Textures[TextureID.Farmland] = content.Load<Texture2D>("Images/Tiles/Farmland");
         Textures[TextureID.PressurePlate] = content.Load<Texture2D>("Images/Tiles/PressurePlate");
+        Textures[TextureID.TimedPressurePlate] = content.Load<Texture2D>("Images/Tiles/TimedPressurePlate");
         // TILES INSERT
         Textures[TextureID.Torch] = content.Load<Texture2D>("Images/Decals/Torch");
         Textures[TextureID.BlueTorch] = content.Load<Texture2D>("Images/Decals/BlueTorch");
@@ -726,6 +728,7 @@ public static class TextureManager
         Metadata[TextureID.WhiteTiles] = new(Textures[TextureID.WhiteTiles].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Farmland] = new(Textures[TextureID.Farmland].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.PressurePlate] = new(Textures[TextureID.PressurePlate].Bounds.Size, new(1, 2), "tile");
+        Metadata[TextureID.TimedPressurePlate] = new(Textures[TextureID.TimedPressurePlate].Bounds.Size, new(1, 5), "tile");
         // TILES METADATA INSERT
         Metadata[TextureID.Torch] = new(Textures[TextureID.Torch].Bounds.Size, new(6, 1), "decal");
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), "decal");
