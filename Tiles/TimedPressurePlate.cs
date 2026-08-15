@@ -41,7 +41,6 @@ public class TimedPressurePlate : TriggerTile
     public override void RunAction(GameManager gameManager)
     {
         base.RunAction(gameManager);
-        Activated = false;
         Timer = null;
     }
     public override void Edit(EditorManager editorManager)
