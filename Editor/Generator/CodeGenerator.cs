@@ -8,6 +8,7 @@ namespace Quest.Editor.Generator;
 public static class CodeGenerator
 {
     private const string tileCodeTemplate = "namespace Quest.Tiles;\r\n\r\npublic class $name : Tile\r\n{\r\n    public $name(Point location) : base(location, TileTypeID.$name) { }\r\n}\r\n";
+    private const string triggerTileCodeTemplate = "using System.IO;\r\n\r\nnamespace Quest.Tiles;\r\n\r\npublic class $name : TriggerTile\r\n{\r\n    public $name(Point location, string levelName, TileEffect effectType, ByteCoord effectCoord, LevelPath effectLevel) : base(TileTypeID.$name, location, levelName, effectType, effectCoord, effectLevel)\r\n    {\r\n\r\n    }\r\n    public override void WriteState(BinaryWriter writer, GameManager gameManager)\r\n    {\r\n    }\r\n    public override void ReadState(BinaryReader reader, GameManager gameManager)\r\n    {\r\n    }\r\n}\r\n";
     private const string decalCodeTemplate = "namespace Quest.Decals;\r\npublic class $name(Point location) : Decal(location) {}\r\n";
     private const string itemCodeTemplate = "namespace Quest.Items;\r\npublic class $name : Item\r\n{\r\n    public $name(byte amount, string? customName = null) : base(ItemTypes.$name, amount, customName)\r\n    {}\r\n}\r\n";
 
@@ -15,6 +16,7 @@ public static class CodeGenerator
     private static string levelManagerSource = "";
     private static string constantsSource = "";
     private static string tileSource = "";
+    private static string tilesetsSource = "";
     private static string decalSource = "";
     private static string itemSource = "";
     private static string sourceDirectory = "";
@@ -109,21 +111,29 @@ public static class CodeGenerator
         levelManagerSource = File.ReadAllText($"{sourceDirectory}/Managers/LevelManager.cs");
         constantsSource = File.ReadAllText($"{sourceDirectory}/Constants.cs");
         tileSource = File.ReadAllText($"{sourceDirectory}/Tiles/Tile.cs");
+        tilesetsSource = File.ReadAllText($"{sourceDirectory}/Tiles/Tilesets.cs");
         decalSource = File.ReadAllText($"{sourceDirectory}/Decals/Decal.cs");
         itemSource = File.ReadAllText($"{sourceDirectory}/Items/Item.cs");
     }
     public static void WriteTileCode()
     {
         string? name = Ask("Tile name: ");
+        bool isTriggerTile = Ask("Is TriggerTile [y/n]: ")?.ToLower() == "y";
+        string tileset = Ask("Tileset [Flooring, Walls, Windows Interactables, Natural]") ?? "";
         bool isWalkable = Ask("Is walkable [y/n]: ")?.ToLower() == "y";
         bool isWall = !isWalkable && Ask("Is wall [y/n]:")?.ToLower() == "y";
         string? color = Ask("Tile minimap color [new(r, g, b)/Color.someColor]: ");
-        bool isSpecial = Ask("Is special (requires custom constructor) [y/n]: ")?.ToLower() == "y";
+        bool isSpecial = isTriggerTile || Ask("Is special (requires custom constructor) [y/n]: ")?.ToLower() == "y";
         if (color == null) return;
         if (name == null) return;
 
         // Source code
-        string classSource = tileCodeTemplate.Replace("$name", name).Replace("$iswalkable", isWalkable ? "true" : "false").Replace("$iswall", isWall ? "        IsWall = true;\r\n" : "");
+        string classSource = tileCodeTemplate;
+        if (isTriggerTile)
+            classSource = triggerTileCodeTemplate;
+        classSource = classSource.Replace("$name", name).Replace("$iswalkable", isWalkable ? "true" : "false").Replace("$iswall", isWall ? "        IsWall = true;\r\n" : "");
+
+
         File.WriteAllText($"{sourceDirectory}/Tiles/{name}.cs", classSource);
 
         // TextureManager TextureID enum
@@ -140,9 +150,20 @@ public static class CodeGenerator
         string newTileSource = tileSource.Replace("    // TILES ID", $"    {name},\r\n    // TILES ID");
         // TileType variable in TileTypes class in Tile.cs
         newTileSource = newTileSource.Replace("        // TILES REGISTER", $"        new(TileTypeID.{name}, TextureID.{name}, {isWalkable.ToString().ToLower()}, {isWall.ToString().ToLower()}),\r\n        // TILES REGISTER");
-        if (isSpecial)
+        if (isTriggerTile)
+            newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, levelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null),\r\n            // TILEFROMID\r\n");
+        else if (isSpecial)
             newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, levelName),\r\n            // TILEFROMID\r\n");
+        
         File.WriteAllText($"{sourceDirectory}/Tiles/Tile.cs", newTileSource);
+
+        // Tileset
+        TilesetTypes? tilesetType = Enum.TryParse<TilesetTypes>(tileset, true, out var tst) ? tst : null;
+        if (tilesetType != null)
+        {
+            string newTileset = tilesetsSource.Replace($"        // {tilesetType.ToString()?.ToUpper()} TILESET\r\n", $"        TileTypeID.{name},\r\n        // {tilesetType.ToString()?.ToUpper()} TILESET\r\n");
+            File.WriteAllText($"{sourceDirectory}/Tiles/Tilesets.cs", newTileset);
+        }
 
         // Minimap color
         string newConstantsSource = constantsSource.Replace("        // MINIMAPCOLORS", $"        {color}, // {name}\r\n        // MINIMAPCOLORS");

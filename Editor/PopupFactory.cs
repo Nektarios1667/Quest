@@ -22,7 +22,7 @@ public static class PopupFactory
         if (PopupOpen) return (false, Array.Empty<string>());
         PopupOpen = true;
         // Setup
-        Form = new() { Text = title, Width = 500, Height = 100 + fields.Length * 35 };
+        Form = new() { Text = title, Width = 620, Height = 100 + fields.Length * 35 };
         List<Control> inputs = [];
 
         // Fields
@@ -36,7 +36,7 @@ public static class PopupFactory
                 Text = field.Label,
                 Left = 10,
                 Top = 10 + i * 35,
-                Width = 150
+                Width = 200
             };
 
             Control inputControl;
@@ -45,7 +45,7 @@ public static class PopupFactory
             {
                 ComboBox combo = new()
                 {
-                    Left = 165,
+                    Left = 215,
                     Top = 10 + i * 35,
                     Width = 300,
                     DropDownStyle = ComboBoxStyle.DropDownList
@@ -61,7 +61,7 @@ public static class PopupFactory
             {
                 TextBox textBox = new()
                 {
-                    Left = 165,
+                    Left = 215,
                     Top = 10 + i * 35,
                     Width = 300,
                     Text = field.Placeholder,
@@ -250,5 +250,10 @@ public static class PopupFactory
     {
         if (string.IsNullOrWhiteSpace(value)) return false;
         return Enum.TryParse<ItemTypeID>(value, false, out var _);
+    }
+    public static bool IsBool(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        return bool.TryParse(value, out var _);
     }
 }

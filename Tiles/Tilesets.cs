@@ -29,6 +29,7 @@ public static class Tilesets
         TileTypeID.ConcreteFlooring,
         TileTypeID.Flooring,
         TileTypeID.WoodFlooring,
+        // FLOORING TILESET
     ];
     public static readonly TileTypeID[] Walls = [
         TileTypeID.ConcreteWall,
@@ -41,6 +42,7 @@ public static class Tilesets
         TileTypeID.IceWall,
         TileTypeID.DryWall,
         TileTypeID.Door,
+        // WALLS TILESET
     ];
     public static readonly TileTypeID[] Windows = [
         TileTypeID.ConcreteWindow,
@@ -52,6 +54,7 @@ public static class Tilesets
         TileTypeID.SnowWindow,
         TileTypeID.IceWindow,
         TileTypeID.DryWallWindow,
+        // WINDOWS TILESET
     ];
     public static readonly TileTypeID[] Interactables = [
         TileTypeID.Chest,
@@ -68,6 +71,9 @@ public static class Tilesets
         TileTypeID.Stove,
         TileTypeID.PressurePlate,
         TileTypeID.TimedPressurePlate,
+        TileTypeID.Lever,
+        TileTypeID.Target,
+        // INTERACTABLES TILESET
     ];
     public static readonly TileTypeID[] Natural = [
         TileTypeID.Grass,
@@ -90,6 +96,7 @@ public static class Tilesets
         TileTypeID.Lava,
         TileTypeID.Sky,
         TileTypeID.Darkness,
+        // NATURAL TILESET
     ];
     public static readonly Dictionary<TilesetTypes, TileTypeID[]> TypeToArray = new()
     {

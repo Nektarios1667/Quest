@@ -2,6 +2,7 @@ using Quest.Editor.Managers;
 using Quest.Editor;
 using System.ComponentModel;
 using System.IO;
+using SharpDX.XAudio2;
 
 namespace Quest.Tiles;
 
@@ -59,6 +60,12 @@ public class Door : Tile, IHasState, IEditableTile, IHasLevelData
         IsOpened = true;
         LightingManager.SetLightGridBlocking(Location.ToPoint(), false);
         SaveManager.SaveStateTile(this, game.LevelManager.Level.LevelName);
+    }
+    public void Close(GameManager game)
+    {
+        IsOpened = false;
+        LightingManager.SetLightGridBlocking(Location.ToPoint(), true);
+        SaveManager.UnsaveStateTile(this, game.LevelManager.Level.LevelName);
     }
     public void WriteState(BinaryWriter writer, GameManager gameManager)
     {

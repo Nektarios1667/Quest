@@ -165,6 +165,8 @@ public static class Constants
         Color.Gray, // PressurePlate
         Color.Gray, // Pedestal
         Color.Gray, // TimedPressurePlate
+        Color.Gray, // Lever
+        Color.Pink, // Target
         // MINIMAPCOLORS
     ];
 }

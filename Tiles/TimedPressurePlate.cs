@@ -1,7 +1,5 @@
 using Quest.Editor;
 using Quest.Editor.Managers;
-using ScottPlot.Interactivity;
-using SharpDX.MediaFoundation.DirectX;
 using System.IO;
 
 namespace Quest.Tiles;
@@ -10,6 +8,7 @@ public class TimedPressurePlate : TriggerTile
 {
     Timer? Timer { get; set; }
     float Time { get; set; }
+    bool SingleTime { get; set; } = false;
     public TimedPressurePlate(Point location, string levelName, TileEffect effectType, ByteCoord effectCoord, LevelPath effectLevel, float time) : base(TileTypeID.TimedPressurePlate, location, levelName, effectType, effectCoord, effectLevel)
     {
         Time = time;
@@ -24,7 +23,21 @@ public class TimedPressurePlate : TriggerTile
     }
     public override void OnPlayerEnter(GameManager gameManager, PlayerManager player)
     {
-        Timer = TimerManager.NewTimer($"TimedPressurePlate_{UID}", Time, () => RunAction(gameManager));
+        Timer = TimerManager.NewTimer($"TimedPressurePlate_{UID}", Time, () => Activate(gameManager));
+
+        // Special
+        if (Timer.Progress <= 0 && EffectType is TileEffect.ToggleOpenDoor or TileEffect.ToggleCloseDoor)
+        {
+            base.Activate(gameManager);
+            Activated = false;
+
+            // 
+            if (EffectType == TileEffect.ToggleCloseDoor)
+                EffectType = TileEffect.OpenDoor;
+            else if (EffectType == TileEffect.ToggleOpenDoor)
+                EffectType = TileEffect.CloseDoor;
+        }
+
     }
     public override void WriteState(BinaryWriter writer, GameManager gameManager)
     {
@@ -36,12 +49,13 @@ public class TimedPressurePlate : TriggerTile
         Activated = reader.ReadBoolean();
         float timeLeft = reader.ReadSingle();
         if (Activated)
-            TimerManager.SetTimer($"TimedPressurePlate_{UID}", timeLeft, () => RunAction(gameManager));
+            TimerManager.SetTimer($"TimedPressurePlate_{UID}", timeLeft, () => Activate(gameManager));
     }
-    public override void RunAction(GameManager gameManager)
+    public override void Activate(GameManager gameManager)
     {
-        base.RunAction(gameManager);
+        base.Activate(gameManager);
         Timer = null;
+        if (!SingleTime) Activated = false;
     }
     public override void Edit(EditorManager editorManager)
     {
@@ -49,7 +63,9 @@ public class TimedPressurePlate : TriggerTile
 
         // Set time length
         var (success, values) = PopupFactory.ShowInputForm("Timed Pressure Plate Editor", [
-            new("Timer Length", PopupFactory.IsPositiveFloat, placeholder: Time)]);
+            new("Timer Length", PopupFactory.IsPositiveFloat, placeholder: Time),
+            new("Single Time", PopupFactory.IsBool, placeholder: SingleTime)
+        ]);
 
         if (!success)
         {
@@ -63,10 +79,12 @@ public class TimedPressurePlate : TriggerTile
     {
         base.WriteLevelData(writer);
         writer.Write(Time);
+        writer.Write(SingleTime);
     }
     public override void ReadLevelData(BinaryReader reader, LevelPath levelPath)
     {
         base.ReadLevelData(reader, levelPath);
         Time = reader.ReadSingle();
+        SingleTime = reader.ReadBoolean();
     }
 }

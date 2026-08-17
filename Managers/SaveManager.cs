@@ -33,6 +33,11 @@ public class SaveManager
         else
             stateTiles[levelName] = [tile];
     }
+    public static void UnsaveStateTile(IHasState tile, string levelName)
+    {
+        if (stateTiles.TryGetValue(@levelName, out var levelDoors))
+            levelDoors.Remove(tile);
+    }
     public static void SaveChestGenerator(Chest chest, string level)
     {
         if (chests.TryGetValue(level, out var levelChests))

@@ -435,7 +435,7 @@ public class LevelEditor : Game, IAdjustableWindow
         // Add tile
         if (currentTool == EditorTool.Tile)
         {
-            Tile tile = Tile.TileFromId(TileSelection, mouseCoord, "NUL");
+            Tile tile = Tile.TileFromId(TileSelection, mouseCoord, LevelPath.Null);
 
             editorManager.SetTile(tile);
         }

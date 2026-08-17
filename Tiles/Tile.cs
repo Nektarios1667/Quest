@@ -71,6 +71,8 @@ public enum TileTypeIDOld : byte
     Farmland,
     PressurePlate,
     TimedPressurePlate,
+    Lever,
+    Target,
     // TILES ID
 }
 public enum TileTypeID : byte
@@ -143,6 +145,8 @@ public enum TileTypeID : byte
     Crafter,
     PressurePlate,
     TimedPressurePlate,
+    Lever,
+    Target,
     // TILES ID
 }
 public class TileType
@@ -236,6 +240,8 @@ public static class TileTypes
         new(TileTypeID.Crafter, TextureID.Crafter, false, false, weight: 0),
         new(TileTypeID.PressurePlate, TextureID.PressurePlate, true, false),
         new(TileTypeID.TimedPressurePlate, TextureID.TimedPressurePlate, true, false),
+        new(TileTypeID.Lever, TextureID.Lever, true, false),
+        new(TileTypeID.Target, TextureID.Target, false, true),
         // TILES REGISTER
     ];
 }
@@ -280,9 +286,10 @@ public class Tile
         gameManager.Batch.DrawPoint(dest.ToVector2() + new Vector2(Constants.TileSize.X / 2, Constants.TileSize.Y), (mask & 2) == 0 ? Color.Red : Color.Green, size: 5); // Down
     }
 
-    public virtual void OnPlayerEnter(GameManager gameManager,PlayerManager player) { }
-    public virtual void OnPlayerCollide(GameManager gameManager,PlayerManager player) { }
-    public static Tile TileFromId(TileTypeID type, Point location, string levelName)
+    public virtual void OnPlayerEnter(GameManager gameManager, PlayerManager player) { }
+    public virtual void OnPlayerCollide(GameManager gameManager, PlayerManager player) { }
+    public virtual void OnProjectileCollide(GameManager gameManager, Projectile proj) { }
+    public static Tile TileFromId(TileTypeID type, Point location, LevelPath level)
     {
         // Create a tile from an id
         return type switch
@@ -291,18 +298,20 @@ public class Tile
             TileTypeID.Lava => new Lava(location),
             TileTypeID.Stairs => new Stairs(location, LevelPath.Null, location),
             TileTypeID.Door => new Door(location, null),
-            TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, levelName),
+            TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, level.LevelName),
             TileTypeID.Lamp => new Lamp(location),
-            TileTypeID.Jukebox => new Jukebox(location, levelName),
-            TileTypeID.DiscWriter => new DiscWriter(location, levelName),
-            TileTypeID.Inscriber => new Inscriber(location, levelName),
-            TileTypeID.Furnace => new Furnace(location, levelName),
-            TileTypeID.Stove => new Stove(location, levelName),
-            TileTypeID.DisplayCase => new DisplayCase(location, levelName),
-            TileTypeID.Crate => new Crate(location, levelName),
-            TileTypeID.Crafter => new Crafter(location, levelName),
-            TileTypeID.PressurePlate => new PressurePlate(location, levelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null),
-            TileTypeID.TimedPressurePlate => new TimedPressurePlate(location, levelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null, 10f),
+            TileTypeID.Jukebox => new Jukebox(location, level.LevelName),
+            TileTypeID.DiscWriter => new DiscWriter(location, level.LevelName),
+            TileTypeID.Inscriber => new Inscriber(location, level.LevelName),
+            TileTypeID.Furnace => new Furnace(location, level.LevelName),
+            TileTypeID.Stove => new Stove(location, level.LevelName),
+            TileTypeID.DisplayCase => new DisplayCase(location, level.LevelName),
+            TileTypeID.Crate => new Crate(location, level.LevelName),
+            TileTypeID.Crafter => new Crafter(location, level.LevelName),
+            TileTypeID.PressurePlate => new PressurePlate(location, level.LevelName, TileEffect.None, ByteCoord.Zero, level),
+            TileTypeID.TimedPressurePlate => new TimedPressurePlate(location, level.LevelName, TileEffect.None, ByteCoord.Zero, level, 10f),
+            TileTypeID.Lever => new Lever(location, level.LevelName, TileEffect.None, ByteCoord.Zero, level),
+            TileTypeID.Target => new Target(location, level.LevelName, TileEffect.None, ByteCoord.Zero, level),
             // TILEFROMID
             _ => new(location, type)
         };

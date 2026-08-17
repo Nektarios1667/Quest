@@ -1,6 +1,7 @@
 ﻿using Quest.Editor;
 using Quest.Editor.Managers;
 using ScottPlot.Interactivity;
+using SharpDX.Direct2D1.Effects;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,6 +16,9 @@ public enum TileEffect : byte
 {
     None,
     OpenDoor,
+    CloseDoor,
+    ToggleOpenDoor,
+    ToggleCloseDoor,
     SpawnItem,
     SpawnEnemy,
     RunCommand,
@@ -36,20 +40,30 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
         EffectCoord = effectCoord;
         EffectLevel = effectLevel;
     }
-    public virtual void RunAction(GameManager gameManager)
+    public virtual void Activate(GameManager gameManager)
     {
         if (Activated) return;
         Activated = true;
 
         // Get tile
+        if (EffectLevel.IsNull()) return;
         Tile? tile = gameManager.LevelManager.GetTile(EffectLevel, EffectCoord.ToPoint());
         if (tile == null) return;
 
+        RunAction(gameManager, tile);
+    }
+    public virtual void RunAction(GameManager gameManager, Tile tile)
+    {
         // --- Action ---
         // Open
-        if (EffectType == TileEffect.OpenDoor)
+        if (EffectType is TileEffect.OpenDoor or TileEffect.ToggleOpenDoor)
         {
             if (tile is Door door) door.Open(gameManager);
+        }
+        // Close
+        else if (EffectType is TileEffect.CloseDoor or TileEffect.ToggleCloseDoor)
+        {
+            if (tile is Door door) door.Close(gameManager);
         }
         // Spawn Item
         else if (EffectType == TileEffect.SpawnItem)
@@ -84,7 +98,7 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
             new("Tile Effect", null, dropdownOptions: Enum.GetNames<TileEffect>(), placeholder: EffectType),
             new("Effected Tile Coord X", PopupFactory.IsByte, placeholder: EffectCoord.X),
             new("Effected Tile Coord Y", PopupFactory.IsByte, placeholder: EffectCoord.Y),
-            new("Effected Tile Level", null, placeholder: EffectLevel.LevelName),
+            new("Effected Tile Level", null, placeholder: EffectLevel.IsNull() ? "" : EffectLevel.LevelName),
             new("[Optional] Spawn Item Type", null, EditorManager.ItemsOptionsWNone, placeholder: SpawnItem == null ? "NONE" : SpawnItem.Type),
             new("[Optional] Spawn Item Amount", PopupFactory.IsByte, placeholder: SpawnItem == null ? "0" : SpawnItem.Type),
             //new("[Optional] Spawn Enemy", null, placeholder: SpawnEnemy),
@@ -124,5 +138,6 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
         EffectType = (TileEffect)reader.ReadByte();
         EffectCoord = reader.ReadByteCoord();
         EffectLevel = new(levelPath.WorldName, reader.ReadString());
+        if (EffectLevel.IsNull()) EffectLevel = LevelPath.Null;
     }
 }

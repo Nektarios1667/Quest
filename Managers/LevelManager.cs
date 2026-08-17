@@ -362,7 +362,8 @@ public class LevelManager
     public Tile? GetTile(LevelPath level, int x, int y) => GetTile(GetLevel(level), x, y);
     public static Tile? GetTile(Level level, Point coord)
     {
-        if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y)
+        if (coord.X < 0 || coord.X >= Constants.MapSize.X || coord.Y < 0 || coord.Y >= Constants.MapSize.Y ||
+        level.Tiles.Length < coord.X + coord.Y * Constants.MapSize.X)
             return null;
         return level.Tiles[coord.X + coord.Y * Constants.MapSize.X];
     }

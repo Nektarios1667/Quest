@@ -2603,6 +2603,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Tiles/LavaBorder.png
 
+#begin Images/Tiles/Lever.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Tiles/Lever.png
+
 #begin Images/Tiles/LimeTiles.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -2902,6 +2914,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Tiles/Stove.png
+
+#begin Images/Tiles/Target.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Tiles/Target.png
 
 #begin Images/Tiles/Template.png
 /importer:TextureImporter

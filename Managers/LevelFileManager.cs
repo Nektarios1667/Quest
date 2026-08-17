@@ -274,7 +274,7 @@ public static class LevelFileManager
         }
 
         // Make generic tile
-        Tile tile = Tile.TileFromId(type, loc, levelPath.LevelName);
+        Tile tile = Tile.TileFromId(type, loc, levelPath);
 
         // Extra data
         if (tile is IHasLevelData data)
