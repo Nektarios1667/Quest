@@ -37,7 +37,7 @@ public class Projectile : IEntity
     }
     public void Draw(GameManager gameManager)
     {
-        Rectangle source = GetAnimationSource(Texture, GameManager.GameTime, duration: 0.5f);
+        Rectangle source = GetAnimationSource(Texture, GameManager.GameTime, duration: 0.1f);
         Vector2 texMiddle = Size.ToVector2() / Constants.ProjectileScale / 2; // Since the origin is the center (for rotation), we need to offset the position by half the size of the texture (times the scale)
         DrawTexture(gameManager.Batch, Texture, CameraManager.WorldToScreen(Position.ToPoint()) + (texMiddle * Constants.ProjectileScale).ToPoint(), source: source, origin: texMiddle, rotation: Direction, scale: new(Constants.ProjectileScale));
         // Debug

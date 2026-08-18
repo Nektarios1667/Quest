@@ -787,7 +787,7 @@ public static class TextureManager
         Metadata[TextureID.VulnerabilitySpell] = new(Textures[TextureID.VulnerabilitySpell].Bounds.Size, new(4, 1), "projectile");
         Metadata[TextureID.WeaknessSpell] = new(Textures[TextureID.WeaknessSpell].Bounds.Size, new(4, 1), "projectile");
         Metadata[TextureID.LifestealSpell] = new(Textures[TextureID.LifestealSpell].Bounds.Size, new(4, 1), "projectile");
-        Metadata[TextureID.NinjaStarProjectile] = new(Textures[TextureID.NinjaStarProjectile].Bounds.Size, new(1, 1), "projectile");
+        Metadata[TextureID.NinjaStarProjectile] = new(Textures[TextureID.NinjaStarProjectile].Bounds.Size, new(4, 1), "projectile");
         // PROJECTILES METADATA INSERT
         Metadata[TextureID.Glow] = new(Textures[TextureID.Glow].Bounds.Size, new(1, 1), "effect");
         Metadata[TextureID.Slash] = new(Textures[TextureID.Slash].Bounds.Size, new(1, 1), "effect");
