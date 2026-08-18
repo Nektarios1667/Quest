@@ -1,6 +1,7 @@
 using Quest.Editor;
 using Quest.Editor.Managers;
 using System.IO;
+using System.Linq;
 
 namespace Quest.Tiles;
 
@@ -26,16 +27,10 @@ public class TimedPressurePlate : TriggerTile
         Timer = TimerManager.NewTimer($"TimedPressurePlate_{UID}", Time, () => Activate(gameManager));
 
         // Special
-        if (Timer.Progress <= 0 && EffectType is TileEffect.ToggleOpenDoor or TileEffect.ToggleCloseDoor)
+        if (Timer.Progress <= 0 && ToggleTileEffects.Contains(EffectType))
         {
             base.Activate(gameManager);
             Activated = false;
-
-            // 
-            if (EffectType == TileEffect.ToggleCloseDoor)
-                EffectType = TileEffect.OpenDoor;
-            else if (EffectType == TileEffect.ToggleOpenDoor)
-                EffectType = TileEffect.CloseDoor;
         }
 
     }
@@ -51,7 +46,7 @@ public class TimedPressurePlate : TriggerTile
         if (Activated)
             TimerManager.SetTimer($"TimedPressurePlate_{UID}", timeLeft, () => Activate(gameManager));
     }
-    public override void Activate(GameManager gameManager)
+    public override void Activate(GameManager gameManager, bool _ = true)
     {
         base.Activate(gameManager);
         Timer = null;

@@ -22,10 +22,19 @@ public enum TileEffect : byte
     SpawnItem,
     SpawnEnemy,
     RunCommand,
+    EnableLogicA,
+    EnableLogicB,
+    DisableLogicA,
+    DisableLogicB,
+    ToggleEnableLogicA,
+    ToggleEnableLogicB,
+    ToggleDisableLogicA,
+    ToggleDisableLogicB,
 }
 
 public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelData
 {
+    public static readonly TileEffect[] ToggleTileEffects = [TileEffect.ToggleOpenDoor, TileEffect.ToggleCloseDoor, TileEffect.ToggleEnableLogicA, TileEffect.ToggleEnableLogicB, TileEffect.ToggleDisableLogicA, TileEffect.ToggleDisableLogicB];
     public TileEffect EffectType { get; set; }
     public ByteCoord EffectCoord { get; set; }
     public LevelPath EffectLevel { get; set; }
@@ -40,9 +49,9 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
         EffectCoord = effectCoord;
         EffectLevel = effectLevel;
     }
-    public virtual void Activate(GameManager gameManager)
+    public virtual void Activate(GameManager gameManager, bool allowReactivate = false)
     {
-        if (Activated) return;
+        if (Activated && !allowReactivate) return;
         Activated = true;
 
         // Get tile
@@ -52,7 +61,7 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
 
         RunAction(gameManager, tile);
     }
-    public virtual void RunAction(GameManager gameManager, Tile tile)
+    public void RunAction(GameManager gameManager, Tile tile)
     {
         // --- Action ---
         // Open
@@ -88,13 +97,50 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
                 CommandManager.Execute(Command);
             }
         }
+        // Logic
+        else if (EffectType is TileEffect.EnableLogicA or TileEffect.ToggleEnableLogicA)
+        {
+            if (tile is LogicGate gate)
+                gate.SetInput(gameManager, true, InputType.A);
+        }
+        else if (EffectType is TileEffect.EnableLogicB or TileEffect.ToggleEnableLogicB)
+        {
+            if (tile is LogicGate gate)
+                gate.SetInput(gameManager, true, InputType.B);
+        }
+        else if (EffectType is TileEffect.DisableLogicA or TileEffect.ToggleDisableLogicA)
+        {
+            if (tile is LogicGate gate)
+                gate.SetInput(gameManager, false, InputType.A);
+        }
+        else if (EffectType is TileEffect.DisableLogicB or TileEffect.ToggleDisableLogicB)
+        {
+            if (tile is LogicGate gate)
+                gate.SetInput(gameManager, false, InputType.B);
+        }
+
+        // Toggle
+        // Door
+        if (EffectType == TileEffect.ToggleCloseDoor)
+            EffectType = TileEffect.ToggleOpenDoor;
+        else if (EffectType == TileEffect.ToggleOpenDoor)
+            EffectType = TileEffect.ToggleCloseDoor;
+        // Door
+        else if (EffectType == TileEffect.ToggleEnableLogicA)
+            EffectType = TileEffect.ToggleDisableLogicA;
+        else if (EffectType == TileEffect.ToggleDisableLogicA)
+            EffectType = TileEffect.ToggleEnableLogicA;
+        else if (EffectType == TileEffect.ToggleEnableLogicB)
+            EffectType = TileEffect.ToggleDisableLogicB;
+        else if (EffectType == TileEffect.ToggleDisableLogicB)
+            EffectType = TileEffect.ToggleEnableLogicB;
     }
     public abstract void WriteState(BinaryWriter writer, GameManager gameManager);
     public abstract void ReadState(BinaryReader reader, GameManager gameManager);
     public virtual void Edit(EditorManager editorManager)
     {
-        // Input fields
-        List<InputField> fields = [
+        // Window
+        var (success, values) = PopupFactory.ShowInputForm("Trigger Tile Editor", [
             new("Tile Effect", null, dropdownOptions: Enum.GetNames<TileEffect>(), placeholder: EffectType),
             new("Effected Tile Coord X", PopupFactory.IsByte, placeholder: EffectCoord.X),
             new("Effected Tile Coord Y", PopupFactory.IsByte, placeholder: EffectCoord.Y),
@@ -103,11 +149,8 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
             new("[Optional] Spawn Item Amount", PopupFactory.IsByte, placeholder: SpawnItem == null ? "0" : SpawnItem.Type),
             //new("[Optional] Spawn Enemy", null, placeholder: SpawnEnemy),
             new("[Optional] Command", null, placeholder: SpawnEnemy),
-        ];
+        ]);
 
-
-        // Window
-        var (success, values) = PopupFactory.ShowInputForm("Trigger Tile Editor", fields.ToArray());
         if (!success)
         {
             if (!PopupFactory.PopupOpen) Logger.Error("Trigger tile edit failed.");

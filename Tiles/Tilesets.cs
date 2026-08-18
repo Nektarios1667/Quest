@@ -73,6 +73,7 @@ public static class Tilesets
         TileTypeID.TimedPressurePlate,
         TileTypeID.Lever,
         TileTypeID.Target,
+        TileTypeID.LogicGate,
         // INTERACTABLES TILESET
     ];
     public static readonly TileTypeID[] Natural = [

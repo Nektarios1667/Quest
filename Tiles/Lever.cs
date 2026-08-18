@@ -23,7 +23,7 @@ public class Lever : TriggerTile
             TimerManager.SetTimer($"LeverCooldown_{UID}", 1, null);
         }
     }
-    public override void Activate(GameManager gameManager)
+    public override void Activate(GameManager gameManager, bool _ = true)
     {
         Activated = !Activated;
 
@@ -32,12 +32,6 @@ public class Lever : TriggerTile
         if (tile == null) return;
 
         RunAction(gameManager, tile);
-
-        // Toggle
-        if (EffectType == TileEffect.ToggleCloseDoor)
-            EffectType = TileEffect.ToggleOpenDoor;
-        else if (EffectType == TileEffect.ToggleOpenDoor)
-            EffectType = TileEffect.ToggleCloseDoor;
     }
     public override void WriteState(BinaryWriter writer, GameManager gameManager)
     {

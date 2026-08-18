@@ -73,6 +73,7 @@ public enum TileTypeIDOld : byte
     TimedPressurePlate,
     Lever,
     Target,
+    LogicGate,
     // TILES ID
 }
 public enum TileTypeID : byte
@@ -147,6 +148,7 @@ public enum TileTypeID : byte
     TimedPressurePlate,
     Lever,
     Target,
+    LogicGate,
     // TILES ID
 }
 public class TileType
@@ -242,6 +244,7 @@ public static class TileTypes
         new(TileTypeID.TimedPressurePlate, TextureID.TimedPressurePlate, true, false),
         new(TileTypeID.Lever, TextureID.Lever, true, false),
         new(TileTypeID.Target, TextureID.Target, false, true),
+        new(TileTypeID.LogicGate, TextureID.LogicGate, true, false),
         // TILES REGISTER
     ];
 }
@@ -264,11 +267,6 @@ public class Tile
     public Tile(Point location, TileTypeID type)
     {
         Location = new(location);
-        TypeID = type;
-    }
-    public Tile(ByteCoord location, TileTypeID type)
-    {
-        Location = location;
         TypeID = type;
     }
     public virtual void Draw(GameManager gameManager)
@@ -312,6 +310,7 @@ public class Tile
             TileTypeID.TimedPressurePlate => new TimedPressurePlate(location, level.LevelName, TileEffect.None, ByteCoord.Zero, level, 10f),
             TileTypeID.Lever => new Lever(location, level.LevelName, TileEffect.None, ByteCoord.Zero, level),
             TileTypeID.Target => new Target(location, level.LevelName, TileEffect.None, ByteCoord.Zero, level),
+            TileTypeID.LogicGate => new LogicGate(location, level.LevelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null, LogicGateType.And),
             // TILEFROMID
             _ => new(location, type)
         };

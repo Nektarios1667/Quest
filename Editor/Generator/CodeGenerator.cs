@@ -119,7 +119,7 @@ public static class CodeGenerator
     {
         string? name = Ask("Tile name: ");
         bool isTriggerTile = Ask("Is TriggerTile [y/n]: ")?.ToLower() == "y";
-        string tileset = Ask("Tileset [Flooring, Walls, Windows Interactables, Natural]") ?? "";
+        string tileset = Ask("Tileset [Flooring, Walls, Windows, Interactables, Natural]") ?? "";
         bool isWalkable = Ask("Is walkable [y/n]: ")?.ToLower() == "y";
         bool isWall = !isWalkable && Ask("Is wall [y/n]:")?.ToLower() == "y";
         string? color = Ask("Tile minimap color [new(r, g, b)/Color.someColor]: ");
@@ -151,9 +151,9 @@ public static class CodeGenerator
         // TileType variable in TileTypes class in Tile.cs
         newTileSource = newTileSource.Replace("        // TILES REGISTER", $"        new(TileTypeID.{name}, TextureID.{name}, {isWalkable.ToString().ToLower()}, {isWall.ToString().ToLower()}),\r\n        // TILES REGISTER");
         if (isTriggerTile)
-            newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, levelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null),\r\n            // TILEFROMID\r\n");
+            newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, LevelPath.LevelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null),\r\n            // TILEFROMID\r\n");
         else if (isSpecial)
-            newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, levelName),\r\n            // TILEFROMID\r\n");
+            newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, LevelPath.LevelName),\r\n            // TILEFROMID\r\n");
         
         File.WriteAllText($"{sourceDirectory}/Tiles/Tile.cs", newTileSource);
 

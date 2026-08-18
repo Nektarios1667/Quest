@@ -167,6 +167,7 @@ public static class Constants
         Color.Gray, // TimedPressurePlate
         Color.Gray, // Lever
         Color.Pink, // Target
+        Color.Gray, // LogicGate
         // MINIMAPCOLORS
     ];
 }
