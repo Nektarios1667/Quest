@@ -25,8 +25,8 @@ public class Projectile : IEntity
         Size = size ?? (TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap).Scaled(Constants.ProjectileScale);
         UID = UIDManager.Get(UIDCategory.Projectiles);
 
-        // Update collision 60/s
-        TimerManager.SetTimer($"ProjectileCollision_{UID}", 0.017f, () => UpdateCollision(gameManager), int.MaxValue);
+        // Update collision 20/s
+        TimerManager.SetTimer($"ProjectileCollision_{UID}", 0.05f, () => UpdateCollision(gameManager), int.MaxValue);
     }
     public void Update(GameManager gameManager)
     {
