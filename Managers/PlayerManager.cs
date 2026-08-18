@@ -50,6 +50,7 @@ public class PlayerManager : IEntity
         {
             equippedSlot = value;
             EquippedSlotChanged?.Invoke(equippedSlot);
+            TimerManager.TryRemove("MeleeAttack");
         }
     }
     public Item? HoveredItem { get; private set; }
@@ -357,8 +358,9 @@ public class PlayerManager : IEntity
         {
             bool left = PlayerDirection == Direction.Left;
             var leftShift = left ? new(TextureManager.Metadata[EquippedItem.Texture].Size.X * 2, 0) : Point.Zero;
-            Point itemPos = Constants.Middle + CameraManager.CameraOffset.ToPoint() - leftShift + Constants.MageItemShift.Scaled(left ? -1 : 1);
-            DrawTexture(gameManager.Batch, EquippedItem.Texture, itemPos, scale: new(2), effects: PlayerDirection == Direction.Left ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+            Point itemPos = Constants.Middle + CameraManager.CameraOffset.ToPoint() + TextureManager.Metadata[EquippedItem.Texture].Size - leftShift + Constants.MageItemShift.Scaled(left ? -1 : 1);
+            float rotate = Math.Clamp(((float)Math.Pow(TimerManager.TryGetTimer("MeleeAttack")?.Progress ?? 0, 0.5f)) * (PlayerDirection == Direction.Left ? -1 : 1) * 2, -1f, 1f);
+            DrawTexture(gameManager.Batch, EquippedItem.Texture, itemPos, scale: new(2), effects: PlayerDirection == Direction.Left ? SpriteEffects.FlipHorizontally : SpriteEffects.None, rotation: rotate, origin: TextureManager.Metadata[EquippedItem.Texture].Size.ToVector2() / 2);
         }
         // Hitbox
         DebugManager.DrawHitbox(gameManager.Batch, this);

@@ -14,7 +14,7 @@ public class MeleeWeapon : Item
     }
     public override bool PrimaryUse(GameManager gameManager, PlayerManager player)
     {
-        if (TimerManager.IsCompleteOrMissing($"MeleeAttack_{UID}"))
+        if (TimerManager.IsCompleteOrMissing($"MeleeAttack"))
         {
             // Positioning and aiming
             Vector2 dir = InputManager.MousePosition.ToVector2() - Constants.Middle.ToVector2() - CameraManager.CameraOffset;
@@ -26,9 +26,9 @@ public class MeleeWeapon : Item
             SoundManager.PlaySound("Swoosh", pitchVariation: 0.25f);
 
             gameManager.LevelManager.Level.Projectiles.Add(projectile);
-            TimerManager.SetTimer($"MeleeAttackDecay_{UID}", 0.5f, projectile.Destroy, updateAction: (prog) => projectile.Alpha = 1 - prog * prog * prog * prog);
+            TimerManager.SetTimer($"MeleeAttackDecay", 0.5f, projectile.Destroy, updateAction: (prog) => projectile.Alpha = 1 - prog * prog * prog * prog);
 
-            TimerManager.SetTimer($"MeleeAttack_{UID}", FireRate, null);
+            TimerManager.SetTimer($"MeleeAttack", FireRate, null);
 
             return true;
         }
