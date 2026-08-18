@@ -9,17 +9,19 @@ public class Timer
     public bool Paused { get; private set; } = false;
 
     public readonly int Repetitions;
-    public readonly Action? Call;
+    public readonly Action? CompleteAction;
+    public readonly Action<float>? UpdateAction;
     public readonly float Duration;
     public float Progress => 1 - Left / Duration;
 
     public bool IsExpired => Left <= 0f && Completions >= Repetitions;
     public event Action? Completed;
-    public Timer(float duration, Action? call, int repetitions = 1)
+    public Timer(float duration, Action? call, int repetitions = 1, Action<float>? updateAction = null)
     {
         Left = duration;
         Repetitions = repetitions;
-        Call = call;
+        CompleteAction = call;
+        UpdateAction = updateAction;
         Duration = duration;
     }
     public void Update(GameManager gameManager)
@@ -27,13 +29,16 @@ public class Timer
         if (IsExpired) return;
 
         if (Left > 0)
+        {
             Left -= GameManager.DeltaTime;
+            UpdateAction?.Invoke(Progress);
+        }
 
         if (Left <= 0f)
         {
             Completions++;
             Completed?.Invoke();
-            Call?.Invoke();
+            CompleteAction?.Invoke();
             if (Repetitions > Completions)
                 Left = Duration;
         }
@@ -64,15 +69,15 @@ public static class TimerManager
 
         DebugManager.EndBenchmark("TimerUpdates");
     }
-    public static Timer NewTimer(string name, float duration, Action? call, int repetitions = 1)
+    public static Timer NewTimer(string name, float duration, Action? completeAction, int repetitions = 1, Action<float>? updateAction = null)
     {
         if (!timers.ContainsKey(name))
-            timers[name] = new(duration, call, repetitions);
+            timers[name] = new(duration, completeAction, repetitions, updateAction);
         return timers[name];
     }
-    public static Timer SetTimer(string name, float duration, Action? call, int repetitions = 1)
+    public static Timer SetTimer(string name, float duration, Action? completeAction, int repetitions = 1, Action<float>? updateAction = null)
     {
-        timers[name] = new(duration, call, repetitions);
+        timers[name] = new(duration, completeAction, repetitions, updateAction);
         return timers[name];
     }
     public static void Remove(string name)

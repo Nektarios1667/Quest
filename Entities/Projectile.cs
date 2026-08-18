@@ -11,6 +11,7 @@ public class Projectile : IEntity
     public RectangleF Bounds => new(Position, Size);
     public ushort UID { get; }
     public TextureID Texture { get; private set; }
+    public float Alpha { get; set; } = 1;
     public ushort Damage { get; private set; }
     public float Speed { get; private set; } // Tiles
     public bool IsAlive { get; private set; } = true;
@@ -39,7 +40,7 @@ public class Projectile : IEntity
     {
         Rectangle source = GetAnimationSource(Texture, GameManager.GameTime, duration: 0.1f);
         Vector2 texMiddle = Size.ToVector2() / Constants.ProjectileScale / 2; // Since the origin is the center (for rotation), we need to offset the position by half the size of the texture (times the scale)
-        DrawTexture(gameManager.Batch, Texture, CameraManager.WorldToScreen(Position.ToPoint()) + (texMiddle * Constants.ProjectileScale).ToPoint(), source: source, origin: texMiddle, rotation: Direction, scale: new(Constants.ProjectileScale));
+        DrawTexture(gameManager.Batch, Texture, CameraManager.WorldToScreen(Position.ToPoint()) + (texMiddle * Constants.ProjectileScale).ToPoint(), source: source, origin: texMiddle, rotation: Direction, scale: new(Constants.ProjectileScale), color: Color.White * Alpha);
         // Debug
         DebugManager.DrawHitbox(gameManager.Batch, this);
     }

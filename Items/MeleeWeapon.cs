@@ -26,7 +26,7 @@ public class MeleeWeapon : Item
             SoundManager.PlaySound("Swoosh", pitchVariation: 0.25f);
 
             gameManager.LevelManager.Level.Projectiles.Add(projectile);
-            TimerManager.SetTimer($"MeleeAttackDecay_{UID}", 0.5f, projectile.Destroy);
+            TimerManager.SetTimer($"MeleeAttackDecay_{UID}", 0.5f, projectile.Destroy, updateAction: (prog) => projectile.Alpha = 1 - prog * prog * prog * prog);
 
             TimerManager.SetTimer($"MeleeAttack_{UID}", FireRate, null);
 
