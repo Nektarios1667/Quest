@@ -5,7 +5,7 @@ namespace Quest.Entities;
 
 public class Enemy : IEntity
 {
-    public ushort UID { get; set; }
+    public ushort UID { get; private set; }
     public bool IsAlive => Health > 0;
     public int MaxHealth { get; set; }
     public int Health { get; set; }

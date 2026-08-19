@@ -67,7 +67,7 @@ public class NPC : IEntity
     public static List<(NPC npc, float distSq)> NPCsNearby { get; set; } = [];
     public ushort UID { get; }
     public List<ShopOption> ShopOptions { get; private set; } = [];
-    public Point Position { get; set; }
+    public Point Position { get; private set; }
     public string Name { get; set; }
     public string Dialog { get; set; }
     public TextureID Texture { get; set; }

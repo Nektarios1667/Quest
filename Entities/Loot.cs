@@ -4,7 +4,7 @@ public struct Loot : IEntity
 {
     public ushort UID { get; } = UIDManager.Get(UIDCategory.Loot);
     public ItemRef Item { get; }
-    public Point Position { get; set; }
+    public Point Position { get; private set; }
     public float Birth { get; private set; }
     public readonly RectangleF Bounds => new(Position.ToVector2(), Size);
     // Generated
