@@ -77,6 +77,8 @@ public enum ItemTypeID : byte
     IronAxe,
     DiamondAxe,
     NinjaStar,
+    Bow,
+    Slingshot,
     // ITEMS ENUM
 }
 
@@ -181,6 +183,8 @@ public class ItemTypes
     public static readonly ItemType IronAxe = new(ItemTypeID.IronAxe, "Iron weapon with short range but high damage.", 1);
     public static readonly ItemType DiamondAxe = new(ItemTypeID.DiamondAxe, "Diamond weapon with short range but high damage.", 1);
     public static readonly ItemType NinjaStar = new(ItemTypeID.NinjaStar, "Sharpened blades that can be thrown.");
+    public static readonly ItemType Bow = new(ItemTypeID.Bow, "Wooden bow capable of shooting arrows.", 1);
+    public static readonly ItemType Slingshot = new(ItemTypeID.Slingshot, "Small slingshot that can launch stones.", 1);
     // ITEMS REGISTER
     public static readonly ItemType[] All = [
     ActiveOrb,
@@ -258,6 +262,8 @@ public class ItemTypes
     IronAxe,
     DiamondAxe,
     NinjaStar,
+    Bow,
+    Slingshot,
     // ITEMS ENUM
     ];
 }
@@ -369,6 +375,8 @@ public class Item
             ItemTypeID.Potato => new Potato(amount, customName),
             ItemTypeID.RawBeef => new RawBeef(amount, customName),
             ItemTypeID.RawFish => new RawFish(amount, customName),
+            ItemTypeID.Bow => new Bow(amount, customName),
+            ItemTypeID.Slingshot => new Slingshot(amount, customName),
             // ITEMFROMID
             _ => new Item(type, amount, customName),
         };
