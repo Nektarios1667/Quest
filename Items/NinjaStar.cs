@@ -2,8 +2,15 @@ namespace Quest.Items;
 
 public class NinjaStar : RangedWeapon
 {
-    public NinjaStar(byte amount, string? customName = null) : base(ItemTypes.NinjaStar, amount, 0.7f, 5f, 20, TextureID.NinjaStarProjectile, customName) // TOOD FIX Ninja star projectile texture
+    public NinjaStar(byte amount, string? customName = null) : base(ItemTypes.NinjaStar, amount, customName) // TOOD FIX Ninja star projectile texture
     {
+        // Configure ranged weapon properties here
+        FireRate = 0.7f;
+        ProjectileSpeed = 5f;
+        Damage = 20;
+        ProjectileTexture = TextureID.NinjaStarProjectile;
+        AccuracyAngle = 10 * MathF.PI / 180f;
+
         Ammo = new ItemRef(ItemTypes.NinjaStar, 1);
     }
     public override bool PrimaryUse(GameManager gameManager, PlayerManager player)

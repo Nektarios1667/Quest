@@ -33,7 +33,7 @@ public static class RandomManager
     {
         return random.NextDouble();
     }
-    public static bool OneOutOF(int n)
+    public static bool OneOutOf(int n)
     {
         return random.Next(n) == 0;
     }
