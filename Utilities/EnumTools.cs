@@ -1,6 +1,4 @@
-﻿using SharpDX.MediaFoundation.DirectX;
-
-namespace Quest.Utilities;
+﻿namespace Quest.Utilities;
 
 public static class EnumTools
 {

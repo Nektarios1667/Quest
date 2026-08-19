@@ -1,2 +1,3 @@
 namespace Quest.Decals;
-public class Carrots(Point location) : Decal(location) {}
+
+public class Carrots(Point location) : Decal(location) { }

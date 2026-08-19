@@ -1,8 +1,6 @@
 
 using Quest.Editor;
 using Quest.Editor.Managers;
-using ScottPlot.Colormaps;
-using System.ComponentModel;
 using System.IO;
 
 namespace Quest.Tiles;

@@ -393,7 +393,8 @@ public static class CommandManager
                 projectile.Destroy();
                 return true;
             }
-        } else if (type == "player" && uid == 0)
+        }
+        else if (type == "player" && uid == 0)
         {
             PlayerManager!.Hurt(GameManager!, int.MaxValue);
             return true;
@@ -430,7 +431,8 @@ public static class CommandManager
             LevelManager!.LoadLevel(GameManager!, LevelManager.Level.LevelPath.ToString());
             _ = SaveManager.ReadGameState(GameManager!, PlayerManager!, SaveManager.CurrentSave.ToString());
             return true;
-        } else if (parts[1] == "inventory")
+        }
+        else if (parts[1] == "inventory")
         {
             PlayerManager!.Inventory.Clear();
             return true;

@@ -11,7 +11,7 @@ public class Furnace : Tile, IContainer
         Container = new([null, null, null]);
         SaveManager.SaveContainer(this, levelName);
     }
-    public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
+    public override void OnPlayerCollide(GameManager gameManager, PlayerManager player)
     {
         UserInterface.FurnaceUI.BindContainer(Container);
         player.OpenInterface(gameManager, UserInterface.FurnaceUI);

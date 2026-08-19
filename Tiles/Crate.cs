@@ -12,7 +12,7 @@ public class Crate : Tile, IContainer
         Container = new(new Item?[Size.X * Size.Y]);
         SaveManager.SaveContainer(this, levelName);
     }
-    public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
+    public override void OnPlayerCollide(GameManager gameManager, PlayerManager player)
     {
         UserInterface.CrateUI.BindContainer(Container);
         player.OpenInterface(gameManager, UserInterface.CrateUI);

@@ -1,14 +1,6 @@
 ﻿using Quest.Editor;
 using Quest.Editor.Managers;
-using ScottPlot.Interactivity;
-using SharpDX.Direct2D1.Effects;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Quest.Tiles;
 
@@ -166,7 +158,7 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
         else SpawnItem = null;
 
         //if (values[6] != "") // TODO
-        
+
         if (values[6] != "") Command = values[6];
         else Command = null;
     }

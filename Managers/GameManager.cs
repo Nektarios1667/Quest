@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework.Content;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Quest.Managers;

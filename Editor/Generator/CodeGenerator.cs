@@ -154,7 +154,7 @@ public static class CodeGenerator
             newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, LevelPath.LevelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null),\r\n            // TILEFROMID\r\n");
         else if (isSpecial)
             newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, LevelPath.LevelName),\r\n            // TILEFROMID\r\n");
-        
+
         File.WriteAllText($"{sourceDirectory}/Tiles/Tile.cs", newTileSource);
 
         // Tileset

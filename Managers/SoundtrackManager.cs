@@ -1,8 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
-using Migs.MPath.Core.Data;
-using Quest.World;
-using SharpDX.MediaFoundation.DirectX;
 
 namespace Quest.Managers;
 
@@ -97,7 +94,8 @@ public static class SoundtrackManager
             Soundtracks? soundtrack = GetRandomSoundtrack(gameManager.StateManager.Mood);
             if (soundtrack != null)
                 PlaySoundtrack(soundtrack.Value);
-        } else if (musicSource.HasValue)
+        }
+        else if (musicSource.HasValue)
         {
             // Pause on level change
             if (gameManager.LevelManager.Level.LevelName != musicSource.Value.level)

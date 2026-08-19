@@ -24,7 +24,7 @@ public class DisplayCase : Tile, IContainer, IHasLevelData
         if (Container.Items[0] != null)
             DrawTexture(gameManager.Batch, Container.Items[0]!.Texture, dest + Constants.TileHalfSize + new Point(0, (int)(Math.Sin(GameManager.GameTime) * 2)), scale: new(3), origin: new Vector2(8, 8));
     }
-    public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
+    public override void OnPlayerCollide(GameManager gameManager, PlayerManager player)
     {
         UserInterface.DisplayCaseUI.BindContainer(Container);
         player.OpenInterface(gameManager, UserInterface.DisplayCaseUI);

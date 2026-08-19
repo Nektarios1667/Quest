@@ -21,7 +21,7 @@ public class Chest : Tile, IContainer, IEditableTile, IHasLevelData
         Key = key;
         ConsumeKey = consumeKey;
     }
-    public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
+    public override void OnPlayerCollide(GameManager gameManager, PlayerManager player)
     {
         // Unlocked
         if (Generated)

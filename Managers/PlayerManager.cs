@@ -12,12 +12,14 @@ public class PlayerManager : IEntity
     public StatusManager StatusManager { get; } = new();
     // Health
     private int _health = Constants.PlayerBaseHealth;
-    public int Health {
+    public int Health
+    {
         get => _health;
         set { _health = value; Game.OverlayManager.HealthBar.CurrentValue = value; }
     }
     private int _maxHealth = Constants.PlayerBaseHealth;
-    public int MaxHealth {
+    public int MaxHealth
+    {
         get => _maxHealth;
         set { _maxHealth = value; Game.OverlayManager.HealthBar.MaxValue = value; }
     }

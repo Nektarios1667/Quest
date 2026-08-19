@@ -1,2 +1,3 @@
 namespace Quest.Decals;
-public class Kill(Point location) : Decal(location) {}
+
+public class Kill(Point location) : Decal(location) { }

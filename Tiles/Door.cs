@@ -1,8 +1,6 @@
-using Quest.Editor.Managers;
 using Quest.Editor;
-using System.ComponentModel;
+using Quest.Editor.Managers;
 using System.IO;
-using SharpDX.XAudio2;
 
 namespace Quest.Tiles;
 
@@ -26,7 +24,7 @@ public class Door : Tile, IHasState, IEditableTile, IHasLevelData
         Rectangle source = new(IsWalkable ? 16 : 0, 0, 16, 16);
         DrawTexture(gameManager.Batch, TextureID.Door, dest, source: source, scale: Constants.TileSizeScale);
     }
-    public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
+    public override void OnPlayerCollide(GameManager gameManager, PlayerManager player)
     {
         if (Key == null || player.Inventory.Count(Key.Type) >= Key.Amount)
         {

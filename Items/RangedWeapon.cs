@@ -19,7 +19,7 @@ public class RangedWeapon : Item
     {
         // Check time
         if (!TimerManager.IsCompleteOrMissing($"RangedAttack_{UID}")) return false;
-        
+
         // Use
         if (Ammo == null || player.Inventory.Has(Ammo))
         {
@@ -36,7 +36,8 @@ public class RangedWeapon : Item
             }
             TimerManager.SetTimer($"RangedAttack_{UID}", FireRate, null);
             return true;
-        } else
+        }
+        else
         {
             gameManager.OverlayManager.Notification($"No {Ammo.Name}!", Color.Red, 1f);
             TimerManager.SetTimer($"RangedAttack_{UID}", FireRate, null);

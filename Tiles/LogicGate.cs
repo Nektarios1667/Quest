@@ -39,7 +39,7 @@ public class LogicGate : TriggerTile
             InputA = input;
         else if (inputType == InputType.B)
             InputB = input;
-        
+
         // Solve
         bool act = Solve(GateType, InputA, InputB);
         if (act != Activated)

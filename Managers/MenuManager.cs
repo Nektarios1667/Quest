@@ -1,10 +1,8 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using MonoGUI;
 using Quest.Editor;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Quest.Managers;
@@ -126,7 +124,7 @@ public class MenuManager
         gameManager.StateManager.State = GameState.MainMenu;
 
         SoundtrackManager.StopSoundtrack();
-        
+
         gameManager.LevelManager.UnloadWorld(gameManager.LevelManager.Level.WorldName);
     }
     public async void ContinueSaveButton()

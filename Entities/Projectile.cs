@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace Quest.Entities;
+﻿namespace Quest.Entities;
 
 public class Projectile : IEntity
 {

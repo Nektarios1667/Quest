@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace Quest.Tiles;
 
@@ -13,7 +7,7 @@ namespace Quest.Tiles;
 public interface IHasState
 {
     public ushort UID { get; }
-    public TileTypeID TypeID {  get; }
+    public TileTypeID TypeID { get; }
     public ByteCoord Location { get; }
     public void WriteState(BinaryWriter writer, GameManager gameManager);
     public void ReadState(BinaryReader reader, GameManager gameManager);

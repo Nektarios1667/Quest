@@ -10,7 +10,7 @@ public class Jukebox : Tile, IContainer
         Container = new([null]);
         SaveManager.SaveContainer(this, levelName);
     }
-    public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
+    public override void OnPlayerCollide(GameManager gameManager, PlayerManager player)
     {
         UserInterface.JukeboxUI.BindContainer(Container);
         player.OpenInterface(gameManager, UserInterface.JukeboxUI);

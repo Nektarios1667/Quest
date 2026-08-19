@@ -13,7 +13,7 @@ public class Crafter : Tile, IContainer
         Container = new(new Item?[IngredientsSize.X * IngredientsSize.Y + 1]);
         SaveManager.SaveContainer(this, levelName);
     }
-    public override void OnPlayerCollide(GameManager gameManager,PlayerManager player)
+    public override void OnPlayerCollide(GameManager gameManager, PlayerManager player)
     {
         UserInterface.CrafterUI.BindContainer(Container);
         player.OpenInterface(gameManager, UserInterface.CrafterUI);

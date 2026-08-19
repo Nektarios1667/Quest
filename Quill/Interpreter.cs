@@ -37,7 +37,7 @@ public class QuillInstance
         Lines = script.SourceCode.Split('\n');
     }
 
-    public int Step(GameManager gameManager,int budget)
+    public int Step(GameManager gameManager, int budget)
     {
         int stepsUsed = 0;
         int allowedReps = PerformanceMode == QuillPerformanceMode.High ? 3 : 1;
@@ -108,7 +108,7 @@ public static partial class Interpreter
     private static readonly Dictionary<string, string> ExternalSymbols = new() {
         { "<ready>", "false" },
     };
-    public static void UpdateSymbols(GameManager gameManager,PlayerManager player)
+    public static void UpdateSymbols(GameManager gameManager, PlayerManager player)
     {
         DebugManager.StartBenchmark("QuillSymbolsUpdate");
 
@@ -237,7 +237,7 @@ public static partial class Interpreter
         Scripts.Add(inst);
     }
 
-    public static void Update(GameManager gameManager,PlayerManager player)
+    public static void Update(GameManager gameManager, PlayerManager player)
     {
         if (Scripts.Count == 0) return;
 

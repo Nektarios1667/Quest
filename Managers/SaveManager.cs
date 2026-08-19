@@ -1,9 +1,6 @@
 ﻿using Quest.World;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -377,7 +374,8 @@ public class SaveManager
                         case "EFFX": ReadEffectsSection(gameManager, playerManager, sectionReader); break;
                         default: Logger.Warning($"Unknown level section '{id}'"); break; // Unknown section - ignore it
                     }
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     Logger.Error($"Save Error | {id}\n{e}");
                 }

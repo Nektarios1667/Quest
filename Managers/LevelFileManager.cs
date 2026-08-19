@@ -1,13 +1,11 @@
 ﻿using Quest.World;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
 using IO = System.IO;
 
 namespace Quest.Managers;
@@ -21,7 +19,7 @@ public static class LevelFileManager
             return ReadWorld(gameManager, filename, reload);
         });
     }
-    public  static bool ReadWorld(GameManager gameManager, string folder, bool reload = false)
+    public static bool ReadWorld(GameManager gameManager, string folder, bool reload = false)
     {
         string[] levelFiles = Directory.GetFiles($"GameData/Worlds/{folder}/levels", "*.qlv");
 
@@ -73,7 +71,8 @@ public static class LevelFileManager
         LevelPath levelPath = new(filename);
         string path = $"GameData/Worlds/{levelPath.WorldName}/levels/{levelPath.LevelName}.qlv";
 
-        if (levelPath.IsNull()) {
+        if (levelPath.IsNull())
+        {
             Logger.Error($"Invalid file format '{filename}.'");
             return false;
         }
