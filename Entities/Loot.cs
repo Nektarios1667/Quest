@@ -32,7 +32,7 @@ public struct Loot : IEntity
         if (Item.Amount > 1)
             DrawTexture(gameManager.Batch, Texture, pos + lootStackOffset, scale: new(2));
         if (Item.Amount > 2)
-            DrawTexture(gameManager.Batch, Texture, pos + lootStackOffset.Scaled(2), scale: new(2));
+            DrawTexture(gameManager.Batch, Texture, pos + lootStackOffset + lootStackOffset, scale: new(2));
         // Draw hitbox
         DebugManager.DrawHitbox(gameManager.Batch, this);
     }
