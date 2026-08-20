@@ -82,31 +82,31 @@ public static class TimerManager
     public static void Remove(string name)
     {
         if (!timers.Remove(name))
-            Logger.Error($"No timer with name '{name}' found");
+            Logger.Error($"No timer with name '{name}' found", true);
     }
     public static void TryRemove(string name) { timers.Remove(name); }
     public static float TimeLeft(string name)
     {
         if (timers.TryGetValue(name, out var timer))
             return timer.Left;
-        Logger.Error($"No timer with name '{name}' found");
+        Logger.Error($"No timer with name '{name}' found", true);
+        return -1;
+    }
+    public static float TryTimeLeft(string name)
+    {
+        if (timers.TryGetValue(name, out var timer))
+            return timer.Left;
         return -1;
     }
     public static Timer GetTimer(string name)
     {
         if (timers.TryGetValue(name, out var timer))
             return timer;
-        Logger.Error($"No timer with name '{name}' found");
+        Logger.Error($"No timer with name '{name}' found", true);
         return new(-1, null);
     }
     public static Dictionary<string, Timer> GetAllTimers() => timers;
 
-    public static float TryTimeLeft(string name)
-    {
-        if (timers.TryGetValue(name, out var timer))
-            return timer.Left;
-        return 0;
-    }
     public static Timer? TryGetTimer(string name)
     {
         if (timers.TryGetValue(name, out var timer))

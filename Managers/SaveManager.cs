@@ -173,9 +173,9 @@ public class SaveManager
         writer.Write((byte)playerManager.MaxHealth);
         writer.Write((byte)playerManager.Hunger);
         writer.Write((byte)playerManager.MaxHunger);
-        writer.Write(TimerManager.TimeLeft("PlayerHungerLoss"));   // float
-        writer.Write(TimerManager.TimeLeft("PlayerNaturalRegen")); // float
-        writer.Write(TimerManager.TimeLeft("PlayerStarvation"));   // float
+        writer.Write(TimerManager.TryTimeLeft("PlayerHungerLoss"));   // float
+        writer.Write(TimerManager.TryTimeLeft("PlayerNaturalRegen")); // float
+        writer.Write(TimerManager.TryTimeLeft("PlayerStarvation"));   // float
 
         TasksComplete++;
     }
