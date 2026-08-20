@@ -3,8 +3,9 @@ using System.Linq;
 
 namespace Quest.Entities;
 
-public class Enemy : IEntity
+public class Enemy : IEntity, IStatusEffectable
 {
+    public Dictionary<StatusEffect, float> StatusEffects { get; set; } = new();
     public ushort UID { get; private set; }
     public bool IsAlive => Health > 0;
     public int MaxHealth { get; set; }
@@ -80,6 +81,9 @@ public class Enemy : IEntity
         if (!IsAlive)
             UIDManager.Release(UIDCategory.Enemies, UID);
 
+        // Effects
+        StatusManager.Update(gameManager, this);
+
         // View range
         float playerDistSq = Vector2.DistanceSquared(FootPosition, CameraManager.CameraDest);
 
@@ -142,14 +146,14 @@ public class Enemy : IEntity
         HealthBar.Draw(gameManager.Batch);
         DamageNotifs.Draw(gameManager.Batch);
     }
-    public virtual void Hurt(int damage)
+    public virtual void Hurt(GameManager _, int damage)
     {
 
         if (damage <= Defense) damage /= 2;
         Health -= damage;
         DamageNotifs.AddNotification($"-{damage}", duration: 2, color: Color.Red);
     }
-    public virtual void Heal(int health)
+    public virtual void Heal(GameManager _, int health)
     {
         Health += Math.Min(health, MaxHealth - Health);
         DamageNotifs.AddNotification($"+{health}", duration: 2, color: Color.Green);

@@ -19,62 +19,71 @@ public enum StatusEffect : byte
     Fullness,
 }
 
-public class StatusManager
+public static class StatusManager
 {
-    private readonly Dictionary<StatusEffect, float> _statusEffects = new();
-    private readonly Dictionary<StatusEffect, Notification> _notifications = new();
-    public Dictionary<StatusEffect, float> GetStatusEffects() => _statusEffects;
-    public int GetStatusEffectsCount() => _statusEffects.Count;
-    public void AddStatusEffect(PlayerManager player, StatusEffect effect, float duration)
+    private static readonly Dictionary<StatusEffect, Notification> playerNotifs = new();
+
+    public static void AddStatusEffect(IStatusEffectable entity, StatusEffect effect, float duration)
     {
-        _statusEffects[effect] = duration;
-        if (_notifications.TryGetValue(effect, out var notif))
+        entity.StatusEffects[effect] = duration;
+
+        if (entity is not PlayerManager playerManager) return;
+        // Player
+        if (playerNotifs.TryGetValue(effect, out var notif))
             notif.Duration = Math.Max(duration, notif.Duration);
         else
         {
-            Notification newNotif = player.StatusArea.AddNotification($"{TimeSpan.FromSeconds(duration):mm\\:ss} | {effect}", color: IsPositiveEffect(effect) ? Color.Lime : Color.Red, int.MaxValue);
-            _notifications[effect] = newNotif;
+            Notification newNotif = playerManager.StatusArea.AddNotification($"{TimeSpan.FromSeconds(duration):mm\\:ss} | {effect}", color: IsPositiveEffect(effect) ? Color.Lime : Color.Red, int.MaxValue);
+            playerNotifs[effect] = newNotif;
         }
     }
-    public void ClearStatusEffect(StatusEffect effect)
+    public static void ClearStatusEffect(StatusEffect effect, IStatusEffectable entity)
     {
-        _statusEffects.Remove(effect);
-        if (_notifications.TryGetValue(effect, out var notif))
-            notif.Duration = 0;
-    }
-    public void ClearAllStatusEffects(GameManager gameManager)
-    {
-        gameManager.GradingEffect?.Parameters["Saturation"].SetValue(1);
+        bool isPlayer = entity.UID == 0; // PlayerManager always has UID 0
+        entity.StatusEffects.Remove(effect);
 
-        _statusEffects.Clear();
-        foreach (var notif in _notifications.Values)
+        if (isPlayer && playerNotifs.TryGetValue(effect, out var notif))
             notif.Duration = 0;
     }
-    public bool HasStatusEffect(StatusEffect effect)
+    public static void ClearAllStatusEffects(GameManager gameManager, IStatusEffectable entity)
     {
-        return _statusEffects.ContainsKey(effect);
+        bool isPlayer = entity.UID == 0; // PlayerManager always has UID 0
+
+        entity.StatusEffects.Clear();
+
+        // Player
+        if (isPlayer)
+        {
+            gameManager.GradingEffect?.Parameters["Saturation"].SetValue(1);
+            foreach (var notif in playerNotifs.Values)
+                notif.Duration = 0;
+        }
     }
-    public float GetStatusEffectDuration(StatusEffect effect)
+    public static bool HasStatusEffect(StatusEffect effect, IStatusEffectable entity)
     {
-        return _statusEffects.TryGetValue(effect, out float duration) ? duration : 0;
+        return entity.StatusEffects.ContainsKey(effect);
     }
-    private float GetEffectMult(StatusEffect effect)
+    public static float GetStatusEffectDuration(StatusEffect effect, IStatusEffectable entity)
+    {
+        return entity.StatusEffects.TryGetValue(effect, out float duration) ? duration : 0;
+    }
+    private static float GetEffectMult(StatusEffect effect, IStatusEffectable entity)
     {
         return effect switch
         {
-            StatusEffect.Speed => HasStatusEffect(effect) ? 2f : 1f,
-            StatusEffect.Strength => HasStatusEffect(effect) ? 1.5f : 1f,
-            StatusEffect.Weakness => HasStatusEffect(effect) ? 0.5f : 1f,
-            StatusEffect.Slowness => HasStatusEffect(effect) ? 0.5f : 1f,
-            StatusEffect.Vulnerability => HasStatusEffect(effect) ? 1.5f : 1f,
-            StatusEffect.Protection => HasStatusEffect(effect) ? 0.5f : 1f,
-            StatusEffect.Lifesteal => HasStatusEffect(effect) ? 0.3f : 0f,
-            StatusEffect.Cravings => HasStatusEffect(effect) ? 3.0f : 1f,
-            StatusEffect.Fullness => HasStatusEffect(effect) ? 0.67f : 1f,
+            StatusEffect.Speed => HasStatusEffect(effect, entity) ? 2f : 1f,
+            StatusEffect.Strength => HasStatusEffect(effect, entity) ? 1.5f : 1f,
+            StatusEffect.Weakness => HasStatusEffect(effect, entity) ? 0.5f : 1f,
+            StatusEffect.Slowness => HasStatusEffect(effect, entity) ? 0.5f : 1f,
+            StatusEffect.Vulnerability => HasStatusEffect(effect, entity) ? 1.5f : 1f,
+            StatusEffect.Protection => HasStatusEffect(effect, entity) ? 0.5f : 1f,
+            StatusEffect.Lifesteal => HasStatusEffect(effect, entity) ? 0.3f : 0f,
+            StatusEffect.Cravings => HasStatusEffect(effect, entity) ? 3.0f : 1f,
+            StatusEffect.Fullness => HasStatusEffect(effect, entity) ? 0.67f : 1f,
             _ => 1f
         };
     }
-    private bool IsPositiveEffect(StatusEffect effect)
+    private static bool IsPositiveEffect(StatusEffect effect)
     {
         return effect switch
         {
@@ -87,56 +96,68 @@ public class StatusManager
             _ => false
         };
     }
-    public float GetSpeedMult() => GetEffectMult(StatusEffect.Speed) * GetEffectMult(StatusEffect.Slowness);
-    public float GetDamageMult() => GetEffectMult(StatusEffect.Strength) * GetEffectMult(StatusEffect.Weakness);
-    public float GetDefenseMult() => GetEffectMult(StatusEffect.Protection) * GetEffectMult(StatusEffect.Vulnerability);
-    public int GetCravingsMult() => (int)(GetEffectMult(StatusEffect.Cravings) * GetEffectMult(StatusEffect.Fullness));
-    public float GetLifestealMult() => GetEffectMult(StatusEffect.Lifesteal);
-    public void Update(GameManager gameManager, PlayerManager player)
+    public static float GetSpeedMult(IStatusEffectable entity) => GetEffectMult(StatusEffect.Speed, entity) * GetEffectMult(StatusEffect.Slowness, entity);
+    public static float GetDamageMult(IStatusEffectable entity) => GetEffectMult(StatusEffect.Strength, entity) * GetEffectMult(StatusEffect.Weakness, entity);
+    public static float GetDefenseMult(IStatusEffectable entity) => GetEffectMult(StatusEffect.Protection, entity) * GetEffectMult(StatusEffect.Vulnerability, entity);
+    public static int GetCravingsMult(IStatusEffectable entity) => (int)(GetEffectMult(StatusEffect.Cravings, entity) * GetEffectMult(StatusEffect.Fullness, entity));
+    public static float GetLifestealMult(IStatusEffectable entity) => GetEffectMult(StatusEffect.Lifesteal, entity);
+    public static void Update(GameManager gameManager, IStatusEffectable entity)
     {
+        bool isPlayer = entity.UID == 0; // PlayerManager always has UID 0
+
         // Time
         var expiredEffects = new List<StatusEffect>();
-        foreach (var kvp in _statusEffects)
+        foreach (var kvp in entity.StatusEffects)
         {
-            _statusEffects[kvp.Key] -= GameManager.DeltaTime;
-            _notifications[kvp.Key].Text = $"{TimeSpan.FromSeconds(_statusEffects[kvp.Key]):mm\\:ss} | {kvp.Key}";
-            if (_statusEffects[kvp.Key] <= 0)
+            entity.StatusEffects[kvp.Key] -= GameManager.DeltaTime;
+
+            // Player
+            if (isPlayer)
             {
-                expiredEffects.Add(kvp.Key);
+                playerNotifs[kvp.Key].Text = $"{TimeSpan.FromSeconds(entity.StatusEffects[kvp.Key]):mm\\:ss} | {kvp.Key}";
+                if (entity.StatusEffects[kvp.Key] <= 0)
+                {
+                    expiredEffects.Add(kvp.Key);
+                }
             }
         }
 
-        // Clear
-        foreach (var effect in expiredEffects)
-        {
-            _statusEffects.Remove(effect);
-            _notifications[effect].Duration = 0;
-        }
 
         // Reset visual effects
-        gameManager.GradingEffect?.Parameters["Tint"].SetValue(Vector3.One);
-        gameManager.GradingEffect?.Parameters["Saturation"].SetValue(1f);
-        gameManager.GradingEffect?.Parameters["Contrast"].SetValue(1f);
+        if (isPlayer)
+        {
+            // Clear effects
+            foreach (var effect in expiredEffects)
+            {
+                entity.StatusEffects.Remove(effect);
+                playerNotifs[effect].Duration = 0;
+            }
+            // Clear visuals
+            gameManager.GradingEffect?.Parameters["Tint"].SetValue(Vector3.One);
+            gameManager.GradingEffect?.Parameters["Saturation"].SetValue(1f);
+            gameManager.GradingEffect?.Parameters["Contrast"].SetValue(1f);
+        }
 
         // Status effects
-        if (HasStatusEffect(StatusEffect.Poison) || HasStatusEffect(StatusEffect.Burning))
+        if (HasStatusEffect(StatusEffect.Poison, entity) || HasStatusEffect(StatusEffect.Burning, entity))
         {
-            if (TimerManager.IsCompleteOrMissing("PlayerDOTTick"))
+            if (TimerManager.IsCompleteOrMissing($"DOTTick_{entity.UID}"))
             {
-                player.Hurt(gameManager, 5);
-                TimerManager.SetTimer("PlayerDOTTick", 1, null);
+                entity.Hurt(gameManager, 5);
+                TimerManager.SetTimer($"DOTTick_{entity.UID}", 1, null);
             }
-            gameManager.GradingEffect?.Parameters["Tint"].SetValue(new Vector3(.8f, 1, .8f));
+            if (isPlayer)
+                gameManager.GradingEffect?.Parameters["Tint"].SetValue(new Vector3(.8f, 1, .8f));
         }
-        if (HasStatusEffect(StatusEffect.Regeneration) && TimerManager.IsCompleteOrMissing("PlayerRegenerationTick"))
+        if (HasStatusEffect(StatusEffect.Regeneration, entity) && TimerManager.IsCompleteOrMissing($"RegenerationTick_{entity.UID}"))
         {
-            player.Heal(gameManager, 5);
-            TimerManager.SetTimer("PlayerRegenerationTick", 1, null);
+            entity.Heal(gameManager, 5);
+            TimerManager.SetTimer($"RegenerationTick_{entity.UID}", 1, null);
         }
-        if (HasStatusEffect(StatusEffect.Delerium))
+        if (HasStatusEffect(StatusEffect.Delerium, entity) && isPlayer)
         {
-            gameManager.GradingEffect?.Parameters["Saturation"].SetValue(0.1f + (0.9f / (0.4f * GetStatusEffectDuration(StatusEffect.Delerium) + 1)));
-            CameraManager.Camera += RandomManager.RandomUnitVec2() * Math.Clamp(0.1f * GetStatusEffectDuration(StatusEffect.Delerium), 0, 4);
+            gameManager.GradingEffect?.Parameters["Saturation"].SetValue(0.1f + (0.9f / (0.4f * GetStatusEffectDuration(StatusEffect.Delerium, entity) + 1)));
+            CameraManager.Camera += RandomManager.RandomUnitVec2() * Math.Clamp(0.1f * GetStatusEffectDuration(StatusEffect.Delerium, entity), 0, 4);
         }
     }
 }

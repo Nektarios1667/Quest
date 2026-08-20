@@ -97,7 +97,7 @@ public static class CommandManager
             new("enemy", CEnemy, "Spawned enemy.", "Failed to spawn enemy."),
             new("freecam <bool>", CFreecam, "Set freecam to |1|", "Failed to set freecam to |1|"),
             new("kill [enemy|projectile|player] <ushort>", CKill, "Killed |1| with UID |2|", "Failed to kill |1| with UID |2|"),
-            new("effect <effect> {1:999}", CEffect, "Applied effect '|1|' for |2| seconds.", "Failed to apply effect '|1|' for |2| seconds."),
+            new("effect <effect> {1:999999}", CEffect, "Applied effect '|1|' for |2| seconds.", "Failed to apply effect '|1|' for |2| seconds."),
             new("reload [lights|lightgrid|level|inventory]", CReload, "Reloaded |1|.", "Failed to reload |1|."),
             new("music *", CMusic, "Playing music |1|.", "Failed to play music |1|."),
         ];
@@ -380,8 +380,8 @@ public static class CommandManager
             if (GameManager!.LevelManager.Level.Enemies.TryGetValue(uid, out var enemy))
             {
                 // 2x max health so that if defense is max then it'll still die
-                enemy.Hurt(ushort.MaxValue);
-                enemy.Hurt(ushort.MaxValue);
+                enemy.Hurt(GameManager, ushort.MaxValue);
+                enemy.Hurt(GameManager, ushort.MaxValue);
                 return true;
             }
         }
@@ -406,7 +406,7 @@ public static class CommandManager
         string effectName = command.Split(' ')[1];
         int effectLength = int.Parse(command.Split(' ')[2]);
         if (!Enum.TryParse<StatusEffect>(effectName, out var effect)) return false;
-        PlayerManager!.StatusManager.AddStatusEffect(PlayerManager, effect, effectLength);
+        StatusManager.AddStatusEffect(PlayerManager, effect, effectLength);
         return true;
     }
     private static bool CReload(string command)

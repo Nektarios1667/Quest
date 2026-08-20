@@ -26,7 +26,7 @@ public class Consumable : Item
 
         // Status
         if (StatusGiven != null && RandomManager.RandomFloat() < StatusGiven.Value.Chance)
-            player.StatusManager.AddStatusEffect(player, StatusGiven.Value.Effect, StatusGiven.Value.Duration);
+            StatusManager.AddStatusEffect(player, StatusGiven.Value.Effect, StatusGiven.Value.Duration);
 
         // Consume
         player.Inventory.Consume(Take(1)!.GetItemRef());

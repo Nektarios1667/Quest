@@ -118,7 +118,7 @@ public class MenuManager
     }
     public void ExitToMainMenu()
     {
-        playerManager.StatusManager.ClearAllStatusEffects(gameManager);
+        StatusManager.ClearAllStatusEffects(gameManager, playerManager);
 
         gameManager.StateManager.OverlayState = OverlayState.None;
         gameManager.StateManager.State = GameState.MainMenu;

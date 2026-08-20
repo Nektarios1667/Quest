@@ -2,14 +2,14 @@
 using Quest.Interaction;
 namespace Quest.Managers;
 
-public class PlayerManager : IEntity
+public class PlayerManager : IEntity, IStatusEffectable
 {
     public ushort UID => 0;
+    // Status effect
+    public Dictionary<StatusEffect, float> StatusEffects { get; set; } = new();
     // Events
     public event Action<int>? EquippedSlotChanged;
     // Properties
-    // Player stats
-    public StatusManager StatusManager { get; } = new();
     // Health
     private int _health = Constants.PlayerBaseHealth;
     public int Health
@@ -37,7 +37,7 @@ public class PlayerManager : IEntity
         set { _maxHunger = value; Game.OverlayManager.HungerBar.MaxValue = value; }
     }
     public bool IsAlive => _health > 0;
-    public int Speed => (int)(Constants.PlayerBaseSpeed * StatusManager.GetSpeedMult());
+    public int Speed => (int)(Constants.PlayerBaseSpeed * StatusManager.GetSpeedMult(this));
     // Inventory and UI
     public NotificationArea StatusArea { get; } = new(new(5, 5), 400, PixelOperatorSubtitle, color: Color.Gray, hAlign: HorizontalAlignment.Left, vAlign: VerticalAlignment.Top);
     public bool InventoryOpen { get; set; } = false;
@@ -178,7 +178,7 @@ public class PlayerManager : IEntity
         if (TimerManager.IsCompleteOrMissing("PlayerHungerLoss"))
         {
             TimerManager.SetTimer("PlayerHungerLoss", Constants.SecondsPerHungerLoss, null);
-            Hunger -= StatusManager.GetCravingsMult();
+            Hunger -= StatusManager.GetCravingsMult(this);
         }
         // Natural regen
         if (Hunger > MaxHunger * 0.8f && Health < MaxHealth && TimerManager.IsCompleteOrMissing("PlayerNaturalRegen"))
@@ -232,15 +232,20 @@ public class PlayerManager : IEntity
                     // Damage enemy / player
                     if (entity is Enemy enemy)
                     {
-                        enemy.Hurt((int)(proj.Damage * StatusManager.GetDamageMult()));
-                        Heal(gameManager, (int)(proj.Damage * StatusManager.GetLifestealMult()));
+                        enemy.Hurt(gameManager, (int)(proj.Damage * StatusManager.GetDamageMult(this)));
+                        Heal(gameManager, (int)(proj.Damage * StatusManager.GetLifestealMult(this)));
                     }
                     else if (entity is PlayerManager)
                     {
-                        Hurt(gameManager, (int)(proj.Damage * StatusManager.GetDefenseMult()));
+                        Hurt(gameManager, (int)(proj.Damage * StatusManager.GetDefenseMult(this)));
+                    }
+
+                    // Status effects
+                    if (entity is IStatusEffectable effectable)
+                    {
                         var projEffect = proj.GetProjectileEffect();
                         if (projEffect != null)
-                            StatusManager.AddStatusEffect(this, projEffect.Value.effect, projEffect.Value.duration);
+                            StatusManager.AddStatusEffect(effectable, projEffect.Value.effect, projEffect.Value.duration);
                     }
 
                     // Destroy

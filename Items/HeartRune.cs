@@ -8,7 +8,7 @@ public class HeartRune : Item
     {
         if (TimerManager.IsCompleteOrMissing("HeartRuneCooldown"))
         {
-            player.StatusManager.AddStatusEffect(player, StatusEffect.Regeneration, 6);
+            StatusManager.AddStatusEffect(player, StatusEffect.Regeneration, 6);
             SoundManager.PlaySoundInstance("Spook");
             TimerManager.SetTimer("HeartRuneCooldown", 60, null);
             return true;

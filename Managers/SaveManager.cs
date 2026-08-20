@@ -300,10 +300,10 @@ public class SaveManager
     private static void WriteEffectsSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager)
     {
         // Write EFFX
-        byte effectsCount = (byte)Math.Clamp(playerManager.StatusManager.GetStatusEffectsCount(), 0, 255);
+        byte effectsCount = (byte)Math.Clamp(playerManager.StatusEffects.Count, 0, 255);
         writer.Write(effectsCount);
 
-        foreach (var kv in playerManager.StatusManager.GetStatusEffects().Take(effectsCount))
+        foreach (var kv in playerManager.StatusEffects.Take(effectsCount))
         {
             writer.Write((byte)kv.Key); // effect type - byte
             writer.Write(kv.Value);     // effect timer - float
@@ -519,13 +519,13 @@ public class SaveManager
     private static void ReadEffectsSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader)
     {
         // Read Status Effects
-        playerManager.StatusManager.ClearAllStatusEffects(gameManager);
+        StatusManager.ClearAllStatusEffects(gameManager, playerManager);
         byte effectsCount = reader.ReadByte();
         for (int i = 0; i < effectsCount; i++)
         {
             StatusEffect effect = (StatusEffect)reader.ReadByte();
             float duration = reader.ReadSingle();
-            playerManager.StatusManager.AddStatusEffect(playerManager, effect, duration);
+            StatusManager.AddStatusEffect(playerManager, effect, duration);
         }
         gameManager.LevelManager.TasksComplete++;
     }
