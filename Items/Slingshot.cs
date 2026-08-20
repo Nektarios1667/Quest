@@ -9,7 +9,7 @@ public class Slingshot : RangedWeapon
         FireRate = 0.8f;
         ProjectileSpeed = 7f;
         Damage = 10;
-        ProjectileTexture = TextureID.Rock;
+        ProjectileTexture = TextureID.RockProjectile;
         AccuracyAngle = 8 * MathF.PI / 180f;
 
         Ammo = new(ItemTypes.Rock, 1);
