@@ -2,6 +2,6 @@ namespace Quest.Items;
 
 public class Ink : Item
 {
-    public Ink(int amount) : base(ItemTypes.Ink, amount)
+    public Ink(int amount, string? customName = null) : base(ItemTypes.Ink, amount, customName)
     { }
 }

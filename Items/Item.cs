@@ -52,7 +52,7 @@ public enum ItemTypeID : byte
     RubyMedal,
     HeartRune,
     LightningStaff,
-    TimeStaff,
+    FireStaff,
     Scroll,
     Carrot,
     RawFish,
@@ -158,7 +158,7 @@ public class ItemTypes
     public static readonly ItemType RubyMedal = new(ItemTypeID.RubyMedal, "Award medal made of ruby.");
     public static readonly ItemType HeartRune = new(ItemTypeID.HeartRune, "Mysterious rune in the shape of a heart.", 1);
     public static readonly ItemType LightningStaff = new(ItemTypeID.LightningStaff, "Magical staff infused with lightning.", 1);
-    public static readonly ItemType TimeStaff = new(ItemTypeID.TimeStaff, "Magical staff able to control time.", 1);
+    public static readonly ItemType FireStaff = new(ItemTypeID.FireStaff, "Magical staff able to control fire.", 1);
     public static readonly ItemType Scroll = new(ItemTypeID.Scroll, "Antique scroll with writings on it.", 1);
     public static readonly ItemType Carrot = new(ItemTypeID.Carrot, "Hearty carrot from the ground.");
     public static readonly ItemType RawFish = new(ItemTypeID.RawFish, "Uncooked fish from the sea.");
@@ -237,7 +237,7 @@ public class ItemTypes
     RubyMedal,
     HeartRune,
     LightningStaff,
-    TimeStaff,
+    FireStaff,
     Scroll,
     Carrot,
     RawFish,
@@ -378,6 +378,7 @@ public class Item
             ItemTypeID.Bow => new Bow(amount, customName),
             ItemTypeID.Slingshot => new Slingshot(amount, customName),
             ItemTypeID.HeartRune => new HeartRune(amount, customName),
+            ItemTypeID.FireStaff => new FireStaff(amount, customName),
             // ITEMFROMID
             _ => new Item(type, amount, customName),
         };

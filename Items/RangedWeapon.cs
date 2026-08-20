@@ -9,7 +9,7 @@ public class RangedWeapon : Item
     public TextureID ProjectileTexture { get; protected set; } // Texture for the projectile
     public ItemRef? Ammo { get; protected set; }
 
-    public RangedWeapon(ItemType itemType, byte amount, string? customName = null) : base(itemType, amount, customName)
+    public RangedWeapon(ItemType itemType, int amount, string? customName = null) : base(itemType, amount, customName)
     {
         // Child classes should set FireRate, ProjectileSpeed, Damage and ProjectileTexture in their constructors
     }

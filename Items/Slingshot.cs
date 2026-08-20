@@ -3,9 +3,8 @@ namespace Quest.Items;
 
 public class Slingshot : RangedWeapon
 {
-    public Slingshot(byte amount, string? customName = null) : base(ItemTypes.Slingshot, amount, customName)
+    public Slingshot(int amount, string? customName = null) : base(ItemTypes.Slingshot, amount, customName)
     {
-        // Configure ranged weapon properties here instead of passing them to base
         FireRate = 0.8f;
         ProjectileSpeed = 7f;
         Damage = 10;

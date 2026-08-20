@@ -3,9 +3,8 @@ namespace Quest.Items;
 
 public class Bow : RangedWeapon
 {
-    public Bow(byte amount, string? customName = null) : base(ItemTypes.Bow, amount, customName)
+    public Bow(int amount, string? customName = null) : base(ItemTypes.Bow, amount, customName)
     {
-        // Configure ranged weapon properties here instead of passing them to base
         FireRate = 1.2f;
         ProjectileSpeed = 10f;
         Damage = 15;

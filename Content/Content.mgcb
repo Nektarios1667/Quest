@@ -2015,7 +2015,7 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/Template.png
 
-#begin Images/Items/TimeStaff.png
+#begin Images/Items/FireStaff.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -2025,7 +2025,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Items/TimeStaff.png
+/build:Images/Items/FireStaff.png
 
 #begin Images/Items/VulnerabilityPotion.png
 /importer:TextureImporter

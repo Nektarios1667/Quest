@@ -2,6 +2,6 @@ namespace Quest.Items;
 
 public class EmeraldMedal : Item
 {
-    public EmeraldMedal(int amount) : base(ItemTypes.EmeraldMedal, amount)
+    public EmeraldMedal(int amount, string? customName = null) : base(ItemTypes.EmeraldMedal, amount, customName)
     { }
 }

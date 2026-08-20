@@ -2,7 +2,7 @@ namespace Quest.Items;
 
 public class BottledCloud : Item
 {
-    public BottledCloud(int amount) : base(ItemTypes.BottledCloud, amount)
+    public BottledCloud(int amount, string? customName = null) : base(ItemTypes.BottledCloud, amount, customName)
     {
     }
 }

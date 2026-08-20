@@ -2,6 +2,6 @@ namespace Quest.Items;
 
 public class LightningStaff : Item
 {
-    public LightningStaff(int amount) : base(ItemTypes.LightningStaff, amount)
+    public LightningStaff(int amount, string? customName = null) : base(ItemTypes.LightningStaff, amount, customName)
     { }
 }

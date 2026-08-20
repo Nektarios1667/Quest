@@ -3,9 +3,8 @@ namespace Quest.Items;
 
 public class Crossbow : RangedWeapon
 {
-    public Crossbow(byte amount, string? customName = null) : base(ItemTypes.Crossbow, amount, customName)
+    public Crossbow(int amount, string? customName = null) : base(ItemTypes.Crossbow, amount, customName)
     {
-        // Configure ranged weapon properties here instead of passing them to base
         FireRate = 1.8f;
         ProjectileSpeed = 13f;
         Damage = 25;

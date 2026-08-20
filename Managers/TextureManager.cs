@@ -108,7 +108,7 @@ public static class TextureManager
         RubyMedal,
         HeartRune,
         LightningStaff,
-        TimeStaff,
+        FireStaff,
         Scroll,
         Carrot,
         RawFish,
@@ -384,7 +384,7 @@ public static class TextureManager
         Textures[TextureID.RubyMedal] = content.Load<Texture2D>("Images/Items/RubyMedal");
         Textures[TextureID.HeartRune] = content.Load<Texture2D>("Images/Items/HeartRune");
         Textures[TextureID.LightningStaff] = content.Load<Texture2D>("Images/Items/LightningStaff");
-        Textures[TextureID.TimeStaff] = content.Load<Texture2D>("Images/Items/TimeStaff");
+        Textures[TextureID.FireStaff] = content.Load<Texture2D>("Images/Items/FireStaff");
         Textures[TextureID.Scroll] = content.Load<Texture2D>("Images/Items/Scroll");
         Textures[TextureID.Carrot] = content.Load<Texture2D>("Images/Items/Carrot");
         Textures[TextureID.RawFish] = content.Load<Texture2D>("Images/Items/RawFish");
@@ -645,7 +645,7 @@ public static class TextureManager
         Metadata[TextureID.RubyMedal] = new(Textures[TextureID.RubyMedal].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.HeartRune] = new(Textures[TextureID.HeartRune].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.LightningStaff] = new(Textures[TextureID.LightningStaff].Bounds.Size, new(1, 1), "item");
-        Metadata[TextureID.TimeStaff] = new(Textures[TextureID.TimeStaff].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.FireStaff] = new(Textures[TextureID.FireStaff].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Scroll] = new(Textures[TextureID.Scroll].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Carrot] = new(Textures[TextureID.Carrot].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.RawFish] = new(Textures[TextureID.RawFish].Bounds.Size, new(1, 1), "item");
