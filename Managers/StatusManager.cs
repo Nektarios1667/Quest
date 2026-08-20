@@ -130,7 +130,7 @@ public class StatusManager
         }
         if (HasStatusEffect(StatusEffect.Regeneration) && TimerManager.IsCompleteOrMissing("PlayerRegenerationTick"))
         {
-            player.Heal(gameManager, 10);
+            player.Heal(gameManager, 5);
             TimerManager.SetTimer("PlayerRegenerationTick", 1, null);
         }
         if (HasStatusEffect(StatusEffect.Delerium))

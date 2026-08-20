@@ -377,6 +377,7 @@ public class Item
             ItemTypeID.RawFish => new RawFish(amount, customName),
             ItemTypeID.Bow => new Bow(amount, customName),
             ItemTypeID.Slingshot => new Slingshot(amount, customName),
+            ItemTypeID.HeartRune => new HeartRune(amount, customName),
             // ITEMFROMID
             _ => new Item(type, amount, customName),
         };
