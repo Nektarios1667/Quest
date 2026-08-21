@@ -313,9 +313,8 @@ public class SaveManager
     }
     private static void WriteEOFSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager) { }
     #endregion
-    public static async Task<bool> ReadGameState(GameManager gameManager, PlayerManager playerManager, string save)
+    public static async Task<bool> ReadGameState(GameManager gameManager, PlayerManager playerManager, LevelPath levelPath)
     {
-        LevelPath levelPath = new(save);
         string file = $"GameData/Worlds/{levelPath.WorldName}/saves/{levelPath.LevelName}.qsv";
         if (!File.Exists(file))
         {
@@ -323,7 +322,7 @@ public class SaveManager
             return false;
         }
         CurrentSave = levelPath;
-        WriteKeyValueFile("Persistent/continue", new() { { "save", save } });
+        WriteKeyValueFile("Persistent/continue", new() { { "save", levelPath.ToString() } });
         await LevelFileManager.ReadWorldAsync(gameManager, levelPath.WorldName, true);
 
         gameManager.LevelManager.TasksComplete = 0;
@@ -342,7 +341,7 @@ public class SaveManager
             byte[] magic = reader.ReadBytes(4);
             if (Encoding.ASCII.GetString(magic) != "QSAV")
             {
-                Logger.Error($"invalid file format for file '{save}'.");
+                Logger.Error($"invalid file format for file '{levelPath}'.");
                 return false;
             }
 
@@ -387,13 +386,13 @@ public class SaveManager
         return true;
     }
     #region ReadSections
-    private static void ReadTableSection(GameManager gameManager, BinaryReader reader, Dictionary<ushort, string> levelTable)
+    public static void ReadTableSection(GameManager gameManager, BinaryReader reader, Dictionary<ushort, string> levelTable)
     {
         ushort tableLength = reader.ReadUInt16();
         for (int t = 0; t < tableLength; t++)
             levelTable[reader.ReadUInt16()] = reader.ReadString();
     }
-    private static void ReadWeatherSection(GameManager gameManager, BinaryReader reader)
+    public static void ReadWeatherSection(GameManager gameManager, BinaryReader reader)
     {
         // Read weather data
         string level = reader.ReadString();
@@ -406,7 +405,7 @@ public class SaveManager
         gameManager.WeatherManager.SetWeatherPersistent(seed: weatherSeed, lastWeatherTime: lastWeather, lastTimeValue: GameManager.GameTime);
         gameManager.LevelManager.TasksComplete++;
     }
-    private static void ReadCameraSection(GameManager gameManager, BinaryReader reader)
+    public static void ReadCameraSection(GameManager gameManager, BinaryReader reader)
     {
         // Read CameraManager data
         CameraManager.CameraDest = new(reader.ReadSingle(), reader.ReadSingle());
@@ -414,7 +413,7 @@ public class SaveManager
         CameraManager.Update(gameManager, 0); // In bounds check
         gameManager.LevelManager.TasksComplete++;
     }
-    private static void ReadPlayerSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader)
+    public static void ReadPlayerSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader)
     {
         playerManager.Health = reader.ReadByte();
         playerManager.MaxHealth = reader.ReadByte();
@@ -429,7 +428,7 @@ public class SaveManager
         float starvationTimer = reader.ReadSingle();
         if (starvationTimer >= 0) TimerManager.SetTimer("PlayerStarvation", starvationTimer, null);
     }
-    private static void ReadLevelSection(GameManager gameManager, PlayerManager playerManager, LevelPath levelPath, BinaryReader reader)
+    public static void ReadLevelSection(GameManager gameManager, PlayerManager playerManager, LevelPath levelPath, BinaryReader reader)
     {
         // Levels
         byte levelCount = reader.ReadByte();
@@ -505,7 +504,7 @@ public class SaveManager
         }
         gameManager.LevelManager.TasksComplete++;
     }
-    private static void ReadInventorySection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader)
+    public static void ReadInventorySection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader)
     {
         // Read Inventory data
         byte invLength = reader.ReadByte();
@@ -516,7 +515,7 @@ public class SaveManager
         }
         gameManager.LevelManager.TasksComplete++;
     }
-    private static void ReadEffectsSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader)
+    public static void ReadEffectsSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader)
     {
         // Read Status Effects
         StatusManager.ClearAllStatusEffects(gameManager, playerManager);

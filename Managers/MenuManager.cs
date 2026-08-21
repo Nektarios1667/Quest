@@ -144,7 +144,7 @@ public class MenuManager
         if (SaveManager.ReadKeyValueFile("Persistent/continue").TryGetValue("save", out var loadSave))
         {
             gameManager.StateManager.State = GameState.Loading;
-            bool success = await SaveManager.ReadGameState(gameManager, playerManager, loadSave);
+            bool success = await SaveManager.ReadGameState(gameManager, playerManager, new(loadSave));
             gameManager.StateManager.State = GameState.Game;
             return success;
         }
@@ -211,7 +211,7 @@ public class MenuManager
                 gameManager.LevelManager.LoadLevel(gameManager, 0);
         }
         else
-            await SaveManager.ReadGameState(gameManager, playerManager, $"{worlds.Selected}/{saves.Selected}");
+            await SaveManager.ReadGameState(gameManager, playerManager, new($"{worlds.Selected}/{saves.Selected}"));
 
         gameManager.StateManager.State = GameState.Game;
     }

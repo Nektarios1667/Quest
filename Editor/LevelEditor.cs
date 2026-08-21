@@ -117,7 +117,7 @@ public class LevelEditor : Game, IAdjustableWindow
         levelGenerator = new(42, 1f / 64);
         levelManager = new();
         //overlayManager = new(null);
-        gameManager = new(Content, spriteBatch, levelManager, null, null, null); // No WeatherManager or OverlayManager
+        gameManager = new(spriteBatch, levelManager, null, null, null); // No WeatherManager or OverlayManager
         gameManager.StateManager.State = GameState.Editor;
         editorManager = new(gameManager);
         editorLevelManager = new(gameManager, levelGenerator);

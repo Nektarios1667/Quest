@@ -127,7 +127,7 @@ public class Window : Game, IAdjustableWindow
         playerManager = new();
         overlayManager = new(playerManager);
         weatherManager = new();
-        gameManager = new(Content, spriteBatch, levelManager, overlayManager, weatherManager, Grading);
+        gameManager = new(spriteBatch, levelManager, overlayManager, weatherManager, Grading);
         menuManager = new(this, spriteBatch, Content, this, gameManager, playerManager);
         CommandManager.Init(this, gameManager, levelManager, playerManager);
 

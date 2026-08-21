@@ -20,14 +20,14 @@ public class GameManager
     public SpriteBatch MinimapBatch { get; private set; }
     public Effect? GradingEffect { get; private set; }
 
-    public GameManager(ContentManager content, SpriteBatch batch, LevelManager level, OverlayManager? overlay, WeatherManager? weatherManager, Effect? gradingEffect)
+    public GameManager(SpriteBatch batch, LevelManager level, OverlayManager? overlay, WeatherManager? weatherManager, Effect? gradingEffect)
     {
         if (overlay == null && StateManager.State == GameState.Game)
             Logger.Error("No OverlayManager object for the ");
 
         GradingEffect = gradingEffect;
         Batch = batch;
-        MinimapBatch = new SpriteBatch(batch.GraphicsDevice);
+        MinimapBatch = batch != null ? new SpriteBatch(batch.GraphicsDevice) : null!;
         LevelManager = level;
         OverlayManager = overlay!; // Allow null OverlayManager for level editor. Not using nullable OverlayManager property just for convenience.
         WeatherManager = weatherManager!; // Allow null WeatherManager for level editor. Not using nullable WeatherManager property just for convenience.
@@ -74,7 +74,7 @@ public class GameManager
             StateManager.OverlayState = OverlayState.None;
             StatusManager.ClearAllStatusEffects(this, playerManager);
 
-            await SaveManager.ReadGameState(this, playerManager, SaveManager.CurrentSave.ToString());
+            await SaveManager.ReadGameState(this, playerManager, SaveManager.CurrentSave);
 
             TimerManager.TryRemove("ScreenFadeOut");
         }

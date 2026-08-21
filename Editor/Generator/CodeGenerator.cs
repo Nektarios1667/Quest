@@ -2,6 +2,8 @@
 using ScottPlot.TickGenerators;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace Quest.Editor.Generator;
 
@@ -27,7 +29,7 @@ public static class CodeGenerator
         {
             ReloadSource();
             // CLI
-            Console.WriteLine("[t]ile, [d]ecal, [i]tem, [l]oot table, or [w]eather test: ");
+            Console.WriteLine("[t]ile, [d]ecal, [i]tem, [l]oot table, [w]eather test, or [s]ave viewer: ");
             string? resp = Console.ReadLine()?.ToLower();
             if (resp == null || resp == "") continue;
 
@@ -44,6 +46,16 @@ public static class CodeGenerator
                 TestWeatherNoise();
             else if (resp == "exit" || resp == "quit")
                 return;
+            else if (resp == "s" || resp == "save" || resp == "save viewer")
+            {
+                Thread thread = new Thread(() =>
+                {
+                    Application.Run(new QLVViewer());
+                });
+
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
+            }
             else
                 Console.WriteLine("Unknown response");
         }

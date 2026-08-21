@@ -429,7 +429,7 @@ public static class CommandManager
             SaveManager.SaveGameStateAsync(GameManager!, PlayerManager!);
             LevelFileManager.ReadLevel(GameManager!, LevelManager!.Level.LevelPath.ToString(), reload: true);
             LevelManager!.LoadLevel(GameManager!, LevelManager.Level.LevelPath.ToString());
-            _ = SaveManager.ReadGameState(GameManager!, PlayerManager!, SaveManager.CurrentSave.ToString());
+            _ = SaveManager.ReadGameState(GameManager!, PlayerManager!, SaveManager.CurrentSave);
             return true;
         }
         else if (parts[1] == "inventory")
