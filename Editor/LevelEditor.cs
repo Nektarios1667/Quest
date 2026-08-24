@@ -19,7 +19,7 @@ public class LevelEditor : Game, IAdjustableWindow
     private EditorLevelManager editorLevelManager = null!;
     private EditorOverlayManager editorOverlayManager = null!;
     private GUI gui = null!;
-    private Matrix scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
+    private static Matrix Scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
 
     // GUIs and menus
     private GUI SettingsMenu = null!;
@@ -92,11 +92,19 @@ public class LevelEditor : Game, IAdjustableWindow
         graphics.PreferredBackBufferWidth = width;
         graphics.PreferredBackBufferHeight = height;
 
+        Scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
+
         graphics.ApplyChanges();
     }
     public void SetFullscreen(bool enabled)
     {
         graphics.IsFullScreen = enabled;
+        if (graphics.IsFullScreen)
+        {
+            graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
+            graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
+        }
+
         graphics.ApplyChanges();
     }
     protected override void Initialize()
@@ -331,7 +339,7 @@ public class LevelEditor : Game, IAdjustableWindow
     {
         // Clear and start
         GraphicsDevice.Clear(Color.Magenta);
-        spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: scale);
+        spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Scale);
 
         Point mouseCoordDraw = CameraManager.TileToScreen(mouseCoord);
 

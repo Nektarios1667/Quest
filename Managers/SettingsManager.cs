@@ -37,7 +37,7 @@ public static class SettingsManager
     private static Checkbox fullscreenCheckbox = null!;
     private static Dropdown resolutionDropdown = null!;
     public static GUI CreateSettingsMenu(IAdjustableWindow window, Game game, GameManager gameManager, SpriteBatch batch, ContentManager content)
-    {
+    {   
         settingsMenu = new(game, batch, PixelOperator);
         settingsMenu.LoadContent();
         Label settingsLabel = new(settingsMenu, new(Constants.Middle.X - 130, 50), Color.White, "Settings", PixelOperatorTitle);
