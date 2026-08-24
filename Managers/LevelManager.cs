@@ -107,10 +107,10 @@ public class LevelManager
         if (Level.Tiles == null || Level.Tiles.Length == 0) return;
 
         // Get bounds - padding start includes the padding area, while screen start is the area that is actually visible on screen
-        Point paddingStart = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize - Constants.TileDrawPadding;
-        Point paddingEnd = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize + Constants.TileDrawPadding;
-        Point screenStart = paddingStart + Constants.TileDrawPadding;
-        Point screenEnd = paddingEnd - Constants.TileDrawPadding;
+        Point paddingStart = CameraManager.TopLeftTileCoord - Constants.TileDrawPadding;
+        Point paddingEnd = CameraManager.BottomRightTileCoord + Constants.TileDrawPadding;
+        Point screenStart = CameraManager.TopLeftTileCoord;
+        Point screenEnd = CameraManager.BottomRightTileCoord;
 
         // Iterate through each tile in the padded bounds
         for (int y = paddingStart.Y; y <= paddingEnd.Y; y++)

@@ -193,10 +193,10 @@ public static class LightingManager
         // Precomputations
         if (LuxelSize.X == 0)
             LuxelSize = Constants.TileSize.Scaled(InvLightDivisions);
-        LastLuxel = CameraManager.Camera.ToPoint() / Constants.TileSize.Scaled(InvLightDivisions);
+        LastLuxel = CameraManager.CameraToScaledTile(InvLightDivisions);
         // Calculate region
-        LightingStart = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize + PointTools.Up - Constants.TileDrawPadding;
-        LightingEnd = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize - PointTools.Up + Constants.TileDrawPadding;
+        LightingStart = CameraManager.TopLeftTileCoord + PointTools.Up - Constants.TileDrawPadding;
+        LightingEnd = CameraManager.BottomRightTileCoord - PointTools.Up + Constants.TileDrawPadding;
         Rectangle updateRegion = new(LightingStart.Scaled(LightDivisions), (LightingEnd - LightingStart).Scaled(LightDivisions));
 
         // Reset

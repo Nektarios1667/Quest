@@ -21,7 +21,7 @@ public class RangedWeapon : Item
         // Use
         if (Ammo == null || player.Inventory.Has(Ammo))
         {
-            Vector2 dir = InputManager.MousePosition.ToVector2() - Constants.Middle.ToVector2() - CameraManager.CameraOffset;
+            Vector2 dir = CameraManager.ScreenToWorld(InputManager.MousePosition.ToVector2()) - CameraManager.CameraDest;
 
             // Player-owned projectiles have UID of 0
             float random = RandomManager.RandomFloat() * 2f - 1f;

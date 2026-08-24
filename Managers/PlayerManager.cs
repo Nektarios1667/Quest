@@ -417,7 +417,7 @@ public class PlayerManager : IEntity, IStatusEffectable
         for (int o = 0; o < Constants.PlayerCorners.Length; o++)
         {
             // Check if the player collides with a tile
-            Point coord = (CameraManager.PlayerFoot + Constants.PlayerCorners[o]) / Constants.TileSize;
+            Point coord = CameraManager.WorldToTile(CameraManager.PlayerFoot + Constants.PlayerCorners[o]);
             TileBelow = gameManager.LevelManager.GetTile(coord);
             if (TileBelow == null || !TileBelow.IsWalkable) return true;
         }
@@ -426,8 +426,8 @@ public class PlayerManager : IEntity, IStatusEffectable
     public void CheckBumping(GameManager gameManager, Vector2 finalMove)
     {
         Rectangle playerBounds = new((CameraManager.CameraDest + finalMove + new Vector2(-Constants.PlayerBox.X / 2, Constants.PlayerBox.Y)).ToPoint(), Constants.PlayerBox);
-        Point topLeftTile = playerBounds.Location / Constants.TileSize;
-        Point bottomRightTile = (playerBounds.Location + playerBounds.Size) / Constants.TileSize;
+        Point topLeftTile = CameraManager.WorldToTile(playerBounds.Location);
+        Point bottomRightTile = CameraManager.WorldToTile(playerBounds.Location + playerBounds.Size);
 
         for (int y = topLeftTile.Y; y <= bottomRightTile.Y; y++)
         {

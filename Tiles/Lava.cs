@@ -7,7 +7,7 @@ public class Lava : Tile, IDynamicTile
     public override void Draw(GameManager gameManager)
     {
         // Draw each tile using the sprite batch
-        Point dest = Location * Constants.TileSize - CameraManager.Camera.ToPoint();
+        Point dest = CameraManager.TileToScreen(Location);
 
         dest += Constants.Middle;
         // Draw tile

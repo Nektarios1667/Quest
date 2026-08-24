@@ -127,7 +127,7 @@ public static class SoundtrackManager
                 //MediaPlayer.Volume = Math.Clamp(1 - cost / musicSource.Value.radius, 0, 1);
 
                 // --- Simple Distance Check ---
-                Vector2 vec = (CameraManager.PlayerCenter - musicSource.Value.source).ToVector2() / Constants.TileSize.ToVector2();
+                Vector2 vec = CameraManager.WorldToTile(CameraManager.PlayerCenter.ToVector2()) - CameraManager.WorldToTile(musicSource.Value.source.ToVector2());
                 float dist = vec.Length();
                 float volume = Math.Clamp(1 - NumberTools.Square(dist / musicSource.Value.radius), 0, 1);
                 MediaPlayer.Volume = volume;

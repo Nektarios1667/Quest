@@ -26,6 +26,7 @@ public static class CameraManager
     public static Point PlayerCenter => CameraDest.ToPoint() + new Point(0, Constants.MageHalfSize.Y / 2);
     public static Point TileCoord => PlayerFoot / Constants.TileSize;
     public static Point TopLeftTileCoord => (Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
+    public static Point BottomRightTileCoord => (Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
     // Events
     public static event Action<Vector2, Vector2>? CameraMove;
     public static event Action<Vector2, Vector2>? CameraDestMove;
@@ -69,13 +70,22 @@ public static class CameraManager
     // Tile = tile coordinate in the world
     // Screen = pixel position on the screen
     public static Point WorldToTile(Point position) => position / Constants.TileSize;
+    public static Vector2 WorldToTile(Vector2 position) => position / Constants.TileSize.ToVector2();
     public static Point TileToWorld(Point tileCoord) => tileCoord * Constants.TileSize;
+    public static Vector2 TileToWorld(Vector2 tileCoord) => tileCoord * Constants.TileSize.ToVector2();
     public static Point TileToWorld(ByteCoord tileCoord) => tileCoord * Constants.TileSize;
     public static Point TileToScreen(Point tileCoord) => tileCoord * Constants.TileSize - Camera.ToPoint() + Constants.Middle;
+    public static Vector2 TileToScreen(Vector2 tileCoord) => tileCoord * Constants.TileSize.ToVector2() - Camera + Constants.Middle.ToVector2();
     public static Point TileToScreen(ByteCoord tileCoord) => tileCoord * Constants.TileSize - Camera.ToPoint() + Constants.Middle;
     public static Point ScreenToTile(Point screenCoord) => (screenCoord + Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
+    public static Vector2 ScreenToTile(Vector2 screenCoord) => (screenCoord + Camera - Constants.Middle.ToVector2()) / Constants.TileSize.ToVector2();
     public static Point WorldToScreen(Point worldCoord) => worldCoord - Camera.ToPoint() + Constants.Middle;
+    public static Vector2 WorldToScreen(Vector2 worldCoord) => worldCoord - Camera + Constants.Middle.ToVector2();
     public static Point ScreenToWorld(Point screenCoord) => screenCoord + Camera.ToPoint() - Constants.Middle;
+    public static Vector2 ScreenToWorld(Vector2 screenCoord) => screenCoord + Camera - Constants.Middle.ToVector2();
+    // Scaled conversions (e.g. luxel / sub-tile divisions)
+    public static Point WorldToScaledTile(Point worldCoord, float scale) => worldCoord / Constants.TileSize.Scaled(scale);
+    public static Point CameraToScaledTile(float scale) => WorldToScaledTile(Camera.ToPoint(), scale);
     public static Point TileToRelativeTile(Point tile, bool includePadding) => tile - CameraManager.TopLeftTileCoord + (includePadding ? Constants.TileDrawPadding : Point.Zero);
     public static Point TileRelativeToTile(Point tile, bool includePadding) => tile + CameraManager.TopLeftTileCoord - (includePadding ? Constants.TileDrawPadding : Point.Zero);
 }

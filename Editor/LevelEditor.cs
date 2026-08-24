@@ -229,7 +229,7 @@ public class LevelEditor : Game, IAdjustableWindow
         delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
         // Mouse
-        mouseCoord = (InputManager.MousePosition + CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
+        mouseCoord = CameraManager.ScreenToTile(InputManager.MousePosition);
         mouseCoord.X = Math.Clamp(mouseCoord.X, 0, Constants.MapSize.X - 1);
         mouseCoord.Y = Math.Clamp(mouseCoord.Y, 0, Constants.MapSize.Y - 1);
         mouseTile = levelManager.GetTile(mouseCoord)!;
@@ -498,7 +498,7 @@ public class LevelEditor : Game, IAdjustableWindow
     }
     public void MouseSelect()
     {
-        mouseSelection = CameraManager.Camera.ToPoint() + InputManager.MousePosition - Constants.Middle;
+        mouseSelection = CameraManager.ScreenToWorld(InputManager.MousePosition);
         mouseSelectionCoord = mouseCoord;
         editorManager.Update(TileSelection, BiomeSelection, currentTool, delta, mouseTile, mouseCoord, mouseSelection, mouseSelectionCoord);
     }

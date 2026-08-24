@@ -63,8 +63,8 @@ public class EditorOverlayManager
     }
     public void DrawBiomes()
     {
-        Point start = (CameraManager.Camera.ToPoint() - Constants.Middle) / Constants.TileSize;
-        Point end = (CameraManager.Camera.ToPoint() + Constants.Middle) / Constants.TileSize;
+        Point start = CameraManager.TopLeftTileCoord;
+        Point end = CameraManager.BottomRightTileCoord;
         for (int y = start.Y; y <= end.Y; y++)
         {
             for (int x = start.X; x <= end.X; x++)

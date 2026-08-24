@@ -17,7 +17,7 @@ public class MeleeWeapon : Item
         if (TimerManager.IsCompleteOrMissing($"MeleeAttack"))
         {
             // Positioning and aiming
-            Vector2 dir = InputManager.MousePosition.ToVector2() - Constants.Middle.ToVector2() - CameraManager.CameraOffset;
+            Vector2 dir = CameraManager.ScreenToWorld(InputManager.MousePosition.ToVector2()) - CameraManager.CameraDest;
             // Player-owned projectiles have UID of 0
             Projectile projectile = new(gameManager, 0, CameraManager.CameraDest, (float)Math.Atan2(dir.Y, dir.X), TextureID.Slash, Damage, 0, size: Constants.TileSize.Scaled(Range));
             projectile.Position -= projectile.Size.ToVector2() / 2;

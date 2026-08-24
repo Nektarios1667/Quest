@@ -34,7 +34,7 @@ public class OverlayManager
         CameraManager.TileChange += (_, _) => LM.MarkUpdateLighting();
         CameraManager.CameraMove += (_, newCam) =>
         {
-            if (newCam.ToPoint() / Constants.TileSize.Scaled(LM.InvLightDivisions) != LM.LastLuxel)
+            if (CameraManager.WorldToScaledTile(newCam.ToPoint(), LM.InvLightDivisions) != LM.LastLuxel)
                 LM.MarkUpdateLighting();
         };
     }
@@ -206,7 +206,7 @@ public class OverlayManager
                     continue;
 
                 // Draw
-                Rectangle rect = new(new Point(x, y) * LM.LuxelSize + Constants.Middle - CameraManager.Camera.ToPoint(), LM.LuxelSize);
+                Rectangle rect = new(CameraManager.WorldToScreen((new Point(x, y) * LM.LuxelSize)), LM.LuxelSize);
                 Color sky = gameManager.LevelManager.SkyColor * (1 - intensity);
                 Color weather = LM.BiomeColors[x / LM.LightDivisions, y / LM.LightDivisions] * (1 - intensity);
                 Color color = ColorTools.Blend(weather, sky, 0.5f * sky.A / 255, AlphaBlend.Max);

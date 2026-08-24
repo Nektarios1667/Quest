@@ -105,7 +105,7 @@ public class NPC : IEntity
     public void Update(GameManager gameManager)
     {
         // Mark as dialogue possibility
-        float distSq = Vector2.DistanceSquared(CameraManager.PlayerFoot.ToVector2() / Constants.TileSize.ToVector2(), Position.ToVector2() + Constants.HalfVec);
+        float distSq = Vector2.DistanceSquared(CameraManager.WorldToTile(CameraManager.PlayerFoot.ToVector2()), Position.ToVector2() + Constants.HalfVec);
         if (distSq <= 4)
             NPCsNearby.Add((this, distSq));
     }
