@@ -88,6 +88,12 @@ public class Window : Game, IAdjustableWindow
     public void SetFullscreen(bool enabled)
     {
         graphics.IsFullScreen = enabled;
+        if (graphics.IsFullScreen)
+        {
+            graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
+            graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
+        }
+
         graphics.ApplyChanges();
     }
     protected override void Initialize()
