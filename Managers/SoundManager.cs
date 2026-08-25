@@ -18,7 +18,7 @@ public static class SoundManager
         LoadSound(content, "Fire2", "Sounds/Effects/Fire2");
         LoadSound(content, "Rain", "Sounds/Effects/Rain");
         LoadSound(content, "Sandstorm", "Sounds/Effects/Sandstorm");
-        LoadSound(content, "Snow", "Sounds/Effects/Sandstorm"); // TODO FIX 
+        LoadSound(content, "Snow", "Sounds/Effects/Sandstorm");
         LoadSound(content, "Trinkets", "Sounds/Effects/Trinkets");
         LoadSound(content, "Click", "Sounds/Effects/Click");
         LoadSound(content, "DoorLocked", "Sounds/Effects/DoorLocked");

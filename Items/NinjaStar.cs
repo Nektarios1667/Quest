@@ -2,7 +2,7 @@ namespace Quest.Items;
 
 public class NinjaStar : RangedWeapon
 {
-    public NinjaStar(int amount, string? customName = null) : base(ItemTypes.NinjaStar, amount, customName) // TOOD FIX Ninja star projectile texture
+    public NinjaStar(int amount, string? customName = null) : base(ItemTypes.NinjaStar, amount, customName)
     {
         FireRate = 0.7f;
         ProjectileSpeed = 5f;
