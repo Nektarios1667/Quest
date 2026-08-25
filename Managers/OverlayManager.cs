@@ -53,7 +53,7 @@ public class OverlayManager
         if (gameManager.StateManager.State != GameState.Game) return;
 
         // Set item infobox
-        if (playerManager?.HoveredItem != null)
+        if (playerManager?.HoveredItem != null && playerManager.InventoryOpen)
         {
             ItemInfobox.IsVisible = true;
             Item item = playerManager.HoveredItem;
