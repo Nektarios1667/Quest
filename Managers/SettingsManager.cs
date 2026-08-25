@@ -127,7 +127,7 @@ public static class SettingsManager
             window.SetFullscreen(SettingsManager.Fullscreen);
         };
 
-        settingsMenu.AddWidgets(saveButton, revertButton, bindsButton, editorButton, settingsLabel, settingsBackButton, musicSlider, musicLabel, musicValue, soundSlider, soundLabel, soundValue, fpsSlider, fpsLabel, fpsValue, vsyncCheckbox, vsyncLabel, resolutionDropdown, fullscreenCheckbox, fullscreenLabel);
+        settingsMenu.AddWidgets(saveButton, revertButton, bindsButton, editorButton, settingsLabel, settingsBackButton, musicSlider, musicLabel, musicValue, soundSlider, soundLabel, soundValue, fpsSlider, fpsLabel, fpsValue, vsyncCheckbox, vsyncLabel, fullscreenCheckbox, fullscreenLabel, resolutionDropdown);
         LoadSettings(window);
         return settingsMenu;
     }
