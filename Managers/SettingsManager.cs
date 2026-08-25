@@ -18,6 +18,12 @@ public static class SettingsManager
 {
     // Settings
     public static Point ScreenResolution { get; private set; } = new(1280, 720); // Actual screen resolution
+
+    // Helper to update stored screen resolution
+    public static void SetScreenResolution(int x, int y)
+    {
+        ScreenResolution = new Point(x, y);
+    }
     public static Vector2 ScreenScale => ScreenResolution.ToVector2() / Constants.NativeResolution.ToVector2(); // Scale factor from native resolution to actual screen resolution
     public static bool Fullscreen { get; private set; } = false;
     public static int FPS { get; private set; } = 241; // >240 means unlimited

@@ -20,6 +20,7 @@ public class LevelEditor : Game, IAdjustableWindow
     private EditorOverlayManager editorOverlayManager = null!;
     private GUI gui = null!;
     private static Matrix Scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
+    public RenderTarget2D Render = null!;
 
     // GUIs and menus
     private GUI SettingsMenu = null!;
@@ -92,7 +93,23 @@ public class LevelEditor : Game, IAdjustableWindow
         graphics.PreferredBackBufferWidth = width;
         graphics.PreferredBackBufferHeight = height;
 
+        // Update stored resolution and scale
+        SettingsManager.SetScreenResolution(width, height);
         Scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
+
+        // Recreate native render target (keep it at Constants.NativeResolution)
+        try
+        {
+            Render?.Dispose();
+            Render = new RenderTarget2D(
+                GraphicsDevice,
+                Constants.NativeResolution.X, Constants.NativeResolution.Y,
+                false,
+                SurfaceFormat.Color,
+                DepthFormat.None
+            );
+        }
+        catch { }
 
         graphics.ApplyChanges();
     }
@@ -137,6 +154,15 @@ public class LevelEditor : Game, IAdjustableWindow
 
         gameManager.StateManager.State = GameState.Editor;
         Logger.System("Initialized managers.");
+
+        // Create native-resolution render target for the editor
+        Render = new RenderTarget2D(
+            GraphicsDevice,
+            Constants.NativeResolution.X, Constants.NativeResolution.Y,
+            false,
+            SurfaceFormat.Color,
+            DepthFormat.None
+        );
 
         // Settings gui
         SettingsMenu = SettingsManager.CreateSettingsMenu(this, this, gameManager, spriteBatch, Content);
@@ -337,9 +363,10 @@ public class LevelEditor : Game, IAdjustableWindow
 
     protected override void Draw(GameTime gameTime)
     {
-        // Clear and start
+        // Render to native-resolution render target (no scale matrix)
+        GraphicsDevice.SetRenderTarget(Render);
         GraphicsDevice.Clear(Color.Magenta);
-        spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Scale);
+        spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
         Point mouseCoordDraw = CameraManager.TileToScreen(mouseCoord);
 
@@ -403,8 +430,17 @@ public class LevelEditor : Game, IAdjustableWindow
         // Cursor
         DrawTexture(spriteBatch, TextureID.CursorArrow, InputManager.MousePosition);
 
-        // Final
+        // Finalize scene render
         spriteBatch.End();
+
+        // Draw the native render to the backbuffer, scaling to current backbuffer size
+        GraphicsDevice.SetRenderTarget(null);
+        GraphicsDevice.Clear(Color.Transparent);
+        Rectangle dest = new Rectangle(0, 0, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
+        spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        spriteBatch.Draw(Render, dest, Color.White);
+        spriteBatch.End();
+
         base.Draw(gameTime);
     }
     public void DrawTileGhostCursor(Point mouseCoordDraw)
