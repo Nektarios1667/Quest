@@ -48,12 +48,15 @@ public class EditorLevelManager
     }
     public void SaveLevelAs()
     {
+        // Pull metadata
+        var metadata = SaveManager.ReadKeyValueFile($"Worlds/{LevelManager.Level.LevelPath.WorldName}/metadata");
+
         // Winforms
         var (success, values) = ShowInputForm("Save As", [
             new("World", null),
             new("Level", null),
-            new("Author", null),
-            new("Description", null),
+            new("Author", null, placeholder: metadata.GetValueOrDefault("Author", defaultValue: "Unknown")),
+            new("Description", null, placeholder: metadata.GetValueOrDefault("Description", defaultValue: "None")),
         ]);
         if (!success)
         {

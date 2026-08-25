@@ -73,15 +73,21 @@ public class Window : Game, IAdjustableWindow
         graphics.PreferredBackBufferWidth = width;
         graphics.PreferredBackBufferHeight = height;
 
+        // Update stored resolution and scale
         Scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
 
+        // Set Render
+        Render?.Dispose();
         Render = new RenderTarget2D(
             GraphicsDevice,
-            SettingsManager.ScreenResolution.X, SettingsManager.ScreenResolution.Y,
+            Constants.NativeResolution.X, Constants.NativeResolution.Y,
             false,
             SurfaceFormat.Color,
             DepthFormat.None
         );
+
+        // Update shader parameters
+        Pixelize?.Parameters["TexSize"]?.SetValue(new Vector2(width, height));
 
         graphics.ApplyChanges();
     }
@@ -92,6 +98,8 @@ public class Window : Game, IAdjustableWindow
         {
             graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
+            // Also update stored resolution and related shader params
+            Pixelize?.Parameters["TexSize"]?.SetValue(new Vector2(GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height));
         }
 
         graphics.ApplyChanges();
@@ -146,7 +154,7 @@ public class Window : Game, IAdjustableWindow
         // Render Targets
         Render = new RenderTarget2D(
             GraphicsDevice,
-            SettingsManager.ScreenResolution.X, SettingsManager.ScreenResolution.Y,
+            Constants.NativeResolution.X, Constants.NativeResolution.Y,
             false,
             SurfaceFormat.Color,
             DepthFormat.None
@@ -180,7 +188,6 @@ public class Window : Game, IAdjustableWindow
         delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
         // Managers
-        //SoundManager.Update();
         Quill.Interpreter.Update(gameManager, playerManager);
         InputManager.Update(this);
         DebugManager.Update(infoSb.ToString().Replace("\n", "\r\n"), memoryDebugSb.ToString().Split("\n"));
@@ -208,7 +215,8 @@ public class Window : Game, IAdjustableWindow
     {
         GraphicsDevice.SetRenderTarget(Render);
         GraphicsDevice.Clear(Color.Magenta);
-        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: Scale);
+        // Draw to native
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
 
         // Draw game
         levelManager.Draw(gameManager);
@@ -242,8 +250,11 @@ public class Window : Game, IAdjustableWindow
         spriteBatch.End();
         GraphicsDevice.SetRenderTarget(null);
         GraphicsDevice.Clear(Color.Transparent);
+
+        // Draw the native resolution render target scaled to the current backbuffer size
+        Rectangle dest = new Rectangle(0, 0, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, effect: Grading);
-        spriteBatch.Draw(Render, Vector2.Zero, Color.White);
+        spriteBatch.Draw(Render, dest, Color.White);
         spriteBatch.End();
 
         base.Draw(gameTime);

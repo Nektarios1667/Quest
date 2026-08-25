@@ -166,8 +166,9 @@ public static class SettingsManager
             if (parts.Length == 2 && int.TryParse(parts[0], out int width) && int.TryParse(parts[1], out int height))
             {
                 ScreenResolution = new Point(width, height);
-                resolutionDropdown.SelectItem($"{ScreenResolution.X}x{ScreenResolution.Y}");
                 window.SetResolution(ScreenResolution.X, ScreenResolution.Y);
+
+                resolutionDropdown.SelectItem($"{ScreenResolution.X}x{ScreenResolution.Y}");
             }
         }
         if (settings.TryGetValue("FullScreen", out string? fullscreenStr) && bool.TryParse(fullscreenStr, out bool fullscreen))
