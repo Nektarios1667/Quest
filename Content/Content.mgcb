@@ -1499,6 +1499,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/EmeraldMedal.png
 
+#begin Images/Items/FireStaff.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/FireStaff.png
+
 #begin Images/Items/GammaCoin.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -2014,18 +2026,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Items/Template.png
-
-#begin Images/Items/FireStaff.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/Items/FireStaff.png
 
 #begin Images/Items/VulnerabilityPotion.png
 /importer:TextureImporter
@@ -3274,6 +3274,12 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Sounds/Effects/Typing.wav
+
+#begin Sounds/Effects/Volcanic.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Volcanic.wav
 
 #begin Sounds/Effects/Whoosh.wav
 /importer:WavImporter

@@ -19,6 +19,7 @@ public static class SoundManager
         LoadSound(content, "Rain", "Sounds/Effects/Rain");
         LoadSound(content, "Sandstorm", "Sounds/Effects/Sandstorm");
         LoadSound(content, "Snow", "Sounds/Effects/Sandstorm");
+        LoadSound(content, "Volcanic", "Sounds/Effects/Sandstorm");
         LoadSound(content, "Trinkets", "Sounds/Effects/Trinkets");
         LoadSound(content, "Click", "Sounds/Effects/Click");
         LoadSound(content, "DoorLocked", "Sounds/Effects/DoorLocked");
@@ -38,6 +39,7 @@ public static class SoundManager
         LoadSound(content, "Thunder3", "Sounds/Effects/Thunder3");
         LoadSound(content, "Thunder4", "Sounds/Effects/Thunder4");
         LoadSound(content, "Thunder5", "Sounds/Effects/Thunder5");
+        LoadSound(content, "VolcanicRumble", "Sounds/Effects/Volcanic");
     }
     public static bool IsMusicPlaying => MediaPlayer.State == MediaState.Playing;
 

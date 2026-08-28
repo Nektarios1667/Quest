@@ -11,6 +11,7 @@ public class WeatherManager
         Rain,
         Snow,
         Sandstorm,
+        Volcanic,
     }
     private readonly Dictionary<WeatherSound, float> WeatherSoundMults = new()
     {
@@ -18,6 +19,7 @@ public class WeatherManager
         { WeatherSound.Rain, 0.5f },
         { WeatherSound.Snow, 0.4f },
         { WeatherSound.Sandstorm, 0.3f },
+        { WeatherSound.Volcanic, 0.5f },
     };
     // Weather
     private readonly Dictionary<BiomeType, WeatherSound> WeatherSounds = new()
@@ -26,7 +28,8 @@ public class WeatherManager
         { BiomeType.Ocean, WeatherSound.Rain },
         { BiomeType.Indoors, WeatherSound.None },
         { BiomeType.Snowy, WeatherSound.Snow },
-        { BiomeType.Desert, WeatherSound.Sandstorm }
+        { BiomeType.Desert, WeatherSound.Sandstorm },
+        { BiomeType.Volcanic, WeatherSound.Volcanic }
     };
     private const float WeatherFadeOut = 3;
     private const float WeatherFadeIn = 2;
@@ -37,6 +40,7 @@ public class WeatherManager
         { WeatherSound.Rain, float.MaxValue },
         { WeatherSound.Snow, float.MaxValue },
         { WeatherSound.Sandstorm, float.MaxValue },
+        { WeatherSound.Volcanic, float.MaxValue },
     };
     public readonly FastNoiseLite WeatherNoise = new((int)(DateTime.Now.Ticks ^ (DateTime.Now.Ticks >> 32)));
     public int WeatherSeed { get => _weatherSeed; set { _weatherSeed = value; WeatherNoise.SetSeed(value); } }
@@ -122,14 +126,7 @@ public class WeatherManager
         // Play sounds
         if (sound != WeatherSound.None)
         {
-            float volume = sound switch
-            {
-                WeatherSound.Rain => WeatherIntensity * WeatherSoundMults[WeatherSound.Rain],
-                WeatherSound.Snow => WeatherIntensity * WeatherSoundMults[WeatherSound.Snow],
-                WeatherSound.Sandstorm => WeatherIntensity * WeatherSoundMults[WeatherSound.Sandstorm],
-                _ => 0f
-            };
-
+            float volume = WeatherIntensity * WeatherSoundMults[sound];
             // Either reset time or count how long in biome
             if (TimeSinceSound[sound] > 0)
             {
@@ -180,6 +177,7 @@ public class WeatherManager
                 case BiomeType.Indoors: break;
                 case BiomeType.Snowy: break;
                 case BiomeType.Desert: break;
+                case BiomeType.Volcanic: SoundManager.PlaySoundInstance($"VolcanicRumble", volume: WeatherIntensity * 0.85f); break;
             }
         }
     }
@@ -224,7 +222,8 @@ public class WeatherManager
                 case BiomeType.Temperate: weatherColor = Color.MediumBlue; break;
                 case BiomeType.Snowy: weatherColor = new(200, 200, 216); break;
                 case BiomeType.Desert: weatherColor = Color.OrangeRed; break;
-                case BiomeType.Ocean: weatherColor = Color.SlateGray; break;
+                case BiomeType.Ocean: weatherColor = Color.MediumBlue; break;
+                case BiomeType.Volcanic: weatherColor = new(107, 75, 52); break;
             }
         }
         weatherColor *= blend + 1 - (weatherColor.A / 255f); // Use alpha channel to adjust transparancy per biome - lower alpha = more opaque

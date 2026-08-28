@@ -466,7 +466,7 @@ public class LevelEditor : Game, IAdjustableWindow
         }
         else if (currentTool == EditorTool.Biome)
         {
-            DrawTexture(spriteBatch, TextureID.TileOutline, mouseCoordDraw, source: new(Point.Zero, Constants.TilePixelSize), scale: Constants.TileSizeScale, color: Biome.Colors[(int)BiomeSelection]);
+            DrawTexture(spriteBatch, TextureID.TileOutline, mouseCoordDraw, source: new(Point.Zero, Constants.TilePixelSize), scale: Constants.TileSizeScale, color: Biome.BiomeTileColors[(int)BiomeSelection]);
             Vector2 textCenter = Arial.MeasureString(BiomeSelection.ToString()) / 2;
             spriteBatch.DrawString(Arial, BiomeSelection.ToString(), (mouseCoordDraw + Constants.TileHalfSize).ToVector2(), Color.Black, MathHelper.PiOver4, textCenter, 1.0f, SpriteEffects.None, 1.0f);
         }
