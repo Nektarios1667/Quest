@@ -173,9 +173,9 @@ public class SaveManager
         writer.Write((byte)playerManager.MaxHealth);
         writer.Write((byte)playerManager.Hunger);
         writer.Write((byte)playerManager.MaxHunger);
-        writer.Write(TimerManager.TryTimeLeft("PlayerHungerLoss"));   // float
-        writer.Write(TimerManager.TryTimeLeft("PlayerNaturalRegen")); // float
-        writer.Write(TimerManager.TryTimeLeft("PlayerStarvation"));   // float
+        writer.Write(TimerManager.TryTimeLeft("PlayerHungerLoss") ?? -1f);   // float
+        writer.Write(TimerManager.TryTimeLeft("PlayerNaturalRegen") ?? -1f); // float
+        writer.Write(TimerManager.TryTimeLeft("PlayerStarvation") ?? -1f);   // float
 
         TasksComplete++;
     }
@@ -568,7 +568,7 @@ public class SaveManager
         writer.Write((ushort)Math.Clamp(enemy.Health, ushort.MinValue, ushort.MaxValue));
         writer.Write((ushort)enemy.Position.X);
         writer.Write((ushort)enemy.Position.Y);
-        writer.Write((float)TimerManager.TryTimeLeft($"EnemyAttack_{enemy.UID}"));
+        writer.Write(TimerManager.TryTimeLeft($"EnemyAttack_{enemy.UID}") ?? -1f);
     }
     public static void WriteProjectileData(BinaryWriter writer, Projectile proj)
     {

@@ -92,11 +92,11 @@ public static class TimerManager
         Logger.Error($"No timer with name '{name}' found", true);
         return -1;
     }
-    public static float TryTimeLeft(string name)
+    public static float? TryTimeLeft(string name)
     {
         if (timers.TryGetValue(name, out var timer))
             return timer.Left;
-        return -1;
+        return null;
     }
     public static Timer GetTimer(string name)
     {
