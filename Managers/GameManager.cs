@@ -10,12 +10,12 @@ public class GameManager
     public static float DeltaTime { get; private set; } = 0f;
     public static float GameTime { get; set; } = 0f;
     public static float TotalTime { get; private set; } = 0f;
+    public static float DayTime { get; set; } = 0f;
 
     public LevelManager LevelManager { get; private set; }
     public OverlayManager OverlayManager { get; private set; }
     public WeatherManager WeatherManager { get; private set; }
     public StateManager StateManager { get; private set; } = new StateManager();
-    public float DayTime { get; set; } = 0f;
     public SpriteBatch Batch { get; private set; }
     public SpriteBatch MinimapBatch { get; private set; }
     public Effect? GradingEffect { get; private set; }

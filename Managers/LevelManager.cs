@@ -89,7 +89,7 @@ public class LevelManager
             SkyColor = Level.Tint;
             return;
         }
-        SkyColor = WeatherManager.GetSkyColor(gameManager.DayTime) * 0.9f;
+        SkyColor = WeatherManager.GetSkyColor(GameManager.DayTime) * 0.9f;
     }
     public void Draw(GameManager gameManager)
     {

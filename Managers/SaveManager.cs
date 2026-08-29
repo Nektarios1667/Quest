@@ -151,7 +151,7 @@ public class SaveManager
     {
         // Write WHTR data
         writer.Write(gameManager.LevelManager.Level.Path);
-        writer.Write(gameManager.DayTime);
+        writer.Write(GameManager.DayTime);
         writer.Write(GameManager.GameTime);
         writer.Write(gameManager.WeatherManager.WeatherSeed);
         writer.Write(gameManager.WeatherManager.LastWeather);
@@ -398,7 +398,7 @@ public class SaveManager
         string level = reader.ReadString();
         gameManager.LevelManager.LoadLevel(gameManager, level);
 
-        gameManager.DayTime = reader.ReadSingle();
+        GameManager.DayTime = reader.ReadSingle();
         GameManager.GameTime = reader.ReadSingle();
         int weatherSeed = reader.ReadInt32();
         float lastWeather = reader.ReadSingle();

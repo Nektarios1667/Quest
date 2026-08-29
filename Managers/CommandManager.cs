@@ -281,9 +281,9 @@ public static class CommandManager
     {
         string[] parts = command.Split(' ');
         if (parts[1] == "set")
-            GameManager!.DayTime = int.Parse(parts[2]);
+            GameManager.DayTime = int.Parse(parts[2]);
         else if (parts[1] == "change")
-            GameManager!.DayTime += int.Parse(parts[2]);
+            GameManager.DayTime += int.Parse(parts[2]);
         else
             return false;
         return true;

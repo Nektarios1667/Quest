@@ -1,10 +1,12 @@
-﻿using System.Linq;
+﻿using System.Drawing.Text;
+using System.Linq;
 
 namespace Quest.Interaction;
 
 public partial class UserInterface
 {
     public static UserInterface ChestUI { get; private set; } = null!;
+    public static UserInterface ClockUI { get; private set; } = null!;
     public static UserInterface CrafterUI { get; private set; } = null!;
     public static UserInterface CrateUI { get; private set; } = null!;
     public static UserInterface DiscWriterUI { get; private set; } = null!;
@@ -18,6 +20,7 @@ public partial class UserInterface
     public static void Init(SpriteBatch batch, LevelManager levelManager)
     {
         CreateChestUI(batch);
+        CreateClockUI(batch);
         CreateCrafterUI(batch, levelManager);
         CreateCrateUI(batch);
         CreateDiscWriterUI(batch);
@@ -50,6 +53,36 @@ public partial class UserInterface
                 ChestUI.AddElement($"slot_{x + y * Chest.Size.X}", slot);
             }
         }
+    }
+    private static void CreateClockUI(SpriteBatch batch)
+    {
+        string GetDaytime() => ((int)GameManager.DayTime).ToString();
+        string GetTimeName()
+        {
+            float timeFraction = GameManager.DayTime / Constants.DayLength;
+            if (timeFraction <= 0.05f || timeFraction >= 0.95f) return "NOON";
+            else if (timeFraction <= 0.2 || timeFraction >= 0.8f) return "DAY";
+            else if (timeFraction <= 0.3f) return "SUNSET";
+            else if (timeFraction >= 0.7f) return "SUNRISE";
+            else if (timeFraction >= 0.45f && timeFraction <= 0.55F) return "MIDNIGHT";
+            else return "NIGHT";
+        }
+
+        // ----- Clock UI -----
+        ClockUI = new(batch);
+
+        // Title
+        Point titleSize = PixelOperatorLarge.MeasureString("CLOCK").ToPoint();
+        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "CLOCK", PixelOperatorLarge, Color.White);
+        ClockUI.AddElement("title", title);
+
+        // Daytime
+        LinkedLabel time = new(new(Constants.Middle.X - 65, 150), "Time: |1|", [GetDaytime], PixelOperatorLarge, Color.Cyan);
+        ClockUI.AddElement("time", time);
+
+        // Name
+        LinkedLabel timeName = new(new(Constants.Middle.X - 30, 200), "|1|", [GetTimeName], PixelOperatorLarge, Color.Cyan);
+        ClockUI.AddElement("timeName", timeName);
     }
     private static void CreateCrafterUI(SpriteBatch batch, LevelManager levelManager)
     {

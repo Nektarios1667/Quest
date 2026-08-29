@@ -135,6 +135,7 @@ public static class TextureManager
         NinjaStar,
         Bow,
         Slingshot,
+        Clock,
         // ITEMS ENUM INSERT
         Dirt,
         Flooring,
@@ -411,6 +412,7 @@ public static class TextureManager
         Textures[TextureID.NinjaStar] = content.Load<Texture2D>("Images/Items/NinjaStar");
         Textures[TextureID.Bow] = content.Load<Texture2D>("Images/Items/Bow");
         Textures[TextureID.Slingshot] = content.Load<Texture2D>("Images/Items/Slingshot");
+        Textures[TextureID.Clock] = content.Load<Texture2D>("Images/Items/Clock");
         // ITEMS INSERT
         Textures[TextureID.Dirt] = content.Load<Texture2D>("Images/Tiles/Dirt");
         Textures[TextureID.Flooring] = content.Load<Texture2D>("Images/Tiles/Flooring");
@@ -672,6 +674,7 @@ public static class TextureManager
         Metadata[TextureID.NinjaStar] = new(Textures[TextureID.NinjaStar].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Bow] = new(Textures[TextureID.Bow].Bounds.Size, new(1, 1), "item");
         Metadata[TextureID.Slingshot] = new(Textures[TextureID.Slingshot].Bounds.Size, new(1, 1), "item");
+        Metadata[TextureID.Clock] = new(Textures[TextureID.Clock].Bounds.Size, new(1, 1), "item");
         // ITEMS METADATA INSERT
         Metadata[TextureID.Dirt] = new(Textures[TextureID.Dirt].Bounds.Size, new(4, 4), "tile");
         Metadata[TextureID.Flooring] = new(Textures[TextureID.Flooring].Bounds.Size, new(4, 4), "tile");

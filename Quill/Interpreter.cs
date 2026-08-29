@@ -133,7 +133,7 @@ public static partial class Interpreter
         ExternalSymbols["<spawn>"] = gameManager.LevelManager.Level.Spawn.CoordString();
         // Game
         ExternalSymbols["<gametime>"] = GameManager.GameTime.ToString();
-        ExternalSymbols["<daytime>"] = gameManager.DayTime.ToString();
+        ExternalSymbols["<daytime>"] = GameManager.DayTime.ToString();
         ExternalSymbols["<totaltime>"] = GameManager.GameTime.ToString();
         ExternalSymbols["<gamestate>"] = gameManager.StateManager.State.ToString().WrapSingleQuotes();
         // Inventory

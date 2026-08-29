@@ -112,7 +112,7 @@ public class MenuManager
         DebugMenu = new(window, batch, PixelOperator);
         DebugMenu.LoadContent();
         HorizontalSlider timeSlider = new(DebugMenu, new(Constants.Middle.X, 20), 200, Color.Black, Color.Gray);
-        timeSlider.ValueChanged += (value) => gameManager.DayTime = value * 500;
+        timeSlider.ValueChanged += (value) => GameManager.DayTime = value * 500;
         Label timeLabel = new(DebugMenu, new(Constants.Middle.X - 100, 0), Color.Black, "Daytime");
         DebugMenu.AddWidgets(timeSlider, timeLabel);
     }

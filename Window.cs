@@ -324,7 +324,7 @@ public class Window : Game, IAdjustableWindow
         infoSb.Append("\nGameTime: ");
         infoSb.AppendFormat("{0:0.00}", GameManager.GameTime);
         infoSb.Append("\nDayTime: ");
-        infoSb.AppendFormat("{0:0.00}", gameManager.DayTime);
+        infoSb.AppendFormat("{0:0.00}", GameManager.DayTime);
         infoSb.Append("\nTotalTime: ");
         infoSb.AppendFormat("{0:0.00}", GameManager.GameTime);
         infoSb.Append("\nCamera: ");
@@ -336,7 +336,7 @@ public class Window : Game, IAdjustableWindow
         infoSb.Append("\nLevel: ");
         infoSb.Append(levelManager.Level?.Path);
         infoSb.Append("\nDaylight: ");
-        infoSb.AppendFormat("{0:0}%", WeatherManager.GetDaylightPercent(gameManager.DayTime));
+        infoSb.AppendFormat("{0:0}%", WeatherManager.GetDaylightPercent(GameManager.DayTime));
         infoSb.Append("\nLighting: ");
         infoSb.AppendFormat("{0}", LightingManager.Lights.Count);
         infoSb.Append("\nLight Cell Updates: ");
