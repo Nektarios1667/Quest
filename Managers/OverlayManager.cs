@@ -13,7 +13,7 @@ public class OverlayManager
     public Dialog WorldInfobox { get; private set; }
     public Dialog ItemInfobox { get; private set; }
     public static readonly Point lootStackOffset = new(4, 4);
-    private RenderTarget2D? minimap = null;
+    private RenderTarget2D? Minimap = null;
     public OverlayManager(PlayerManager playerManager)
     {
         Gui = new();
@@ -27,8 +27,6 @@ public class OverlayManager
 
         // Trigger lighting updates
         playerManager.EquippedSlotChanged += (_) => LM.MarkUpdateLighting();
-        playerManager.InventoryUI.OnSlotDrop += (_, _) => LM.MarkUpdateLighting();
-        playerManager.InventoryUI.OnSlotItemChange += (_, _) => LM.MarkUpdateLighting();
 
         TimerManager.SetTimer("LightingUpdate", 0.5f, LM.MarkUpdateLighting, int.MaxValue);
         CameraManager.TileChange += (_, _) => LM.MarkUpdateLighting();
@@ -37,6 +35,11 @@ public class OverlayManager
             if (CameraManager.WorldToScaledTile(newCam.ToPoint(), LM.InvLightDivisions) != LM.LastLuxel)
                 LM.MarkUpdateLighting();
         };
+    }
+    public void InitUI(PlayerManager playerManager)
+    {
+        playerManager.InventoryUI.OnSlotDrop += (_, _) => LM.MarkUpdateLighting();
+        playerManager.InventoryUI.OnSlotItemChange += (_, _) => LM.MarkUpdateLighting();
     }
     public void ToggleWorldInfobox(WorldMetadata metadata)
     {
@@ -92,7 +95,7 @@ public class OverlayManager
 
             // Minimap
                 if (gameManager.StateManager.OverlayState != OverlayState.None)
-                    minimap = DrawMiniMap(device, gameManager.LevelManager, minimap, gameManager.Batch, gameManager.MinimapBatch);
+                    Minimap = DrawMiniMap(device, gameManager.LevelManager, Minimap, gameManager.Batch, gameManager.MinimapBatch);
         }
 
         // Inventories
@@ -274,5 +277,5 @@ public class OverlayManager
     {
         LootNotifications.AddNotification(text, color, duration);
     }
-    public void InvalidateMinimap() { minimap = null; }
+    public void InvalidateMinimap() { Minimap = null; }
 }

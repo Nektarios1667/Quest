@@ -15,4 +15,14 @@ public class Compass : Item
 
         return true;
     }
+    public override bool SecondaryUse(GameManager gameManager, PlayerManager player)
+    {
+        // Toggle open
+        if (player.OpenedInterface != null)
+            player.CloseInterface();
+        else
+            player.OpenInterface(gameManager, UserInterface.WaypointUI);
+
+        return true;
+    }
 }

@@ -1,4 +1,6 @@
-﻿namespace Quest.Utilities;
+﻿using SharpDX.Direct3D9;
+
+namespace Quest.Utilities;
 
 public enum AlphaBlend
 {
@@ -69,5 +71,26 @@ public static class ColorTools
             newColor.A = color1.A;
 
         return newColor;
+    }
+    public static Color? TryParse(string color, bool allowAlpha = true)
+    {
+        // Split
+        string[] parts = color.Split(',');
+        if (parts.Length != 3 && (parts.Length != 4 || !allowAlpha))
+            return null;
+
+        // Parse num
+        byte a = 255;
+        if (
+            byte.TryParse(parts[0], out var r) &&
+            byte.TryParse(parts[1], out var g) &&
+            byte.TryParse(parts[2], out var b) &&
+            (parts.Length == 3 || byte.TryParse(parts[3], out a))
+        )
+        {
+            return new(r, g, b, a);
+        }
+
+        return null;
     }
 }

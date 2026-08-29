@@ -18,8 +18,11 @@ public partial class UserInterface
     public static UserInterface JukeboxUI { get; private set; } = null!;
     public static UserInterface PedestalUI { get; private set; } = null!;
     public static UserInterface StoveUI { get; private set; } = null!;
-    public static void Init(SpriteBatch batch, LevelManager levelManager)
+    public static UserInterface WaypointUI { get; private set; } = null!;
+    public static void Init(SpriteBatch batch, GameManager gameManager)
     {
+        LevelManager levelManager = gameManager.LevelManager;
+
         CreateChestUI(batch);
         CreateClockUI(batch);
         CreateCompassUI(batch);
@@ -33,6 +36,7 @@ public partial class UserInterface
         CreateJukeboxUI(batch, levelManager);
         CreatePedestalUI(batch);
         CreateStoveUI(batch, levelManager);
+        CreateWaypointUI(batch, gameManager);
     }
 
     private static void CreateChestUI(SpriteBatch batch)
@@ -362,7 +366,7 @@ public partial class UserInterface
         // Title
         Point titleSize = PixelOperatorLarge.MeasureString("PEDESTAL").ToPoint();
         Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "PEDESTAL", PixelOperatorLarge, Color.White);
-        DisplayCaseUI.AddElement("title", title);
+        PedestalUI.AddElement("title", title);
 
         // Display item
         Slot display = new(new(Constants.Middle.X - Slot.SlotSize.X / 2, 75));
@@ -417,5 +421,77 @@ public partial class UserInterface
         };
 
         StoveUI.AddElement("cook", cook);
+    }
+    private static void CreateWaypointUI(SpriteBatch batch, GameManager gameManager)
+    {
+        // ----- Waypoint -----
+        WaypointUI = new(batch);
+
+        // Title
+        Point titleSize = PixelOperatorLarge.MeasureString("WAYPOINT").ToPoint();
+        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "WAYPOINT", PixelOperatorLarge, Color.White);
+        WaypointUI.AddElement("title", title);
+
+        // Add
+        Label nameLabel = new(new(Constants.Middle.X - 100, 80), "NAME", PixelOperator, Color.White);
+        TextInput nameInput = new(new(Constants.Middle.X - 100, 120), new(200, 40), PixelOperator, Color.White, Color.Black * 0.6f, Color.Black * 0.4f, borderThickness: 0);
+
+        Label colorLabel = new(new(Constants.Middle.X - 100, 160), "RGB COLOR", PixelOperator, Color.White);
+        TextInput colorInput = new(new(Constants.Middle.X - 100, 200), new(200, 40), PixelOperator, Color.White, Color.Black * 0.6f, Color.Black * 0.4f, borderThickness: 0);
+
+        Label messageLabel = new(new(Constants.Middle.X - 100, 340), "", PixelOperator, Color.White);
+
+        Button addButton = new(new(Constants.Middle.X - 40, 250), new(80, 30), "ADD", PixelOperator, Color.White, Color.Green * 0.6f, Color.Green * 0.4f, borderThickness: 0);
+        addButton.Clicked += () =>
+        {
+            // Parse and add
+            Color? color = ColorTools.TryParse(colorInput.Text, allowAlpha: false);
+            if (color == null)
+            {
+                messageLabel.Foreground = Color.Red;
+                messageLabel.SetText($"Failed to add '{nameInput.Text}'");
+                return;
+            }
+
+            // Add waypoiny
+            gameManager.LevelManager.Level.AddWaypoint(new(CameraManager.TileCoord.ToByteCoord(), nameInput.Text, color.Value));
+            gameManager.OverlayManager.InvalidateMinimap();
+
+            messageLabel.Foreground = Color.Green;
+            messageLabel.SetText($"Added '{nameInput.Text}'");
+
+            // Clear
+            nameInput.SetText("");
+            colorInput.SetText("");
+        };
+        Button deleteButton = new(new(Constants.Middle.X - 40, 290), new(80, 30), "DELETE", PixelOperator, Color.White, Color.Red * 0.6f, Color.Red * 0.4f, borderThickness: 0);
+        deleteButton.Clicked += () =>
+        {
+            bool success = gameManager.LevelManager.Level.RemoveWaypoint(nameInput.Text);
+            gameManager.OverlayManager.InvalidateMinimap();
+
+            // Success label
+            if (success)
+            {
+                messageLabel.Foreground = Color.Green;
+                messageLabel.SetText($"Removed '{nameInput.Text}'");
+                nameInput.SetText("");
+                colorInput.SetText("");
+            } else
+            {
+                messageLabel.Foreground = Color.Red;
+                messageLabel.SetText($"No waypoint '{nameInput.Text}'");
+            }
+        };
+
+        WaypointUI.AddElement("nameLabel", nameLabel);
+        WaypointUI.AddElement("nameInput", nameInput);
+        WaypointUI.AddElement("colorLabel", colorLabel);
+        WaypointUI.AddElement("colorInput", colorInput);
+        WaypointUI.AddElement("addButton", addButton);
+        WaypointUI.AddElement("deleteButton", deleteButton);
+        WaypointUI.AddElement("messageLabel", messageLabel);
+
+        PedestalUI.AddElement("display", nameInput);
     }
 }

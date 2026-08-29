@@ -41,8 +41,8 @@ public class PlayerManager : IEntity, IStatusEffectable
     // Inventory and UI
     public NotificationArea StatusArea { get; } = new(new(5, 5), 400, PixelOperatorSubtitle, color: Color.Gray, hAlign: HorizontalAlignment.Left, vAlign: VerticalAlignment.Top);
     public bool InventoryOpen { get; set; } = false;
-    public Container Inventory { get; }
-    public UserInterface InventoryUI { get; }
+    public Container Inventory { get; private set; }
+    public UserInterface InventoryUI { get; private set; }
     public UserInterface? OpenedInterface { get; set; } = null;
     private int equippedSlot = 0;
     public int EquippedSlot
@@ -67,6 +67,10 @@ public class PlayerManager : IEntity, IStatusEffectable
     private GameManager Game = null!;
     public PlayerManager()
     {
+        TimerManager.SetTimer("PlayerHungerLoss", Constants.SecondsPerHungerLoss, null);
+    }
+    public void InitUI()
+    {
         Inventory = new(new Item[6 * 4]);
         InventoryUI = UserInterface.InventoryUI;
         InventoryUI.BindContainer(Inventory);
@@ -74,8 +78,6 @@ public class PlayerManager : IEntity, IStatusEffectable
         InventoryUI.OnSlotClick += SlotClicked;
         InventoryUI.OnSlotDrop += SlotDropped;
         InventoryUI.OnSlotHover += SlotHovered;
-
-        TimerManager.SetTimer("PlayerHungerLoss", Constants.SecondsPerHungerLoss, null);
     }
 
     public void Update(GameManager gameManager)

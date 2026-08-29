@@ -92,5 +92,6 @@ public class Level
         if (addAmount != points.Length)
             Logger.Error($"Level {Path} at maxiumum waypoint count (255). {points.Length - addAmount} waypoints not added.");
     }
-    public void RemoveWaypoint(Waypoint point) => Waypoints.Remove(point);
+    public bool RemoveWaypoint(string name) => Waypoints.RemoveAll(p => p.Name == name) > 0;
+    public bool RemoveWaypoint(Waypoint point) => Waypoints.Remove(point);
 }

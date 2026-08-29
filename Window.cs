@@ -36,12 +36,38 @@ public class Window : Game, IAdjustableWindow
     public int moveY;
 
     // Debug
-    private static readonly Color[] colors = {
-        Color.Purple, new(255, 128, 128), new(128, 255, 128), new(255, 255, 180), new(128, 255, 255),
-        Color.Brown, Color.Gray, new(192, 128, 64), new(64, 128, 192), new(192, 192, 64),
-        new(64, 192, 128), new(192, 64, 128), new(160, 80, 0), new(80, 160, 0), new(0, 160, 80),
-        new(160, 0, 80), new(96, 96, 192), new(192, 96, 96), new(96, 192, 96), new(192, 192, 96),
-        Color.DarkRed, Color.Cyan, Color.Magenta, Color.Orange, Color.Yellow, Color.Blue, Color.Red
+    private static readonly Color[] colors =
+    {
+        Color.Red,
+        Color.Lime,
+        Color.Blue,
+        Color.Yellow,
+        Color.Cyan,
+        Color.Magenta,
+        Color.Orange,
+        Color.Purple,
+        Color.White,
+        Color.Black,
+        Color.DeepPink,
+        Color.LimeGreen,
+        Color.DarkBlue,
+        Color.Gold,
+        Color.Turquoise,
+        Color.DarkViolet,
+        Color.Coral,
+        Color.MediumSpringGreen,
+        Color.SaddleBrown,
+        Color.HotPink,
+        Color.DarkTurquoise,
+        Color.OrangeRed,
+        Color.SlateBlue,
+        Color.Chartreuse,
+        Color.MediumOrchid,
+        Color.DarkGoldenrod,
+        Color.Aquamarine,
+        Color.Crimson,
+        Color.SkyBlue,
+        Color.DarkGreen
     };
     private float debugUpdateTime;
     private float cacheDelta;
@@ -132,18 +158,22 @@ public class Window : Game, IAdjustableWindow
         LoadTextures(Content);
 
         // Soundtracks
-        SoundtrackManager.LoadSoundtracks(Content);
 
         // Managers
-        SoundManager.Init(Content);
         levelManager = new();
-        UserInterface.Init(spriteBatch, levelManager);
         playerManager = new();
         overlayManager = new(playerManager);
         weatherManager = new();
         gameManager = new(spriteBatch, levelManager, overlayManager, weatherManager, Grading);
         menuManager = new(this, spriteBatch, Content, this, gameManager, playerManager);
         CommandManager.Init(this, gameManager, levelManager, playerManager);
+        SoundManager.Init(Content);
+        SoundtrackManager.LoadSoundtracks(Content);
+
+        // UI
+        UserInterface.Init(spriteBatch, gameManager);
+        playerManager.InitUI();
+        overlayManager.InitUI(playerManager);
 
         Logger.System("Initialized managers.");
 
