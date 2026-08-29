@@ -98,6 +98,7 @@ public class SaveManager
             WriteSection(writer, "CAMR", WriteCameraSection, gameManager, playerManager);
             WriteSection(writer, "PLYR", WritePlayerSection, gameManager, playerManager);
             WriteSection(writer, "LEVL", WriteLevelsSection, gameManager, playerManager);
+            WriteSection(writer, "LOOT", WriteLootSection, gameManager, playerManager);
             WriteSection(writer, "INVT", WriteInventorySection, gameManager, playerManager);
             WriteSection(writer, "EFFX", WriteEffectsSection, gameManager, playerManager);
             WriteSection(writer, "WAYP", WriteWaypointsSection, gameManager, playerManager);
@@ -190,8 +191,7 @@ public class SaveManager
         stateTiles.Keys,
         gameManager.LevelManager.Levels
             .Where(l => l.WorldName == worldName &&
-                (l.Loot.Count > 0 ||
-                 l.Enemies.Count > 0 ||
+                (l.Enemies.Count > 0 ||
                  l.Projectiles.Count > 0 ||
                  l.NPCs.Count > 0))
             .Select(l => l.LevelName)
@@ -208,18 +208,6 @@ public class SaveManager
         {
             writer.Write(level);
             Level levelObj = gameManager.LevelManager.GetLevel($"{worldName}/{level}");
-
-            // Loot
-            writer.Write((ushort)levelObj.Loot.Count);
-            foreach (var loot in levelObj.Loot)
-            {
-                writer.Write((byte)(loot.Item.Type.TypeID + 1));
-                writer.Write(loot.Item.Amount);
-                writer.Write((ushort)loot.Position.X);
-                writer.Write((ushort)loot.Position.Y);
-            }
-            TasksComplete++;
-
 
             // State tiles - let IHasState handle its own info
             if (stateTiles.TryGetValue(level, out var levelStateTiles))
@@ -286,6 +274,27 @@ public class SaveManager
             }
             TasksComplete++;
         }
+    }
+    private static void WriteLootSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager)
+    {
+        // Collect all loot
+        var allLoot = gameManager.LevelManager.Levels
+        .SelectMany(level => level.Loot
+            .Take(ushort.MaxValue)
+            .Select(loot => (loot, level)))
+        .ToArray();
+
+        // Loot
+        writer.Write((ushort)allLoot.Length);
+        foreach ((Loot loot, Level level) in allLoot)
+        {
+            writer.Write(level.UID);
+            writer.Write((byte)(loot.Item.Type.TypeID + 1));
+            writer.Write(loot.Item.Amount);
+            writer.Write((ushort)loot.Position.X);
+            writer.Write((ushort)loot.Position.Y);
+        }
+        TasksComplete++;
     }
     private static void WriteInventorySection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager)
     {
@@ -390,6 +399,7 @@ public class SaveManager
                         case "CAMR": ReadCameraSection(gameManager, sectionReader, levelTable); break;
                         case "PLYR": ReadPlayerSection(gameManager, playerManager, sectionReader, levelTable); break;
                         case "LEVL": ReadLevelSection(gameManager, playerManager, levelPath, sectionReader, levelTable); break;
+                        case "LOOT": ReadLootSection(gameManager, playerManager, sectionReader, levelTable); break;
                         case "INVT": ReadInventorySection(gameManager, playerManager, sectionReader, levelTable); break;
                         case "EFFX": ReadEffectsSection(gameManager, playerManager, sectionReader, levelTable); break;
                         case "WAYP": ReadWaypointsSection(gameManager, playerManager, sectionReader, levelTable); break;
@@ -463,15 +473,6 @@ public class SaveManager
         {
             string lvl = $"{levelPath.WorldName}/{reader.ReadString()}";
             Level current = gameManager.LevelManager.GetLevel(lvl);
-            // Loot
-            ushort lootCount = reader.ReadUInt16();
-            for (int l = 0; l < lootCount; l++)
-            {
-                byte typeID = (byte)(reader.ReadByte() - 1);
-                byte amount = reader.ReadByte();
-                Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
-                current.Loot.Add(new Loot(new(ItemTypes.All[typeID], amount), location));
-            }
 
             // State tiles IHasState
             ushort stateTileCount = reader.ReadUInt16();
@@ -530,6 +531,21 @@ public class SaveManager
             }
         }
         gameManager.LevelManager.TasksComplete++;
+    }
+    public static void ReadLootSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
+    {
+        // Loot
+        ushort lootCount = reader.ReadUInt16();
+        for (int l = 0; l < lootCount; l++)
+        {
+            ushort levelUID = reader.ReadUInt16();
+            Level level = levelTable[levelUID];
+
+            byte typeID = (byte)(reader.ReadByte() - 1);
+            byte amount = reader.ReadByte();
+            Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
+            level.Loot.Add(new Loot(new(ItemTypes.All[typeID], amount), location));
+        }
     }
     public static void ReadInventorySection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
     {
