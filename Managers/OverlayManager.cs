@@ -94,8 +94,8 @@ public class OverlayManager
             Gui.Draw(gameManager.Batch);
 
             // Minimap
-                if (gameManager.StateManager.OverlayState != OverlayState.None)
-                    Minimap = DrawMiniMap(device, gameManager.LevelManager, Minimap, gameManager.Batch, gameManager.MinimapBatch);
+            if (gameManager.StateManager.OverlayState != OverlayState.None && (playerManager == null || playerManager.Inventory.Has(new(ItemTypes.Map, 1))))
+                Minimap = DrawMiniMap(device, gameManager.LevelManager, Minimap, gameManager.Batch, gameManager.MinimapBatch);
         }
 
         // Inventories

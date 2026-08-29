@@ -1763,6 +1763,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Items/MagicKey.png
 
+#begin Images/Items/Map.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Items/Map.png
+
 #begin Images/Items/NinjaStar.png
 /importer:TextureImporter
 /processor:TextureProcessor
