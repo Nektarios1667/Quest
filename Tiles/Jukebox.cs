@@ -14,7 +14,7 @@ public class Jukebox : Tile, IContainer
     {
         UserInterface.JukeboxUI.BindContainer(Container);
         player.OpenInterface(gameManager, UserInterface.JukeboxUI);
-        gameManager.StateManager.OverlayState = OverlayState.Container;
+        gameManager.StateManager.OverlayState = OverlayState.Interface;
     }
     public override void Draw(GameManager gameManager)
     {

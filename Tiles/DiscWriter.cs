@@ -14,6 +14,6 @@ public class DiscWriter : Tile, IContainer
     {
         UserInterface.DiscWriterUI.BindContainer(Container);
         player.OpenInterface(gameManager, UserInterface.DiscWriterUI);
-        gameManager.StateManager.OverlayState = OverlayState.Container;
+        gameManager.StateManager.OverlayState = OverlayState.Interface;
     }
 }

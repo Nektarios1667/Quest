@@ -20,7 +20,7 @@ public enum GameState
 public enum OverlayState
 {
     None,
-    Container,
+    Interface,
     Pause,
     GUI,
     Finished,

@@ -17,6 +17,6 @@ public class Crafter : Tile, IContainer
     {
         UserInterface.CrafterUI.BindContainer(Container);
         player.OpenInterface(gameManager, UserInterface.CrafterUI);
-        gameManager.StateManager.OverlayState = OverlayState.Container;
+        gameManager.StateManager.OverlayState = OverlayState.Interface;
     }
 }

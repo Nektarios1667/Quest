@@ -16,6 +16,6 @@ public class Crate : Tile, IContainer
     {
         UserInterface.CrateUI.BindContainer(Container);
         player.OpenInterface(gameManager, UserInterface.CrateUI);
-        gameManager.StateManager.OverlayState = OverlayState.Container;
+        gameManager.StateManager.OverlayState = OverlayState.Interface;
     }
 }

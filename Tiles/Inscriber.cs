@@ -14,6 +14,6 @@ public class Inscriber : Tile, IContainer
     {
         UserInterface.InscriberUI.BindContainer(Container);
         player.OpenInterface(gameManager, UserInterface.InscriberUI);
-        gameManager.StateManager.OverlayState = OverlayState.Container;
+        gameManager.StateManager.OverlayState = OverlayState.Interface;
     }
 }

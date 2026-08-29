@@ -15,6 +15,6 @@ public class Furnace : Tile, IContainer
     {
         UserInterface.FurnaceUI.BindContainer(Container);
         player.OpenInterface(gameManager, UserInterface.FurnaceUI);
-        gameManager.StateManager.OverlayState = OverlayState.Container;
+        gameManager.StateManager.OverlayState = OverlayState.Interface;
     }
 }

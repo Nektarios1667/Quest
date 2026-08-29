@@ -15,6 +15,6 @@ public class Stove : Tile, IContainer
     {
         UserInterface.StoveUI.BindContainer(Container);
         player.OpenInterface(gameManager, UserInterface.StoveUI);
-        gameManager.StateManager.OverlayState = OverlayState.Container;
+        gameManager.StateManager.OverlayState = OverlayState.Interface;
     }
 }

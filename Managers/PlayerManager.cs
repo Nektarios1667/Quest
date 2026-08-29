@@ -446,7 +446,7 @@ public class PlayerManager : IEntity, IStatusEffectable
     public void OpenInventory(GameManager gameManager)
     {
         InventoryOpen = true;
-        gameManager.StateManager.OverlayState = OverlayState.Container;
+        gameManager.StateManager.OverlayState = OverlayState.Interface;
         SoundManager.PlaySound("Click");
     }
     public void CloseInventory(GameManager gameManager)
@@ -466,7 +466,7 @@ public class PlayerManager : IEntity, IStatusEffectable
         OpenedInterface.OnSlotDrop += SlotDropped;
         OpenedInterface.OnSlotHover += SlotHovered;
 
-        gameManager.StateManager.OverlayState = OverlayState.Container;
+        gameManager.StateManager.OverlayState = OverlayState.Interface;
         SoundManager.PlaySound("Click");
     }
     public void CloseInterface()

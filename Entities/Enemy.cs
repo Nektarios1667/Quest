@@ -75,6 +75,16 @@ public class Enemy : IEntity, IStatusEffectable
     }
     public virtual void Update(GameManager gameManager)
     {
+        // Healthbar
+        HealthBar.Position = CameraManager.WorldToScreen(Position.ToPoint()) + new Point(0, Size.Y + 10);
+        HealthBar.CurrentValue = Health;
+        HealthBar.Update(GameManager.DeltaTime);
+
+        // Damage notifs
+        DamageNotifs.Position = CameraManager.WorldToScreen(Position.ToPoint());
+        DamageNotifs.Update(GameManager.DeltaTime);
+
+        // Return if not in game
         if (gameManager.StateManager.State != GameState.Game) return;
 
         // Check death
@@ -128,14 +138,6 @@ public class Enemy : IEntity, IStatusEffectable
                     Position += Vector2.Normalize(move) * Speed * Constants.TileSize.ToVector2() * GameManager.DeltaTime;
             }
         }
-
-        // Healthbar
-        HealthBar.Position = CameraManager.WorldToScreen(Position.ToPoint()) + new Point(0, Size.Y + 10);
-        HealthBar.CurrentValue = Health;
-        HealthBar.Update(GameManager.DeltaTime);
-        // Damage notifs
-        DamageNotifs.Position = CameraManager.WorldToScreen(Position.ToPoint());
-        DamageNotifs.Update(GameManager.DeltaTime);
     }
     public virtual void Draw(GameManager gameManager)
     {

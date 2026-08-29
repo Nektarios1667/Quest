@@ -28,7 +28,7 @@ public class DisplayCase : Tile, IContainer, IHasLevelData
     {
         UserInterface.DisplayCaseUI.BindContainer(Container);
         player.OpenInterface(gameManager, UserInterface.DisplayCaseUI);
-        gameManager.StateManager.OverlayState = OverlayState.Container;
+        gameManager.StateManager.OverlayState = OverlayState.Interface;
     }
     public void Edit(EditorManager editorManager)
     {
