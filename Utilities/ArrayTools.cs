@@ -52,4 +52,9 @@ public static class ArrayTools
                 if (array[x, y] == target) return true;
         return false;
     }
+    public static T? Random<T>(T[] array) where T : class
+    {
+        if (array.Length == 0) return null;
+        return array[RandomManager.RandomIntRange(0, array.Length - 1)];
+    }
 }

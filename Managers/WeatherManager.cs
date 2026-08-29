@@ -5,42 +5,18 @@ namespace Quest.Managers;
 
 public class WeatherManager
 {
-    private enum WeatherSound
-    {
-        None,
-        Rain,
-        Snow,
-        Sandstorm,
-        Volcanic,
-    }
-    private readonly Dictionary<WeatherSound, float> WeatherSoundMults = new()
-    {
-        { WeatherSound.None, 0 },
-        { WeatherSound.Rain, 0.5f },
-        { WeatherSound.Snow, 0.4f },
-        { WeatherSound.Sandstorm, 0.3f },
-        { WeatherSound.Volcanic, 0.5f },
-    };
     // Weather
-    private readonly Dictionary<BiomeType, WeatherSound> WeatherSounds = new()
-    {
-        { BiomeType.Temperate, WeatherSound.Rain },
-        { BiomeType.Ocean, WeatherSound.Rain },
-        { BiomeType.Indoors, WeatherSound.None },
-        { BiomeType.Snowy, WeatherSound.Snow },
-        { BiomeType.Desert, WeatherSound.Sandstorm },
-        { BiomeType.Volcanic, WeatherSound.Volcanic }
-    };
     private const float WeatherFadeOut = 3;
     private const float WeatherFadeIn = 2;
-    private readonly Dictionary<WeatherSound, float> FadeStartVolume = new();
-    private readonly Dictionary<WeatherSound, float> TimeSinceSound = new()
+    private readonly Dictionary<WeatherTypeID, float> FadeStartVolume = new();
+    private readonly Dictionary<WeatherTypeID, float> TimeSinceSound = new()
     {
-        { WeatherSound.None, float.MaxValue },
-        { WeatherSound.Rain, float.MaxValue },
-        { WeatherSound.Snow, float.MaxValue },
-        { WeatherSound.Sandstorm, float.MaxValue },
-        { WeatherSound.Volcanic, float.MaxValue },
+        { WeatherTypeID.None, float.MaxValue },
+        { WeatherTypeID.Rain, float.MaxValue },
+        { WeatherTypeID.Ocean, float.MaxValue },
+        { WeatherTypeID.Snow, float.MaxValue },
+        { WeatherTypeID.Sandstorm, float.MaxValue },
+        { WeatherTypeID.Volcano, float.MaxValue },
     };
     public readonly FastNoiseLite WeatherNoise = new((int)(DateTime.Now.Ticks ^ (DateTime.Now.Ticks >> 32)));
     public int WeatherSeed { get => _weatherSeed; set { _weatherSeed = value; WeatherNoise.SetSeed(value); } }
@@ -114,80 +90,84 @@ public class WeatherManager
         // End sounds
         else if (WeatherIntensity <= 0)
         {
-            foreach (var weatherSound in WeatherSounds.Values)
-                SoundManager.GetInstance(weatherSound.ToString())?.Stop();
+            foreach (var weatherSound in WeatherTypes.Types.Values)
+                SoundManager.GetInstance(weatherSound.AmbientSoundName)?.Stop();
         }
         DebugManager.EndBenchmark("WeatherSounds");
     }
     private void UpdateAmbientWeatherSound(BiomeType biome)
     {
-        WeatherSounds.TryGetValue(biome, out WeatherSound sound);
+        WeatherTypes.Types.TryGetValue(biome, out var weatherType);
+
+        // -TimeSinceSound = how long the player has been in that biome
+        // TimeSinceSound = how long the player has been out of that biome
 
         // Play sounds
-        if (sound != WeatherSound.None)
+        if (weatherType.Type != WeatherTypeID.None)
         {
-            float volume = WeatherIntensity * WeatherSoundMults[sound];
-            // Either reset time or count how long in biome
-            if (TimeSinceSound[sound] > 0)
+            float volume = WeatherIntensity * weatherType.AmbientSoundVolumeMult;
+            // Reset time and count how long in biome
+            float time = TimeSinceSound[weatherType.Type];
+            if (time > 0)
             {
-                FadeStartVolume.Remove(sound);
-                TimeSinceSound[sound] = 0;
-            }
-            else
-                TimeSinceSound[sound] -= GameManager.DeltaTime;
+                FadeStartVolume.Remove(weatherType.Type);
 
-            SoundManager.PlaySoundInstance(sound.ToString(), volume * Math.Clamp(-TimeSinceSound[sound] / WeatherFadeIn, 0, 1), loop: true);
+                // If its in the process of fading out, swap it to fade in at same volume
+                if (time < WeatherFadeOut)
+                    // Since fade out and fade in might not be the same length, do the equivalent amount complete
+                    TimeSinceSound[weatherType.Type] = -(time / WeatherFadeOut) * WeatherFadeIn;
+                else
+                    TimeSinceSound[weatherType.Type] = 0;
+            }
+            TimeSinceSound[weatherType.Type] -= GameManager.DeltaTime;
+
+            SoundManager.PlaySoundInstance(weatherType.AmbientSoundName, volume * Math.Clamp(-TimeSinceSound[weatherType.Type] / WeatherFadeIn, 0, 1), loop: true);
         }
 
         // End others sounds
-        foreach (var weatherSound in WeatherSounds.Values)
+        foreach (var weathers in WeatherTypes.Types.Values)
         {
-            if (weatherSound != sound && weatherSound != WeatherSound.None)
+            if (weathers.Type != weatherType.Type && weathers.Type != WeatherTypeID.None)
             {
-                // Either reset time or count how long since in biome
-                if (TimeSinceSound[weatherSound] < 0)
-                    TimeSinceSound[weatherSound] = 0;
-                else
-                    TimeSinceSound[weatherSound] += GameManager.DeltaTime;
+                // Reset time and count how long since in biome
+                if (TimeSinceSound[weathers.Type] < 0)
+                    TimeSinceSound[weathers.Type] = 0;
+                TimeSinceSound[weathers.Type] += GameManager.DeltaTime;
 
                 // Fade out or clear
-                var instance = SoundManager.GetInstance(weatherSound.ToString());
-                if (TimeSinceSound[weatherSound] >= WeatherFadeOut)
+                var instance = SoundManager.GetInstance(weathers.AmbientSoundName);
+                if (TimeSinceSound[weathers.Type] >= WeatherFadeOut)
                 {
                     // Clear
-                    SoundManager.EndInstance(weatherSound.ToString());
-                    FadeStartVolume.Remove(weatherSound);
+                    SoundManager.EndInstance(weathers.AmbientSoundName);
+                    FadeStartVolume.Remove(weathers.Type);
                 }
                 else if (instance != null)
                 {
-                    if (!FadeStartVolume.ContainsKey(weatherSound)) FadeStartVolume[weatherSound] = instance.Volume; // When first starting to fade record what the original volume was
-                    instance.Volume = (WeatherFadeOut - TimeSinceSound[weatherSound]) / WeatherFadeOut * FadeStartVolume[weatherSound]; // Fade away logic
+                    if (!FadeStartVolume.ContainsKey(weathers.Type)) FadeStartVolume[weathers.Type] = instance.Volume; // When first starting to fade record what the original volume was
+                    instance.Volume = (WeatherFadeOut - TimeSinceSound[weathers.Type]) / WeatherFadeOut * FadeStartVolume[weathers.Type]; // Fade away logic
                 }
             }
         }
     }
     private void UpdateWeatherSfx(BiomeType currentBiome)
     {
-        if (WeatherIntensity > .2f && RandomManager.ChancePerSecond(0.1f))
+        WeatherType type = WeatherTypes.Types[currentBiome];
+
+        if (WeatherIntensity > type.SoundEffectThreshold && RandomManager.ChancePerSecond(type.SoundEffectChance))
         {
-            switch (currentBiome)
-            {
-                case BiomeType.Temperate: SoundManager.PlaySoundInstance($"Thunder{RandomManager.RandomIntRange(1, 6)}", volume: WeatherIntensity * 0.75f); break;
-                case BiomeType.Ocean: SoundManager.PlaySoundInstance($"Thunder{RandomManager.RandomIntRange(1, 6)}", volume: WeatherIntensity * 0.75f); break;
-                case BiomeType.Indoors: break;
-                case BiomeType.Snowy: break;
-                case BiomeType.Desert: break;
-                case BiomeType.Volcanic: SoundManager.PlaySoundInstance($"VolcanicRumble", volume: WeatherIntensity * 0.85f); break;
-            }
+            var sound = ArrayTools.Random(type.SoundEffectNames);
+            if (sound != null)
+                SoundManager.PlaySoundInstance(sound, volume: WeatherIntensity * type.SoundEffectVolumeMult, pitch: type.SoundEffectPitch);
         }
     }
     // Sky
     public static readonly List<(float pos, Color color)> darkGradient = [
         (0, Color.Transparent),
         (0.2f, Color.Transparent),
-        (0.3f, Color.Black),
+        (0.3f, Color.Orange),
         (0.5f, Color.Black),
-        (0.7f, Color.Black),
+        (0.7f, Color.Orange),
         (0.8f, Color.Transparent),
         (1, Color.Transparent),
     ];
@@ -212,20 +192,9 @@ public class WeatherManager
     {
         // Calculate sky colors from weather, biome, and time
         BiomeType? currentBiome = gameManager.LevelManager.GetBiome(loc);
+        if (currentBiome == null) return Color.Transparent;
 
-        Color weatherColor = default;
-        if (currentBiome == null || currentBiome == BiomeType.Indoors || blend == 0) weatherColor = Color.Transparent;
-        else
-        {
-            switch (currentBiome)
-            {
-                case BiomeType.Temperate: weatherColor = Color.MediumBlue; break;
-                case BiomeType.Snowy: weatherColor = new(200, 200, 216); break;
-                case BiomeType.Desert: weatherColor = Color.OrangeRed; break;
-                case BiomeType.Ocean: weatherColor = Color.MediumBlue; break;
-                case BiomeType.Volcanic: weatherColor = new(107, 75, 52); break;
-            }
-        }
+        Color weatherColor = WeatherTypes.Types.GetValueOrDefault(currentBiome.Value).WeatherColor;
         weatherColor *= blend + 1 - (weatherColor.A / 255f); // Use alpha channel to adjust transparancy per biome - lower alpha = more opaque
         return weatherColor;
     }

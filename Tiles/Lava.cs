@@ -8,8 +8,6 @@ public class Lava : Tile, IDynamicTile
     {
         // Draw each tile using the sprite batch
         Point dest = CameraManager.TileToScreen(Location);
-
-        dest += Constants.Middle;
         // Draw tile
         Color color = Color.Lerp(Color.Yellow, Color.OrangeRed, 0.5f * (float)Math.Sin(GameManager.GameTime * MathHelper.PiOver2));
         Rectangle source = new((int)((Math.Cos(GameManager.GameTime * 0.1f) + 1) / 2 * 48), (int)((Math.Sin(GameManager.GameTime * 0.2f) + 1) / 2 * 48), Constants.TilePixelSize.X, Constants.TilePixelSize.Y);

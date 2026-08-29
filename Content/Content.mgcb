@@ -3209,6 +3209,42 @@
 /processorParam:Quality=Best
 /build:Sounds/Effects/Rain.wav
 
+#begin Sounds/Effects/Rumble1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Rumble1.wav
+
+#begin Sounds/Effects/Rumble2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Rumble2.wav
+
+#begin Sounds/Effects/Rumble3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Rumble3.wav
+
+#begin Sounds/Effects/Rumble4.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Rumble4.wav
+
+#begin Sounds/Effects/Rumble5.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Rumble5.wav
+
+#begin Sounds/Effects/Rumble6.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Rumble6.wav
+
 #begin Sounds/Effects/Sandstorm.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -3275,11 +3311,11 @@
 /processorParam:Quality=Best
 /build:Sounds/Effects/Typing.wav
 
-#begin Sounds/Effects/Volcanic.wav
+#begin Sounds/Effects/VolcanoAmbience.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
-/build:Sounds/Effects/Volcanic.wav
+/build:Sounds/Effects/VolcanoAmbience.wav
 
 #begin Sounds/Effects/Whoosh.wav
 /importer:WavImporter

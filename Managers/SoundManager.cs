@@ -19,7 +19,6 @@ public static class SoundManager
         LoadSound(content, "Rain", "Sounds/Effects/Rain");
         LoadSound(content, "Sandstorm", "Sounds/Effects/Sandstorm");
         LoadSound(content, "Snow", "Sounds/Effects/Sandstorm");
-        LoadSound(content, "Volcanic", "Sounds/Effects/Sandstorm");
         LoadSound(content, "Trinkets", "Sounds/Effects/Trinkets");
         LoadSound(content, "Click", "Sounds/Effects/Click");
         LoadSound(content, "DoorLocked", "Sounds/Effects/DoorLocked");
@@ -39,7 +38,13 @@ public static class SoundManager
         LoadSound(content, "Thunder3", "Sounds/Effects/Thunder3");
         LoadSound(content, "Thunder4", "Sounds/Effects/Thunder4");
         LoadSound(content, "Thunder5", "Sounds/Effects/Thunder5");
-        LoadSound(content, "VolcanicRumble", "Sounds/Effects/Volcanic");
+        LoadSound(content, "Rumble1", "Sounds/Effects/Rumble1");
+        LoadSound(content, "Rumble2", "Sounds/Effects/Rumble2");
+        LoadSound(content, "Rumble3", "Sounds/Effects/Rumble3");
+        LoadSound(content, "Rumble4", "Sounds/Effects/Rumble4");
+        LoadSound(content, "Rumble5", "Sounds/Effects/Rumble5");
+        LoadSound(content, "Rumble6", "Sounds/Effects/Rumble6");
+        LoadSound(content, "VolcanoAmbience", "Sounds/Effects/VolcanoAmbience");
     }
     public static bool IsMusicPlaying => MediaPlayer.State == MediaState.Playing;
 
@@ -64,15 +69,14 @@ public static class SoundManager
     public static void PlaySoundInstance(string key, float volume = 1f, float pitch = 0f, float pan = 0f, bool loop = false)
     {
         var instance = GetOrCreateInstance(key);
-        if (instance != null)
-        {
-            instance.Volume = MathHelper.Clamp(volume * SettingsManager.SoundVolume, 0f, 1f);
-            instance.Pitch = pitch;
-            instance.Pan = pan;
-            instance.IsLooped = loop;
-            if (instance.State != SoundState.Playing)
-                instance.Play();
-        }
+        if (instance == null) return;
+
+        instance.Volume = MathHelper.Clamp(volume * SettingsManager.SoundVolume, 0f, 1f);
+        instance.Pitch = pitch;
+        instance.Pan = pan;
+        instance.IsLooped = loop;
+        if (instance.State != SoundState.Playing)
+            instance.Play();
     }
     public static SoundEffectInstance? GetInstance(string key)
     {
