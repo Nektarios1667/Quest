@@ -162,23 +162,44 @@ public class WeatherManager
         }
     }
     // Sky
-    public static readonly List<(float pos, Color color)> darkGradient = [
-        (0, Color.Transparent),
-        (0.2f, Color.Transparent),
-        (0.3f, Color.Orange),
-        (0.5f, Color.Black),
-        (0.7f, Color.Orange),
-        (0.8f, Color.Transparent),
-        (1, Color.Transparent),
+    public static readonly List<(float time, Color color)> darkGradient = [
+        // Day
+        (0.00f, new(100, 149, 237, 0)),         // Transparent blue
+        (0.20f, new(100, 149, 237, 0)),         // Transparent blue
+
+        // Sunset
+        (0.23f, new Color(255, 200, 80, 170)),   // Golden
+        (0.25f, new Color(255, 120, 50, 170)),  // Orange
+        (0.27f, new Color(180, 50, 80, 220)),   // Red/pink
+        (0.30f, new Color(40, 20, 60, 240)),    // Purple twilight
+
+        // Night 
+        (0.35f, Color.Black),
+        (0.65f, Color.Black),
+
+        // Sunrise
+        (0.70f, new Color(40, 20, 60, 240)),    // Purple twilight
+        (0.73f, new Color(180, 50, 80, 220)),   // Pink/redr
+        (0.75f, new Color(255, 120, 50, 170)),  // Orange
+        (0.77f, new Color(255, 200, 80, 170)),   // Golden
+
+        // Day
+        (0.80f, new(100, 149, 237, 0)),         // Transparent blue
+        (1.00f, new(100, 149, 237, 0)),         // Transparent blue
     ];
     public static Color GetSkyColor(float time)
     {
         float cycle = time / Constants.DayLength;
         // Find stops
-        var start = darkGradient.LastOrDefault(s => s.pos <= cycle, darkGradient[^1]);
-        var end = darkGradient.FirstOrDefault(s => s.pos >= cycle, darkGradient[^1]);
+        var start = darkGradient.LastOrDefault(s => s.time <= cycle, darkGradient[^1]);
+        var end = darkGradient.FirstOrDefault(s => s.time >= cycle, darkGradient[^1]);
 
-        Color color = Color.Lerp(start.color, end.color, (cycle - start.pos) / (end.pos - start.pos));
+        float lerp = start.time == end.time ? 1f : (cycle - start.time) / (end.time - start.time);
+        Color color = Color.Lerp(start.color, end.color, lerp);
+        if (color == Color.Transparent)
+        {
+            Console.WriteLine("uh oh ");
+        }
         return color;
     }
     public static float GetDaylightPercent(float time)

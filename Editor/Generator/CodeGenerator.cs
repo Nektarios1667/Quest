@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using System.Drawing;
+using Xna = Microsoft.Xna.Framework;
 
 namespace Quest.Editor.Generator;
 
@@ -29,7 +31,7 @@ public static class CodeGenerator
         {
             ReloadSource();
             // CLI
-            Console.WriteLine("[t]ile, [d]ecal, [i]tem, [l]oot table, [w]eather test, or [s]ave viewer: ");
+            Console.WriteLine("[t]ile, [d]ecal, [i]tem, [l]oot table, [w]eather test, s[k]y test, or [s]ave viewer: ");
             string? resp = Console.ReadLine()?.ToLower();
             if (resp == null || resp == "") continue;
 
@@ -42,11 +44,13 @@ public static class CodeGenerator
                 WriteItemCode();
             else if (resp == "l" || resp == "loot table")
                 WriteLootTable();
-            else if (resp == "w" || resp == "weather noise")
+            else if (resp == "w" || resp == "weather test")
                 TestWeatherNoise();
+            else if (resp == "k" || resp == "sky test")
+                TestSky();
             else if (resp == "exit" || resp == "quit")
                 return;
-            else if (resp == "s" || resp == "save" || resp == "save viewer")
+            else if (resp == "s" || resp == "save viewer")
             {
                 Thread thread = new Thread(() =>
                 {
@@ -116,6 +120,31 @@ public static class CodeGenerator
 
         plot.SavePng("weather.png", 1200, 400);
 
+    }
+    public static void TestSky()
+    {
+        const int width = Constants.DayLength;
+        const int height = 100;
+
+        using Bitmap image = new(width, height);
+
+        for (int x = 0; x < width; x++)
+        {
+            // Get
+            Xna.Color color = WeatherManager.GetSkyColor(x);
+            if (color == Xna.Color.Transparent)
+                color = Xna.Color.Green;
+
+            // Markers
+            if (x % 60 == 0)
+                color = Xna.Color.Green;
+
+            // Write column
+            for (int y = 0; y < height; y++)
+                image.SetPixel(x, y, System.Drawing.Color.FromArgb(color.R, color.G, color.B));
+        }
+
+        image.Save("sky.png", System.Drawing.Imaging.ImageFormat.Png);
     }
     public static void ReloadSource()
     {

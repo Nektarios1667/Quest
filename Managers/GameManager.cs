@@ -23,7 +23,7 @@ public class GameManager
     public GameManager(SpriteBatch batch, LevelManager level, OverlayManager? overlay, WeatherManager? weatherManager, Effect? gradingEffect)
     {
         if (overlay == null && StateManager.State == GameState.Game)
-            Logger.Error("No OverlayManager object for the ");
+            Logger.Error("No OverlayManager object for the GameManager!");
 
         GradingEffect = gradingEffect;
         Batch = batch;
@@ -56,7 +56,7 @@ public class GameManager
             DeltaTime = deltaTime;
             GameTime += deltaTime;
             if (StateManager.State == GameState.Game)
-                DayTime += deltaTime;
+                DayTime += deltaTime * (InputManager.KeyDown(Keys.J) ? 10 : 1);
             if (DayTime >= Constants.DayLength) DayTime = 0f;
         }
         else
