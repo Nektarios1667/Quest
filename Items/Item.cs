@@ -80,6 +80,7 @@ public enum ItemTypeID : byte
     Bow,
     Slingshot,
     Clock,
+    Compass,
     // ITEMS ENUM
 }
 
@@ -187,6 +188,7 @@ public class ItemTypes
     public static readonly ItemType Bow = new(ItemTypeID.Bow, "Wooden bow capable of shooting arrows.", 1);
     public static readonly ItemType Slingshot = new(ItemTypeID.Slingshot, "Small slingshot that can launch stones.", 1);
     public static readonly ItemType Clock = new(ItemTypeID.Clock, "Handheld device to keep time.", 1);
+    public static readonly ItemType Compass = new(ItemTypeID.Compass, "Tool used to locate your position.", 1);
     // ITEMS REGISTER
     public static readonly ItemType[] All = [
     ActiveOrb,
@@ -267,6 +269,7 @@ public class ItemTypes
     Bow,
     Slingshot,
     Clock,
+    Compass,
     // ITEMS ENUM
     ];
 }
@@ -383,6 +386,7 @@ public class Item
             ItemTypeID.HeartRune => new HeartRune(amount, customName),
             ItemTypeID.FireStaff => new FireStaff(amount, customName),
             ItemTypeID.Clock => new Clock(amount, customName),
+            ItemTypeID.Compass => new Compass(amount, customName),
             // ITEMFROMID
             _ => new Item(type, amount, customName),
         };

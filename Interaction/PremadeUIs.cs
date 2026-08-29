@@ -7,6 +7,7 @@ public partial class UserInterface
 {
     public static UserInterface ChestUI { get; private set; } = null!;
     public static UserInterface ClockUI { get; private set; } = null!;
+    public static UserInterface CompassUI { get; private set; } = null!;
     public static UserInterface CrafterUI { get; private set; } = null!;
     public static UserInterface CrateUI { get; private set; } = null!;
     public static UserInterface DiscWriterUI { get; private set; } = null!;
@@ -21,6 +22,7 @@ public partial class UserInterface
     {
         CreateChestUI(batch);
         CreateClockUI(batch);
+        CreateCompassUI(batch);
         CreateCrafterUI(batch, levelManager);
         CreateCrateUI(batch);
         CreateDiscWriterUI(batch);
@@ -83,6 +85,22 @@ public partial class UserInterface
         // Name
         LinkedLabel timeName = new(new(Constants.Middle.X - 30, 200), "|1|", [GetTimeName], PixelOperatorLarge, Color.Cyan);
         ClockUI.AddElement("timeName", timeName);
+    }
+    private static void CreateCompassUI(SpriteBatch batch)
+    {
+        string GetPosition() => $"{CameraManager.TileCoord.X}, {CameraManager.TileCoord.Y}";
+
+        // ----- Compass UI -----
+        CompassUI = new(batch);
+
+        // Title
+        Point titleSize = PixelOperatorLarge.MeasureString("COMPASS").ToPoint();
+        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "COMPASS", PixelOperatorLarge, Color.White);
+        CompassUI.AddElement("title", title);
+
+        // Position
+        LinkedLabel pos = new(new(Constants.Middle.X - 85, 150), "Pos: |1|", [GetPosition], PixelOperatorLarge, Color.Cyan);
+        CompassUI.AddElement("position", pos);
     }
     private static void CreateCrafterUI(SpriteBatch batch, LevelManager levelManager)
     {
