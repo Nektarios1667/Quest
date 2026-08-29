@@ -454,7 +454,7 @@ public partial class UserInterface
             }
 
             // Add waypoiny
-            gameManager.LevelManager.Level.AddWaypoint(new(gameManager.LevelManager.Level.LevelPath, CameraManager.TileCoord.ToByteCoord(), nameInput.Text, color.Value, playerMade: true));
+            gameManager.LevelManager.Level.AddWaypoint(new(CameraManager.TileCoord.ToByteCoord(), nameInput.Text, color.Value, playerMade: true));
             gameManager.OverlayManager.InvalidateMinimap();
 
             messageLabel.Foreground = Color.Green;

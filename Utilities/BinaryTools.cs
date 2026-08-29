@@ -86,7 +86,6 @@ public static class BinaryWriterExtensions
     }
     public static void Write(this BinaryWriter writer, Waypoint waypoint)
     {
-        writer.Write(waypoint.LevelPath.ToString());
         writer.Write(waypoint.Position);
         writer.Write(waypoint.Name);
         writer.Write(waypoint.Color);
@@ -187,11 +186,10 @@ public static class BinaryReaderExtensions
     }
     public static Waypoint ReadWaypoint(this BinaryReader reader)
     {
-        LevelPath path = new(reader.ReadString());
         ByteCoord pos = reader.ReadByteCoord();
         string name = reader.ReadString();
         Color color = reader.ReadColor();
-        return new(path, pos, name, color);
+        return new(pos, name, color);
     }
     public static ShopOption ReadShopOption(this BinaryReader reader)
     {

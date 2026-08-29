@@ -411,7 +411,7 @@ public class EditorManager
         string name = values[2];
         Color color = new(byte.Parse(values[3]), byte.Parse(values[4]), byte.Parse(values[5]));
 
-        LevelManager.Level.AddWaypoint(new(LevelManager.Level.LevelPath, pos, name, color));
+        LevelManager.Level.AddWaypoint(new(pos, name, color));
     }
     public void DeleteWaypoint()
     {

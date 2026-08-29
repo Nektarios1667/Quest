@@ -315,13 +315,21 @@ public class SaveManager
     private static void WriteWaypointsSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager)
     {
         // Write WAYP
-        Waypoint[] playerWaypoints = gameManager.LevelManager.Level.Waypoints.Where(w => w.PlayerMade).Take(255).ToArray();
+        // Collect
+        var playerWaypoints = gameManager.LevelManager.Levels
+        .SelectMany(level => level.Waypoints
+            .Where(w => w.PlayerMade)
+            .Take(255)
+            .Select(point => (point, level)))
+        .ToArray();
+
         byte waypointsCount = (byte)playerWaypoints.Length;
         
         writer.Write(waypointsCount);
-        foreach (Waypoint waypoint in playerWaypoints)
+        foreach ((Waypoint point, Level level) in playerWaypoints)
         {
-            writer.Write(waypoint);
+            writer.Write(level.UID);
+            writer.Write(point);
         }
     }
     private static void WriteEOFSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager) { }
@@ -343,7 +351,7 @@ public class SaveManager
         MenuManager.SetCurrentlyLoading("Loading save file...");
 
         // Level table - uid <--> levelName
-        Dictionary<ushort, string> levelTable = [];
+        Dictionary<ushort, Level> levelTable = [];
 
         // Read sections
         string id = "";
@@ -377,14 +385,14 @@ public class SaveManager
                 {
                     switch (id)
                     {
-                        case "TABL": ReadTableSection(gameManager, sectionReader, levelTable); break;
-                        case "WHTR": ReadWeatherSection(gameManager, sectionReader); break;
-                        case "CAMR": ReadCameraSection(gameManager, sectionReader); break;
-                        case "PLYR": ReadPlayerSection(gameManager, playerManager, sectionReader); break;
-                        case "LEVL": ReadLevelSection(gameManager, playerManager, levelPath, sectionReader); break;
-                        case "INVT": ReadInventorySection(gameManager, playerManager, sectionReader); break;
-                        case "EFFX": ReadEffectsSection(gameManager, playerManager, sectionReader); break;
-                        case "WAYP": ReadWaypointsSection(gameManager, playerManager, sectionReader); break;
+                        case "TABL": ReadTableSection(gameManager, sectionReader, levelTable, levelPath.WorldName); break;
+                        case "WHTR": ReadWeatherSection(gameManager, sectionReader, levelTable); break;
+                        case "CAMR": ReadCameraSection(gameManager, sectionReader, levelTable); break;
+                        case "PLYR": ReadPlayerSection(gameManager, playerManager, sectionReader, levelTable); break;
+                        case "LEVL": ReadLevelSection(gameManager, playerManager, levelPath, sectionReader, levelTable); break;
+                        case "INVT": ReadInventorySection(gameManager, playerManager, sectionReader, levelTable); break;
+                        case "EFFX": ReadEffectsSection(gameManager, playerManager, sectionReader, levelTable); break;
+                        case "WAYP": ReadWaypointsSection(gameManager, playerManager, sectionReader, levelTable); break;
                         default: Logger.Warning($"Unknown level section '{id}'"); break; // Unknown section - ignore it
                     }
                 }
@@ -400,13 +408,18 @@ public class SaveManager
         return true;
     }
     #region ReadSections
-    public static void ReadTableSection(GameManager gameManager, BinaryReader reader, Dictionary<ushort, string> levelTable)
+    public static void ReadTableSection(GameManager gameManager, BinaryReader reader, Dictionary<ushort, Level> levelTable, string worldName)
     {
         ushort tableLength = reader.ReadUInt16();
         for (int t = 0; t < tableLength; t++)
-            levelTable[reader.ReadUInt16()] = reader.ReadString();
+        {
+            ushort id = reader.ReadUInt16();
+            string name = reader.ReadString();
+            levelTable[id] = gameManager.LevelManager.GetLevel(new LevelPath(worldName, name));
+        }
+
     }
-    public static void ReadWeatherSection(GameManager gameManager, BinaryReader reader)
+    public static void ReadWeatherSection(GameManager gameManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
     {
         // Read weather data
         string level = reader.ReadString();
@@ -419,7 +432,7 @@ public class SaveManager
         gameManager.WeatherManager.SetWeatherPersistent(seed: weatherSeed, lastWeatherTime: lastWeather, lastTimeValue: GameManager.GameTime);
         gameManager.LevelManager.TasksComplete++;
     }
-    public static void ReadCameraSection(GameManager gameManager, BinaryReader reader)
+    public static void ReadCameraSection(GameManager gameManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
     {
         // Read CameraManager data
         CameraManager.CameraDest = new(reader.ReadSingle(), reader.ReadSingle());
@@ -427,7 +440,7 @@ public class SaveManager
         CameraManager.Update(gameManager, 0); // In bounds check
         gameManager.LevelManager.TasksComplete++;
     }
-    public static void ReadPlayerSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader)
+    public static void ReadPlayerSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
     {
         playerManager.Health = reader.ReadByte();
         playerManager.MaxHealth = reader.ReadByte();
@@ -442,7 +455,7 @@ public class SaveManager
         float starvationTimer = reader.ReadSingle();
         if (starvationTimer >= 0) TimerManager.SetTimer("PlayerStarvation", starvationTimer, null);
     }
-    public static void ReadLevelSection(GameManager gameManager, PlayerManager playerManager, LevelPath levelPath, BinaryReader reader)
+    public static void ReadLevelSection(GameManager gameManager, PlayerManager playerManager, LevelPath levelPath, BinaryReader reader, Dictionary<ushort, Level> levelTable)
     {
         // Levels
         byte levelCount = reader.ReadByte();
@@ -518,7 +531,7 @@ public class SaveManager
         }
         gameManager.LevelManager.TasksComplete++;
     }
-    public static void ReadInventorySection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader)
+    public static void ReadInventorySection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
     {
         // Read Inventory data
         byte invLength = reader.ReadByte();
@@ -529,7 +542,7 @@ public class SaveManager
         }
         gameManager.LevelManager.TasksComplete++;
     }
-    public static void ReadEffectsSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader)
+    public static void ReadEffectsSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
     {
         // Read Status Effects
         StatusManager.ClearAllStatusEffects(gameManager, playerManager);
@@ -542,7 +555,7 @@ public class SaveManager
         }
         gameManager.LevelManager.TasksComplete++;
     }
-    private static void ReadWaypointsSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader)
+    private static void ReadWaypointsSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
     {
         // Write WAYP
         Waypoint[] playerWaypoints = gameManager.LevelManager.Level.Waypoints.Where(w => w.PlayerMade).Take(255).ToArray();
@@ -550,8 +563,11 @@ public class SaveManager
 
         for (int w = 0; w < waypointsCount; w++)
         {
+            ushort levelUID = reader.ReadUInt16();
+            Level level = levelTable[levelUID];
+
             Waypoint point = reader.ReadWaypoint();
-            gameManager.LevelManager.GetLevel(point.LevelPath).AddWaypoint(point);
+            level.AddWaypoint(point);
         }
     }
     #endregion
