@@ -383,6 +383,53 @@ public class EditorManager
         editing.Texture = texture;
         editing.ProjectileTexture = projTexture;
     }
+    public void NewWaypoint()
+    {
+        // Check
+        if (LevelManager.Level.Waypoints.Count >= byte.MaxValue)
+        {
+            Logger.Error("Maximum number of Waypoints reached (255).");
+            return;
+        }
+
+        // Winforms
+        var (success, values) = ShowInputForm("Waypoint Editor", [
+            new("X", IsByte),
+            new("Y", IsByte),
+            new("Name", null),
+            new("R", IsByte),
+            new("G", IsByte),
+            new("B", IsByte),
+        ]);
+        if (!success)
+        {
+            if (!PopupOpen) Logger.Error("Decal creation failed.");
+            return;
+        }
+
+        ByteCoord pos = new(byte.Parse(values[0]), byte.Parse(values[1]));
+        string name = values[2];
+        Color color = new(byte.Parse(values[3]), byte.Parse(values[4]), byte.Parse(values[5]));
+
+        LevelManager.Level.AddWaypoint(new(pos, name, color));
+    }
+    public void DeleteWaypoint()
+    {
+        // Winforms
+        var (success, values) = ShowInputForm("Waypoint Editor", [
+            new("Waypoint", null, LevelManager.Level.Waypoints.Select(w => $"{w.Name} | {w.Position}").ToArray())
+        ]);
+        if (!success)
+        {
+            if (!PopupOpen) Logger.Error("Decal creation failed.");
+            return;
+        }
+
+        Waypoint? point = LevelManager.Level.Waypoints.FirstOrDefault(w => w.Name == values[0].Split(" | ")[0]);
+
+        if (point != null)
+            LevelManager.Level.RemoveWaypoint(point);
+    }
     public void NewDecal()
     {
         // Check

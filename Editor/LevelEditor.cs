@@ -13,6 +13,7 @@ public class LevelEditor : Game, IAdjustableWindow
     // Devices and managers
     private readonly GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch = null!;
+    private SpriteBatch minimapBatch = null!;
     private GameManager gameManager = null!;
     private LevelManager levelManager = null!;
     private EditorManager editorManager = null!;
@@ -134,6 +135,7 @@ public class LevelEditor : Game, IAdjustableWindow
     protected override void LoadContent()
     {
         spriteBatch = new SpriteBatch(GraphicsDevice);
+        minimapBatch = new SpriteBatch(GraphicsDevice);
 
         // Textures
         LoadTextures(Content);
@@ -141,16 +143,14 @@ public class LevelEditor : Game, IAdjustableWindow
         // Managers
         levelGenerator = new(42, 1f / 64);
         levelManager = new();
-        //overlayManager = new(null);
         gameManager = new(spriteBatch, levelManager, null, null, null); // No WeatherManager or OverlayManager
         gameManager.StateManager.State = GameState.Editor;
         editorManager = new(gameManager);
         editorLevelManager = new(gameManager, levelGenerator);
         editorOverlayManager = new(gameManager, spriteBatch, GraphicsDevice);
-        TimerManager.SetTimer("UpdateMinimap", 1, editorOverlayManager.FlagRebuildMinimap, int.MaxValue);
-        TimerManager.SetTimer("UpdateEditorWindowTile", 3, () =>
-            Window.Title = editorLevelManager.LevelManager.Level.LevelPath.IsNull() ? "Quest Level Editor" : $"Quest Level Editor - {editorLevelManager.LevelManager.Level.LevelPath}",
-        int.MaxValue);
+        levelManager.LevelLoaded += (_) => editorOverlayManager.InvalidateMinimap();
+        levelManager.LevelLoaded += (Level level) => Window.Title = $"Quest Level Editor - {level.LevelPath}";
+        Window.Title = "Quest Level Editor";
 
         gameManager.StateManager.State = GameState.Editor;
         Logger.System("Initialized managers.");
@@ -184,12 +184,13 @@ public class LevelEditor : Game, IAdjustableWindow
         mouseMenu.AddItem("Edit...", null, []);
         mouseMenu.AddSubMenu("Edit...", editMenu);
 
-        MouseMenu newMenu = new(gui, Point.Zero, new(100, 105), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
+        MouseMenu newMenu = new(gui, Point.Zero, new(100, 125), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         newMenu.AddItem("New NPC", editorManager.NewNPC, []);
         newMenu.AddItem("New Enemy", editorManager.NewEnemy, []);
         newMenu.AddItem("New Loot", editorManager.NewLoot, []);
         newMenu.AddItem("New Decal", editorManager.NewDecal, []);
         newMenu.AddItem("New Script", editorManager.NewScript, []);
+        newMenu.AddItem("New Waypoint", editorManager.NewWaypoint, []);
         mouseMenu.AddItem("New...", null, []);
         mouseMenu.AddSubMenu("New...", newMenu);
 
@@ -337,6 +338,9 @@ public class LevelEditor : Game, IAdjustableWindow
         if (InputManager.BindPressed(InputAction.SelectTileTool)) currentTool = EditorTool.Tile;
         if (InputManager.BindPressed(InputAction.SelectDecalTool)) currentTool = EditorTool.Decal;
         if (InputManager.BindPressed(InputAction.SelectBiomeTool)) currentTool = EditorTool.Biome;
+        // Waypoints
+        if (InputManager.BindPressed(InputAction.NewWaypoint)) { MouseSelect(); editorManager.NewWaypoint(); }
+        if (InputManager.BindPressed(InputAction.DeleteWaypoint)) { MouseSelect(); editorManager.DeleteWaypoint(); }
         // Script
         if (InputManager.BindPressed(InputAction.DeleteScript)) editorManager.DeleteScript();
         else if (InputManager.BindPressed(InputAction.NewScript)) editorManager.NewScript();
@@ -398,7 +402,8 @@ public class LevelEditor : Game, IAdjustableWindow
 
         // Minimap
         if (!DebugManager.ProgramInfo)
-            editorOverlayManager.DrawMiniMap();
+            editorOverlayManager.Minimap = OverlayManager.DrawMiniMap(GraphicsDevice, levelManager, editorOverlayManager.Minimap, spriteBatch, spriteBatch); // Same batch reused for minimap
+
 
         // Ghost tile cursor
         DrawTileGhostCursor(mouseCoordDraw);

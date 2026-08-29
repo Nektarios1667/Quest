@@ -1,4 +1,5 @@
 ﻿using Quest.Editor;
+using Quest.World;
 using System.IO;
 using System.Linq;
 namespace Quest.Utilities;
@@ -82,6 +83,12 @@ public static class BinaryWriterExtensions
         writer.Write((ushort)Math.Round(enemy.Position.X));
         writer.Write((ushort)Math.Round(enemy.Position.Y));
         writer.Write(enemy.UID);
+    }
+    public static void Write(this BinaryWriter writer, Waypoint waypoint)
+    {
+        writer.Write(waypoint.Position);
+        writer.Write(waypoint.Name);
+        writer.Write(waypoint.Color);
     }
     public static void Write(this BinaryWriter writer, ILootGenerator generator)
     {
@@ -176,6 +183,13 @@ public static class BinaryReaderExtensions
             uid
         );
         return enemy;
+    }
+    public static Waypoint ReadWaypoint(this BinaryReader reader)
+    {
+        ByteCoord pos = reader.ReadByteCoord();
+        string name = reader.ReadString();
+        Color color = reader.ReadColor();
+        return new(pos, name, color);
     }
     public static ShopOption ReadShopOption(this BinaryReader reader)
     {

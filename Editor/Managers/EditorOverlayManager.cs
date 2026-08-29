@@ -21,8 +21,7 @@ public class EditorOverlayManager
     private readonly StringBuilder FrameTimeSb;
     private float CacheDelta;
     private Dictionary<string, float> FrameTimes = [];
-    private RenderTarget2D Minimap = null!;
-    private bool RebuildMiniMapFlag = true;
+    public RenderTarget2D? Minimap { get; set; }  = null;
     public EditorOverlayManager(GameManager gameManager, SpriteBatch batch, GraphicsDevice graphics)
     {
         GameManager = gameManager;
@@ -33,9 +32,9 @@ public class EditorOverlayManager
     }
     public void Update()
     {
-        if (RebuildMiniMapFlag)
-            RebuildMiniMap();
+       
     }
+    public void InvalidateMinimap() => Minimap = null;
     public static void DrawTileOverlay(SpriteBatch spriteBatch, TileTypeID selection, Tile? mouseTile)
     {
         if (mouseTile is Stairs stair)
@@ -77,44 +76,6 @@ public class EditorOverlayManager
             }
         }
     }
-    public void DrawMiniMap()
-    {
-        DebugManager.StartBenchmark("DrawMinimap");
-
-        // Frame
-        GameManager.Batch.DrawRectangle(new(7, Constants.NativeResolution.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
-
-        // Draw minimap texture
-        if (Minimap != null)
-            Batch.Draw(Minimap, new Rectangle(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
-
-        // Player
-        Point dest = CameraManager.TileCoord + new Point(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10);
-        Batch.DrawPoint(dest.ToVector2(), Color.Red, size: 2);
-
-        DebugManager.EndBenchmark("DrawMinimap");
-    }
-    public void RebuildMiniMap()
-    {
-        Minimap = new RenderTarget2D(Graphics, Constants.MapSize.X, Constants.MapSize.Y);
-        Graphics.SetRenderTarget(Minimap);
-        Graphics.Clear(Color.Transparent);
-        Batch.Begin();
-
-        for (int y = 0; y < Constants.MapSize.Y; y++)
-        {
-            for (int x = 0; x < Constants.MapSize.X; x++)
-            {
-                Tile tile = GameManager.LevelManager.GetTile(new Point(x, y))!;
-                Batch.DrawPoint(new(x, y), Constants.MiniMapColors[(byte)tile.Type.ID]);
-            }
-        }
-
-        Batch.End();
-        Graphics.SetRenderTarget(null);
-        RebuildMiniMapFlag = false;
-    }
-    public void FlagRebuildMinimap() { RebuildMiniMapFlag = true; }
     public void DrawFrameInfo()
     {
         float boxHeight = DebugManager.FrameTimes.Count * 20;

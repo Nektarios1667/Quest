@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading;
 
 namespace Quest.World;
 
@@ -35,6 +36,7 @@ public class Level
     public ushort UID;
     public Dictionary<ushort, Enemy> Enemies { get; private set; }
     public List<Projectile> Projectiles { get; private set; }
+    public List<Waypoint> Waypoints { get; private set; } = [];
     public Dictionary<ByteCoord, Decal> Decals { get; private set; }
     public Dictionary<ushort, NPC> NPCs { get; private set; }
     public LevelPath LevelPath { get; private set; }
@@ -73,4 +75,22 @@ public class Level
         }
     }
     public void Rename(LevelPath path) => LevelPath = path;
+    public void AddWaypoint(Waypoint point) {
+        if (Waypoints.Count >= byte.MaxValue)
+        {
+            Logger.Error($"Level {Path} at maxiumum waypoint count (255).");
+            return;
+        }
+        Waypoints.Add(point);
+    }
+    public void AddWaypoints(Waypoint[] points)
+    {
+        int addAmount = Math.Min(points.Length, byte.MaxValue - Waypoints.Count);
+        Waypoints.AddRange(points[..addAmount]);
+
+        // Checks
+        if (addAmount != points.Length)
+            Logger.Error($"Level {Path} at maxiumum waypoint count (255). {points.Length - addAmount} waypoints not added.");
+    }
+    public void RemoveWaypoint(Waypoint point) => Waypoints.Remove(point);
 }

@@ -9,6 +9,7 @@ public class LevelManager
 {
     // Loading
     public event Action<float>? LoadingProgressed;
+    public event Action<Level>? LevelLoaded;
     public int TotalTasks { get; set; }
     private int _tasksComplete;
     public int TasksComplete
@@ -171,13 +172,6 @@ public class LevelManager
             return false;
         }
 
-        // Close dialogs
-        if (Level != null && NPC.DialogBox != null)
-        {
-            NPC.DialogBox.IsVisible = false;
-            NPC.DialogBox.Displayed = "";
-        }
-
         // Load the level data
         if (levelIndex < 0) levelIndex = Levels.Count - Math.Abs(levelIndex);
 
@@ -211,7 +205,7 @@ public class LevelManager
         Level = level;
 
         // MiniMap
-        gameManager.OverlayManager?.RefreshMiniMap();
+        gameManager.OverlayManager?.InvalidateMinimap();
 
         // Pathfinding
         PathfindingManager.SetGrid(Level,
@@ -226,7 +220,10 @@ public class LevelManager
         // Spawn
         CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
         CameraManager.Camera = CameraManager.CameraDest;
+        
         Logger.System($"Loaded level '{level.Path}'.");
+        LevelLoaded?.Invoke(Level);
+
         return true;
     }
     public bool UnloadWorld(string folder)

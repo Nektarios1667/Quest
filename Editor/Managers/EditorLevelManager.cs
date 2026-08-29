@@ -111,6 +111,7 @@ public class EditorLevelManager
         WriteSection(writer, "LOOT", WriteLootSection);
         WriteSection(writer, "DCAL", WriteDecalSection);
         WriteSection(writer, "ENEM", WriteEnemySection);
+        WriteSection(writer, "WAYP", WriteWaypointSection);
         WriteSection(writer, "QSCR", WriteScriptSection);
         WriteSection(writer, "_EOF", WriteEOFSection);
 
@@ -198,6 +199,14 @@ public class EditorLevelManager
         Enemy[] enemies = [.. LevelManager.Level.Enemies.Values];
         for (int n = 0; n < Math.Min(enemies.Length, ushort.MaxValue); n++)
             writer.Write(enemies[n]);
+    }
+    private void WriteWaypointSection(BinaryWriter writer)
+    {
+        // Waypoints
+        writer.Write((byte)LevelManager.Level.Waypoints.Count);
+
+        foreach (var waypoint in LevelManager.Level.Waypoints)
+            writer.Write(waypoint);
     }
     public void WriteScriptSection(BinaryWriter writer)
     {

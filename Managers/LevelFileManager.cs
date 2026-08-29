@@ -61,7 +61,7 @@ public static class LevelFileManager
         if (!multiTask)
         {
             gameManager.LevelManager.TasksComplete = 0;
-            gameManager.LevelManager.TotalTasks = 12;
+            gameManager.LevelManager.TotalTasks = 13;
         }
 
         var sw = new Stopwatch();
@@ -99,6 +99,7 @@ public static class LevelFileManager
         Point spawn = new();
         Color tint = new();
         List<Loot> lootBuffer = new();
+        List<Waypoint> waypointBuffer = new();
         List<NPC> npcBuffer = new();
         List<Enemy> enemyBuffer = new();
         Dictionary<ByteCoord, Decal> decalBuffer = new();
@@ -149,6 +150,7 @@ public static class LevelFileManager
                     case "LOOT": ReadLootSection(gameManager, sectionReader, lootBuffer); break;
                     case "DCAL": ReadDecalSection(gameManager, sectionReader, decalBuffer); break;
                     case "ENEM": ReadEnemySection(gameManager, sectionReader, enemyBuffer); break;
+                    case "WAYP": ReadWaypointSection(gameManager, sectionReader, waypointBuffer); break;
                     case "QSCR": ReadScriptSection(gameManager, sectionReader, levelPath, scriptBuffer); break;
                     default: Logger.Warning($"Unknown level section '{id}'"); break; // Unknown section - ignore it
                 }
@@ -156,6 +158,8 @@ public static class LevelFileManager
 
             // Make and add the level
             Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, enemyBuffer, [], scriptBuffer, meta, tint);
+            created.AddWaypoints(waypointBuffer.ToArray());
+
             if (reload) gameManager.LevelManager.Levels.RemoveAll(l => l.Path == filename);
             gameManager.LevelManager.Levels.Add(created);
             sw.Stop();
@@ -239,6 +243,17 @@ public static class LevelFileManager
 
         for (int e = 0; e < enemyCount; e++)
             enemyBuffer.Add(reader.ReadEnemy());
+        gameManager.LevelManager.TasksComplete++;
+    }
+    private static void ReadWaypointSection(GameManager gameManager, BinaryReader reader, List<Waypoint> waypointBuffer)
+    {
+        // Waypoints
+        byte waypointCount = reader.ReadByte();
+        waypointBuffer.Clear();
+        waypointBuffer.Capacity = waypointCount;
+
+        for (int w = 0; w < waypointCount; w++)
+            waypointBuffer.Add(reader.ReadWaypoint());
         gameManager.LevelManager.TasksComplete++;
     }
     private static void ReadScriptSection(GameManager gameManager, BinaryReader reader, LevelPath levelPath, List<QuillScript> scriptBuffer)

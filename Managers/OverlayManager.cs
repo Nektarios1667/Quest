@@ -13,7 +13,7 @@ public class OverlayManager
     public Dialog WorldInfobox { get; private set; }
     public Dialog ItemInfobox { get; private set; }
     public static readonly Point lootStackOffset = new(4, 4);
-    private RenderTarget2D? minimap;
+    private RenderTarget2D? minimap = null;
     public OverlayManager(PlayerManager playerManager)
     {
         Gui = new();
@@ -91,8 +91,8 @@ public class OverlayManager
             Gui.Draw(gameManager.Batch);
 
             // Minimap
-            if (gameManager.StateManager.OverlayState != OverlayState.None)
-                DrawMiniMap(device, gameManager);
+                if (gameManager.StateManager.OverlayState != OverlayState.None)
+                    minimap = DrawMiniMap(device, gameManager.LevelManager, minimap, gameManager.Batch, gameManager.MinimapBatch);
         }
 
         // Inventories
@@ -218,21 +218,21 @@ public class OverlayManager
         DebugManager.EndBenchmark("DrawLighting");
     }
 
-    public void DrawMiniMap(GraphicsDevice device, GameManager gameManager)
+    public static RenderTarget2D? DrawMiniMap(GraphicsDevice device, LevelManager levelManager, RenderTarget2D? minimap, SpriteBatch batch, SpriteBatch mapBatch)
     {
         DebugManager.StartBenchmark("DrawMinimap");
         // Frame
-        gameManager.Batch.DrawRectangle(new(7, Constants.NativeResolution.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
+        batch.DrawRectangle(new(7, Constants.NativeResolution.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
 
         // Create render if not done already
         if (minimap == null)
         {
             // Setup target
             minimap = new RenderTarget2D(device, Constants.MapSize.X, Constants.MapSize.Y);
-            gameManager.Batch.End();
+            batch.End();
             device.SetRenderTarget(minimap);
             device.Clear(Color.Transparent);
-            gameManager.MinimapBatch.Begin();
+            mapBatch.Begin();
 
             // Pixels
             for (int y = 0; y < Constants.MapSize.Y; y++)
@@ -240,27 +240,39 @@ public class OverlayManager
                 for (int x = 0; x < Constants.MapSize.X; x++)
                 {
                     // Get tile
-                    Tile tile = gameManager.LevelManager.GetTile(new Point(x, y))!;
-                    gameManager.MinimapBatch.DrawPoint(new(x, y), Constants.MiniMapColors[(int)tile.Type.ID]);
+                    Tile tile = levelManager.GetTile(new Point(x, y))!;
+                    mapBatch.DrawPoint(new(x, y), Constants.MiniMapColors[(int)tile.Type.ID]);
                 }
             }
 
+            // Waypoints
+            foreach (Waypoint waypoint in levelManager.Level.Waypoints)
+            {
+                // Name background
+                mapBatch.FillRectangle(new(waypoint.Position.ToVector2(), PixelOperatorVerySmall.MeasureString(waypoint.Name)), Color.Black * 0.6f);
+                // Marker
+                mapBatch.DrawPoint(waypoint.Position.ToVector2(), waypoint.Color, size: 2);
+                // Name
+                mapBatch.DrawString(PixelOperatorVerySmall, waypoint.Name, waypoint.Position.ToVector2(), Color.White);
+            }
+
             // Resume normal render
-            gameManager.MinimapBatch.End();
+            mapBatch.End();
             device.SetRenderTarget(null);
-            gameManager.Batch.Begin();
+            batch.Begin();
         }
-        gameManager.Batch.Draw(minimap, new Rectangle(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
+        batch.Draw(minimap, new Rectangle(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
 
         // Player
         Point dest = CameraManager.TileCoord + new Point(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10);
-        gameManager.Batch.DrawPoint(dest.ToVector2(), Color.Red, size: 2);
+        batch.DrawPoint(dest.ToVector2(), Color.Red, size: 2);
 
         DebugManager.EndBenchmark("DrawMinimap");
+        return minimap;
     }
     public void Notification(string text, Color? color = null, float duration = 5f)
     {
         LootNotifications.AddNotification(text, color, duration);
     }
-    public void RefreshMiniMap() { minimap = null; }
+    public void InvalidateMinimap() { minimap = null; }
 }
