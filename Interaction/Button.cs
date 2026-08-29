@@ -2,7 +2,7 @@
 
 public enum ButtonState
 {
-    Normal,
+    None,
     Hovered,
     Pressed,
 }
@@ -18,7 +18,7 @@ public class Button : UIElement
     public Color Highlight { get; set; }
     public Color? BorderColor { get; set; }
     public int BorderThickness { get; set; }
-    public ButtonState State { get; private set; } = ButtonState.Normal;
+    public ButtonState State { get; private set; } = ButtonState.None;
     private Point textPosition { get; set; }
     public Button(Point location, Point size, string text, SpriteFont font, Color fg, Color bg, Color hl, Color? borderColor = null, int borderThickness = 2) : base(location)
     {
@@ -49,12 +49,12 @@ public class Button : UIElement
                 State = ButtonState.Hovered;
         }
         else
-            State = ButtonState.Normal;
+            State = ButtonState.None;
     }
     public override void Draw(UserInterface ui)
     {
         // Background
-        ui.Batch.FillRectangle(Bounds, State == ButtonState.Normal ? Background : Highlight);
+        ui.Batch.FillRectangle(Bounds, State == ButtonState.None ? Background : Highlight);
         // Border
         if (BorderColor.HasValue)
             ui.Batch.DrawRectangle(Bounds, BorderColor.Value, BorderThickness);

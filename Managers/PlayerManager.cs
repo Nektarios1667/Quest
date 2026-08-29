@@ -475,6 +475,8 @@ public class PlayerManager : IEntity, IStatusEffectable
     {
         if (OpenedInterface == null) return;
 
+        OpenedInterface.Close();
+
         OpenedInterface.OnSlotClick -= SlotClicked;
         OpenedInterface.OnSlotDrop -= SlotDropped;
         OpenedInterface.OnSlotHover -= SlotHovered;

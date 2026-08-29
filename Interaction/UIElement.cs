@@ -20,5 +20,6 @@ public abstract class UIElement
     public virtual void Enable() => IsEnabled = true;
     public virtual void Disable() => IsEnabled = false;
     public virtual void ToggleEnable() => IsEnabled = !IsEnabled;
+    public virtual void Close() { }
 
 }

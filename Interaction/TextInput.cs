@@ -22,7 +22,7 @@ public class TextInput : UIElement
     public Color Highlight { get; set; }
     public Color? BorderColor { get; set; }
     public int BorderThickness { get; set; }
-    public ButtonState State { get; private set; } = ButtonState.Normal;
+    public ButtonState State { get; private set; } = ButtonState.None;
     public string AllowedChars { get; set; } = AllChars;
     public TextInput(Point location, Point size, SpriteFont font, Color fg, Color bg, Color hl, Color? borderColor = null, int borderThickness = 2) : base(location)
     {
@@ -53,10 +53,10 @@ public class TextInput : UIElement
                 gameManager.StateManager.OverlayState = OverlayState.GUI;
                 Clicked?.Invoke();
             }
-            else if (State != ButtonState.Normal)
+            else if (State != ButtonState.None)
             {
                 gameManager.StateManager.RevertOverlayState();
-                State = ButtonState.Normal;
+                State = ButtonState.None;
             }
         }
 
@@ -80,7 +80,7 @@ public class TextInput : UIElement
     public override void Draw(UserInterface ui)
     {
         // Background
-        ui.Batch.FillRectangle(Bounds, State == ButtonState.Normal ? Background : Highlight);
+        ui.Batch.FillRectangle(Bounds, State == ButtonState.None ? Background : Highlight);
         // Border
         if (BorderColor.HasValue)
             ui.Batch.DrawRectangle(Bounds, BorderColor.Value, BorderThickness);
@@ -96,6 +96,10 @@ public class TextInput : UIElement
                 ui.Batch.DrawLine(textPos + new Vector2(Font.MeasureString(Text).X, 0), textPos + Font.MeasureString(Text), Foreground, 3);
         }
 
+    }
+    public override void Close()
+    {
+        State = ButtonState.None;
     }
     public void SetText(string text)
     {

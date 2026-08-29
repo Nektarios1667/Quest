@@ -230,8 +230,8 @@ public class OverlayManager
         // Create render if not done already
         if (minimap == null)
         {
-            // Setup target
-            minimap = new RenderTarget2D(device, Constants.MapSize.X, Constants.MapSize.Y);
+            // Setup target - extra space to the right for labels
+            minimap = new RenderTarget2D(device, Constants.MapSize.X + 150, Constants.MapSize.Y);
             batch.End();
             device.SetRenderTarget(minimap);
             device.Clear(Color.Transparent);
@@ -264,7 +264,7 @@ public class OverlayManager
             device.SetRenderTarget(null);
             batch.Begin();
         }
-        batch.Draw(minimap, new Rectangle(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10, Constants.MapSize.X, Constants.MapSize.Y), Color.White);
+        batch.Draw(minimap, new Rectangle(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10, Constants.MapSize.X + 150, Constants.MapSize.Y), Color.White);
 
         // Player
         Point dest = CameraManager.TileCoord + new Point(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10);

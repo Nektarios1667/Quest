@@ -80,6 +80,12 @@ public partial class UserInterface
 
         return true;
     }
+    public void Close()
+    {
+        // Close input cursors
+        foreach (var element in Elements.Values)
+            element.Close();
+    }
     public void RemoveElement(string name)
     {
         Elements.Remove(name);

@@ -7,7 +7,7 @@ public class Slot : UIElement
     public event Action? OnHovered;
     public event Action? OnItemChange;
     public Rectangle Bounds { get; protected set; }
-    public ButtonState State { get; protected set; } = ButtonState.Normal;
+    public ButtonState State { get; protected set; } = ButtonState.None;
     public Item? Item { get; protected set; }
     public Color Color { get; set; } = Color.White;
     public Color? Marked { get; protected set; }
@@ -40,7 +40,7 @@ public class Slot : UIElement
             }
         }
         else
-            State = ButtonState.Normal;
+            State = ButtonState.None;
 
         // Dropping
         if ((State == ButtonState.Hovered || State == ButtonState.Pressed) && InputManager.BindDown(InputAction.DropItem))
