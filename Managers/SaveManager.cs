@@ -100,6 +100,7 @@ public class SaveManager
             WriteSection(writer, "LEVL", WriteLevelsSection, gameManager, playerManager);
             WriteSection(writer, "INVT", WriteInventorySection, gameManager, playerManager);
             WriteSection(writer, "EFFX", WriteEffectsSection, gameManager, playerManager);
+            WriteSection(writer, "WAYP", WriteWaypointsSection, gameManager, playerManager);
             WriteSection(writer, "_EOF", WriteEOFSection, gameManager, playerManager);
 
             writer.Flush();
@@ -311,6 +312,18 @@ public class SaveManager
 
         TasksComplete++;
     }
+    private static void WriteWaypointsSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager)
+    {
+        // Write WAYP
+        Waypoint[] playerWaypoints = gameManager.LevelManager.Level.Waypoints.Where(w => w.PlayerMade).Take(255).ToArray();
+        byte waypointsCount = (byte)playerWaypoints.Length;
+        
+        writer.Write(waypointsCount);
+        foreach (Waypoint waypoint in playerWaypoints)
+        {
+            writer.Write(waypoint);
+        }
+    }
     private static void WriteEOFSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager) { }
     #endregion
     public static async Task<bool> ReadGameState(GameManager gameManager, PlayerManager playerManager, LevelPath levelPath)
@@ -371,6 +384,7 @@ public class SaveManager
                         case "LEVL": ReadLevelSection(gameManager, playerManager, levelPath, sectionReader); break;
                         case "INVT": ReadInventorySection(gameManager, playerManager, sectionReader); break;
                         case "EFFX": ReadEffectsSection(gameManager, playerManager, sectionReader); break;
+                        case "WAYP": ReadWaypointsSection(gameManager, playerManager, sectionReader); break;
                         default: Logger.Warning($"Unknown level section '{id}'"); break; // Unknown section - ignore it
                     }
                 }
@@ -527,6 +541,18 @@ public class SaveManager
             StatusManager.AddStatusEffect(playerManager, effect, duration);
         }
         gameManager.LevelManager.TasksComplete++;
+    }
+    private static void ReadWaypointsSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader)
+    {
+        // Write WAYP
+        Waypoint[] playerWaypoints = gameManager.LevelManager.Level.Waypoints.Where(w => w.PlayerMade).Take(255).ToArray();
+        byte waypointsCount = reader.ReadByte();
+
+        for (int w = 0; w < waypointsCount; w++)
+        {
+            Waypoint point = reader.ReadWaypoint();
+            gameManager.LevelManager.GetLevel(point.LevelPath).AddWaypoint(point);
+        }
     }
     #endregion
     private static void ClearSavedState()
