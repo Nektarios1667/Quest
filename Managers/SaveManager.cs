@@ -265,15 +265,15 @@ public class SaveManager
     private static void WriteProjectilesSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager)
     {
         // Collect all projectiles
-        var allEnemies = gameManager.LevelManager.Levels
+        var allProjectiles = gameManager.LevelManager.Levels
         .SelectMany(level => level.Projectiles
             .Take(ushort.MaxValue)
             .Select(proj => (proj, level)))
         .ToArray();
 
         // Enemy
-        writer.Write((ushort)allEnemies.Length);
-        foreach ((Projectile proj, Level level) in allEnemies)
+        writer.Write((ushort)allProjectiles.Length);
+        foreach ((Projectile proj, Level level) in allProjectiles)
         {
             writer.Write(level.UID);
             WriteProjectileData(writer, proj);
@@ -786,7 +786,7 @@ public class SaveManager
         float direction = reader.ReadSingle();
         TextureID tex = (TextureID)reader.ReadUInt16();
         ushort damage = reader.ReadUInt16();
-        ushort speed = reader.ReadUInt16();
+        float speed = reader.ReadSingle();
         Point size = new(reader.ReadByte(), reader.ReadByte());
 
         Projectile proj = new(gameManager, ownerUID, position, direction, tex, damage, speed, size);
