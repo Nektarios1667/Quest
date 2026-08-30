@@ -1,3 +1,5 @@
+using Quest.World;
+
 namespace Quest.Tiles;
 
 
@@ -287,7 +289,7 @@ public class Tile
     public virtual void OnPlayerEnter(GameManager gameManager, PlayerManager player) { }
     public virtual void OnPlayerCollide(GameManager gameManager, PlayerManager player) { }
     public virtual void OnProjectileCollide(GameManager gameManager, Projectile proj) { }
-    public static Tile TileFromId(TileTypeID type, Point location, LevelPath level)
+    public static Tile TileFromId(TileTypeID type, Point location, LevelPath levelPath)
     {
         // Create a tile from an id
         return type switch
@@ -296,21 +298,21 @@ public class Tile
             TileTypeID.Lava => new Lava(location),
             TileTypeID.Stairs => new Stairs(location, LevelPath.Null, location),
             TileTypeID.Door => new Door(location, null),
-            TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, level.LevelName),
+            TileTypeID.Chest => new Chest(location, LootPreset.EmptyPreset, levelPath),
             TileTypeID.Lamp => new Lamp(location),
-            TileTypeID.Jukebox => new Jukebox(location, level.LevelName),
-            TileTypeID.DiscWriter => new DiscWriter(location, level.LevelName),
-            TileTypeID.Inscriber => new Inscriber(location, level.LevelName),
-            TileTypeID.Furnace => new Furnace(location, level.LevelName),
-            TileTypeID.Stove => new Stove(location, level.LevelName),
-            TileTypeID.DisplayCase => new DisplayCase(location, level.LevelName),
-            TileTypeID.Crate => new Crate(location, level.LevelName),
-            TileTypeID.Crafter => new Crafter(location, level.LevelName),
-            TileTypeID.PressurePlate => new PressurePlate(location, level.LevelName, TileEffect.None, ByteCoord.Zero, level),
-            TileTypeID.TimedPressurePlate => new TimedPressurePlate(location, level.LevelName, TileEffect.None, ByteCoord.Zero, level, 10f),
-            TileTypeID.Lever => new Lever(location, level.LevelName, TileEffect.None, ByteCoord.Zero, level),
-            TileTypeID.Target => new Target(location, level.LevelName, TileEffect.None, ByteCoord.Zero, level),
-            TileTypeID.LogicGate => new LogicGate(location, level.LevelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null, LogicGateType.And),
+            TileTypeID.Jukebox => new Jukebox(location, levelPath),
+            TileTypeID.DiscWriter => new DiscWriter(location, levelPath),
+            TileTypeID.Inscriber => new Inscriber(location, levelPath),
+            TileTypeID.Furnace => new Furnace(location, levelPath),
+            TileTypeID.Stove => new Stove(location, levelPath),
+            TileTypeID.DisplayCase => new DisplayCase(location, levelPath),
+            TileTypeID.Crate => new Crate(location, levelPath),
+            TileTypeID.Crafter => new Crafter(location, levelPath),
+            TileTypeID.PressurePlate => new PressurePlate(location, levelPath.LevelName, TileEffect.None, ByteCoord.Zero, levelPath),
+            TileTypeID.TimedPressurePlate => new TimedPressurePlate(location, levelPath.LevelName, TileEffect.None, ByteCoord.Zero, levelPath, 10f),
+            TileTypeID.Lever => new Lever(location, levelPath.LevelName, TileEffect.None, ByteCoord.Zero, levelPath),
+            TileTypeID.Target => new Target(location, levelPath.LevelName, TileEffect.None, ByteCoord.Zero, levelPath),
+            TileTypeID.LogicGate => new LogicGate(location, levelPath.LevelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null, LogicGateType.And),
             // TILEFROMID
             _ => new(location, type)
         };

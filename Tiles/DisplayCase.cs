@@ -3,16 +3,17 @@ using Quest.Editor.Managers;
 using Quest.Interaction;
 using System.ComponentModel;
 using System.IO;
+using Quest.World;
 
 namespace Quest.Tiles;
 
 public class DisplayCase : Tile, IContainer, IHasLevelData
 {
     public Interaction.Container Container { get; private set; }
-    public DisplayCase(Point location, string levelName) : base(location, TileTypeID.DisplayCase)
+    public DisplayCase(Point location, LevelPath level) : base(location, TileTypeID.DisplayCase)
     {
         Container = new([null]);
-        SaveManager.SaveContainer(this, levelName);
+        SaveManager.SaveContainer(this, level);
     }
     public override void Draw(GameManager gameManager)
     {

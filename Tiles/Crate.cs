@@ -1,5 +1,6 @@
 
 using Quest.Interaction;
+using Quest.World;
 
 namespace Quest.Tiles;
 
@@ -7,10 +8,10 @@ public class Crate : Tile, IContainer
 {
     public readonly static Point Size = new(4, 2);
     public Container Container { get; set; }
-    public Crate(Point location, string levelName) : base(location, TileTypeID.Crate)
+    public Crate(Point location, LevelPath level) : base(location, TileTypeID.Crate)
     {
         Container = new(new Item?[Size.X * Size.Y]);
-        SaveManager.SaveContainer(this, levelName);
+        SaveManager.SaveContainer(this, level);
     }
     public override void OnPlayerCollide(GameManager gameManager, PlayerManager player)
     {

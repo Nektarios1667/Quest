@@ -78,7 +78,7 @@ public class EditorManager
                 Tile current = queue.Dequeue();
                 if (current.Type.ID == TileSelection || visited.Contains(current.Location)) continue; // Skip if already filled
                 count++;
-                SetTile(Tile.TileFromId(TileSelection, current.Location.ToPoint(), LevelManager.Level.LevelPath));
+                SetTile(Tile.TileFromId(TileSelection, current.Location.ToPoint(), LevelPath.Null));
                 visited.Add(current.Location); // Mark as visited
 
                 // Check neighbors

@@ -1,4 +1,5 @@
 ﻿using Quest.World;
+using SharpDX.Direct2D1.Effects;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -19,30 +20,37 @@ public class SaveManager
     }
     public static float LoadingProgress => TotalTasks <= 0 ? 0 : (float)TasksComplete / TotalTasks;
     // Save State changes
-    private static readonly Dictionary<string, HashSet<IHasState>> stateTiles = [];
-    private static readonly Dictionary<string, HashSet<Chest>> chests = [];
-    private static readonly Dictionary<string, HashSet<IContainer>> containers = [];
+    private static readonly Dictionary<IHasState, LevelPath> savedStateTiles = [];
+    private static readonly Dictionary<Chest, LevelPath> savedChests = [];
+    private static readonly Dictionary<IContainer, LevelPath> savedContainers = [];
+    private static Dictionary<LevelPath, Level> pathToLevel = [];
+
     public static LevelPath CurrentSave { get; set; } = new();
-    public static void SaveStateTile(IHasState tile, string levelName)
+    public static void SaveStateTile(IHasState tile, LevelPath levelPath)
     {
-        if (stateTiles.TryGetValue(levelName, out var levelDoors))
-            levelDoors.Add(tile);
-        else
-            stateTiles[levelName] = [tile];
+        if (savedStateTiles.Count >= ushort.MaxValue)
+        {
+            Logger.Error($"Maximum state tile count reached {ushort.MaxValue}");
+            return;
+        }
+
+        savedStateTiles[tile] = levelPath;
     }
-    public static void UnsaveStateTile(IHasState tile, string levelName)
+    public static void UnsaveStateTile(IHasState tile)
     {
-        if (stateTiles.TryGetValue(@levelName, out var levelDoors))
-            levelDoors.Remove(tile);
+        savedStateTiles.Remove(tile);
     }
-    public static void SaveChestGenerator(Chest chest, string level)
+    public static void SaveChestGenerator(Chest chest, LevelPath levelPath)
     {
-        if (chests.TryGetValue(level, out var levelChests))
-            levelChests.Add(chest);
-        else
-            chests[level] = [chest];
+        if (savedChests.Count >= ushort.MaxValue)
+        {
+            Logger.Error($"Maximum chest count reached {ushort.MaxValue}");
+            return;
+        }
+
+        savedChests[chest] = levelPath;
     }
-    public static void SaveContainer(IContainer container, string level)
+    public static void SaveContainer(IContainer container, LevelPath levelPath)
     {
         // Don't allow Chest even though it is IContainer
         if (container is Chest)
@@ -52,10 +60,13 @@ public class SaveManager
         }
 
         // Add
-        if (containers.TryGetValue(level, out var levelContainers))
-            levelContainers.Add(container);
-        else
-            containers[level] = [container];
+        if (savedContainers.Count >= ushort.MaxValue)
+        {
+            Logger.Error($"Maximum container count reached {ushort.MaxValue}");
+            return;
+        }
+
+        savedContainers[container] = levelPath;
     }
     public static async void SaveGameStateAsync(GameManager gameManager, PlayerManager playerMaanger)
     {
@@ -71,18 +82,13 @@ public class SaveManager
         string worldName = gameManager.LevelManager.Level.WorldName;
         byte[] data;
 
-        // All of the levels with extra data
-        string[] levels = new[] {
-                chests.Keys,
-                stateTiles.Keys,
-                gameManager.LevelManager.Levels.Where(l => l.WorldName == worldName &&
-                (l.Loot.Count > 0 || l.Enemies.Count > 0 || l.Projectiles.Count > 0 || l.NPCs.Count > 0))
-            .Select(l => l.LevelName),
-            }.SelectMany(x => x).Distinct().Take(255).ToArray();
+        // Collect all level objects
+        var allPaths = savedStateTiles.Values.Concat(savedChests.Values.Concat(savedContainers.Values)).Distinct();
+        pathToLevel = allPaths.ToDictionary(p => p, p => gameManager.LevelManager.GetLevel(p));
 
         // Progress
         TasksComplete = 0;
-        TotalTasks = 5 + levels.Length * 7; // Saving level data has 7 tasks each
+        TotalTasks = 10;
 
         // Context
         using (var ms = new MemoryStream())
@@ -97,8 +103,13 @@ public class SaveManager
             WriteSection(writer, "WHTR", WriteWeatherSection, gameManager, playerManager);
             WriteSection(writer, "CAMR", WriteCameraSection, gameManager, playerManager);
             WriteSection(writer, "PLYR", WritePlayerSection, gameManager, playerManager);
-            WriteSection(writer, "LEVL", WriteLevelsSection, gameManager, playerManager);
             WriteSection(writer, "LOOT", WriteLootSection, gameManager, playerManager);
+            WriteSection(writer, "TILE", WriteTilesSection, gameManager, playerManager);
+            WriteSection(writer, "CHST", WriteChestsSection, gameManager, playerManager);
+            WriteSection(writer, "CONT", WriteContainersSection, gameManager, playerManager);
+            WriteSection(writer, "ENEM", WriteEnemiesSection, gameManager, playerManager);
+            WriteSection(writer, "PROJ", WriteProjectilesSection, gameManager, playerManager);
+            WriteSection(writer, "NPCS", WriteNPCsSection, gameManager, playerManager);
             WriteSection(writer, "INVT", WriteInventorySection, gameManager, playerManager);
             WriteSection(writer, "EFFX", WriteEffectsSection, gameManager, playerManager);
             WriteSection(writer, "WAYP", WriteWaypointsSection, gameManager, playerManager);
@@ -181,100 +192,6 @@ public class SaveManager
 
         TasksComplete++;
     }
-    private static void WriteLevelsSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager)
-    {
-        string worldName = gameManager.LevelManager.Level.WorldName;
-
-        string[] levels = new[]
-        {
-        chests.Keys,
-        stateTiles.Keys,
-        gameManager.LevelManager.Levels
-            .Where(l => l.WorldName == worldName &&
-                (l.Enemies.Count > 0 ||
-                 l.Projectiles.Count > 0 ||
-                 l.NPCs.Count > 0))
-            .Select(l => l.LevelName)
-
-    }.SelectMany(x => x)
-         .Distinct()
-         .Take(255)
-         .ToArray();
-
-
-        // Write LEVL data
-        writer.Write((byte)levels.Length);
-        foreach (string level in levels)
-        {
-            writer.Write(level);
-            Level levelObj = gameManager.LevelManager.GetLevel($"{worldName}/{level}");
-
-            // State tiles - let IHasState handle its own info
-            if (stateTiles.TryGetValue(level, out var levelStateTiles))
-            {
-                writer.Write((ushort)levelStateTiles.Count);
-
-                foreach (var stateTile in levelStateTiles)
-                {
-                    // Write tile index
-                    ushort idx = stateTile.UID;
-                    writer.Write(idx);
-                    stateTile.WriteState(writer, gameManager);
-                }
-            }
-            else
-                writer.Write((ushort)0);
-            TasksComplete++;
-
-
-            // Chests
-            if (chests.TryGetValue(level, out var levelChests))
-            {
-                writer.Write((ushort)levelChests.Count);
-                foreach (Chest chest in levelChests)
-                    WriteChestData(writer, chest);
-            }
-            else
-                writer.Write((ushort)0);
-            TasksComplete++;
-
-
-            // Containers
-            if (containers.TryGetValue(level, out var levelContainers))
-            {
-                writer.Write((ushort)levelContainers.Count);
-                foreach (IContainer cont in levelContainers)
-                    WriteContainerData(writer, cont);
-            }
-            else
-                writer.Write((ushort)0);
-            TasksComplete++;
-
-            // Enemies
-            writer.Write((ushort)levelObj.Enemies.Count);
-            foreach (var enemy in levelObj.Enemies.Values)
-                WriteEnemyData(writer, enemy);
-            TasksComplete++;
-
-            // Projectiles
-            writer.Write((ushort)levelObj.Projectiles.Count);
-            foreach (var proj in levelObj.Projectiles)
-                WriteProjectileData(writer, proj);
-            TasksComplete++;
-
-            // NPCs
-            writer.Write((ushort)levelObj.NPCs.Count);
-            foreach (var npc in levelObj.NPCs.Values)
-            {
-                writer.Write(npc.UID);
-                writer.Write((byte)npc.ShopOptions.Count);
-
-                foreach (var item in npc.ShopOptions)
-                    writer.Write(item.Stock);
-            }
-            TasksComplete++;
-        }
-    }
     private static void WriteLootSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager)
     {
         // Collect all loot
@@ -296,6 +213,96 @@ public class SaveManager
         }
         TasksComplete++;
     }
+    private static void WriteTilesSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager)
+    {
+        writer.Write((ushort)savedStateTiles.Count);
+        foreach ((IHasState stateTile, LevelPath level) in savedStateTiles)
+        {
+            writer.Write(pathToLevel[level].UID);
+            writer.Write(stateTile.UID);
+            stateTile.WriteState(writer, gameManager);
+        }
+        TasksComplete++;
+    }
+    private static void WriteChestsSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager)
+    {
+        writer.Write((ushort)savedChests.Count);
+        foreach ((Chest chest, LevelPath level) in savedChests)
+        {
+            writer.Write(pathToLevel[level].UID);
+            WriteChestData(writer, chest);
+        }
+        TasksComplete++;
+    }
+    private static void WriteContainersSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager)
+    {
+        writer.Write((ushort)savedContainers.Count);
+        foreach ((IContainer cont, LevelPath level) in savedContainers)
+        {
+            writer.Write(pathToLevel[level].UID);
+            WriteContainerData(writer, cont);
+        }
+        TasksComplete++;
+    }
+    private static void WriteEnemiesSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager)
+    {
+        // Collect all enemies
+        var allEnemies = gameManager.LevelManager.Levels
+        .SelectMany(level => level.Enemies.Values
+            .Take(ushort.MaxValue)
+            .Select(enemy => (enemy, level)))
+        .ToArray();
+
+        // Enemy
+        writer.Write((ushort)allEnemies.Length);
+        foreach ((Enemy enemy, Level level) in allEnemies)
+        {
+            writer.Write(level.UID);
+            WriteEnemyData(writer, enemy);
+        }
+        TasksComplete++;
+    }
+    private static void WriteProjectilesSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager)
+    {
+        // Collect all projectiles
+        var allEnemies = gameManager.LevelManager.Levels
+        .SelectMany(level => level.Projectiles
+            .Take(ushort.MaxValue)
+            .Select(proj => (proj, level)))
+        .ToArray();
+
+        // Enemy
+        writer.Write((ushort)allEnemies.Length);
+        foreach ((Projectile proj, Level level) in allEnemies)
+        {
+            writer.Write(level.UID);
+            WriteProjectileData(writer, proj);
+        }
+        TasksComplete++;
+    }
+    private static void WriteNPCsSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager)
+    {
+        // Collect all NPCs
+        var allNPCs = gameManager.LevelManager.Levels
+        .SelectMany(level => level.NPCs.Values
+            .Take(ushort.MaxValue)
+            .Select(npc => (npc, level)))
+        .ToArray();
+
+        // NPCs
+        writer.Write((ushort)allNPCs.Length);
+        foreach ((NPC npc, Level level) in allNPCs)
+        {
+            writer.Write(level.UID);
+            writer.Write(npc.UID);
+            writer.Write((byte)npc.ShopOptions.Count);
+
+            foreach (var item in npc.ShopOptions)
+                writer.Write(item.Stock);
+        }
+        TasksComplete++;
+    }
+
     private static void WriteInventorySection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager)
     {
         // Write INVT data
@@ -398,8 +405,13 @@ public class SaveManager
                         case "WHTR": ReadWeatherSection(gameManager, sectionReader, levelTable); break;
                         case "CAMR": ReadCameraSection(gameManager, sectionReader, levelTable); break;
                         case "PLYR": ReadPlayerSection(gameManager, playerManager, sectionReader, levelTable); break;
-                        case "LEVL": ReadLevelSection(gameManager, playerManager, levelPath, sectionReader, levelTable); break;
                         case "LOOT": ReadLootSection(gameManager, playerManager, sectionReader, levelTable); break;
+                        case "TILE": ReadTilesSection(gameManager, playerManager, sectionReader, levelTable); break;
+                        case "CHST": ReadChestsSection(gameManager, playerManager, sectionReader, levelTable); break;
+                        case "CONT": ReadContainersSection(gameManager, playerManager, sectionReader, levelTable); break;
+                        case "ENEM": ReadEnemiesSection(gameManager, playerManager, sectionReader, levelTable); break;
+                        case "PROJ": ReadProjectilesSection(gameManager, playerManager, sectionReader, levelTable); break;
+                        case "NPCS": ReadNPCsSection(gameManager, playerManager, sectionReader, levelTable); break;
                         case "INVT": ReadInventorySection(gameManager, playerManager, sectionReader, levelTable); break;
                         case "EFFX": ReadEffectsSection(gameManager, playerManager, sectionReader, levelTable); break;
                         case "WAYP": ReadWaypointsSection(gameManager, playerManager, sectionReader, levelTable); break;
@@ -465,73 +477,6 @@ public class SaveManager
         float starvationTimer = reader.ReadSingle();
         if (starvationTimer >= 0) TimerManager.SetTimer("PlayerStarvation", starvationTimer, null);
     }
-    public static void ReadLevelSection(GameManager gameManager, PlayerManager playerManager, LevelPath levelPath, BinaryReader reader, Dictionary<ushort, Level> levelTable)
-    {
-        // Levels
-        byte levelCount = reader.ReadByte();
-        for (int lc = 0; lc < levelCount; lc++)
-        {
-            string lvl = $"{levelPath.WorldName}/{reader.ReadString()}";
-            Level current = gameManager.LevelManager.GetLevel(lvl);
-
-            // State tiles IHasState
-            ushort stateTileCount = reader.ReadUInt16();
-            for (int s = 0; s < stateTileCount; s++)
-            {
-                ushort idx = reader.ReadUInt16();
-                if (current.Tiles[idx] is IHasState stateTile)
-                    stateTile.ReadState(reader, gameManager);
-                else
-                    Logger.Error($"Tile {idx} is not a IHasState tile");
-            }
-
-
-            // Chests
-            ushort chestCount = reader.ReadUInt16();
-            for (int c = 0; c < chestCount; c++)
-                ReadChestData(reader, current, levelPath);
-
-            // Containers
-            ushort containerCount = reader.ReadUInt16();
-            for (int o = 0; o < containerCount; o++)
-                ReadContainerData(reader, current);
-
-            // Enemies
-            ushort enemyCount = reader.ReadUInt16();
-            for (int e = 0; e < enemyCount; e++)
-                ReadEnemyData(reader, current);
-
-            // Projectiles
-            ushort projectileCount = reader.ReadUInt16();
-            for (int p = 0; p < projectileCount; p++)
-                ReadProjectileData(gameManager, playerManager, reader, current);
-
-            // NPCs
-            ushort npcCount = reader.ReadUInt16();
-            for (int n = 0; n < npcCount; n++)
-            {
-                ushort uid = reader.ReadUInt16();
-                // Read stock amounts
-                if (current.NPCs.TryGetValue(uid, out var npc))
-                {
-                    byte shopCount = reader.ReadByte();
-                    for (int s = 0; s < shopCount; s++)
-                    {
-                        byte stock = reader.ReadByte();
-                        npc.ShopOptions[s].Stock = stock;
-                    }
-                }
-                // Read and discard stock amounts if NPC not found
-                else
-                {
-                    byte shopCount = reader.ReadByte();
-                    reader.ReadBytes(shopCount);
-                    Logger.Error($"NPC with UID {uid} not found in level.");
-                }
-            }
-        }
-        gameManager.LevelManager.TasksComplete++;
-    }
     public static void ReadLootSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
     {
         // Loot
@@ -546,6 +491,103 @@ public class SaveManager
             Point location = new(reader.ReadUInt16(), reader.ReadUInt16());
             level.Loot.Add(new Loot(new(ItemTypes.All[typeID], amount), location));
         }
+    }
+    public static void ReadTilesSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
+    {
+        ushort tileCount = reader.ReadUInt16();
+        for (int t = 0; t < tileCount; t++)
+        {
+            ushort levelUID = reader.ReadUInt16();
+            Level level = levelTable[levelUID];
+
+            ushort tileID = reader.ReadUInt16();
+            if (level.Tiles[tileID] is IHasState stateTile)
+                stateTile.ReadState(reader, gameManager);
+        }
+        TasksComplete++;
+    }
+    public static void ReadChestsSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
+    {
+        ushort chestsCount = reader.ReadUInt16();
+
+        for (int c = 0; c < chestsCount; c++)
+        {
+            ushort levelUID = reader.ReadUInt16();
+            Level level = levelTable[levelUID];
+            ReadChestData(reader, level, level.LevelPath);
+        }
+        TasksComplete++;
+    }
+    public static void ReadContainersSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
+    {
+        ushort containersCount = reader.ReadUInt16();
+
+        for (int c = 0; c < containersCount; c++)
+        {
+            ushort levelUID = reader.ReadUInt16();
+            Level level = levelTable[levelUID];
+            ReadContainerData(reader, level);
+        }
+        TasksComplete++;
+    }
+    public static void ReadEnemiesSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
+    {
+        // Enemy
+        ushort enemiesSection = reader.ReadUInt16();
+        for (int l = 0; l < enemiesSection; l++)
+        {
+            ushort levelUID = reader.ReadUInt16();
+            Level level = levelTable[levelUID];
+
+            ReadEnemyData(reader, level);
+        }
+
+        TasksComplete++;
+    }
+    public static void ReadProjectilesSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
+    {
+        // Projectiles
+        ushort projectilesCount = reader.ReadUInt16();
+        for (int l = 0; l < projectilesCount; l++)
+        {
+            ushort levelUID = reader.ReadUInt16();
+            Level level = levelTable[levelUID];
+
+            ReadProjectileData(gameManager, playerManager, reader, level);
+        }
+
+        TasksComplete++;
+    }
+    public static void ReadNPCsSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
+    {
+        // NPCs
+        ushort npcCount = reader.ReadUInt16();
+        for (int n = 0; n < npcCount; n++)
+        {
+            ushort levelUID = reader.ReadUInt16();
+            Level level = levelTable[levelUID];
+
+            ushort uid = reader.ReadUInt16();
+            // Read stock amounts
+            if (level.NPCs.TryGetValue(uid, out var npc))
+            {
+                byte shopCount = reader.ReadByte();
+                for (int s = 0; s < shopCount; s++)
+                {
+                    byte stock = reader.ReadByte();
+                    npc.ShopOptions[s].Stock = stock;
+                }
+            }
+            // Read and discard stock amounts if NPC not found
+            else
+            {
+                byte shopCount = reader.ReadByte();
+                reader.ReadBytes(shopCount);
+                Logger.Error($"NPC with UID {uid} not found in level.");
+            }
+        }
+
+        TasksComplete++;
     }
     public static void ReadInventorySection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
     {
@@ -589,8 +631,8 @@ public class SaveManager
     #endregion
     private static void ClearSavedState()
     {
-        stateTiles.Clear();
-        chests.Clear();
+        savedStateTiles.Clear();
+        savedChests.Clear();
     }
     #region WriteHelpers
     public static void WriteChestData(BinaryWriter writer, Chest chest)

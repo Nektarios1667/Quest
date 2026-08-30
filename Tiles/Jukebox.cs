@@ -1,14 +1,16 @@
 using Quest.Interaction;
+using Quest.World;
+
 namespace Quest.Tiles;
 
 public class Jukebox : Tile, IContainer
 {
     public Interaction.Container Container { get; private set; }
     public bool IsPlaying { get; set; } = false;
-    public Jukebox(Point location, string levelName) : base(location, TileTypeID.Jukebox)
+    public Jukebox(Point location, LevelPath level) : base(location, TileTypeID.Jukebox)
     {
         Container = new([null]);
-        SaveManager.SaveContainer(this, levelName);
+        SaveManager.SaveContainer(this, level);
     }
     public override void OnPlayerCollide(GameManager gameManager, PlayerManager player)
     {

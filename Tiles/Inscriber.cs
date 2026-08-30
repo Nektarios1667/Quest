@@ -1,14 +1,15 @@
 using Quest.Interaction;
+using Quest.World;
 
 namespace Quest.Tiles;
 
 public class Inscriber : Tile, IContainer
 {
     public Interaction.Container Container { get; private set; }
-    public Inscriber(Point location, string levelName) : base(location, TileTypeID.Inscriber)
+    public Inscriber(Point location, LevelPath level) : base(location, TileTypeID.Inscriber)
     {
         Container = new([null]);
-        SaveManager.SaveContainer(this, levelName);
+        SaveManager.SaveContainer(this, level);
     }
     public override void OnPlayerCollide(GameManager gameManager, PlayerManager player)
     {

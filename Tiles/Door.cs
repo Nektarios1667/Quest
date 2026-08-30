@@ -57,13 +57,13 @@ public class Door : Tile, IHasState, IEditableTile, IHasLevelData
     {
         IsOpened = true;
         LightingManager.SetLightGridBlocking(Location.ToPoint(), false);
-        SaveManager.SaveStateTile(this, game.LevelManager.Level.LevelName);
+        SaveManager.SaveStateTile(this, game.LevelManager.Level.LevelPath);
     }
     public void Close(GameManager game)
     {
         IsOpened = false;
         LightingManager.SetLightGridBlocking(Location.ToPoint(), true);
-        SaveManager.UnsaveStateTile(this, game.LevelManager.Level.LevelName);
+        SaveManager.UnsaveStateTile(this);
     }
     public void WriteState(BinaryWriter writer, GameManager gameManager)
     {

@@ -2,6 +2,7 @@ using Quest.Editor;
 using Quest.Editor.Managers;
 using Quest.Interaction;
 using System.IO;
+using Quest.World;
 
 namespace Quest.Tiles;
 
@@ -14,10 +15,10 @@ public class Chest : Tile, IContainer, IEditableTile, IHasLevelData
     public int Seed { get; private set; } = Random.Shared.Next();
     public ItemRef? Key { get; set; }
     public bool ConsumeKey { get; set; }
-    public Chest(Point location, ILootGenerator lootGenerator, string levelPath, ItemRef? key = null, bool consumeKey = true) : base(location, TileTypeID.Chest)
+    public Chest(Point location, ILootGenerator lootGenerator, LevelPath level, ItemRef? key = null, bool consumeKey = true) : base(location, TileTypeID.Chest)
     {
         LootGenerator = lootGenerator;
-        SaveManager.SaveChestGenerator(this, levelPath);
+        SaveManager.SaveChestGenerator(this, level);
         Key = key;
         ConsumeKey = consumeKey;
     }

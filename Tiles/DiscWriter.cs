@@ -1,14 +1,15 @@
 using Quest.Interaction;
+using Quest.World;
 
 namespace Quest.Tiles;
 
 public class DiscWriter : Tile, IContainer
 {
     public Interaction.Container Container { get; private set; }
-    public DiscWriter(Point location, string levelName) : base(location, TileTypeID.DiscWriter)
+    public DiscWriter(Point location, LevelPath level) : base(location, TileTypeID.DiscWriter)
     {
         Container = new([null]);
-        SaveManager.SaveContainer(this, levelName);
+        SaveManager.SaveContainer(this, level);
     }
     public override void OnPlayerCollide(GameManager gameManager, PlayerManager player)
     {
