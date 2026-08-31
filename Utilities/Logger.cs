@@ -40,7 +40,7 @@ public static class Logger
     public static TextureID InputTexture(string message, TextureID fallback = TextureID.Null)
     {
         string resp = Input(message);
-        if (Enum.TryParse(resp, true, out TextureID texture) && TextureManager.Metadata[texture].Type == "character")
+        if (Enum.TryParse(resp, true, out TextureID texture) && TextureManager.Metadata[texture].Type == TextureType.Character)
             return texture;
         else
         {

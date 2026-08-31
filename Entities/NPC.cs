@@ -84,7 +84,7 @@ public class NPC : IEntity
         UID = uid ?? UIDManager.Get(UIDCategory.NPCs); ;
 
         // Private
-        Metadata meta = TextureManager.Metadata.GetValueOrDefault(Texture, new(Constants.OnePoint, Constants.OnePoint, ""));
+        Metadata meta = TextureManager.Metadata.GetValueOrDefault(Texture, new(Constants.OnePoint, Constants.OnePoint, TextureType.Other));
         spritesize = meta.Size / meta.TileMap;
 
         Position = position;
