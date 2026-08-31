@@ -30,11 +30,6 @@ public partial class QLVViewer : Form
     {
         InitializeComponent();
 
-        // Create mock context
-        Window window = new();
-        window.RunOneFrame();
-        TextureManager.LoadTextures(window.Content);
-
         LevelManager levelManager = new();
         gameManager = new(null!, levelManager, null, null, null);
 
