@@ -9,9 +9,9 @@ namespace Quest.Editor.Generator;
 public partial class QLVViewer : Form
 {
     private GameManager gameManager;
-    private int tilesDisplayed = 100;
-    private int biomesDisplayed = 100;
-    private int decalsDisplayed = 100;
+    private int tilesDisplayed = 200;
+    private int biomesDisplayed = 200;
+    private int decalsDisplayed = 200;
     private Level level;
     // Parent nodes
     private TreeNode levelNode;
@@ -66,14 +66,8 @@ public partial class QLVViewer : Form
         scriptsNode = SaveTree.Nodes.Add("Quill Scripts");
 
         // Level
-        TreeNode levelTintNode = levelNode.Nodes.Add($"Tint");
-        levelTintNode.Nodes.Add($"R: {level.Tint.R}");
-        levelTintNode.Nodes.Add($"G: {level.Tint.G}");
-        levelTintNode.Nodes.Add($"B: {level.Tint.B}");
-
-        TreeNode levelSpawnNode = levelNode.Nodes.Add($"Spawn");
-        levelSpawnNode.Nodes.Add($"X: {level.Spawn.X}");
-        levelSpawnNode.Nodes.Add($"Y: {level.Spawn.Y}");
+        levelNode.Nodes.Add($"Tint: {level.Tint.R}, {level.Tint.G}, {level.Tint.B}");
+        levelNode.Nodes.Add($"Spawn: {level.Spawn.X}, {level.Spawn.Y}");
 
         // Tile
         foreach (Tile tile in level.Tiles[0..tilesDisplayed])
@@ -107,9 +101,16 @@ public partial class QLVViewer : Form
             npcNode.Nodes.Add($"Scale: {npc.Scale}");
             npcNode.Nodes.Add($"Dialog: {npc.Dialog}");
             TreeNode npcShopOptionsNode = npcNode.Nodes.Add($"Shop Options [{npc.ShopOptions.Count}]");
+
+            int o = 1;
             foreach (ShopOption option in npc.ShopOptions)
             {
-                npcShopOptionsNode.Nodes.Add(option.ToString());
+                TreeNode optionNode = npcShopOptionsNode.Nodes.Add($"Option {o}");
+                optionNode.Nodes.Add($"Item: {option.Item.Name}");
+                optionNode.Nodes.Add($"Item Amount: {option.Item.Amount}");
+                optionNode.Nodes.Add($"Cost: {option.Cost?.Name ?? "FREE"}");
+                optionNode.Nodes.Add($"Cost Amount: {option.Cost?.Amount ?? 0}");
+                o++;
             }
         }
 
@@ -126,6 +127,7 @@ public partial class QLVViewer : Form
         {
             TreeNode decalNode = decalsNode.Nodes.Add($"Decal {decal.UID}");
             decalNode.Nodes.Add($"Type: {decal.Type}");
+            decalNode.Nodes.Add($"Pos: {decal.X}, {decal.Y}");
         }
         loadDecals = decalsNode.Nodes.Add("Load Decals...");
         loadDecals.Nodes.Add("");
@@ -185,7 +187,7 @@ public partial class QLVViewer : Form
     {
         if (e.Node?.Text == "Load Tiles...")
         {
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 200; i++)
             {
                 Tile tile = level.Tiles[tilesDisplayed];
                 TreeNode tileNode = tilesNode.Nodes.Insert(tilesDisplayed, $"Tile {tile.UID}");
@@ -197,7 +199,7 @@ public partial class QLVViewer : Form
             loadTiles.Collapse();
         } else if (e.Node?.Text == "Load Biomes...")
         {
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 200; i++)
             {
                 int b = biomesDisplayed;
 
@@ -212,7 +214,7 @@ public partial class QLVViewer : Form
         }
         else if (e.Node?.Text == "Load Decals...")
         {
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 200; i++)
             {
                 int d = decalsDisplayed;
 
