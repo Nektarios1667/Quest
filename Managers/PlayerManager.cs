@@ -1,5 +1,6 @@
 ﻿using Quest.Gui;
 using Quest.Interaction;
+using SharpDX.Direct3D11;
 namespace Quest.Managers;
 
 public class PlayerManager : IEntity, IStatusEffectable
@@ -15,26 +16,26 @@ public class PlayerManager : IEntity, IStatusEffectable
     public int Health
     {
         get => _health;
-        set { _health = value; Game.OverlayManager.HealthBar.CurrentValue = value; }
+        set { _health = value; GameManager.OverlayManager.HealthBar.CurrentValue = value; }
     }
     private int _maxHealth = Constants.PlayerBaseHealth;
     public int MaxHealth
     {
         get => _maxHealth;
-        set { _maxHealth = value; Game.OverlayManager.HealthBar.MaxValue = value; }
+        set { _maxHealth = value; GameManager.OverlayManager.HealthBar.MaxValue = value; }
     }
     // Hunger
     private int _hunger = Constants.PlayerBaseHunger;
     public int Hunger
     {
         get => _hunger;
-        set { _hunger = value; Game.OverlayManager.HungerBar.CurrentValue = value; }
+        set { _hunger = value; GameManager.OverlayManager.HungerBar.CurrentValue = value; }
     }
     private int _maxHunger = Constants.PlayerBaseHunger;
     public int MaxHunger
     {
         get => _maxHunger;
-        set { _maxHunger = value; Game.OverlayManager.HungerBar.MaxValue = value; }
+        set { _maxHunger = value; GameManager.OverlayManager.HungerBar.MaxValue = value; }
     }
     public bool IsAlive => _health > 0;
     public int Speed => (int)(Constants.PlayerBaseSpeed * StatusManager.GetSpeedMult(this));
@@ -64,10 +65,11 @@ public class PlayerManager : IEntity, IStatusEffectable
     public List<Tile> TileBumps { get; private set; } = [];
     public Direction PlayerDirection { get; private set; }
     private float moveX, moveY;
-    private GameManager Game = null!;
+    private GameManager GameManager = null!;
     public PlayerManager()
     {
         TimerManager.SetTimer("PlayerHungerLoss", Constants.SecondsPerHungerLoss, null);
+
     }
     public void InitUI()
     {
@@ -82,7 +84,13 @@ public class PlayerManager : IEntity, IStatusEffectable
 
     public void Update(GameManager gameManager)
     {
-        Game = gameManager;
+        // GameManager setup
+        if (GameManager == null)
+        {
+            GameManager = gameManager;
+            CameraManager.TileChange += (_, tile) => ExploreArea(gameManager, tile, 10);
+        }
+
         if (gameManager.StateManager.State != GameState.Game && gameManager.StateManager.State != GameState.Editor) return;
         if (gameManager.StateManager.OverlayState is OverlayState.Pause or OverlayState.Death) return;
 
@@ -202,17 +210,22 @@ public class PlayerManager : IEntity, IStatusEffectable
     public void UpdateMovements(GameManager gameManager)
     {
         DebugManager.StartBenchmark("UpdateMovement");
+
+        // Moving
         moveX = 0; moveY = 0;
         moveX += InputManager.BindDown(InputAction.MoveLeft) ? -Speed : 0;
         moveX += InputManager.BindDown(InputAction.MoveRight) ? Speed : 0;
         moveY += InputManager.BindDown(InputAction.MoveUp) ? -Speed : 0;
         moveY += InputManager.BindDown(InputAction.MoveDown) ? Speed : 0;
+
         Move(gameManager, new(moveX, moveY));
+
         if (moveX > 0) PlayerDirection = Direction.Right;
         else if (moveX < 0) PlayerDirection = Direction.Left;
         else if (moveY > 0) PlayerDirection = Direction.Down;
         else if (moveY < 0) PlayerDirection = Direction.Up;
         else PlayerDirection = Direction.Forward;
+
         DebugManager.EndBenchmark("UpdateMovement");
     }
     public void CheckProjectiles(GameManager gameManager)
@@ -410,6 +423,25 @@ public class PlayerManager : IEntity, IStatusEffectable
         if (gameManager.LevelManager.Level.Decals.TryGetValue(CameraManager.TileCoord.ToByteCoord(), out var dec))
             dec.OnPlayerEnter(gameManager, this);
     }
+    public void ExploreArea(GameManager gameManager, Point center, int radius)
+    {
+        for (int y = -radius; y <= radius; y++)
+        {
+            for (int x = -radius; x <= radius; x++)
+            {   
+                int idx = (center.X + x) + (center.Y + y) * Constants.MapSize.X;
+
+                // Checks
+                if (Vector2.DistanceSquared(Vector2.Zero, new(x, y)) > radius * radius) continue;
+                if (idx < 0 || idx >= Constants.MapSize.X * Constants.MapSize.Y) continue;
+                if (center.X + x >= Constants.MapSize.X) continue;
+
+                gameManager.LevelManager.Level.Explored[idx] = true;
+            }
+        }
+
+        gameManager.OverlayManager.InvalidateMinimap();
+    }
     public bool IsColliding(GameManager gameManager)
     {
         // Check if level loaded
@@ -526,7 +558,7 @@ public class PlayerManager : IEntity, IStatusEffectable
         Item? item = ui.BoundContainer.Items[slot];
         if (item == null) return;
 
-        Game.LevelManager.Level.Loot.Add(new Loot(new(item.Type, item.Amount, item.CustomName), CameraManager.PlayerFoot + new Point(0, 20)));
+        GameManager.LevelManager.Level.Loot.Add(new Loot(new(item.Type, item.Amount, item.CustomName), CameraManager.PlayerFoot + new Point(0, 20)));
         ui.BoundContainer.SetSlot(slot, null);
     }
     public void SlotHovered(int slot, UserInterface ui)

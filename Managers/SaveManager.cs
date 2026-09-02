@@ -113,6 +113,7 @@ public class SaveManager
             WriteSection(writer, "INVT", WriteInventorySection, gameManager, playerManager);
             WriteSection(writer, "EFFX", WriteEffectsSection, gameManager, playerManager);
             WriteSection(writer, "WAYP", WriteWaypointsSection, gameManager, playerManager);
+            WriteSection(writer, "EXPL", WriteExploredSection, gameManager, playerManager);
             WriteSection(writer, "_EOF", WriteEOFSection, gameManager, playerManager);
 
             writer.Flush();
@@ -348,6 +349,21 @@ public class SaveManager
             writer.Write(point);
         }
     }
+    private static void WriteExploredSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager)
+    {
+        // Write EXPL
+        var allLevels = pathToLevel.Values;
+        writer.Write((ushort)allLevels.Count);
+        foreach (var level in allLevels)
+        {
+            writer.Write(level.UID);
+            for (int b = 0; b < level.Explored.Length; b += 8)
+            {
+                byte packed = NumberTools.PackFlagsByte(level.Explored[b..(b+8)]);
+                writer.Write(packed);
+            }
+        }
+    }
     private static void WriteEOFSection(BinaryWriter writer, GameManager gameManager, PlayerManager playerManager) { }
     #endregion
     public static async Task<bool> ReadGameState(GameManager gameManager, PlayerManager playerManager, LevelPath levelPath)
@@ -415,6 +431,7 @@ public class SaveManager
                         case "INVT": ReadInventorySection(gameManager, playerManager, sectionReader, levelTable); break;
                         case "EFFX": ReadEffectsSection(gameManager, playerManager, sectionReader, levelTable); break;
                         case "WAYP": ReadWaypointsSection(gameManager, playerManager, sectionReader, levelTable); break;
+                        case "EXPL": ReadExploredSection(gameManager, playerManager, sectionReader, levelTable); break;
                         default: Logger.Warning($"Unknown level section '{id}'"); break; // Unknown section - ignore it
                     }
                 }
@@ -626,6 +643,24 @@ public class SaveManager
 
             Waypoint point = reader.ReadWaypoint();
             level.AddWaypoint(point);
+        }
+    }
+    private static void ReadExploredSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
+    {
+        // Read EXPL section
+        ushort levelsCount = reader.ReadUInt16();
+        for (int l = 0; l < levelsCount; l++)
+        {
+            ushort levelUID = reader.ReadUInt16();
+            var level = levelTable[levelUID];
+
+            // Chunks
+            for (int c = 0; c < Constants.MapSize.X * Constants.MapSize.Y; c += 8)
+            {
+                bool[] exploredChunk = NumberTools.UnpackFlagsByte(reader.ReadByte());
+                for (int b = 0; b < exploredChunk.Length; b++)
+                    level.Explored[c + b] = exploredChunk[b];
+            }
         }
     }
     #endregion

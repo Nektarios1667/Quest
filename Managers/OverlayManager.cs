@@ -95,7 +95,7 @@ public class OverlayManager
 
             // Minimap
             if (gameManager.StateManager.OverlayState != OverlayState.None && (playerManager == null || playerManager.Inventory.Has(new(ItemTypes.Map, 1))))
-                Minimap = DrawMiniMap(device, gameManager.LevelManager, Minimap, gameManager.Batch, gameManager.MinimapBatch);
+                Minimap = DrawMiniMap(device, gameManager.LevelManager, Minimap, gameManager.Batch, gameManager.MinimapBatch, gameManager.LevelManager.Level.Explored);
         }
 
         // Inventories
@@ -221,7 +221,7 @@ public class OverlayManager
         DebugManager.EndBenchmark("DrawLighting");
     }
 
-    public static RenderTarget2D? DrawMiniMap(GraphicsDevice device, LevelManager levelManager, RenderTarget2D? minimap, SpriteBatch batch, SpriteBatch mapBatch)
+    public static RenderTarget2D? DrawMiniMap(GraphicsDevice device, LevelManager levelManager, RenderTarget2D? minimap, SpriteBatch batch, SpriteBatch mapBatch, bool[]? exploredTiles = null)
     {
         DebugManager.StartBenchmark("DrawMinimap");
         // Frame
@@ -242,6 +242,12 @@ public class OverlayManager
             {
                 for (int x = 0; x < Constants.MapSize.X; x++)
                 {
+                    if (exploredTiles != null && !exploredTiles[y * Constants.MapSize.X + x])
+                    {
+                        mapBatch.DrawPoint(new(x, y), Color.Black);
+                        continue;
+                    }
+
                     // Get tile
                     Tile tile = levelManager.GetTile(new Point(x, y))!;
                     mapBatch.DrawPoint(new(x, y), Constants.MiniMapColors[(int)tile.Type.ID]);
@@ -251,6 +257,9 @@ public class OverlayManager
             // Waypoints
             foreach (Waypoint waypoint in levelManager.Level.Waypoints)
             {
+                if (exploredTiles != null && !exploredTiles[waypoint.Position.Y * Constants.MapSize.X + waypoint.Position.X])
+                    continue;
+
                 // Name background
                 mapBatch.FillRectangle(new(waypoint.Position.ToVector2(), PixelOperatorVerySmall.MeasureString(waypoint.Name)), Color.Black * 0.6f);
                 // Marker

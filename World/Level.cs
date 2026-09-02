@@ -46,6 +46,7 @@ public class Level
     public WorldMetadata Metadata { get; private set; }
     public List<Loot> Loot { get; private set; }
     public Tile[] Tiles { get; private set; }
+    public bool[] Explored { get; private set; } = new bool[Constants.MapSize.X * Constants.MapSize.Y];
     public BiomeType[] Biome { get; private set; }
     public Point Spawn { get; set; }
     public Color Tint { get; set; }

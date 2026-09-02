@@ -57,6 +57,27 @@ public static class NumberTools
         ];
     }
     public static float Square(float num) => num * num;
+    public static byte PackFlagsByte(params bool[] flags)
+    {
+        if (flags.Length > 8)
+            throw new ArgumentException("Cannot pack more than 8 flags into a byte.");
+        byte result = 0;
+        for (int i = 0; i < flags.Length; i++)
+        {
+            if (flags[i])
+                result |= (byte)(1 << i);
+        }
+        return result;
+    }
+    public static bool[] UnpackFlagsByte(byte flags)
+    {
+        bool[] result = new bool[8];
+        for (int i = 0; i < 8; i++)
+        {
+            result[i] = (flags & (1 << i)) != 0;
+        }
+        return result;
+    }
 }
 
 public static class IntExtensions
