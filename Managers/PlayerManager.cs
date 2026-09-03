@@ -1,5 +1,6 @@
 ﻿using Quest.Gui;
 using Quest.Interaction;
+using Quest.World;
 using SharpDX.Direct3D11;
 namespace Quest.Managers;
 
@@ -225,6 +226,16 @@ public class PlayerManager : IEntity, IStatusEffectable
         else if (moveY > 0) PlayerDirection = Direction.Down;
         else if (moveY < 0) PlayerDirection = Direction.Up;
         else PlayerDirection = Direction.Forward;
+
+        // Level transitions
+        foreach (var transition in gameManager.LevelManager.Level.Transitions)
+        {
+            if (transition.Area.Contains(CameraManager.TileCoord))
+            {
+                LevelTransition.TransitionToLevel(gameManager, transition.DestinationLevel, transition.DestinationPosition);
+                break;
+            }
+        }
 
         DebugManager.EndBenchmark("UpdateMovement");
     }

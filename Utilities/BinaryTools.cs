@@ -2,6 +2,7 @@
 using Quest.World;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 namespace Quest.Utilities;
 
 public static class BinaryWriterExtensions
@@ -102,6 +103,14 @@ public static class BinaryWriterExtensions
     {
         writer.Write((byte)item.Type.TypeID);
         writer.Write(item.Amount);
+
+    }
+    public static void Write(this BinaryWriter writer, LevelTransition transition)
+    {
+        writer.Write(transition.Area.Location.ToByteCoord());
+        writer.Write(transition.Area.Size.ToByteCoord());
+        writer.Write(transition.DestinationLevel.LevelName);
+        writer.Write(transition.DestinationPosition);
     }
 }
 
@@ -229,6 +238,14 @@ public static class BinaryReaderExtensions
         byte itemType = reader.ReadByte();
         byte amount = reader.ReadByte();
         return new ItemRef(ItemTypes.All[itemType], amount);
+    }
+    public static LevelTransition ReadLevelTransition(this BinaryReader reader, string worldName)
+    {
+        ByteCoord location = reader.ReadByteCoord();
+        ByteCoord size = reader.ReadByteCoord();
+        string destLevel = reader.ReadString();
+        ByteCoord destPos = reader.ReadByteCoord();
+        return new LevelTransition(new Rectangle(location.ToPoint(), size.ToPoint()), new(worldName, destLevel), destPos);
     }
 }
 

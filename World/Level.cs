@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using HarfBuzzSharp;
+using MonoGame.Extended.Screens.Transitions;
+using System.Linq;
 using System.Threading;
 
 namespace Quest.World;
@@ -46,12 +48,31 @@ public class Level
     public WorldMetadata Metadata { get; private set; }
     public List<Loot> Loot { get; private set; }
     public Tile[] Tiles { get; private set; }
+    public List<LevelTransition> Transitions { get; private set; }
     public bool[] Explored { get; private set; } = new bool[Constants.MapSize.X * Constants.MapSize.Y];
     public BiomeType[] Biome { get; private set; }
     public Point Spawn { get; set; }
     public Color Tint { get; set; }
     public List<QuillScript> Scripts { get; private set; }
-    public Level(string name, Tile[] tiles, BiomeType[] biome, Point spawn, List<NPC> npcs, List<Loot> loot, Dictionary<ByteCoord, Decal> decals, List<Enemy> enemies, List<Projectile> projectiles, List<QuillScript> scripts, WorldMetadata meta, Color? tint = null, ushort? uid = null)
+    public Level(string name, Tile[] tiles, BiomeType[] biomes, Point spawn, WorldMetadata meta, ushort? uid = null)
+    {
+        // Initialize the level
+        LevelPath = new(name);
+        Tiles = tiles;
+        Biome = biomes.Length == 0 ? new BiomeType[Constants.MapSize.X * Constants.MapSize.Y] : biomes;
+        Spawn = spawn;
+        NPCs = [];
+        Loot = [];
+        Decals = [];
+        Enemies = [];
+        Projectiles = [];
+        Transitions = [];
+        Scripts = [];
+        Metadata = meta;
+        Tint = Color.Transparent;
+        UID = uid ?? UIDManager.Get(UIDCategory.Levels);
+    }
+    public Level(string name, Tile[] tiles, BiomeType[] biome, Point spawn, List<NPC> npcs, List<Loot> loot, Dictionary<ByteCoord, Decal> decals, List<Enemy> enemies, List<Projectile> projectiles, List<LevelTransition> transitions, List<QuillScript> scripts, WorldMetadata meta, Color? tint = null, ushort? uid = null)
     {
         // Initialize the level
         LevelPath = new(name);
@@ -63,6 +84,7 @@ public class Level
         Decals = decals;
         Enemies = enemies.ToDictionary(enemy => enemy.UID, enemy => enemy);
         Projectiles = [.. projectiles];
+        Transitions = [.. transitions];
         Scripts = [.. scripts];
         Metadata = meta;
         Tint = tint ?? Color.Transparent;

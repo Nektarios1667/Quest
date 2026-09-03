@@ -24,12 +24,11 @@ public class LevelManager
     public Level Level { get; private set; }
     public Color SkyColor { get; set; }
     public static readonly Point lootStackOffset = new(4, 4);
-    public static readonly Level EmptyLevel;
+    private static Tile[] grassTiles = new Tile[256 * 256];
+    public static Level EmptyLevel => new("NUL/NUL", grassTiles, [], new(128, 128), WorldMetadata.Null);
     static LevelManager()
     {
-        Tile[] grassTiles = new Tile[256 * 256];
         for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) grassTiles[t] = new Grass(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
-        EmptyLevel = new("NUL/NUL", grassTiles, [], new(128, 128), [], [], [], [], [], [], WorldMetadata.Null);
     }
     public LevelManager()
     {
@@ -161,7 +160,7 @@ public class LevelManager
             if (level.Path == name)
                 return level;
         Logger.Error($"Level '{name}' not found in stored levels.");
-        return new("", [], [], new Point(128, 128), [], [], [], [], [], [], WorldMetadata.Null);
+        return EmptyLevel;
     }
     public bool LoadLevel(GameManager gameManager, int levelIndex)
     {
@@ -220,7 +219,8 @@ public class LevelManager
         // Spawn
         CameraManager.CameraDest = (Level.Spawn * Constants.TileSize).ToVector2();
         CameraManager.Camera = CameraManager.CameraDest;
-        
+        CameraManager.Update(gameManager, 0f); // Force update to avoid visual glitches
+
         Logger.System($"Loaded level '{level.Path}'.");
         LevelLoaded?.Invoke(Level);
 

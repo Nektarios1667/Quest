@@ -1,5 +1,6 @@
 using Quest.Editor;
 using Quest.Editor.Managers;
+using Quest.World;
 using System.IO;
 
 namespace Quest.Tiles;
@@ -17,27 +18,11 @@ public class Stairs : Tile, IEditableTile, IHasLevelData
     {
         if (DestLevel.IsNull()) return;
 
-        TimerManager.SetTimer("ScreenFadeOut", 1.5f, null);
-        TimerManager.SetTimer("StairsTeleport", 1.5f, () => Teleport(gameManager));
+        Teleport(gameManager);
     }
     private void Teleport(GameManager gameManager)
     {
-        // Load another level
-        bool read = LevelFileManager.ReadLevel(gameManager, DestLevel.ToString(), reload: false);
-        bool loaded = gameManager.LevelManager.LoadLevel(gameManager, DestLevel.ToString());
-        if (!read || !loaded)
-        {
-            Logger.Error($"Failed to teleport to level '{DestLevel.LevelName}'");
-            return;
-        }
-
-        CameraManager.CameraDest = (Dest * Constants.TileSize).ToVector2() + new Vector2(Constants.TileSize.X / 2, 0);
-        CameraManager.Camera = CameraManager.CameraDest;
-        CameraManager.Update(gameManager, 0f); // Force update to avoid visual glitches
-
-        TimerManager.SetTimer("ScreenFadeIn", 1.5f, null);
-
-        Logger.System($"Teleporting to level '{DestLevel.LevelName}' @ {Dest}");
+        LevelTransition.TransitionToLevel(gameManager, DestLevel, Dest);
     }
     public void Edit(EditorManager editorManager)
     {

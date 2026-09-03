@@ -99,10 +99,11 @@ public static class LevelFileManager
         Point spawn = new();
         Color tint = new();
         List<Loot> lootBuffer = new();
-        List<Waypoint> waypointBuffer = new();
         List<NPC> npcBuffer = new();
         List<Enemy> enemyBuffer = new();
         Dictionary<ByteCoord, Decal> decalBuffer = new();
+        List<Waypoint> waypointBuffer = new();
+        List<LevelTransition> levelTransitionBuffer = new();
         List<QuillScript> scriptBuffer = new();
 
         gameManager.LevelManager.TasksComplete++;
@@ -151,13 +152,14 @@ public static class LevelFileManager
                     case "DCAL": ReadDecalSection(gameManager, sectionReader, decalBuffer); break;
                     case "ENEM": ReadEnemySection(gameManager, sectionReader, enemyBuffer); break;
                     case "WAYP": ReadWaypointSection(gameManager, sectionReader, waypointBuffer); break;
+                    case "TRAN": ReadLevelTransitionSection(gameManager, sectionReader, levelTransitionBuffer, levelPath.WorldName); break;
                     case "QSCR": ReadScriptSection(gameManager, sectionReader, levelPath, scriptBuffer); break;
                     default: Logger.Warning($"Unknown level section '{id}'"); break; // Unknown section - ignore it
                 }
             }
 
             // Make and add the level
-            Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, enemyBuffer, [], scriptBuffer, meta, tint);
+            Level created = new(filename, tilesBuffer, biomeBuffer, spawn, npcBuffer, lootBuffer, decalBuffer, enemyBuffer, [], levelTransitionBuffer, scriptBuffer, meta, tint);
             created.AddWaypoints(waypointBuffer.ToArray());
 
             if (reload) gameManager.LevelManager.Levels.RemoveAll(l => l.Path == filename);
@@ -254,6 +256,15 @@ public static class LevelFileManager
 
         for (int w = 0; w < waypointCount; w++)
             waypointBuffer.Add(reader.ReadWaypoint());
+        gameManager.LevelManager.TasksComplete++;
+    }
+    private static void ReadLevelTransitionSection(GameManager gameManager, BinaryReader reader, List<LevelTransition> levelTransitionBuffer, string worldName)
+    {
+        byte transitionCount = reader.ReadByte();
+        for (int t = 0; t++ < transitionCount; t++)
+        {
+            levelTransitionBuffer.Add(reader.ReadLevelTransition(worldName));
+        }
         gameManager.LevelManager.TasksComplete++;
     }
     private static void ReadScriptSection(GameManager gameManager, BinaryReader reader, LevelPath levelPath, List<QuillScript> scriptBuffer)

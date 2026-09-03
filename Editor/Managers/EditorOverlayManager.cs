@@ -76,6 +76,20 @@ public class EditorOverlayManager
             }
         }
     }
+    public void DrawTransitions()
+    {
+        foreach (LevelTransition transition in LevelManager.Level.Transitions)
+        {
+            Point dest = CameraManager.TileToScreen(transition.Area.Location);
+            Rectangle rect = new(dest, transition.Area.Size * Constants.TileSize);
+
+            // Outline
+            GameManager.Batch.DrawRectangle(rect, color: Color.Orange, thickness: 4);
+            // Text info - dest level and pos
+            string text = $"Dest: {transition.DestinationLevel.LevelName}\n@ {transition.DestinationPosition}";
+            GameManager.Batch.DrawString(PixelOperator, text, dest.ToVector2() + new Vector2(6, 6), Color.Green);
+        }
+    }
     public void DrawFrameInfo()
     {
         float boxHeight = DebugManager.FrameTimes.Count * 20;

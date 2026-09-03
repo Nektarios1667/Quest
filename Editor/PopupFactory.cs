@@ -241,10 +241,35 @@ public static class PopupFactory
         if (string.IsNullOrWhiteSpace(value)) return false;
         return Enum.GetNames(typeof(DecalType)).Any(t => t.Equals(value, StringComparison.OrdinalIgnoreCase));
     }
-    public static bool IsAlphaNumeric(string value)
+    public static bool IsAlphaNum(string value)
     {
         if (string.IsNullOrWhiteSpace(value)) return false;
         return value.All(char.IsLetterOrDigit);
+    }
+    public static bool IsAlpha(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        return value.All(char.IsLetter);
+    }
+    public static bool IsAlphaOrSpace(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        return value.All(c => char.IsLetter(c) || c == ' ');
+    }
+    public static bool IsAlphaNumOrUnderscore(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        return value.All(c => char.IsLetterOrDigit(c) || c == '_');
+    }
+    public static bool IsAlphaOrUnderscore(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        return value.All(c => char.IsLetter(c) || c == '_');
+    }
+    public static bool IsAlphaNumUnderscoreOrSpace(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        return value.All(c => char.IsLetterOrDigit(c) || c == '_' || c == ' ');
     }
     public static bool IsItemID(string value)
     {

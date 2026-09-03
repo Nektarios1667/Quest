@@ -184,22 +184,24 @@ public class LevelEditor : Game, IAdjustableWindow
         mouseMenu.AddItem("Edit...", null, []);
         mouseMenu.AddSubMenu("Edit...", editMenu);
 
-        MouseMenu newMenu = new(gui, Point.Zero, new(100, 125), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
+        MouseMenu newMenu = new(gui, Point.Zero, new(100, 145), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         newMenu.AddItem("New NPC", editorManager.NewNPC, []);
         newMenu.AddItem("New Enemy", editorManager.NewEnemy, []);
         newMenu.AddItem("New Loot", editorManager.NewLoot, []);
         newMenu.AddItem("New Decal", editorManager.NewDecal, []);
         newMenu.AddItem("New Script", editorManager.NewScript, []);
         newMenu.AddItem("New Waypoint", editorManager.NewWaypoint, []);
+        newMenu.AddItem("New Transition", editorManager.NewTransition, []);
         mouseMenu.AddItem("New...", null, []);
         mouseMenu.AddSubMenu("New...", newMenu);
 
-        MouseMenu deleteMenu = new(gui, Point.Zero, new(150, 105), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
+        MouseMenu deleteMenu = new(gui, Point.Zero, new(150, 125), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         deleteMenu.AddItem("Delete NPC", editorManager.DeleteNPC, []);
         deleteMenu.AddItem("Delete Enemy", editorManager.DeleteEnemy, []);
         deleteMenu.AddItem("Delete Loot", editorManager.DeleteLoot, []);
         deleteMenu.AddItem("Delete Decal", editorManager.DeleteDecal, []);
         deleteMenu.AddItem("Delete Script", editorManager.DeleteScript, []);
+        deleteMenu.AddItem("Delete Transition", editorManager.DeleteTransition, []);
         mouseMenu.AddItem("Delete...", null, []);
         mouseMenu.AddSubMenu("Delete...", deleteMenu);
 
@@ -341,6 +343,9 @@ public class LevelEditor : Game, IAdjustableWindow
         // Waypoints
         if (InputManager.BindPressed(InputAction.NewWaypoint)) { MouseSelect(); editorManager.NewWaypoint(); }
         if (InputManager.BindPressed(InputAction.DeleteWaypoint)) { MouseSelect(); editorManager.DeleteWaypoint(); }
+        // Transitions
+        if (InputManager.BindPressed(InputAction.NewTransition)) { MouseSelect(); editorManager.NewTransition(); }
+        if (InputManager.BindPressed(InputAction.DeleteTransition)) { MouseSelect(); editorManager.DeleteTransition(); }
         // Script
         if (InputManager.BindPressed(InputAction.DeleteScript)) editorManager.DeleteScript();
         else if (InputManager.BindPressed(InputAction.NewScript)) editorManager.NewScript();
@@ -382,6 +387,11 @@ public class LevelEditor : Game, IAdjustableWindow
         if (editorManager.ShowBiomeMarkers)
             editorOverlayManager.DrawBiomes();
         DebugManager.EndBenchmark("DrawBiomes");
+
+        // Render transitions
+        DebugManager.StartBenchmark("DrawTransitions");
+        editorOverlayManager.DrawTransitions();
+        DebugManager.EndBenchmark("DrawTransitions");
 
         // Text info
         DebugManager.StartBenchmark("DebugTextDraw");

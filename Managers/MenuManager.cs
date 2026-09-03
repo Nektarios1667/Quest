@@ -221,7 +221,7 @@ public class MenuManager
         if (saves.Selected == null || saves.Selected == "(New Save)") return;
 
         // Rename
-        var (success, values) = PopupFactory.ShowInputForm("Rename Save", [new("Name:", PopupFactory.IsAlphaNumeric)]);
+        var (success, values) = PopupFactory.ShowInputForm("Rename Save", [new("Name:", PopupFactory.IsAlphaNum)]);
         if (success && values.Length > 0 && !string.IsNullOrWhiteSpace(values[0]))
         {
             string oldPath = $"GameData/Worlds/{worlds.Selected}/saves/{saves.Selected}.qsv";

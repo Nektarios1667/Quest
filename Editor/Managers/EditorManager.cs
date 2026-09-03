@@ -158,10 +158,10 @@ public class EditorManager
 
         // Winforms
         var (success, values) = ShowInputForm("NPC Editor", [
-            new("Name", null),
+            new("Name", IsAlphaOrSpace),
             new("Dialog", null),
             new("Size [0.1-25.5]", IsScaleValue),
-            new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())]),
+            new("Texture", IsAlphaNum, [.. CharacterTextures.Select(t => t.ToString())]),
             new("Shop Option 1", null),
             new("Shop Option 2", null),
             new("Shop Option 3", null),
@@ -234,10 +234,10 @@ public class EditorManager
 
         // Remake
         var (success, values) = ShowInputForm("NPC Editor", [
-            new("Name", null, placeholder: editing.Name),
+            new("Name", IsAlphaOrSpace, placeholder: editing.Name),
             new("Dialog", null, placeholder: editing.Dialog),
             new("Size [0.1-25.5]", IsScaleValue, placeholder: editing.Scale.ToString()),
-            new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())], placeholder: editing.Texture.ToString()),
+            new("Texture", IsAlphaNum, [.. CharacterTextures.Select(t => t.ToString())], placeholder: editing.Texture.ToString()),
             new("Shop Option 1", null, placeholder: editing.ShopOptions.ElementAtOrDefault(0)?.ToString() ?? ""),
             new("Shop Option 2", null, placeholder: editing.ShopOptions.ElementAtOrDefault(1)?.ToString() ?? ""),
             new("Shop Option 3", null, placeholder: editing.ShopOptions.ElementAtOrDefault(2)?.ToString() ?? ""),
@@ -297,8 +297,8 @@ public class EditorManager
             new("Projectile Speed (tiles/s)", IsUInt16),
             new("View Range (tiles)", IsUInt16),
             new("Attack Range (tiles)", IsUInt16),
-            new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())]),
-            new("Projectile Texture", null, [.. ProjectileTextures.Select(t => t.ToString())])
+            new("Texture", IsAlphaNum, [.. CharacterTextures.Select(t => t.ToString())]),
+            new("Projectile Texture", IsAlphaNum, [.. ProjectileTextures.Select(t => t.ToString())])
         ]);
         if (!success)
         {
@@ -360,8 +360,8 @@ public class EditorManager
             new("Projectile Speed", IsUInt16, placeholder: editing.ProjectileSpeed),
             new("View Range", IsUInt16, placeholder: editing.ViewRange),
             new("Attack Range", IsUInt16, placeholder: editing.AttackRange),
-            new("Texture", null, [.. CharacterTextures.Select(t => t.ToString())], placeholder: editing.Texture),
-            new("Projectile Texture", null, [.. ProjectileTextures.Select(t => t.ToString())], placeholder: editing.ProjectileTexture)
+            new("Texture", IsAlphaNum, [.. CharacterTextures.Select(t => t.ToString())], placeholder: editing.Texture),
+            new("Projectile Texture", IsAlphaNum, [.. ProjectileTextures.Select(t => t.ToString())], placeholder: editing.ProjectileTexture)
         ]);
         if (!success)
         {
@@ -396,7 +396,7 @@ public class EditorManager
         var (success, values) = ShowInputForm("Waypoint Editor", [
             new("X", IsByte),
             new("Y", IsByte),
-            new("Name", null),
+            new("Name", IsAlphaNumUnderscoreOrSpace),
             new("R", IsByte),
             new("G", IsByte),
             new("B", IsByte),
@@ -429,6 +429,44 @@ public class EditorManager
 
         if (point != null)
             LevelManager.Level.RemoveWaypoint(point);
+    }
+    public void NewTransition()
+    {
+        // Winforms
+        var (success, values) = ShowInputForm("Transition Editor", [
+            new("Origin X", IsByte),
+            new("Origin Y", IsByte),
+            new("Width", IsByte),
+            new("Height", IsByte),
+            new("Dest Level", IsAlphaNumOrUnderscore),
+            new("Dest Pos X", IsByte),
+            new("Dest Pos Y", IsByte),
+        ]);
+        if (!success)
+        {
+            if (!PopupOpen) Logger.Error("Decal creation failed.");
+            return;
+        }
+
+        // Create transition
+        LevelTransition transition = new(
+            new(new(Byte.Parse(values[0]), Byte.Parse(values[1])), new(Byte.Parse(values[2]), Byte.Parse(values[3]))), // Rect
+            new(CurrentLevel.WorldName, values[4]),
+            new(Byte.Parse(values[5]), Byte.Parse(values[6]))
+        );
+        GameManager.LevelManager.Level.Transitions.Add(transition);
+    }
+    public void DeleteTransition()
+    {
+        foreach (LevelTransition transition in LevelManager.Level.Transitions)
+        {
+            if (transition.Area.Contains(MouseSelectionCoord))
+            {
+                LevelManager.Level.Transitions.Remove(transition);
+                Logger.Log($"Deleted transition @ {MouseSelectionCoord.X}, {MouseSelectionCoord.Y}.");
+                break;
+            }
+        }
     }
     public void NewDecal()
     {

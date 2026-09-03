@@ -112,6 +112,7 @@ public class EditorLevelManager
         WriteSection(writer, "DCAL", WriteDecalSection);
         WriteSection(writer, "ENEM", WriteEnemySection);
         WriteSection(writer, "WAYP", WriteWaypointSection);
+        WriteSection(writer, "TRAN", WriteLevelTransitionSection);
         WriteSection(writer, "QSCR", WriteScriptSection);
         WriteSection(writer, "_EOF", WriteEOFSection);
 
@@ -208,6 +209,15 @@ public class EditorLevelManager
         foreach (var waypoint in LevelManager.Level.Waypoints)
             writer.Write(waypoint);
     }
+    private void WriteLevelTransitionSection(BinaryWriter writer)
+    {
+        // Level transitions
+        writer.Write((byte)LevelManager.Level.Transitions.Count);
+        for (int t = 0; t < LevelManager.Level.Transitions.Count; t++)
+        {
+            writer.Write(LevelManager.Level.Transitions[t]);
+        }
+    }
     public void WriteScriptSection(BinaryWriter writer)
     {
         // Scripts
@@ -235,7 +245,7 @@ public class EditorLevelManager
         Tile[] tiles = LevelGenerator.GenerateLevel(Constants.MapSize, int.Parse(values[2]));
 
         Level current = LevelManager.Level;
-        Level level = new(current.Path, tiles, [], current.Spawn, [.. current.NPCs.Values], current.Loot, current.Decals, [.. current.Enemies.Values], current.Projectiles, [], current.Metadata, current.Tint);
+        Level level = new(current.Path, tiles, [], current.Spawn, [.. current.NPCs.Values], current.Loot, current.Decals, [.. current.Enemies.Values], current.Projectiles, current.Transitions, current.Scripts, current.Metadata, current.Tint);
 
         LevelManager.LoadLevelObject(GameManager, level);
     }
@@ -275,7 +285,7 @@ public class EditorLevelManager
         // Make blank level
         Tile[] grassTiles = new Tile[256 * 256];
         for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) grassTiles[t] = new Grass(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));
-        LevelManager.LoadLevelObject(GameManager, new("NUL/NUL", grassTiles, [], new(128, 128), [], [], [], [], [], [], WorldMetadata.Null));
+        LevelManager.LoadLevelObject(GameManager, new("NUL/NUL", grassTiles, [], new(128, 128), WorldMetadata.Null));
     }
     public bool WarnSave()
     {
