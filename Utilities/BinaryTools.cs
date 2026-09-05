@@ -111,6 +111,8 @@ public static class BinaryWriterExtensions
         writer.Write(transition.Area.Size.ToByteCoord());
         writer.Write(transition.DestinationLevel.LevelName);
         writer.Write(transition.DestinationPosition);
+        writer.Write(transition.IsRelativeX);
+        writer.Write(transition.IsRelativeY);
     }
 }
 
@@ -244,8 +246,10 @@ public static class BinaryReaderExtensions
         ByteCoord location = reader.ReadByteCoord();
         ByteCoord size = reader.ReadByteCoord();
         string destLevel = reader.ReadString();
-        ByteCoord destPos = reader.ReadByteCoord();
-        return new LevelTransition(new Rectangle(location.ToPoint(), size.ToPoint()), new(worldName, destLevel), destPos);
+        Point destPos = reader.ReadPoint();
+        bool isRelativeX = reader.ReadBoolean();
+        bool isRelativeY = reader.ReadBoolean();
+        return new LevelTransition(new Rectangle(location.ToPoint(), size.ToPoint()), new(worldName, destLevel), destPos, isRelativeX, isRelativeY);
     }
 }
 

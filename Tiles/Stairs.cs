@@ -22,7 +22,7 @@ public class Stairs : Tile, IEditableTile, IHasLevelData
     }
     private void Teleport(GameManager gameManager)
     {
-        LevelTransition.TransitionToLevel(gameManager, DestLevel, Dest);
+        LevelTransition.TransitionToLevel(gameManager, DestLevel, Dest.ToPoint());
     }
     public void Edit(EditorManager editorManager)
     {

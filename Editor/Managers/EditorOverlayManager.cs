@@ -85,9 +85,8 @@ public class EditorOverlayManager
 
             // Outline
             GameManager.Batch.DrawRectangle(rect, color: Color.Orange, thickness: 4);
-            // Text info - dest level and pos
-            string text = $"Dest: {transition.DestinationLevel.LevelName}\n@ {transition.DestinationPosition}";
-            GameManager.Batch.DrawString(PixelOperator, text, dest.ToVector2() + new Vector2(6, 6), Color.Green);
+            // Info
+            GameManager.Batch.DrawString(PixelOperator, transition.ToString(), dest.ToVector2() + new Vector2(6, 6), Color.Green);
         }
     }
     public void DrawFrameInfo()

@@ -439,8 +439,8 @@ public class EditorManager
             new("Width", IsByte),
             new("Height", IsByte),
             new("Dest Level", IsAlphaNumOrUnderscore),
-            new("Dest Pos X", IsByte),
-            new("Dest Pos Y", IsByte),
+            new("Dest Pos X", IsInteger),
+            new("Dest Pos Y", IsInteger),
         ]);
         if (!success)
         {
@@ -452,7 +452,9 @@ public class EditorManager
         LevelTransition transition = new(
             new(new(Byte.Parse(values[0]), Byte.Parse(values[1])), new(Byte.Parse(values[2]), Byte.Parse(values[3]))), // Rect
             new(CurrentLevel.WorldName, values[4]),
-            new(Byte.Parse(values[5]), Byte.Parse(values[6]))
+            new(Int32.Parse(values[5]), Int32.Parse(values[6])),
+            values[5].StartsWith('+') || values[5].StartsWith('-'),
+            values[6].StartsWith('+') || values[6].StartsWith('-')
         );
         GameManager.LevelManager.Level.Transitions.Add(transition);
     }

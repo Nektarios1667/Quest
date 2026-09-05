@@ -232,7 +232,7 @@ public class PlayerManager : IEntity, IStatusEffectable
         {
             if (transition.Area.Contains(CameraManager.TileCoord))
             {
-                LevelTransition.TransitionToLevel(gameManager, transition.DestinationLevel, transition.DestinationPosition);
+                LevelTransition.TransitionToLevel(gameManager, transition.DestinationLevel, transition.DestinationPosition, transition.IsRelativeX, transition.IsRelativeY);
                 break;
             }
         }
