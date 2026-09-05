@@ -18,7 +18,7 @@ public static class Constants
 #endif
 
     // Game
-    public static int PlayerBaseSpeed = 300; // normal is 300
+    public const int PlayerBaseSpeed = 300; // normal is 300
     public const int MaxStack = 10;
     public const int DayLength = 600; // Length of a day in seconds
     public const int PlayerBaseHealth = 100;
