@@ -171,6 +171,7 @@ public class LevelEditor : Game, IAdjustableWindow
         // Editor gui
         // Mouse menu
         gui = new(this, spriteBatch, Arial);
+
         mouseMenu = new(gui, Point.Zero, new(100, 300), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
         mouseMenu.AddItem("Pick", PickTile, []);
         mouseMenu.AddItem("Open", editorLevelManager.OpenLevelDialog, []);
@@ -213,10 +214,14 @@ public class LevelEditor : Game, IAdjustableWindow
 
         // Mouse select
         Button tileDrawSelect = new(gui, new(Constants.Middle.X - 100, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Tile, [], "Tiles", border: 0);
-        Button decalDrawSelect = new(gui, new(Constants.Middle.X, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.5f, () => currentTool = EditorTool.Decal, [], "Decals", border: 0);
+        Button decalDrawSelect = new(gui, new(Constants.Middle.X, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Decal, [], "Decals", border: 0);
         Button biomeDrawSelect = new(gui, new(Constants.Middle.X + 100, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Biome, [], "Biomes", border: 0);
         toolHighlight = new(gui, new(Constants.Middle.X - 100, 10), new(90, 30), Color.Transparent, Color.White, 2);
         gui.AddWidgets(tileDrawSelect, decalDrawSelect, biomeDrawSelect, toolHighlight);
+
+        // Settings button
+        Button settingsButton = new(gui, new(Constants.NativeResolution.X - 100, Constants.NativeResolution.Y - 40), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => gameManager.StateManager.State = GameState.Settings, [], "Settings", border: 0);
+        gui.AddWidget(settingsButton);
 
         // Palette selection
         tilesetGroup = new(gui);

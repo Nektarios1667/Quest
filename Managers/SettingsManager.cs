@@ -60,7 +60,7 @@ public static class SettingsManager
         // Binds button in bottom left
         Button bindsButton = new(settingsMenu, new(20, Constants.NativeResolution.Y - 60), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, OpenKeybindsSettings, [], text: "Binds", font: PixelOperator, border: 0);
         // Editor button bottom right
-        Button editorButton = new(settingsMenu, new(Constants.NativeResolution.X - 120, Constants.NativeResolution.Y - 60), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, () => Process.Start(Environment.ProcessPath!, "--level-editor"), [], text: "Editor", font: PixelOperator, border: 0);
+        Button editorButton = new(settingsMenu, new(20, Constants.NativeResolution.Y - 110), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, () => Process.Start(Environment.ProcessPath!, "--level-editor"), [], text: "Editor", font: PixelOperator, border: 0);
 
         // Sound
         // Music
