@@ -76,6 +76,7 @@ public enum TileTypeIDOld : byte
     Lever,
     Target,
     LogicGate,
+    Sign,
     // TILES ID
 }
 public enum TileTypeID : byte
@@ -151,6 +152,7 @@ public enum TileTypeID : byte
     Lever,
     Target,
     LogicGate,
+    Sign,
     // TILES ID
 }
 public class TileType
@@ -247,6 +249,7 @@ public static class TileTypes
         new(TileTypeID.Lever, TextureID.Lever, true, false),
         new(TileTypeID.Target, TextureID.Target, false, true),
         new(TileTypeID.LogicGate, TextureID.LogicGate, true, false),
+        new(TileTypeID.Sign, TextureID.Sign, true, false),
         // TILES REGISTER
     ];
 }
@@ -287,6 +290,7 @@ public class Tile
     }
 
     public virtual void OnPlayerEnter(GameManager gameManager, PlayerManager player) { }
+    public virtual void OnPlayerExit(GameManager gameManager, PlayerManager player) { }
     public virtual void OnPlayerCollide(GameManager gameManager, PlayerManager player) { }
     public virtual void OnProjectileCollide(GameManager gameManager, Projectile proj) { }
     public static Tile TileFromId(TileTypeID type, Point location, LevelPath levelPath)

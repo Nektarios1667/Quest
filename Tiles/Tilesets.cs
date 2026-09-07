@@ -74,6 +74,7 @@ public static class Tilesets
         TileTypeID.Lever,
         TileTypeID.Target,
         TileTypeID.LogicGate,
+        TileTypeID.Sign,
         // INTERACTABLES TILESET
     ];
     public static readonly TileTypeID[] Natural = [

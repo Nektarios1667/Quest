@@ -60,11 +60,11 @@ public class ShopOption
     }
 }
 
-public class NPC : IEntity
+public class NPC : IEntity, IHasDialog
 {
     public static readonly NPC Null = new(TextureID.Null, Point.Zero, "NUL_NAME", "NUL_DIALOG");
     public static Dialog? DialogBox { get; set; }
-    public static List<(NPC npc, float distSq)> NPCsNearby { get; set; } = [];
+    public static List<(IHasDialog entity, float distSq)> DialogsNearby { get; set; } = [];
     public ushort UID { get; }
     public List<ShopOption> ShopOptions { get; private set; } = [];
     public Point Position { get; private set; }
@@ -108,7 +108,7 @@ public class NPC : IEntity
         // Mark as dialogue possibility
         float distSq = Vector2.DistanceSquared(CameraManager.WorldToTile(CameraManager.PlayerFoot.ToVector2()), Position.ToVector2() + Constants.HalfVec);
         if (distSq <= 4)
-            NPCsNearby.Add((this, distSq));
+            DialogsNearby.Add((this, distSq));
     }
     public void AddShopOption(ShopOption option)
     {
@@ -123,6 +123,7 @@ public class NPC : IEntity
     {
         AddShopOption(new(bought, cost, stock));
     }
+    public string GetName() => Name;
     public string GetFullDialog()
     {
         // Name and dialog
