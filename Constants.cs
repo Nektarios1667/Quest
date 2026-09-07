@@ -166,6 +166,7 @@ public static class Constants
         Color.Gray, // Lever
         Color.Pink, // Target
         Color.Gray, // LogicGate
+        Color.Brown, // Sign
         // MINIMAPCOLORS
     ];
 }

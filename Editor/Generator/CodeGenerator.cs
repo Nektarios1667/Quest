@@ -192,9 +192,9 @@ public static class CodeGenerator
         // TileType variable in TileTypes class in Tile.cs
         newTileSource = newTileSource.Replace("        // TILES REGISTER", $"        new(TileTypeID.{name}, TextureID.{name}, {isWalkable.ToString().ToLower()}, {isWall.ToString().ToLower()}),\r\n        // TILES REGISTER");
         if (isTriggerTile)
-            newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, LevelPath.LevelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null),\r\n            // TILEFROMID\r\n");
+            newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, level.LevelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null),\r\n            // TILEFROMID\r\n");
         else if (isSpecial)
-            newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, LevelPath.LevelName),\r\n            // TILEFROMID\r\n");
+            newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, level.LevelName),\r\n            // TILEFROMID\r\n");
 
         File.WriteAllText($"{sourceDirectory}/Tiles/Tile.cs", newTileSource);
 

@@ -61,6 +61,9 @@ public class PlayerManager : IEntity, IStatusEffectable
     // Position and collision
     public RectangleF Bounds => GetHitbox();
     public Tile? TileBelow { get; private set; }
+    public Tile? LastTileBelow { get; private set; }
+    public Decal? DecalBelow { get; private set; }
+    public Decal? LastDecalBelow { get; private set; }
     public List<Tile> TileBumps { get; private set; } = [];
     public Direction PlayerDirection { get; private set; }
     private float moveX, moveY;
@@ -92,7 +95,6 @@ public class PlayerManager : IEntity, IStatusEffectable
 
         // Update player position
         TileBumps.Clear();
-        UpdatePositions(gameManager);
 
         // Check projectiles
         CheckProjectiles(gameManager);
@@ -271,37 +273,37 @@ public class PlayerManager : IEntity, IStatusEffectable
             NPC.DialogBox = new Dialog(gameManager.OverlayManager.Gui, null, new(1200, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false };
             gameManager.OverlayManager.Gui.Widgets.Add(NPC.DialogBox);
         }
-        (NPC npc, float distSq) interacting = new(NPC.Null, float.MaxValue);
-        if (NPC.NPCsNearby.Count > 0)
+        (IHasDialog entity, float distSq) interacting = new(NPC.Null, float.MaxValue);
+        if (NPC.DialogsNearby.Count > 0)
         {
-            interacting = NPC.NPCsNearby[0];
-            for (int n = 1; n < NPC.NPCsNearby.Count; n++)
+            interacting = NPC.DialogsNearby[0];
+            for (int n = 1; n < NPC.DialogsNearby.Count; n++)
             {
-                if (NPC.NPCsNearby[n].distSq < interacting.distSq)
-                    interacting = NPC.NPCsNearby[n];
+                if (NPC.DialogsNearby[n].distSq < interacting.distSq)
+                    interacting = NPC.DialogsNearby[n];
             }
             // Same NPC
             string text = NPC.DialogBox.Text;
-            if (text.Contains(']') && text[1..text.IndexOf(']')] == interacting.npc.Name)
-                NPC.DialogBox.SetText(interacting.npc.GetFullDialog(), respeak: DialogRespeak.Auto);
+            if (text.Contains(']') && text[1..text.IndexOf(']')] == interacting.entity.GetName())
+                NPC.DialogBox.SetText(interacting.entity.GetFullDialog(), respeak: DialogRespeak.Auto);
             else
-                NPC.DialogBox.SetText(interacting.npc.GetFullDialog(), respeak: DialogRespeak.Always);
+                NPC.DialogBox.SetText(interacting.entity.GetFullDialog(), respeak: DialogRespeak.Always);
             NPC.DialogBox.IsVisible = true;
         }
         else
             NPC.DialogBox.IsVisible = false;
 
         // Shop
-        if (NPC.NPCsNearby.Count > 0)
+        if (NPC.DialogsNearby.Count > 0 && interacting.entity is NPC npc)
         {
-            if (InputManager.KeyPressed(Keys.D1)) interacting.npc.Buy(0, Inventory, gameManager);
-            if (InputManager.KeyPressed(Keys.D2)) interacting.npc.Buy(1, Inventory, gameManager);
-            if (InputManager.KeyPressed(Keys.D3)) interacting.npc.Buy(2, Inventory, gameManager);
-            if (InputManager.KeyPressed(Keys.D4)) interacting.npc.Buy(3, Inventory, gameManager);
-            if (InputManager.KeyPressed(Keys.D5)) interacting.npc.Buy(4, Inventory, gameManager);
+            if (InputManager.KeyPressed(Keys.D1)) npc.Buy(0, Inventory, gameManager);
+            if (InputManager.KeyPressed(Keys.D2)) npc.Buy(1, Inventory, gameManager);
+            if (InputManager.KeyPressed(Keys.D3)) npc.Buy(2, Inventory, gameManager);
+            if (InputManager.KeyPressed(Keys.D4)) npc.Buy(3, Inventory, gameManager);
+            if (InputManager.KeyPressed(Keys.D5)) npc.Buy(4, Inventory, gameManager);
         }
 
-        NPC.NPCsNearby.Clear();
+        NPC.DialogsNearby.Clear();
     }
     public void CheckForLoot(GameManager gameManager)
     {
@@ -383,6 +385,9 @@ public class PlayerManager : IEntity, IStatusEffectable
     }
     public void Move(GameManager gameManager, Vector2 move)
     {
+        LastTileBelow = TileBelow;
+        LastDecalBelow = DecalBelow;
+
         // Move
         if (move == Vector2.Zero) return;
         Vector2 finalMove = Vector2.Normalize(move) * GameManager.DeltaTime * Speed;
@@ -403,25 +408,28 @@ public class PlayerManager : IEntity, IStatusEffectable
 
         // On tile enter
         UpdatePositions(gameManager);
-        if (TileBelow == null) return;
-        TileBelow.OnPlayerEnter(gameManager, this);
+        if (TileBelow != null && TileBelow != LastTileBelow)
+            TileBelow.OnPlayerEnter(gameManager, this);
+        if (LastTileBelow != null && LastTileBelow != TileBelow)
+            LastTileBelow.OnPlayerExit(gameManager, this);
 
         // Decal
-        if (gameManager.LevelManager.Level.Decals.TryGetValue(CameraManager.TileCoord.ToByteCoord(), out var dec))
-            dec.OnPlayerEnter(gameManager, this);
+        if (DecalBelow != null && DecalBelow != LastDecalBelow)
+            DecalBelow.OnPlayerEnter(gameManager, this);
+        if (LastDecalBelow != null && LastDecalBelow != DecalBelow)
+            LastDecalBelow.OnPlayerExit(gameManager, this);
     }
     public bool IsColliding(GameManager gameManager)
     {
         // Check if level loaded
         if (gameManager.LevelManager.Level == null) return false;
         // Check 4 corners
-        UpdatePositions(gameManager);
         for (int o = 0; o < Constants.PlayerCorners.Length; o++)
         {
             // Check if the player collides with a tile
             Point coord = CameraManager.WorldToTile(CameraManager.PlayerFoot + Constants.PlayerCorners[o]);
-            TileBelow = gameManager.LevelManager.GetTile(coord);
-            if (TileBelow == null || !TileBelow.IsWalkable) return true;
+            Tile? tile = gameManager.LevelManager.GetTile(coord);
+            if (tile == null || !tile.IsWalkable) return true;
         }
         return false;
     }
@@ -536,7 +544,11 @@ public class PlayerManager : IEntity, IStatusEffectable
     }
     public void UpdatePositions(GameManager gameManager)
     {
+        LastTileBelow = TileBelow;
         TileBelow = gameManager.LevelManager.GetTile(CameraManager.TileCoord);
+
+        LastDecalBelow = DecalBelow;
+        LastDecalBelow = gameManager.LevelManager.Level.Decals.TryGetValue(CameraManager.TileCoord.ToByteCoord(), out var dec) ? dec : null;
     }
     public void Hurt(GameManager gameManager, int damage)
     {

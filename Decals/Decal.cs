@@ -74,6 +74,7 @@ public class Decal
         DrawTexture(gameManager.Batch, Texture, dest, source: source, scale: Constants.TileSizeScale);
     }
     public virtual void OnPlayerEnter(GameManager gameManager, PlayerManager playerManager) { }
+    public virtual void OnPlayerExit(GameManager gameManager, PlayerManager playerManager) { }
     public static Decal CreateDecal(DecalType type, Point location)
     {
         return type switch
