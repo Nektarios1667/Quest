@@ -317,6 +317,7 @@ public class Tile
             TileTypeID.Lever => new Lever(location, levelPath.LevelName, TileEffect.None, ByteCoord.Zero, levelPath),
             TileTypeID.Target => new Target(location, levelPath.LevelName, TileEffect.None, ByteCoord.Zero, levelPath),
             TileTypeID.LogicGate => new LogicGate(location, levelPath.LevelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null, LogicGateType.And),
+            TileTypeID.Sign => new Sign(location, "..."),
             // TILEFROMID
             _ => new(location, type)
         };
