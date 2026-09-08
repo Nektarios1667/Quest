@@ -31,7 +31,7 @@ public static class CodeGenerator
         {
             ReloadSource();
             // CLI
-            Console.WriteLine("[t]ile, [d]ecal, [i]tem, [l]oot table, [w]eather test, s[k]y test, or [s]ave viewer: ");
+            Console.WriteLine("[t]ile, [d]ecal, [i]tem, [l]oot table, [w]eather test, s[k]y test, or level [v]iewer: ");
             string? resp = Console.ReadLine()?.ToLower();
             if (resp == null || resp == "") continue;
 
@@ -50,7 +50,7 @@ public static class CodeGenerator
                 TestSky();
             else if (resp == "exit" || resp == "quit")
                 return;
-            else if (resp == "s" || resp == "save viewer")
+            else if (resp == "v" || resp == "level viewer")
             {
                 Thread thread = new Thread(() =>
                 {
