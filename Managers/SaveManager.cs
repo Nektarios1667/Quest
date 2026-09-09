@@ -378,7 +378,7 @@ public class SaveManager
         await LevelFileManager.ReadWorldAsync(gameManager, levelPath.WorldName, true);
 
         gameManager.LevelManager.TasksComplete = 0;
-        gameManager.LevelManager.TotalTasks = 6;
+        gameManager.LevelManager.TotalTasks = 15;
         MenuManager.SetCurrentlyLoading("Loading save file...");
 
         // Level table - uid <--> levelName
