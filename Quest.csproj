@@ -44,9 +44,9 @@
     <ItemGroup>
         <PackageReference Include="DotnetNoise" Version="1.0.0" />
         <PackageReference Include="Migs.MPath" Version="1.1.0" />
-        <PackageReference Include="MonoGame.Extended" Version="4.1.0" />
-        <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.4" />
-	    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4" />
+        <PackageReference Include="MonoGame.Extended" Version="6.1.1" />
+        <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.5.1" />
+	    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.5.1" />
 	    <PackageReference Include="MonoGUI" Version="2.1.1" />
 	    <PackageReference Include="ncalc" Version="7.1.0" />
 	    <PackageReference Include="ScottPlot" Version="5.1.57" />
