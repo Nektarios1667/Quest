@@ -11,7 +11,8 @@ public class LinkedLabel : UIElement
     public Color? Background { get; set; }
     public Color? BorderColor { get; set; }
     public int BorderThickness { get; set; }
-    public LinkedLabel(Point location, string text, Func<string>[] links, SpriteFont font, Color fg, Color? bg = null, Color? borderColor = null, int borderThickness = 2) : base(location)
+    public TextAlignment Alignment { get; set; }
+    public LinkedLabel(Point location, string text, Func<string>[] links, SpriteFont font, Color fg, Color? bg = null, Color? borderColor = null, int borderThickness = 2, TextAlignment alignment = TextAlignment.Left) : base(location)
     {
         OriginalText = text;
         DisplayedText = text;
@@ -22,6 +23,7 @@ public class LinkedLabel : UIElement
         Background = bg;
         BorderColor = borderColor;
         BorderThickness = borderThickness;
+        Alignment = alignment;
         Bounds = new Rectangle(Location, Font.MeasureString(DisplayedText).ToPoint()).Inflated(BorderThickness, BorderThickness);
     }
     public override void Update(UserInterface ui, GameManager gameManager)
@@ -49,7 +51,20 @@ public class LinkedLabel : UIElement
         if (BorderColor.HasValue)
             ui.Batch.DrawRectangle(Bounds, BorderColor.Value, BorderThickness);
         // Text
-        ui.Batch.DrawString(Font, DisplayedText, Location.ToVector2(), Foreground);
+        // Text
+        var textPosition = Location.ToVector2();
+        switch (Alignment)
+        {
+            case TextAlignment.Left:
+                break;
+            case TextAlignment.Center:
+                textPosition.X -= Font.MeasureString(DisplayedText).X / 2;
+                break;
+            case TextAlignment.Right:
+                textPosition.X -= Font.MeasureString(DisplayedText).X;
+                break;
+        }
+        ui.Batch.DrawString(Font, DisplayedText, textPosition, Foreground);
     }
     public void SetText(string text)
     {

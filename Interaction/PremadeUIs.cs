@@ -44,8 +44,7 @@ public partial class UserInterface
         ChestUI = new(batch);
 
         // Title
-        Point titleSize = PixelOperatorLarge.MeasureString("CHEST").ToPoint();
-        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "CHEST", PixelOperatorLarge, Color.White);
+        Label title = new(new(Constants.Middle.X, 20), "CHEST", PixelOperatorLarge, Color.White, alignment: TextAlignment.Center);
         ChestUI.AddElement("title", title);
 
         // Create slots
@@ -77,16 +76,15 @@ public partial class UserInterface
         ClockUI = new(batch);
 
         // Title
-        Point titleSize = PixelOperatorLarge.MeasureString("CLOCK").ToPoint();
-        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "CLOCK", PixelOperatorLarge, Color.White);
+        Label title = new(new(Constants.Middle.X, 20), "CLOCK", PixelOperatorLarge, Color.White, alignment: TextAlignment.Center);
         ClockUI.AddElement("title", title);
 
         // Daytime
-        LinkedLabel time = new(new(Constants.Middle.X - 65, 150), "Time: |1|", [GetDaytime], PixelOperatorLarge, Color.Cyan);
+        LinkedLabel time = new(new(Constants.Middle.X, 150), "Time: |1|", [GetDaytime], PixelOperatorLarge, Color.Cyan, alignment: TextAlignment.Center);
         ClockUI.AddElement("time", time);
 
         // Name
-        LinkedLabel timeName = new(new(Constants.Middle.X - 30, 200), "|1|", [GetTimeName], PixelOperatorLarge, Color.Cyan);
+        LinkedLabel timeName = new(new(Constants.Middle.X, 200), "|1|", [GetTimeName], PixelOperatorLarge, Color.Cyan, alignment: TextAlignment.Center);
         ClockUI.AddElement("timeName", timeName);
     }
     private static void CreateCompassUI(SpriteBatch batch)
@@ -97,12 +95,11 @@ public partial class UserInterface
         CompassUI = new(batch);
 
         // Title
-        Point titleSize = PixelOperatorLarge.MeasureString("COMPASS").ToPoint();
-        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "COMPASS", PixelOperatorLarge, Color.White);
+        Label title = new(new(Constants.Middle.X, 20), "COMPASS", PixelOperatorLarge, Color.White, alignment: TextAlignment.Center);
         CompassUI.AddElement("title", title);
 
         // Position
-        LinkedLabel pos = new(new(Constants.Middle.X - 85, 150), "Pos: |1|", [GetPosition], PixelOperatorLarge, Color.Cyan);
+        LinkedLabel pos = new(new(Constants.Middle.X, 150), "Pos: |1|", [GetPosition], PixelOperatorLarge, Color.Cyan, alignment: TextAlignment.Center);
         CompassUI.AddElement("position", pos);
     }
     private static void CreateCrafterUI(SpriteBatch batch, LevelManager levelManager)
@@ -110,8 +107,7 @@ public partial class UserInterface
         // ----- Crafter UI -----
         CrafterUI = new(batch);
         // Title
-        Point titleSize = PixelOperatorLarge.MeasureString("CRAFTER").ToPoint();
-        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "CRAFTER", PixelOperatorLarge, Color.White);
+        Label title = new(new(Constants.Middle.X, 20), "CRAFTER", PixelOperatorLarge, Color.White, alignment: TextAlignment.Center);
         CrafterUI.AddElement("title", title);
         // Create ingredient slots
         for (int y = 0; y < Crafter.IngredientsSize.Y; y++)
@@ -152,8 +148,7 @@ public partial class UserInterface
         CrateUI = new(batch);
 
         // Title
-        Point titleSize = PixelOperatorLarge.MeasureString("CRATE").ToPoint();
-        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "CRATE", PixelOperatorLarge, Color.White);
+        Label title = new(new(Constants.Middle.X, 20), "CRATE", PixelOperatorLarge, Color.White, alignment: TextAlignment.Center);
         CrateUI.AddElement("title", title);
 
         // Create slots
@@ -173,8 +168,7 @@ public partial class UserInterface
         DiscWriterUI = new(batch);
 
         // Title
-        Point titleSize = PixelOperatorLarge.MeasureString("DISC WRITER").ToPoint();
-        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "DISC WRITER", PixelOperatorLarge, Color.White);
+        Label title = new(new(Constants.Middle.X, 20), "DISC WRITER", PixelOperatorLarge, Color.White, alignment: TextAlignment.Center);
         DiscWriterUI.AddElement("title", title);
 
         // Input disc
@@ -210,8 +204,7 @@ public partial class UserInterface
         DisplayCaseUI = new(batch);
 
         // Title
-        Point titleSize = PixelOperatorLarge.MeasureString("DISPLAY CASE").ToPoint();
-        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "DISPLAY CASE", PixelOperatorLarge, Color.White);
+        Label title = new(new(Constants.Middle.X, 20), "DISPLAY CASE", PixelOperatorLarge, Color.White, alignment: TextAlignment.Center);
         DisplayCaseUI.AddElement("title", title);
 
         // Display item
@@ -224,8 +217,7 @@ public partial class UserInterface
         FurnaceUI = new(batch);
 
         // Title
-        Point titleSize = PixelOperatorLarge.MeasureString("FURNACE").ToPoint();
-        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "FURNACE", PixelOperatorLarge, Color.White);
+        Label title = new(new(Constants.Middle.X, 20), "FURNACE", PixelOperatorLarge, Color.White, alignment: TextAlignment.Center);
         FurnaceUI.AddElement("title", title);
 
         // Fuel input
@@ -273,8 +265,7 @@ public partial class UserInterface
         InscriberUI = new(batch);
 
         // Title
-        Point titleSize = PixelOperatorLarge.MeasureString("INSCRIBER").ToPoint();
-        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "INSCRIBER", PixelOperatorLarge, Color.White);
+        Label title = new(new(Constants.Middle.X, 20), "INSCRIBER", PixelOperatorLarge, Color.White, alignment: TextAlignment.Center);
         InscriberUI.AddElement("title", title);
 
         // Input item
@@ -335,8 +326,7 @@ public partial class UserInterface
         JukeboxUI = new(batch);
 
         // Title
-        Point titleSize = PixelOperatorLarge.MeasureString("JUKEBOX").ToPoint();
-        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "JUKEBOX", PixelOperatorLarge, Color.White);
+        Label title = new(new(Constants.Middle.X, 20), "JUKEBOX", PixelOperatorLarge, Color.White, alignment: TextAlignment.Center);
         JukeboxUI.AddElement("title", title);
 
         // Track
@@ -363,8 +353,7 @@ public partial class UserInterface
         PedestalUI = new(batch);
 
         // Title
-        Point titleSize = PixelOperatorLarge.MeasureString("PEDESTAL").ToPoint();
-        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "PEDESTAL", PixelOperatorLarge, Color.White);
+        Label title = new(new(Constants.Middle.X, 20), "PEDESTAL", PixelOperatorLarge, Color.White, alignment: TextAlignment.Center);
         PedestalUI.AddElement("title", title);
 
         // Display item
@@ -377,8 +366,7 @@ public partial class UserInterface
         StoveUI = new(batch);
 
         // Title    
-        Point titleSize = PixelOperatorLarge.MeasureString("STOVE").ToPoint();
-        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "STOVE", PixelOperatorLarge, Color.White);
+        Label title = new(new(Constants.Middle.X, 20), "STOVE", PixelOperatorLarge, Color.White, alignment: TextAlignment.Center);
         StoveUI.AddElement("title", title);
 
         // Fuel input
@@ -427,18 +415,17 @@ public partial class UserInterface
         WaypointUI = new(batch);
 
         // Title
-        Point titleSize = PixelOperatorLarge.MeasureString("WAYPOINT").ToPoint();
-        Label title = new(new(Constants.Middle.X - titleSize.X / 2, 20), "WAYPOINT", PixelOperatorLarge, Color.White);
+        Label title = new(new(Constants.Middle.X, 20), "WAYPOINT", PixelOperatorLarge, Color.White, alignment: TextAlignment.Center);
         WaypointUI.AddElement("title", title);
 
         // Add
-        Label nameLabel = new(new(Constants.Middle.X - 100, 80), "NAME", PixelOperator, Color.White);
+        Label nameLabel = new(new(Constants.Middle.X, 80), "NAME", PixelOperator, Color.White, alignment: TextAlignment.Center);
         TextInput nameInput = new(new(Constants.Middle.X - 100, 120), new(200, 40), PixelOperator, Color.White, Color.Black * 0.6f, Color.Black * 0.4f, borderThickness: 0);
 
-        Label colorLabel = new(new(Constants.Middle.X - 100, 160), "RGB COLOR", PixelOperator, Color.White);
+        Label colorLabel = new(new(Constants.Middle.X, 160), "RGB COLOR", PixelOperator, Color.White, alignment: TextAlignment.Center);
         TextInput colorInput = new(new(Constants.Middle.X - 100, 200), new(200, 40), PixelOperator, Color.White, Color.Black * 0.6f, Color.Black * 0.4f, borderThickness: 0);
 
-        Label messageLabel = new(new(Constants.Middle.X - 100, 340), "", PixelOperator, Color.White);
+        Label messageLabel = new(new(Constants.Middle.X, 340), "", PixelOperator, Color.White, alignment: TextAlignment.Center);
 
         Button addButton = new(new(Constants.Middle.X - 40, 250), new(80, 30), "ADD", PixelOperator, Color.White, Color.Green * 0.6f, Color.Green * 0.4f, borderThickness: 0);
         addButton.Clicked += () =>
