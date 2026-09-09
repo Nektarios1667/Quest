@@ -21,7 +21,7 @@ public class EditorOverlayManager
     private readonly StringBuilder FrameTimeSb;
     private float CacheDelta;
     private Dictionary<string, float> FrameTimes = [];
-    public RenderTarget2D? Minimap { get; set; }  = null;
+    public RenderTarget2D? Minimap { get; set; } = null;
     public EditorOverlayManager(GameManager gameManager, SpriteBatch batch, GraphicsDevice graphics)
     {
         GameManager = gameManager;
@@ -32,7 +32,7 @@ public class EditorOverlayManager
     }
     public void Update()
     {
-       
+
     }
     public void InvalidateMinimap() => Minimap = null;
     public static void DrawTileOverlay(SpriteBatch spriteBatch, TileTypeID selection, Tile? mouseTile)

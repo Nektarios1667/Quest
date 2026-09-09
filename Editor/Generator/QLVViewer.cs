@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework.Content;
-using MonoGame.Extended.Content;
-using Quest.World;
+﻿using Quest.World;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -8,7 +6,7 @@ namespace Quest.Editor.Generator;
 
 public partial class QLVViewer : Form
 {
-    private GameManager gameManager;
+    private readonly GameManager gameManager;
     private int tilesDisplayed = 200;
     private int biomesDisplayed = 200;
     private int decalsDisplayed = 200;
@@ -192,7 +190,8 @@ public partial class QLVViewer : Form
                 tilesDisplayed += 1;
             }
             loadTiles.Collapse();
-        } else if (e.Node?.Text == "Load Biomes...")
+        }
+        else if (e.Node?.Text == "Load Biomes...")
         {
             for (int i = 0; i < 200; i++)
             {

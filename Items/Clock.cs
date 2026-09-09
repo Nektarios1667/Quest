@@ -1,6 +1,7 @@
 using Quest.Interaction;
 
 namespace Quest.Items;
+
 public class Clock : Item
 {
     public Clock(byte amount, string? customName = null) : base(ItemTypes.Clock, amount, customName)

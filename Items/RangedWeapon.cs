@@ -27,7 +27,7 @@ public class RangedWeapon : Item
             float random = RandomManager.RandomFloat() * 2f - 1f;
             float offset = MathF.Sign(random) * random * random * AccuracyAngle;
             Projectile projectile = new(gameManager, 0, CameraManager.CameraDest, (float)Math.Atan2(dir.Y, dir.X) + offset, ProjectileTexture, Damage, ProjectileSpeed);
-            
+
             projectile.Position -= projectile.Size.ToVector2() / 2;
             gameManager.LevelManager.Level.Projectiles.Add(projectile);
 

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 namespace Quest.World;
+
 public enum WeatherTypeID
 {
     None,
@@ -46,8 +43,8 @@ public readonly record struct WeatherType
 public static class WeatherTypes
 {
     public static readonly WeatherType None = new(WeatherTypeID.None, "", [], 0, 0, 0, 0, Color.Transparent, Color.Transparent, 0, 1);
-    public static readonly WeatherType Rain = new(WeatherTypeID.Rain, "Rain", [..Enumerable.Range(1, 6).Select(i => $"Thunder{i}")], 0.5f, 0.75f, 1.0f, 1.0f, Color.MediumBlue, Color.MediumBlue, 0.1f, 0.2f);
-    public static readonly WeatherType Ocean = new(WeatherTypeID.Rain, "Rain", [..Enumerable.Range(1, 6).Select(i => $"Thunder{i}")], 0.5f, 0.75f, 1.0f, 1.0f, Color.MediumBlue, Color.MediumBlue, 0.2f, 0.15f);
+    public static readonly WeatherType Rain = new(WeatherTypeID.Rain, "Rain", [.. Enumerable.Range(1, 6).Select(i => $"Thunder{i}")], 0.5f, 0.75f, 1.0f, 1.0f, Color.MediumBlue, Color.MediumBlue, 0.1f, 0.2f);
+    public static readonly WeatherType Ocean = new(WeatherTypeID.Rain, "Rain", [.. Enumerable.Range(1, 6).Select(i => $"Thunder{i}")], 0.5f, 0.75f, 1.0f, 1.0f, Color.MediumBlue, Color.MediumBlue, 0.2f, 0.15f);
     public static readonly WeatherType Snow = new(WeatherTypeID.Snow, "Snow", [], 0.4f, 1.0f, 1.0f, 1.0f, new(200, 200, 216), new(200, 200, 216), 0.1f, 0.2f);
     public static readonly WeatherType Sandstorm = new(WeatherTypeID.Sandstorm, "Sandstorm", [], 0.3f, 1.0f, 1.0f, 1.0f, Color.OrangeRed, Color.OrangeRed, 0.1f, 0.2f);
     public static readonly WeatherType Volcano = new(WeatherTypeID.Volcano, "VolcanoAmbience", [.. Enumerable.Range(1, 6).Select(i => $"Rumble{i}")], 1.25f, 1.0f, 0.8f, 1.0f, new(107, 75, 52), new(107, 75, 52), 0.2f, 0.2f);

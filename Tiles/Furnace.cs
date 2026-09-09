@@ -1,5 +1,4 @@
 using Quest.Interaction;
-using Quest.World;
 
 namespace Quest.Tiles;
 

@@ -24,7 +24,7 @@ public class LevelManager
     public Level Level { get; private set; }
     public Color SkyColor { get; set; }
     public static readonly Point lootStackOffset = new(4, 4);
-    private static Tile[] grassTiles = new Tile[256 * 256];
+    private static readonly Tile[] grassTiles = new Tile[256 * 256];
     public static Level EmptyLevel => new("NUL/NUL", grassTiles, [], new(128, 128), WorldMetadata.Null);
     static LevelManager()
     {

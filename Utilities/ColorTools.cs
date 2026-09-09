@@ -1,6 +1,4 @@
-﻿using SharpDX.Direct3D9;
-
-namespace Quest.Utilities;
+﻿namespace Quest.Utilities;
 
 public enum AlphaBlend
 {

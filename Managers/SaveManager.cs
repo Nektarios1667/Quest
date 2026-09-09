@@ -340,7 +340,7 @@ public class SaveManager
         .ToArray();
 
         byte waypointsCount = (byte)playerWaypoints.Length;
-        
+
         writer.Write(waypointsCount);
         foreach ((Waypoint point, Level level) in playerWaypoints)
         {
@@ -358,7 +358,7 @@ public class SaveManager
             writer.Write(level.UID);
             for (int b = 0; b < level.Explored.Length; b += 8)
             {
-                byte packed = NumberTools.PackFlagsByte(level.Explored[b..(b+8)]);
+                byte packed = NumberTools.PackFlagsByte(level.Explored[b..(b + 8)]);
                 writer.Write(packed);
             }
         }

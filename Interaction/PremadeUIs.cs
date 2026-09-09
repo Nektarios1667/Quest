@@ -1,5 +1,4 @@
-﻿using System.Drawing.Text;
-using System.Linq;
+﻿using System.Linq;
 
 namespace Quest.Interaction;
 
@@ -477,7 +476,8 @@ public partial class UserInterface
                 messageLabel.SetText($"Removed '{nameInput.Text}'");
                 nameInput.SetText("");
                 colorInput.SetText("");
-            } else
+            }
+            else
             {
                 messageLabel.Foreground = Color.Red;
                 messageLabel.SetText($"No waypoint '{nameInput.Text}'");

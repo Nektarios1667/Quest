@@ -1,7 +1,6 @@
 ﻿using Quest.Gui;
 using Quest.Interaction;
 using Quest.World;
-using SharpDX.Direct3D11;
 namespace Quest.Managers;
 
 public class PlayerManager : IEntity, IStatusEffectable
@@ -448,7 +447,7 @@ public class PlayerManager : IEntity, IStatusEffectable
         for (int y = -radius; y <= radius; y++)
         {
             for (int x = -radius; x <= radius; x++)
-            {   
+            {
                 int idx = (center.X + x) + (center.Y + y) * Constants.MapSize.X;
 
                 // Checks

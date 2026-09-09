@@ -2,7 +2,6 @@ using Quest.Editor;
 using Quest.Editor.Managers;
 using Quest.Interaction;
 using System.IO;
-using Quest.World;
 
 namespace Quest.Tiles;
 

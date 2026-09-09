@@ -10,7 +10,7 @@ public enum BiomeType : byte
     Volcanic,
 }
 
-public static class Biome 
+public static class Biome
 {
     public static readonly Color[] BiomeTileColors =
     [

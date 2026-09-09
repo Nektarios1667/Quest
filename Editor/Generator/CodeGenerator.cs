@@ -1,10 +1,10 @@
 ﻿using ScottPlot;
 using ScottPlot.TickGenerators;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
-using System.Drawing;
 using Xna = Microsoft.Xna.Framework;
 
 namespace Quest.Editor.Generator;

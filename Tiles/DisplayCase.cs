@@ -3,7 +3,6 @@ using Quest.Editor.Managers;
 using Quest.Interaction;
 using System.ComponentModel;
 using System.IO;
-using Quest.World;
 
 namespace Quest.Tiles;
 

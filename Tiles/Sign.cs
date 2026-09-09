@@ -1,7 +1,6 @@
 using Quest.Editor;
 using Quest.Editor.Managers;
 using System.IO;
-using System.Security.Policy;
 
 namespace Quest.Tiles;
 

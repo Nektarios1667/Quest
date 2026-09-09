@@ -1,7 +1,4 @@
-﻿using HarfBuzzSharp;
-using MonoGame.Extended.Screens.Transitions;
-using System.Linq;
-using System.Threading;
+﻿using System.Linq;
 
 namespace Quest.World;
 
@@ -98,7 +95,8 @@ public class Level
         }
     }
     public void Rename(LevelPath path) => LevelPath = path;
-    public void AddWaypoint(Waypoint point) {
+    public void AddWaypoint(Waypoint point)
+    {
         if (Waypoints.Count >= byte.MaxValue)
         {
             Logger.Error($"Level {Path} at maxiumum waypoint count (255).");
