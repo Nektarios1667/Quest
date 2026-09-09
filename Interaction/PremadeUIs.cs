@@ -48,7 +48,7 @@ public partial class UserInterface
         ChestUI.AddElement("title", title);
 
         // Create slots
-        Point itemStart = new(Constants.Middle.X - Slot.SlotSize.X * Chest.Size.X / 2, Constants.NativeResolution.Y - (Slot.SlotSize.Y + 4) * 8);
+        Point itemStart = new(Constants.Middle.X - (Slot.SlotSize.X + 4) * Chest.Size.X / 2, Constants.NativeResolution.Y - (Slot.SlotSize.Y + 4) * 8);
         for (int y = 0; y < Chest.Size.Y; y++)
         {
             for (int x = 0; x < Chest.Size.X; x++)
@@ -152,7 +152,7 @@ public partial class UserInterface
         CrateUI.AddElement("title", title);
 
         // Create slots
-        Point itemStart = new(Constants.Middle.X - Slot.SlotSize.X * Crate.Size.X / 2, Constants.NativeResolution.Y - (Slot.SlotSize.Y + 4) * 8);
+        Point itemStart = new(Constants.Middle.X - (Slot.SlotSize.X + 4) * Crate.Size.X / 2, Constants.NativeResolution.Y - (Slot.SlotSize.Y + 4) * 8);
         for (int y = 0; y < Crate.Size.Y; y++)
         {
             for (int x = 0; x < Crate.Size.X; x++)
@@ -309,7 +309,7 @@ public partial class UserInterface
         InventoryUI = new(batch);
 
         // Create slots
-        Point itemStart = new(Constants.Middle.X - Slot.SlotSize.X * Chest.Size.X / 2, Constants.NativeResolution.Y - Slot.SlotSize.Y - 4);
+        Point itemStart = new(Constants.Middle.X - (Slot.SlotSize.X + 4) * Chest.Size.X / 2, Constants.NativeResolution.Y - Slot.SlotSize.Y - 4);
         for (int y = 0; y < Chest.Size.Y + 1; y++)
         {
             for (int x = 0; x < Chest.Size.X; x++)
