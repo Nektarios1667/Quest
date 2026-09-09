@@ -49,7 +49,7 @@ public class EditorLevelManager
     public void SaveLevelAs()
     {
         // Pull metadata
-        var metadata = SaveManager.ReadKeyValueFile($"Worlds/{LevelManager.Level.LevelPath.WorldName}/metadata");
+        var metadata = BinaryTools.ReadKeyValueFile($"Worlds/{LevelManager.Level.LevelPath.WorldName}/metadata");
 
         // Winforms
         var (success, values) = ShowInputForm("Save As", [
@@ -89,10 +89,10 @@ public class EditorLevelManager
 
 
         // Write metadata
-        SaveManager.WriteKeyValueFile($"Worlds/{path.WorldName}/metadata", metadata.ToDict());
+        BinaryTools.WriteKeyValueFile($"Worlds/{path.WorldName}/metadata", metadata.ToDict());
 
         // Write metadata
-        SaveManager.WriteKeyValueFile($"Worlds/{path.WorldName}/metadata", metadata.ToDict());
+        BinaryTools.WriteKeyValueFile($"Worlds/{path.WorldName}/metadata", metadata.ToDict());
 
         // Context
         using FileStream fileStream = File.Create($"GameData/Worlds/{path.WorldName}/levels/{path.LevelName}.qlv");

@@ -253,3 +253,56 @@ public static class BinaryReaderExtensions
     }
 }
 
+public static class BinaryTools
+{
+    public static Dictionary<string, string> ReadKeyValueFile(string path)
+    {
+        // Check if file exists
+        Directory.CreateDirectory("GameData/");
+        if (!File.Exists($"GameData/{path}.qkv"))
+        {
+            Logger.Error($"Quest Key Value file '{path}.qkv' not found in GameData/.");
+            return [];
+        }
+
+        // Read key-value pairs from file
+        try
+        {
+            Dictionary<string, string> data = [];
+            using (var fs = new FileStream($"GameData/{path}.qkv", FileMode.Open, FileAccess.Read))
+            using (var reader = new BinaryReader(fs))
+            {
+
+                uint pairs = reader.ReadUInt32();
+                for (int p = 0; p < pairs; p++)
+                {
+                    string key = reader.ReadString();
+                    string value = reader.ReadString();
+                    data[key] = value;
+                }
+            }
+            return data;
+        }
+        catch
+        {
+            return [];
+        }
+    }
+    public static void WriteKeyValueFile(string path, Dictionary<string, string> data)
+    {
+        // Write key-value pairs to file
+        using (var fs = new FileStream($"GameData/{path}.qkv", FileMode.Create, FileAccess.Write))
+        using (var writer = new BinaryWriter(fs))
+        {
+            writer.Write((uint)data.Count);
+            foreach (var pair in data)
+            {
+                writer.Write(pair.Key);
+                writer.Write(pair.Value);
+            }
+        }
+        // Copy back to source code
+        if (Constants.DEVMODE)
+            File.Copy($"GameData/{path}.qkv", $"../../../GameData/{path}.qkv", true);
+    }
+}

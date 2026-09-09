@@ -160,12 +160,12 @@ public static class SettingsManager
             settings[$"Bind_{kv.Key}"] = kv.Value.ToString();
 
         // Write to settings.qkv in GameData/Persistent
-        SaveManager.WriteKeyValueFile("Persistent/settings", settings);
+        BinaryTools.WriteKeyValueFile("Persistent/settings", settings);
     }
     public static void LoadSettings(IAdjustableWindow window)
     {
         // Read from settings.qkv in GameData/Persistent
-        var settings = SaveManager.ReadKeyValueFile("Persistent/settings");
+        var settings = BinaryTools.ReadKeyValueFile("Persistent/settings");
         if (settings.TryGetValue("ScreenResolution", out string? res))
         {
             var parts = res.Split('x');

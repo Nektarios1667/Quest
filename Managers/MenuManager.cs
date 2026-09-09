@@ -141,7 +141,7 @@ public class MenuManager
     public async Task<bool> ContinueSave()
     {
 
-        if (SaveManager.ReadKeyValueFile("Persistent/continue").TryGetValue("save", out var loadSave))
+        if (BinaryTools.ReadKeyValueFile("Persistent/continue").TryGetValue("save", out var loadSave))
         {
             gameManager.StateManager.State = GameState.Loading;
             bool success = await SaveManager.ReadGameState(gameManager, playerManager, new(loadSave));
@@ -178,10 +178,10 @@ public class MenuManager
                 File.Delete($"GameData/Worlds/{worlds.Selected}/saves/{saves.Selected}.qsv");
 
             // Check continue save
-            var continueData = SaveManager.ReadKeyValueFile("Persistent/continue");
+            var continueData = BinaryTools.ReadKeyValueFile("Persistent/continue");
             if (continueData.TryGetValue("save", out string? value) && value.Replace('\\', '/') == $"{worlds.Selected}/{saves.Selected}")
                 continueData.Remove("save");
-            SaveManager.WriteKeyValueFile("Persistent/continue", continueData);
+            BinaryTools.WriteKeyValueFile("Persistent/continue", continueData);
 
             // Refresh
             LoadSaves(worlds.Selected);

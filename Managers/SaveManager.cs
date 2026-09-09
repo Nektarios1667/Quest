@@ -1,5 +1,4 @@
 ﻿using Quest.World;
-using SharpDX.Direct2D1.Effects;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -78,7 +77,7 @@ public class SaveManager
     public static void SaveGameState(GameManager gameManager, PlayerManager playerManager)
     {
         // Continue save
-        WriteKeyValueFile("Persistent/continue", new() { { "save", CurrentSave.ToString() } });
+        BinaryTools.WriteKeyValueFile("Persistent/continue", new() { { "save", CurrentSave.ToString() } });
         string worldName = gameManager.LevelManager.Level.WorldName;
         byte[] data;
 
@@ -375,7 +374,7 @@ public class SaveManager
             return false;
         }
         CurrentSave = levelPath;
-        WriteKeyValueFile("Persistent/continue", new() { { "save", levelPath.ToString() } });
+        BinaryTools.WriteKeyValueFile("Persistent/continue", new() { { "save", levelPath.ToString() } });
         await LevelFileManager.ReadWorldAsync(gameManager, levelPath.WorldName, true);
 
         gameManager.LevelManager.TasksComplete = 0;
@@ -664,11 +663,6 @@ public class SaveManager
         }
     }
     #endregion
-    private static void ClearSavedState()
-    {
-        savedStateTiles.Clear();
-        savedChests.Clear();
-    }
     #region WriteHelpers
     public static void WriteChestData(BinaryWriter writer, Chest chest)
     {
@@ -828,54 +822,4 @@ public class SaveManager
         gameManager.LevelManager.Level.Projectiles.Add(proj);
     }
     #endregion
-    public static Dictionary<string, string> ReadKeyValueFile(string path)
-    {
-        // Check if file exists
-        Directory.CreateDirectory("GameData/");
-        if (!File.Exists($"GameData/{path}.qkv"))
-        {
-            Logger.Error($"Quest Key Value file '{path}.qkv' not found in GameData/.");
-            return [];
-        }
-
-        // Read key-value pairs from file
-        try
-        {
-            Dictionary<string, string> data = [];
-            using (var fs = new FileStream($"GameData/{path}.qkv", FileMode.Open, FileAccess.Read))
-            using (var reader = new BinaryReader(fs))
-            {
-
-                uint pairs = reader.ReadUInt32();
-                for (int p = 0; p < pairs; p++)
-                {
-                    string key = reader.ReadString();
-                    string value = reader.ReadString();
-                    data[key] = value;
-                }
-            }
-            return data;
-        }
-        catch
-        {
-            return [];
-        }
-    }
-    public static void WriteKeyValueFile(string path, Dictionary<string, string> data)
-    {
-        // Write key-value pairs to file
-        using (var fs = new FileStream($"GameData/{path}.qkv", FileMode.Create, FileAccess.Write))
-        using (var writer = new BinaryWriter(fs))
-        {
-            writer.Write((uint)data.Count);
-            foreach (var pair in data)
-            {
-                writer.Write(pair.Key);
-                writer.Write(pair.Value);
-            }
-        }
-        // Copy back to source code
-        if (Constants.DEVMODE)
-            File.Copy($"GameData/{path}.qkv", $"../../../GameData/{path}.qkv", true);
-    }
 }

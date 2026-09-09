@@ -84,7 +84,7 @@ public static class LevelFileManager
 
         // Read metadata
         WorldMetadata meta = WorldMetadata.Null;
-        var kvDict = SaveManager.ReadKeyValueFile($"Worlds/{levelPath.WorldName}/metadata");
+        var kvDict = BinaryTools.ReadKeyValueFile($"Worlds/{levelPath.WorldName}/metadata");
         meta.Author = kvDict.GetValueOrDefault("Author", defaultValue: "Unknown");
         meta.Description = kvDict.GetValueOrDefault("Description", defaultValue: "None");
         gameManager.LevelManager.TasksComplete++;
