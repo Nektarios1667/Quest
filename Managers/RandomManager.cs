@@ -95,4 +95,10 @@ public static class RandomManager
             result += chars[random.Next(chars.Length)];
         return result;
     }
+    public static T SelectRandom<T>(params T[] items)
+    {
+        if (items.Length == 0)
+            throw new ArgumentException("No items provided to select from.");
+        return items[random.Next(items.Length)];
+    }
 }

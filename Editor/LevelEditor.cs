@@ -435,7 +435,7 @@ public class LevelEditor : Game, IAdjustableWindow
         // Gui
         if (gameManager.StateManager.State == GameState.Settings)
         {
-            TextureManager.DrawTexture(spriteBatch, TextureID.MenuBackground, Point.Zero, scale: MenuManager.MenuBackgroundScale);
+            TextureManager.DrawTexture(spriteBatch, TextureID.QuestValleyBackground, Point.Zero, scale: MenuManager.MenuBackgroundScale);
             SettingsMenu.Draw();
         }
         else

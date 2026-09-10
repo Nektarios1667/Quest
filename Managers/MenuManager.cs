@@ -9,7 +9,7 @@ namespace Quest.Managers;
 
 public class MenuManager
 {
-    public static Vector2 MenuBackgroundScale => Constants.NativeResolution.ToVector2() / TextureManager.Metadata[TextureID.MenuBackground].Size.ToVector2();
+    public static Vector2 MenuBackgroundScale => Constants.NativeResolution.ToVector2() / TextureManager.Metadata[MenuBackground].Size.ToVector2();
     public GUI MainMenu { get; private set; }
     public GUI SettingsMenu { get; private set; }
     public GUI CreditsMenu { get; private set; }
@@ -17,6 +17,7 @@ public class MenuManager
     public GUI LoadingMenu { get; private set; }
     public GUI PauseMenu { get; private set; }
     public GUI DebugMenu { get; private set; }
+    public static TextureID MenuBackground { get; private set; } = RandomManager.SelectRandom(TextureManager.TypeTextures[TextureType.Background]);
 
     private readonly GameManager gameManager;
     private readonly PlayerManager playerManager;
@@ -310,7 +311,7 @@ public class MenuManager
     private void DrawMenu(SpriteBatch batch)
     {
 
-        TextureManager.DrawTexture(batch, TextureID.MenuBackground, Point.Zero, scale: MenuBackgroundScale);
+        TextureManager.DrawTexture(batch, MenuBackground, Point.Zero, scale: MenuBackgroundScale);
         Vector2 logoCenter = new(Constants.Middle.X - TextureManager.Metadata[TextureID.QuestTitle].Size.X / 2, 20);
         gameManager.Batch.Draw(Textures[TextureID.QuestTitle], logoCenter, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.0f);
 
@@ -318,24 +319,24 @@ public class MenuManager
     }
     private void DrawSettings(SpriteBatch batch)
     {
-        TextureManager.DrawTexture(batch, TextureID.MenuBackground, Point.Zero, scale: MenuBackgroundScale);
+        TextureManager.DrawTexture(batch, MenuBackground, Point.Zero, scale: MenuBackgroundScale);
         gameManager.Batch.FillRectangle(new(Vector2.Zero, Constants.NativeResolution), Color.Black * 0.6f);
         SettingsMenu.Draw();
     }
     private void DrawCredits(SpriteBatch batch)
     {
-        TextureManager.DrawTexture(batch, TextureID.MenuBackground, Point.Zero, scale: MenuBackgroundScale);
+        TextureManager.DrawTexture(batch, MenuBackground, Point.Zero, scale: MenuBackgroundScale);
         gameManager.Batch.FillRectangle(new(Vector2.Zero, Constants.NativeResolution), Color.Black * 0.6f);
         CreditsMenu.Draw();
     }
     private void DrawLevelSelection(SpriteBatch batch)
     {
-        TextureManager.DrawTexture(batch, TextureID.MenuBackground, Point.Zero, scale: MenuBackgroundScale);
+        TextureManager.DrawTexture(batch, MenuBackground, Point.Zero, scale: MenuBackgroundScale);
         LevelSelectMenu.Draw();
     }
     private void DrawLoading(SpriteBatch batch)
     {
-        TextureManager.DrawTexture(batch, TextureID.MenuBackground, Point.Zero, scale: MenuBackgroundScale);
+        TextureManager.DrawTexture(batch, MenuBackground, Point.Zero, scale: MenuBackgroundScale);
         gameManager.Batch.FillRectangle(new(Vector2.Zero, Constants.NativeResolution), Color.Black * 0.6f);
         LoadingMenu.Draw();
     }

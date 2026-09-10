@@ -17,6 +17,7 @@ public static class TextureManager
         Other,
         Character,
         GUI,
+        Background,
         Item,
         Tile,
         Decal,
@@ -63,7 +64,8 @@ public static class TextureManager
         GuiBackground,
         Slot,
         Speech,
-        MenuBackground,
+        QuestValleyBackground,
+        QuestTundraBackground,
         QuestTitle,
         TileOutline,
         RedX,
@@ -299,6 +301,7 @@ public static class TextureManager
     public static SpriteFont Arial { get; private set; } = null!;
     public static SpriteFont ArialSmall { get; private set; } = null!;
 
+    public static Dictionary<TextureType, TextureID[]> TypeTextures { get; private set; } = [];
     private static ContentManager? Content { get; set; }
     public static void LoadTextures(ContentManager content)
     {
@@ -342,7 +345,8 @@ public static class TextureManager
         Textures[TextureID.GuiBackground] = content.Load<Texture2D>("Images/Gui/GuiBackground");
         Textures[TextureID.Slot] = content.Load<Texture2D>("Images/Gui/Slot");
         Textures[TextureID.Speech] = content.Load<Texture2D>("Images/Gui/Speech");
-        Textures[TextureID.MenuBackground] = content.Load<Texture2D>("Images/Gui/MenuBackground3");
+        Textures[TextureID.QuestValleyBackground] = content.Load<Texture2D>("Images/Gui/QuestValley");
+        Textures[TextureID.QuestTundraBackground] = content.Load<Texture2D>("Images/Gui/QuestTundra");
         Textures[TextureID.QuestTitle] = content.Load<Texture2D>("Images/Gui/QuestTitle");
         Textures[TextureID.TileOutline] = content.Load<Texture2D>("Images/Gui/TileOutline");
         Textures[TextureID.RedX] = content.Load<Texture2D>("Images/Gui/RedX");
@@ -607,7 +611,8 @@ public static class TextureManager
         Metadata[TextureID.GuiBackground] = new(Textures[TextureID.GuiBackground].Bounds.Size, new(1, 1), TextureType.GUI);
         Metadata[TextureID.Slot] = new(Textures[TextureID.Slot].Bounds.Size, new(1, 1), TextureType.GUI);
         Metadata[TextureID.Speech] = new(Textures[TextureID.Speech].Bounds.Size, new(1, 4), TextureType.GUI);
-        Metadata[TextureID.MenuBackground] = new(Textures[TextureID.MenuBackground].Bounds.Size, new(1, 1), TextureType.GUI);
+        Metadata[TextureID.QuestValleyBackground] = new(Textures[TextureID.QuestValleyBackground].Bounds.Size, new(1, 1), TextureType.Background);
+        Metadata[TextureID.QuestTundraBackground] = new(Textures[TextureID.QuestTundraBackground].Bounds.Size, new(1, 1), TextureType.Background);
         Metadata[TextureID.QuestTitle] = new(Textures[TextureID.QuestTitle].Bounds.Size, new(1, 1), TextureType.GUI);
         Metadata[TextureID.TileOutline] = new(Textures[TextureID.TileOutline].Bounds.Size, new(4, 4), TextureType.Tile);
         Metadata[TextureID.RedX] = new(Textures[TextureID.RedX].Bounds.Size, new(1, 1), TextureType.GUI);
@@ -829,7 +834,6 @@ public static class TextureManager
                 Logger.Error($"Metadata for texture '{kv.Key}' failed to load.");
             else
                 Logger.System($"Metadata for texture '{kv.Key}' successfully loaded.");
-        Logger.System($"Successfully loaded {Metadata.Count}/{Textures.Count} texture Metadata.");
 
         // Null texture
         NullTexture = Textures[TextureID.Null];
@@ -838,6 +842,12 @@ public static class TextureManager
         CharacterTextures = [.. Textures.Where(kv => Metadata[kv.Key].Type == TextureType.Character).Select(kv => kv.Key)];
         ProjectileTextures = [.. Textures.Where(kv => Metadata[kv.Key].Type == TextureType.Projectile).Select(kv => kv.Key)];
 
+        // Create type dict
+        foreach (TextureType type in Enum.GetValues<TextureType>())
+        {
+            TypeTextures[type] = [.. Textures.Where(kv => Metadata[kv.Key].Type == type).Select(kv => kv.Key)];
+        }
+        Logger.System($"Successfully loaded {Metadata.Count}/{Textures.Count} texture Metadata.");
 
         // Fonts
         PixelOperator = Content.Load<SpriteFont>("Fonts/PixelOperator");
