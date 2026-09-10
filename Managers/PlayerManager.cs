@@ -393,8 +393,10 @@ public class PlayerManager : IEntity, IStatusEffectable
             bool left = PlayerDirection == Direction.Left;
             var leftShift = left ? new(TextureManager.Metadata[EquippedItem.Texture].Size.X * 2, 0) : Point.Zero;
             Point itemPos = Constants.Middle + CameraManager.CameraOffset.ToPoint() + TextureManager.Metadata[EquippedItem.Texture].Size - leftShift + Constants.MageItemShift.Scaled(left ? -1 : 1);
-            float rotate = Math.Clamp(((float)Math.Pow(TimerManager.TryGetTimer("MeleeAttack")?.Progress ?? 0, 0.5f)) * (PlayerDirection == Direction.Left ? -1 : 1) * 2, -1f, 1f);
-            DrawTexture(gameManager.Batch, EquippedItem.Texture, itemPos, scale: new(2), effects: PlayerDirection == Direction.Left ? SpriteEffects.FlipHorizontally : SpriteEffects.None, rotation: rotate, origin: TextureManager.Metadata[EquippedItem.Texture].Size.ToVector2() / 2);
+
+            float offset = 10 * (float)Math.Sin(MathHelper.Pi * (TimerManager.TryGetTimer("MeleeAttack")?.Progress ?? 0));
+            itemPos += new Point((int)offset * (PlayerDirection == Direction.Left ? -1 : 1), -(int)offset);
+            DrawTexture(gameManager.Batch, EquippedItem.Texture, itemPos, scale: new(Constants.EquipmentScale), effects: PlayerDirection == Direction.Left ? SpriteEffects.FlipHorizontally : SpriteEffects.None, origin: TextureManager.Metadata[EquippedItem.Texture].Size.ToVector2() / 2);
         }
         // Hitbox
         DebugManager.DrawHitbox(gameManager.Batch, this);

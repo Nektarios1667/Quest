@@ -71,6 +71,7 @@ public static class Constants
     public const float PlayerScale = 3;
     public const float NPCScale = 3;
     public const float ProjectileScale = 2;
+    public const float EquipmentScale = 2;
 
     // Colors
     public static readonly Color NearBlack = new(85, 85, 85);

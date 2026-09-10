@@ -281,10 +281,12 @@ public class Tile
         // Connected textures debug
         if (!DebugManager.TileConnectionsDebug) return;
         int mask = gameManager.LevelManager.TileConnectionsMask(this);
-        gameManager.Batch.DrawPoint(dest.ToVector2() + new Vector2(0, Constants.TileSize.Y / 2), (mask & 1) == 0 ? Color.Red : Color.Green, size: 5);     // Left
-        gameManager.Batch.DrawPoint(dest.ToVector2() + new Vector2(Constants.TileSize.X, Constants.TileSize.Y / 2), (mask & 4) == 0 ? Color.Red : Color.Green, size: 5); // Right
-        gameManager.Batch.DrawPoint(dest.ToVector2() + new Vector2(Constants.TileSize.X / 2, 0), (mask & 8) == 0 ? Color.Red : Color.Green, size: 5); // Up
-        gameManager.Batch.DrawPoint(dest.ToVector2() + new Vector2(Constants.TileSize.X / 2, Constants.TileSize.Y), (mask & 2) == 0 ? Color.Red : Color.Green, size: 5); // Down
+
+        Vector2 destVec = dest.ToVector2();
+        gameManager.Batch.DrawPoint(destVec + new Vector2(0, Constants.TileSize.Y / 2), (mask & 1) == 0 ? Color.Red : Color.Green, size: 5);     // Left
+        gameManager.Batch.DrawPoint(destVec + new Vector2(Constants.TileSize.X, Constants.TileSize.Y / 2), (mask & 4) == 0 ? Color.Red : Color.Green, size: 5); // Right
+        gameManager.Batch.DrawPoint(destVec + new Vector2(Constants.TileSize.X / 2, 0), (mask & 8) == 0 ? Color.Red : Color.Green, size: 5); // Up
+        gameManager.Batch.DrawPoint(destVec + new Vector2(Constants.TileSize.X / 2, Constants.TileSize.Y), (mask & 2) == 0 ? Color.Red : Color.Green, size: 5); // Down
     }
 
     public virtual void OnPlayerEnter(GameManager gameManager, PlayerManager player) { }
