@@ -385,7 +385,7 @@ public class PlayerManager : IEntity, IStatusEffectable
         int sourceRow = (int)PlayerDirection;
         // Draw player
         Point pos = Constants.Middle - Constants.MageHalfSize + CameraManager.CameraOffset.ToPoint();
-        Rectangle source = GetAnimationSource(TextureID.BlueMage, GameManager.GameTime, duration: sourceRow == 0 ? .5f : .25f, row: sourceRow);
+        Rectangle source = GetAnimationSource(TextureID.BlueMage, GameManager.GameTime, duration: PlayerDirection == Direction.Forward ? .5f : .25f, row: sourceRow);
         DrawTexture(gameManager.Batch, TextureID.BlueMage, pos, scale: new(Constants.PlayerScale), source: source);
         // Draw equipped item
         if (EquippedItem != null)
