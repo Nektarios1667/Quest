@@ -62,10 +62,10 @@ public class GameManager
         {
             StateManager.OverlayState = OverlayState.None;
             StatusManager.ClearAllStatusEffects(this, playerManager);
+            TimerManager.TryRemove("ScreenFadeOut");
+            TimerManager.SetTimer("ScreenFadeIn", 2f, false, null);
 
             await SaveManager.ReadGameState(this, playerManager, SaveManager.CurrentSave);
-
-            TimerManager.TryRemove("ScreenFadeOut");
         }
         catch (Exception e)
         {

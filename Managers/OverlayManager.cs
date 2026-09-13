@@ -7,7 +7,7 @@ namespace Quest.Managers;
 public class OverlayManager
 {
     public Gui.Overlay Gui { get; private set; } // GUI handler
-    public NotificationArea LootNotifications { get; private set; } // Loot pickup notifications
+    public NotificationArea PlayerNotificationArea { get; private set; } // Loot pickup notifications
     public StatusBar HealthBar { get; private set; }
     public StatusBar HungerBar { get; private set; }
     public Dialog WorldInfobox { get; private set; }
@@ -20,7 +20,7 @@ public class OverlayManager
         Gui.Widgets = [
             HealthBar = new StatusBar(new(10, Constants.NativeResolution.Y - 35), new(300, 25), Color.Green * 0.7f, Color.Red * 0.7f, 100, 100, textType: StatusTextType.Fraction),
             HungerBar = new StatusBar(new(10, Constants.NativeResolution.Y - 70), new(300, 25), Color.Goldenrod * 0.7f, Color.Brown * 0.7f, 20, 20, textType: StatusTextType.Fraction),
-            LootNotifications = new NotificationArea(Constants.Middle - new Point(0, Constants.MageHalfSize.Y + 15), 5, PixelOperatorBold),
+            PlayerNotificationArea = new NotificationArea(Constants.Middle - new Point(0, Constants.MageHalfSize.Y + 15), 5, PixelOperatorBold),
             WorldInfobox = new Dialog(Gui, null, new(1200, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false },
             ItemInfobox = new Dialog(Gui, new(Constants.NativeResolution.X - 370, Constants.NativeResolution.Y - 200), new(350, 200), new Color(100, 100, 100) * 0.5f, Color.White, "", PixelOperator, borderColor: new Color(40, 40, 40) * 0.5f) { IsVisible = false }
         ];
@@ -90,7 +90,7 @@ public class OverlayManager
         // Widgets
         if (gameManager.StateManager.OverlayState != OverlayState.Death)
         {
-            LootNotifications.Offset = (CameraManager.CameraDest - CameraManager.Camera).ToPoint();
+            PlayerNotificationArea.Offset = (CameraManager.CameraDest - CameraManager.Camera).ToPoint();
             Gui.Draw(gameManager.Batch);
 
             // Minimap
@@ -284,7 +284,7 @@ public class OverlayManager
     }
     public void Notification(string text, Color? color = null, float duration = 5f)
     {
-        LootNotifications.AddNotification(text, color, duration);
+        PlayerNotificationArea.AddNotification(text, color, duration);
     }
     public void InvalidateMinimap() { Minimap = null; }
 }

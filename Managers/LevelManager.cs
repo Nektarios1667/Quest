@@ -369,7 +369,7 @@ public class LevelManager
     public void DropLoot(GameManager gameManager, Loot loot)
     {
         Level.Loot.Add(loot);
-        gameManager.OverlayManager.LootNotifications.AddNotification($"-{loot.DisplayName}");
+        gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"-{loot.DisplayName}");
     }
     public static int Flatten(Point point) => point.X + point.Y * Constants.MapSize.X;
 }

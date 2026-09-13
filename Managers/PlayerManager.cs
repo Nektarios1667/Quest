@@ -339,7 +339,7 @@ public class PlayerManager : IEntity, IStatusEffectable
             // Pick up loot
             if (PointTools.DistanceSquared(CameraManager.PlayerFoot, loot.Position + new Point(20, 20)) <= Constants.TileSize.X * Constants.TileSize.Y * .5f)
             {
-                gameManager.OverlayManager.LootNotifications.AddNotification($"+{loot.DisplayName}");
+                gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"+{loot.DisplayName}");
                 Item adding = Item.Create(loot.Item.Type, loot.Item.Amount, loot.Item.CustomName);
                 Item leftover = Inventory.AddItem(adding);
                 if (leftover.Amount <= 0)
@@ -597,11 +597,10 @@ public class PlayerManager : IEntity, IStatusEffectable
     public void Hurt(GameManager gameManager, int damage)
     {
         Health -= damage;
-        gameManager.OverlayManager.LootNotifications.AddNotification($"-{damage}", Color.Orange, duration: 2);
+        gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"-{damage}", Color.Orange, duration: 2);
         if (Health <= 0)
         {
             Die(gameManager);
-
         }
     }
     public void Die(GameManager gameManager)
@@ -620,13 +619,27 @@ public class PlayerManager : IEntity, IStatusEffectable
         health = Math.Min(health, MaxHealth - Health);
         Health += health;
         if (health > 0)
-            gameManager.OverlayManager.LootNotifications.AddNotification($"+{health}", Color.Green, duration: 2);
+            gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"+{health}", Color.Green, duration: 2);
+    }
+    public void SetHealth(GameManager gameManager, int health)
+    {
+        Health = Math.Min(health, MaxHealth);
+        if (Health <= 0)
+        {
+            Die(gameManager);
+        }
+        gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"={Health}", Color.Green, duration: 2);
     }
     public void Eat(GameManager gameManager, int hunger)
     {
         hunger = Math.Min(hunger, Constants.PlayerBaseHunger - Hunger);
         Hunger += hunger;
         if (hunger > 0)
-            gameManager.OverlayManager.LootNotifications.AddNotification($"+{hunger}", Color.Goldenrod, duration: 2);
+            gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"+{hunger}", Color.Goldenrod, duration: 2);
+    }
+    public void SetHunger(GameManager gameManager, int hunger)
+    {
+        Hunger = Math.Min(hunger, MaxHunger);
+        gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"={Hunger}", Color.Goldenrod, duration: 2);
     }
 }
