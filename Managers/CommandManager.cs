@@ -90,6 +90,7 @@ public static class CommandManager
             new($"daytime <modify> {{-{Constants.DayLength}:{Constants.DayLength}}}", CDaytime, "Daytime |1| |2|", "Failed |1| daytime |2|"),
             new("store * *", CStore, "Stored |2| to '|1|'", "Failed to store |2| to '|1|'"),
             new("gametime <modify> {-999999:999999}", CGameTime, "Game time |1| |2|", "Failed |1| gametime |2|"),
+            new("gamespeed set d{0:100}", CGameSpeed, "Game speed set to |2|", "Failed to set game speed to |2|"),
             new("macro *", CMacro, "Executed macro '|1|'.", "Failed to execute macro '|1|'."),
             new("give <item> {1:255} *", CGive, "Gave |2| |1| (|3|) to player", "Failed to give |2| |1| (|3|) to player"),
             new("notif <int> <int> <int> <number> **", CNotif, "Notification |*| created.", "Failed to create notification |*|."),
@@ -179,7 +180,7 @@ public static class CommandManager
             // Any
             else if (args[p] == "*") { }
             // Float range
-            else if (args[p].StartsWith("f{") && args[p].EndsWith('}'))
+            else if (args[p].StartsWith("d{") && args[p].EndsWith('}'))
             {
                 string[] range = args[p][2..^1].Split(':');
                 if (range.Length != 2) { return false; }
@@ -200,6 +201,7 @@ public static class CommandManager
             }
             // Unlimited args
             else if (args[p] == "**") { return true; }
+            else if (args[p] != part) { return false; }
 
 
             // +1
@@ -305,6 +307,18 @@ public static class CommandManager
         else if (parts[1] == "change")
         {
             GameManager.GameTime += daytime;
+            return true;
+        }
+        return false;
+    }
+    private static bool CGameSpeed(string command)
+    {
+        string[] parts = command.Split(' ');
+        if (parts.Length < 2) return false;
+        float speed = float.Parse(parts[2]);
+        if (parts[1] == "set")
+        {
+            GameManager.TimeScale = speed;
             return true;
         }
         return false;
