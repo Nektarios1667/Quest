@@ -20,7 +20,7 @@ public class Lever : TriggerTile
         if (TimerManager.IsCompleteOrMissing($"LeverCooldown_{UID}"))
         {
             Activate(gameManager);
-            TimerManager.SetTimer($"LeverCooldown_{UID}", 1, null);
+            TimerManager.SetTimer($"LeverCooldown_{UID}", 1, true, null);
         }
     }
     public override void Activate(GameManager gameManager, bool _ = true)
@@ -41,6 +41,6 @@ public class Lever : TriggerTile
     public override void ReadState(BinaryReader reader, GameManager gameManager)
     {
         Activated = reader.ReadBoolean();
-        TimerManager.SetTimer($"LeverCooldown_{UID}", reader.ReadSingle(), null);
+        TimerManager.SetTimer($"LeverCooldown_{UID}", reader.ReadSingle(), true, null);
     }
 }

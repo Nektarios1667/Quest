@@ -109,7 +109,7 @@ public static class StatusManager
         var expiredEffects = new List<StatusEffect>();
         foreach (var kvp in entity.StatusEffects)
         {
-            entity.StatusEffects[kvp.Key] -= GameManager.DeltaTime;
+            entity.StatusEffects[kvp.Key] -= GameManager.DeltaGameTime;
 
             // Player
             if (isPlayer)
@@ -144,7 +144,7 @@ public static class StatusManager
             if (TimerManager.IsCompleteOrMissing($"DOTTick_{entity.UID}"))
             {
                 entity.Hurt(gameManager, 5);
-                TimerManager.SetTimer($"DOTTick_{entity.UID}", 1, null);
+                TimerManager.SetTimer($"DOTTick_{entity.UID}", 1, true, null);
             }
             if (isPlayer)
                 gameManager.GradingEffect?.Parameters["Tint"].SetValue(new Vector3(.8f, 1, .8f));
@@ -152,7 +152,7 @@ public static class StatusManager
         if (HasStatusEffect(StatusEffect.Regeneration, entity) && TimerManager.IsCompleteOrMissing($"RegenerationTick_{entity.UID}"))
         {
             entity.Heal(gameManager, 5);
-            TimerManager.SetTimer($"RegenerationTick_{entity.UID}", 1, null);
+            TimerManager.SetTimer($"RegenerationTick_{entity.UID}", 1, true, null);
         }
         if (HasStatusEffect(StatusEffect.Delerium, entity) && isPlayer)
         {

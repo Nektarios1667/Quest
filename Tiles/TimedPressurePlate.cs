@@ -24,7 +24,7 @@ public class TimedPressurePlate : TriggerTile
     }
     public override void OnPlayerEnter(GameManager gameManager, PlayerManager player)
     {
-        Timer = TimerManager.NewTimer($"TimedPressurePlate_{UID}", Time, () => Activate(gameManager));
+        Timer = TimerManager.NewTimer($"TimedPressurePlate_{UID}", Time, true, () => Activate(gameManager), int.MaxValue);
 
         // Special
         if (Timer.Progress <= 0 && ToggleTileEffects.Contains(EffectType))
@@ -44,7 +44,7 @@ public class TimedPressurePlate : TriggerTile
         Activated = reader.ReadBoolean();
         float timeLeft = reader.ReadSingle();
         if (Activated)
-            TimerManager.SetTimer($"TimedPressurePlate_{UID}", timeLeft, () => Activate(gameManager));
+            TimerManager.SetTimer($"TimedPressurePlate_{UID}", timeLeft, true, () => Activate(gameManager));
     }
     public override void Activate(GameManager gameManager, bool _ = true)
     {

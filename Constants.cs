@@ -23,7 +23,7 @@ public static class Constants
     public const int DayLength = 600; // Length of a day in seconds
     public const int PlayerBaseHealth = 100;
     public const int PlayerBaseHunger = 20;
-    public const int SecondsPerHungerLoss = 60; // How many seconds it takes to lose 1 hunger point
+    public const int SecondsPerHungerLoss = 30; // How many seconds it takes to lose 1 hunger point
     public const int SecondsPerNaturalRegen = 3; // How many seconds it takes to regenerate health when hungry
     public const int NaturalRegenRate = 5; // How many hp for each hunger point when regenerating health
     public const int SecondsPerStarvation = 5; // How many seconds it takes to lose hp when starving

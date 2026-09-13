@@ -42,8 +42,8 @@ public class PlayerManager : IEntity, IStatusEffectable
     // Inventory and UI
     public NotificationArea StatusArea { get; } = new(new(5, 5), 400, PixelOperatorSubtitle, color: Color.Gray, hAlign: HorizontalAlignment.Left, vAlign: VerticalAlignment.Top);
     public bool InventoryOpen { get; set; } = false;
-    public Container Inventory { get; private set; }
-    public UserInterface InventoryUI { get; private set; }
+    public Container Inventory { get; private set; } = null!;
+    public UserInterface InventoryUI { get; private set; } = null!;
     public UserInterface? OpenedInterface { get; set; } = null;
     private int equippedSlot = 0;
     public int EquippedSlot
@@ -71,7 +71,7 @@ public class PlayerManager : IEntity, IStatusEffectable
     private GameManager GameManager = null!;
     public PlayerManager()
     {
-        TimerManager.SetTimer("PlayerHungerLoss", Constants.SecondsPerHungerLoss, null);
+        TimerManager.SetTimer("PlayerHungerLoss", Constants.SecondsPerHungerLoss, true, null);
 
     }
     public void InitUI()
@@ -149,7 +149,7 @@ public class PlayerManager : IEntity, IStatusEffectable
         // Inventory
         DebugManager.StartBenchmark("InventoryUpdate");
 
-        StatusArea.Update(GameManager.DeltaTime);
+        StatusArea.Update(GameManager.DeltaRealTime);
 
         // Change equipped item with hotkeys
         if (!InventoryOpen)
@@ -189,13 +189,13 @@ public class PlayerManager : IEntity, IStatusEffectable
         // Hunger
         if (TimerManager.IsCompleteOrMissing("PlayerHungerLoss"))
         {
-            TimerManager.SetTimer("PlayerHungerLoss", Constants.SecondsPerHungerLoss, null);
+            TimerManager.SetTimer("PlayerHungerLoss", Constants.SecondsPerHungerLoss, true, null);
             Hunger -= StatusManager.GetCravingsMult(this);
         }
         // Natural regen
         if (Hunger > MaxHunger * 0.8f && Health < MaxHealth && TimerManager.IsCompleteOrMissing("PlayerNaturalRegen"))
         {
-            TimerManager.SetTimer("PlayerNaturalRegen", Constants.SecondsPerNaturalRegen, null);
+            TimerManager.SetTimer("PlayerNaturalRegen", Constants.SecondsPerNaturalRegen, true, null);
             Heal(gameManager, Constants.NaturalRegenRate);
             Hunger -= 1;
         }
@@ -204,7 +204,7 @@ public class PlayerManager : IEntity, IStatusEffectable
         {
             StatusManager.AddStatusEffect(this, StatusEffect.Weakness, Constants.SecondsPerStarvation + 1);
             StatusManager.AddStatusEffect(this, StatusEffect.Slowness, Constants.SecondsPerStarvation + 1);
-            TimerManager.SetTimer("PlayerStarvation", Constants.SecondsPerStarvation, null);
+            TimerManager.SetTimer("PlayerStarvation", Constants.SecondsPerStarvation, true, null);
             if (Hunger <= 0)
                 Hurt(gameManager, Constants.StarvationRate);
         }
@@ -415,7 +415,7 @@ public class PlayerManager : IEntity, IStatusEffectable
 
         // Move
         if (move == Vector2.Zero) return;
-        Vector2 finalMove = Vector2.Normalize(move) * GameManager.DeltaTime * Speed;
+        Vector2 finalMove = Vector2.Normalize(move) * GameManager.DeltaGameTime * Speed;
 
         // Stuck in block
         if (IsColliding(gameManager)) return;
@@ -611,7 +611,7 @@ public class PlayerManager : IEntity, IStatusEffectable
         CloseInterface();
         CloseInventory(gameManager);
 
-        TimerManager.SetTimer("ScreenFadeOut", 2f, null);
+        TimerManager.SetTimer("ScreenFadeOut", 2f, false, null);
 
         gameManager.StateManager.OverlayState = OverlayState.Death;
     }

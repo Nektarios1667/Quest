@@ -6,9 +6,11 @@ public class GameManager
 {
     // Static times
     public static ulong FrameCount { get; private set; } = 0;
-    public static float DeltaTime { get; private set; } = 0f;
     public static float GameTime { get; set; } = 0f;
-    public static float TotalTime { get; private set; } = 0f;
+    public static float DeltaGameTime { get; set; } = 0f;
+    public static float TimeScale { get; set; } = 100f;
+    public static float RealTime { get; private set; } = 0f;
+    public static float DeltaRealTime { get; private set; } = 0f;
     public static float DayTime { get; set; } = 0f;
 
     public LevelManager LevelManager { get; private set; }
@@ -31,36 +33,24 @@ public class GameManager
         OverlayManager = overlay!; // Allow null OverlayManager for level editor. Not using nullable OverlayManager property just for convenience.
         WeatherManager = weatherManager!; // Allow null WeatherManager for level editor. Not using nullable WeatherManager property just for convenience.
     }
-    public void Update(float deltaTime)
+    public void Update(float deltaRealTime)
     {
         FrameCount++;
-        TotalTime += deltaTime;
-
-        // Escape button
-        if (InputManager.KeyPressed(Keys.Escape))
-        {
-            // Pause/unpause
-            if (StateManager.State == GameState.Game)
-            {
-                if (StateManager.OverlayState == OverlayState.None)
-                    StateManager.OverlayState = OverlayState.Pause;
-                else if (StateManager.OverlayState == OverlayState.Pause)
-                    StateManager.OverlayState = OverlayState.None;
-            }
-        }
+        DeltaRealTime = deltaRealTime;
+        RealTime += deltaRealTime;
 
         // Time
-        if (StateManager.OverlayState != OverlayState.Pause)
+        if (StateManager.OverlayState != OverlayState.Pause && StateManager.State == GameState.Game)
         {
-            DeltaTime = deltaTime;
-            GameTime += deltaTime;
-            if (StateManager.State == GameState.Game)
-                DayTime += deltaTime * (InputManager.KeyDown(Keys.J) ? 10 : 1);
-            if (DayTime >= Constants.DayLength) DayTime = 0f;
+            DeltaGameTime = deltaRealTime * TimeScale;
+            GameTime += DeltaGameTime;
+            DayTime = (DayTime + DeltaGameTime) % Constants.DayLength;
         }
         else
-            DeltaTime = 0f;
-        DebugManager.DeltaHistory[FrameCount % (ulong)DebugManager.DeltaHistory.Length] = deltaTime;
+        {
+            DeltaGameTime = 0;
+        }
+        DebugManager.DeltaHistory[FrameCount % (ulong)DebugManager.DeltaHistory.Length] = deltaRealTime;
     }
     private bool respawning = false;
     public async Task Respawn(PlayerManager playerManager)

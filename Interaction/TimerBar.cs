@@ -19,7 +19,7 @@ public class TimerBar : ProgressBar
     {
         // Running
         if (IsRunning)
-            CurrentTime += GameManager.DeltaTime;
+            CurrentTime += GameManager.DeltaGameTime;
 
         // Progress
         Progress = CurrentTime / Time;

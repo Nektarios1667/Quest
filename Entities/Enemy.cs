@@ -58,7 +58,7 @@ public class Enemy : IEntity, IStatusEffectable
         AttackRange = attackRange;
         Scale = Constants.PlayerScale;
 
-        TimerManager.SetTimer($"EnemyAttack_{UID}", AttackSpeed, null);
+        TimerManager.SetTimer($"EnemyAttack_{UID}", AttackSpeed, true, null);
         Metadata meta = TextureManager.Metadata.GetValueOrDefault(Texture, new(Constants.OnePoint, Constants.OnePoint, TextureType.Other));
         Size = (meta.Size / meta.TileMap).Scaled(Scale);
 
@@ -69,21 +69,21 @@ public class Enemy : IEntity, IStatusEffectable
     {
         Health = MaxHealth;
 
-        UIDManager.Release(UIDCategory.Enemies, UID);
+        UIDManager.Release(UIDCategory.Enemies, UID);   
         UID = UIDManager.Get(UIDCategory.Enemies);
 
-        TimerManager.SetTimer($"EnemyAttack_{UID}", AttackSpeed, null);
+        TimerManager.SetTimer($"EnemyAttack_{UID}", AttackSpeed, true, null);
     }
     public virtual void Update(GameManager gameManager)
     {
         // Healthbar
         HealthBar.Position = CameraManager.WorldToScreen(Position.ToPoint()) + new Point(0, Size.Y + 10);
         HealthBar.CurrentValue = Health;
-        HealthBar.Update(GameManager.DeltaTime);
+        HealthBar.Update(GameManager.DeltaRealTime);
 
         // Damage notifs
         DamageNotifs.Position = CameraManager.WorldToScreen(Position.ToPoint());
-        DamageNotifs.Update(GameManager.DeltaTime);
+        DamageNotifs.Update(GameManager.DeltaRealTime);
 
         // Return if not in game
         if (gameManager.StateManager.State != GameState.Game) return;
@@ -108,7 +108,7 @@ public class Enemy : IEntity, IStatusEffectable
             {
                 Vector2 dir = CameraManager.PlayerCenter.ToVector2() - Bounds.Center;
                 Attack(gameManager, (float)Math.Atan2(dir.Y, dir.X));
-                TimerManager.SetTimer($"EnemyAttack_{UID}", AttackSpeed, null);
+                TimerManager.SetTimer($"EnemyAttack_{UID}", AttackSpeed, true, null);
                 Path?.Clear();
             }
         }
@@ -124,7 +124,7 @@ public class Enemy : IEntity, IStatusEffectable
                 var path = PathfindingManager.GetPath(from, to);
 
                 Path = path != null ? [.. path.Value.Path.Select(p => CameraManager.TileRelativeToTile(p.ToPoint(), true))] : null;
-                TimerManager.SetTimer($"EnemyPathfind_{UID}", 0.5f, null);
+                TimerManager.SetTimer($"EnemyPathfind_{UID}", 0.5f, false, null);
             }
             // Move along path
             if (Path != null && Path.Count > 0)
@@ -136,7 +136,7 @@ public class Enemy : IEntity, IStatusEffectable
                     Path.RemoveAt(0);
                 }
                 else
-                    Position += Vector2.Normalize(move) * Speed * Constants.TileSize.ToVector2() * GameManager.DeltaTime;
+                    Position += Vector2.Normalize(move) * Speed * Constants.TileSize.ToVector2() * GameManager.DeltaGameTime;
             }
         }
     }

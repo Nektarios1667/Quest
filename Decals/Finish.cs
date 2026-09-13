@@ -12,6 +12,6 @@ public class Finish(Point location) : Decal(location)
     public override void OnPlayerEnter(GameManager gameManager, PlayerManager playerManager)
     {
         gameManager.StateManager.OverlayState = OverlayState.Finished;
-        TimerManager.SetTimer("ScreenFadeOut", 2f, null);
+        TimerManager.SetTimer("ScreenFadeOut", 2f, false, null);
     }
 }

@@ -119,7 +119,7 @@ public class WeatherManager
                 else
                     TimeSinceSound[weatherType.Type] = 0;
             }
-            TimeSinceSound[weatherType.Type] -= GameManager.DeltaTime;
+            TimeSinceSound[weatherType.Type] -= GameManager.DeltaRealTime;
 
             SoundManager.PlaySoundInstance(weatherType.AmbientSoundName, volume * Math.Clamp(-TimeSinceSound[weatherType.Type] / WeatherFadeIn, 0, 1), loop: true);
         }
@@ -132,7 +132,7 @@ public class WeatherManager
                 // Reset time and count how long since in biome
                 if (TimeSinceSound[weathers.Type] < 0)
                     TimeSinceSound[weathers.Type] = 0;
-                TimeSinceSound[weathers.Type] += GameManager.DeltaTime;
+                TimeSinceSound[weathers.Type] += GameManager.DeltaRealTime;
 
                 // Fade out or clear
                 var instance = SoundManager.GetInstance(weathers.AmbientSoundName);

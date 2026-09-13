@@ -482,16 +482,18 @@ public class SaveManager
     {
         playerManager.Health = reader.ReadByte();
         playerManager.MaxHealth = reader.ReadByte();
+        playerManager.Hunger = reader.ReadByte();
+        playerManager.MaxHunger = reader.ReadByte();
         gameManager.LevelManager.TasksComplete++;
 
         float hungerLossTimer = reader.ReadSingle();
-        if (hungerLossTimer >= 0) TimerManager.SetTimer("PlayerHungerLoss", hungerLossTimer, null);
+        if (hungerLossTimer >= 0) TimerManager.SetTimer("PlayerHungerLoss", hungerLossTimer, true, null);
 
         float regenTimer = reader.ReadSingle();
-        if (regenTimer >= 0) TimerManager.SetTimer("PlayerNaturalRegen", regenTimer, null);
+        if (regenTimer >= 0) TimerManager.SetTimer("PlayerNaturalRegen", regenTimer, true, null);
 
         float starvationTimer = reader.ReadSingle();
-        if (starvationTimer >= 0) TimerManager.SetTimer("PlayerStarvation", starvationTimer, null);
+        if (starvationTimer >= 0) TimerManager.SetTimer("PlayerStarvation", starvationTimer, true, null);
     }
     public static void ReadLootSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
     {

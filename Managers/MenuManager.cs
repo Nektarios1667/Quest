@@ -242,22 +242,36 @@ public class MenuManager
     {
         DebugManager.StartBenchmark("MenuUpdate");
 
+        // Escape button
+        if (InputManager.KeyPressed(Keys.Escape))
+        {
+            // Pause/unpause
+            if (gameManager.StateManager.State == GameState.Game)
+            {
+                if (gameManager.StateManager.OverlayState == OverlayState.None)
+                    gameManager.StateManager.OverlayState = OverlayState.Pause;
+                else if (gameManager.StateManager.OverlayState == OverlayState.Pause)
+                    gameManager.StateManager.OverlayState = OverlayState.None;
+            }
+        }
+
+        // Update menus
         switch (gameManager.StateManager.State)
         {
             case GameState.MainMenu:
-                MainMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                MainMenu.Update(GameManager.DeltaRealTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
             case GameState.Settings:
-                SettingsMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                SettingsMenu.Update(GameManager.DeltaRealTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
             case GameState.Credits:
-                CreditsMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                CreditsMenu.Update(GameManager.DeltaRealTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
             case GameState.LevelSelect:
-                LevelSelectMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                LevelSelectMenu.Update(GameManager.DeltaRealTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
             case GameState.Loading:
-                LoadingMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                LoadingMenu.Update(GameManager.DeltaRealTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
             case GameState.Game:
                 //DebugMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
@@ -267,7 +281,7 @@ public class MenuManager
         switch (gameManager.StateManager.OverlayState)
         {
             case OverlayState.Pause:
-                PauseMenu.Update(GameManager.DeltaTime, InputManager.MouseState, InputManager.KeyboardState);
+                PauseMenu.Update(GameManager.DeltaRealTime, InputManager.MouseState, InputManager.KeyboardState);
                 break;
         }
 

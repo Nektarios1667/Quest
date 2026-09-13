@@ -196,7 +196,7 @@ public class Window : Game, IAdjustableWindow
         CursorArrow = Content.Load<Texture2D>("Images/Gui/CursorArrow");
 
         // Timer
-        TimerManager.NewTimer("FrameTimeUpdate", 0.5f, UpdateFrameTimes, int.MaxValue);
+        TimerManager.NewTimer("FrameTimeUpdate", 0.5f, false, UpdateFrameTimes, int.MaxValue);
 
         // Final
         Logger.System("Game finished initializing.");
@@ -334,7 +334,7 @@ public class Window : Game, IAdjustableWindow
             memoryDebugSb.Append("\nGC Gen2: ");
             memoryDebugSb.Append(GC.CollectionCount(2));
 
-            TimerManager.SetTimer("UpdateProgramInfo", 1f, null);
+            TimerManager.SetTimer("UpdateProgramInfo", 1f, false,null);
         }
 
         if (!DebugManager.ProgramInfo) return;
@@ -356,7 +356,7 @@ public class Window : Game, IAdjustableWindow
         infoSb.Append("\nDayTime: ");
         infoSb.AppendFormat("{0:0.00}", GameManager.DayTime);
         infoSb.Append("\nTotalTime: ");
-        infoSb.AppendFormat("{0:0.00}", GameManager.GameTime);
+        infoSb.AppendFormat("{0:0.00}", GameManager.RealTime);
         infoSb.Append("\nCamera: ");
         infoSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.Camera.X, CameraManager.Camera.Y);
         infoSb.Append("\nTile Below: ");
@@ -415,6 +415,6 @@ public class Window : Game, IAdjustableWindow
     {
         frameTimes.Clear();
         frameTimes = new(DebugManager.FrameTimes);
-        cacheDelta = GameManager.DeltaTime;
+        cacheDelta = GameManager.DeltaRealTime;
     }
 }

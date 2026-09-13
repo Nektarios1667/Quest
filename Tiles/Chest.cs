@@ -56,7 +56,7 @@ public class Chest : Tile, IContainer, IEditableTile, IHasLevelData
             if (TimerManager.IsCompleteOrMissing(timerName))
             {
                 SoundManager.PlaySoundInstance("ChestLocked");
-                TimerManager.SetTimer(timerName, 5, null);
+                TimerManager.SetTimer(timerName, 5, false, null);
             }
         }
 

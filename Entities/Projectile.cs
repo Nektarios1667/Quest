@@ -25,14 +25,14 @@ public class Projectile : IEntity
         UID = UIDManager.Get(UIDCategory.Projectiles);
 
         // Update collision 20/s
-        TimerManager.SetTimer($"ProjectileCollision_{UID}", 0.05f, () => UpdateCollision(gameManager), int.MaxValue);
+        TimerManager.SetTimer($"ProjectileCollision_{UID}", 0.05f, false, () => UpdateCollision(gameManager), int.MaxValue);
     }
     public void Update(GameManager gameManager)
     {
         if (gameManager.StateManager.State != GameState.Game) return;
 
         // Move
-        Position += new Vector2(MathF.Cos(Direction), MathF.Sin(Direction)) * Speed * Constants.TileSize.ToVector2() * GameManager.DeltaTime;
+        Position += new Vector2(MathF.Cos(Direction), MathF.Sin(Direction)) * Speed * Constants.TileSize.ToVector2() * GameManager.DeltaGameTime;
     }
     public void Draw(GameManager gameManager)
     {

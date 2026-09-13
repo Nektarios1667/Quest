@@ -12,7 +12,7 @@ public class Overlay
     {
         // Update all widgets
         foreach (Widget widget in Widgets)
-            widget.Update(GameManager.DeltaTime);
+            widget.Update(GameManager.DeltaRealTime);
 
         // Remove expired widgets
         for (int w = 0; w < Widgets.Count; w++)

@@ -146,7 +146,7 @@ public static class DebugManager
         if (!TimerManager.IsCompleteOrMissing("DebugWindowUpdate")) return;
         if (DebugWindow == null) return;
 
-        TimerManager.SetTimer("DebugWindowUpdate", 0.5f, null);
+        TimerManager.SetTimer("DebugWindowUpdate", 0.5f, false, null);
 
         // Frame times
         DebugWindow.SetFrameTimes(FrameTimes.Select(t => (t.Key, t.Value)));

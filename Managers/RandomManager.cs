@@ -60,10 +60,10 @@ public static class RandomManager
     }
     public static bool ChancePerSecond(float chancePerSecond)
     {
-        if (chancePerSecond <= 0f || GameManager.DeltaTime <= 0f)
+        if (chancePerSecond <= 0f || GameManager.DeltaGameTime <= 0f)
             return false;
 
-        float chanceThisFrame = chancePerSecond * GameManager.DeltaTime;
+        double chanceThisFrame = chancePerSecond * GameManager.DeltaGameTime;
         return random.NextDouble() < chanceThisFrame;
     }
     public static Color RandomColor()

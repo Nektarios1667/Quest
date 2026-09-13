@@ -49,7 +49,7 @@ public class Door : Tile, IHasState, IEditableTile, IHasLevelData
                 // Sfx
                 SoundManager.PlaySoundInstance("DoorLocked");
 
-                TimerManager.SetTimer(timerName, 5, null);
+                TimerManager.SetTimer(timerName, 5, false, null);
             }
         }
     }
