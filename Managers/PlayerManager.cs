@@ -16,7 +16,7 @@ public class PlayerManager : IEntity, IStatusEffectable
     public int Health
     {
         get => _health;
-        set { _health = value; GameManager.OverlayManager.HealthBar.CurrentValue = value; }
+        private set { _health = value; GameManager.OverlayManager.HealthBar.CurrentValue = value; }
     }
     private int _maxHealth = Constants.PlayerBaseHealth;
     public int MaxHealth
@@ -29,7 +29,7 @@ public class PlayerManager : IEntity, IStatusEffectable
     public int Hunger
     {
         get => _hunger;
-        set { _hunger = value; GameManager.OverlayManager.HungerBar.CurrentValue = value; }
+        private set { _hunger = value; GameManager.OverlayManager.HungerBar.CurrentValue = value; }
     }
     private int _maxHunger = Constants.PlayerBaseHunger;
     public int MaxHunger
@@ -621,14 +621,15 @@ public class PlayerManager : IEntity, IStatusEffectable
         if (health > 0)
             gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"+{health}", Color.Green, duration: 2);
     }
-    public void SetHealth(GameManager gameManager, int health)
+    public void SetHealth(GameManager gameManager, int health, bool notify = false)
     {
         Health = Math.Min(health, MaxHealth);
         if (Health <= 0)
         {
             Die(gameManager);
         }
-        gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"={Health}", Color.Green, duration: 2);
+        if (notify)
+            gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"={Health}", Color.Green, duration: 2);
     }
     public void Eat(GameManager gameManager, int hunger)
     {
@@ -637,9 +638,10 @@ public class PlayerManager : IEntity, IStatusEffectable
         if (hunger > 0)
             gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"+{hunger}", Color.Goldenrod, duration: 2);
     }
-    public void SetHunger(GameManager gameManager, int hunger)
+    public void SetHunger(GameManager gameManager, int hunger, bool notify = false)
     {
         Hunger = Math.Min(hunger, MaxHunger);
-        gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"={Hunger}", Color.Goldenrod, duration: 2);
+        if (notify)
+            gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"={Hunger}", Color.Goldenrod, duration: 2);
     }
 }

@@ -481,9 +481,9 @@ public class SaveManager
     }
     public static void ReadPlayerSection(GameManager gameManager, PlayerManager playerManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)
     {
-        playerManager.Health = reader.ReadByte();
+        playerManager.SetHealth(gameManager, reader.ReadByte());
         playerManager.MaxHealth = reader.ReadByte();
-        playerManager.Hunger = reader.ReadByte();
+        playerManager.SetHunger(gameManager, reader.ReadByte());
         playerManager.MaxHunger = reader.ReadByte();
         gameManager.LevelManager.TasksComplete++;
 

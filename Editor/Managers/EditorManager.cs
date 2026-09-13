@@ -439,8 +439,8 @@ public class EditorManager
             new("Width", IsByte),
             new("Height", IsByte),
             new("Dest Level", IsAlphaNumOrUnderscore),
-            new("Dest Pos X", IsInteger),
-            new("Dest Pos Y", IsInteger),
+            new("Dest X (relative/absolute)", IsInteger),
+            new("Dest Y (relative/absolute)", IsInteger),
         ]);
         if (!success)
         {
