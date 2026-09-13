@@ -28,7 +28,7 @@ public class OverlayManager
         // Trigger lighting updates
         playerManager.EquippedSlotChanged += (_) => LM.MarkUpdateLighting();
 
-        TimerManager.SetTimer("LightingUpdate", 0.5f, LM.MarkUpdateLighting, int.MaxValue);
+        TimerManager.SetTimer("LightingUpdate", 0.5f, false, LM.MarkUpdateLighting, int.MaxValue);
         CameraManager.TileChange += (_, _) => LM.MarkUpdateLighting();
         CameraManager.CameraMove += (_, newCam) =>
         {

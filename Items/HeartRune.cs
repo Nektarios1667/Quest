@@ -10,7 +10,7 @@ public class HeartRune : Item
         {
             StatusManager.AddStatusEffect(player, StatusEffect.Regeneration, 6);
             SoundManager.PlaySoundInstance("Spook");
-            TimerManager.SetTimer("HeartRuneCooldown", 60, null);
+            TimerManager.SetTimer("HeartRuneCooldown", 60, true, null);
             return true;
         }
         return false;

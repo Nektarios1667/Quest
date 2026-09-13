@@ -36,13 +36,13 @@ public class RangedWeapon : Item
                 player.Inventory.Consume(Ammo, ignoreCheck: true);
                 gameManager.OverlayManager.Notification($"-{Ammo.Amount} {Ammo.Name} ", Color.Red, 1f);
             }
-            TimerManager.SetTimer($"RangedAttack_{UID}", FireRate, null);
+            TimerManager.SetTimer($"RangedAttack_{UID}", FireRate, true, null);
             return true;
         }
         else
         {
             gameManager.OverlayManager.Notification($"No {Ammo.Name}!", Color.Red, 1f);
-            TimerManager.SetTimer($"RangedAttack_{UID}", FireRate, null);
+            TimerManager.SetTimer($"RangedAttack_{UID}", FireRate, true, null);
         }
 
         return false;

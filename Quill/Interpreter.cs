@@ -47,7 +47,7 @@ public class QuillInstance
             // Check sleeping
             if (IsSleeping)
             {
-                SleepTimer -= GameManager.DeltaTime * 1000; // Convert to ms
+                SleepTimer -= GameManager.DeltaRealTime * 1000; // Convert to ms
                 return stepsUsed;
             }
 
@@ -134,7 +134,7 @@ public static partial class Interpreter
         // Game
         ExternalSymbols["<gametime>"] = GameManager.GameTime.ToString();
         ExternalSymbols["<daytime>"] = GameManager.DayTime.ToString();
-        ExternalSymbols["<totaltime>"] = GameManager.GameTime.ToString();
+        ExternalSymbols["<totaltime>"] = GameManager.RealTime.ToString();
         ExternalSymbols["<gamestate>"] = gameManager.StateManager.State.ToString().WrapSingleQuotes();
         // Inventory
         ExternalSymbols["<inventoryitems>"] = Utilities.ItemNamesQist(player.Inventory.Items, Chest.Size.X).WrapSingleQuotes();
@@ -151,8 +151,8 @@ public static partial class Interpreter
         ExternalSymbols["<ready>"] = "true";
         ExternalSymbols["<time>"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
         ExternalSymbols["<datetime>"] = DateTime.Now.ToString("yyyy;MM;dd/HH;mm;ss");
-        ExternalSymbols["<fps>"] = (1f / GameManager.DeltaTime).ToString();
-        ExternalSymbols["<deltatime>"] = GameManager.DeltaTime.ToString();
+        ExternalSymbols["<fps>"] = (1f / GameManager.DeltaRealTime).ToString();
+        ExternalSymbols["<deltatime>"] = GameManager.DeltaRealTime.ToString();
         ExternalSymbols["<ispaused>"] = (gameManager.StateManager.OverlayState == OverlayState.Pause).ToString();
         ExternalSymbols["<vsync>"] = SettingsManager.VSYNC.ToString().ToLower();
         ExternalSymbols["<resolution_x>"] = SettingsManager.ScreenResolution.X.ToString();

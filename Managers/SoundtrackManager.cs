@@ -37,7 +37,7 @@ public static class SoundtrackManager
     private static (Point source, int radius, string level)? musicSource = null;
     public static void SetSource((Point source, int radius, string level)? source) => musicSource = source;
     private static Dictionary<Mood, Soundtracks[]> Tracks { get; set; } = [];
-    private static readonly Timer PlayNextSong = TimerManager.SetTimer("PlayNextSong", RandomManager.RandomIntRange(30, 60), EndSong, repetitions: int.MaxValue);
+    private static readonly Timer PlayNextSong = TimerManager.SetTimer("PlayNextSong", RandomManager.RandomIntRange(30, 60), false, EndSong, repetitions: int.MaxValue);
     private static bool QueueNextSong = false;
     public static void LoadSoundtracks(ContentManager content)
     {
@@ -131,8 +131,6 @@ public static class SoundtrackManager
                 float dist = vec.Length();
                 float volume = Math.Clamp(1 - NumberTools.Square(dist / musicSource.Value.radius), 0, 1);
                 MediaPlayer.Volume = volume;
-
-                TimerManager.SetTimer("LocationalMusicPathfind", 0.2f, null);
             }
         }
 

@@ -111,8 +111,8 @@ public class EditorOverlayManager
         DebugSb.Clear();
         DebugSb.Append("FPS: ");
         DebugSb.AppendFormat("{0:0.0}", CacheDelta != 0 ? 1f / CacheDelta : 0);
-        DebugSb.Append("\nTotalTime: ");
-        DebugSb.AppendFormat("{0:0.00}", GameManager.TotalTime);
+        DebugSb.Append("\nReal Time: ");
+        DebugSb.AppendFormat("{0:0.00}", GameManager.RealTime);
         DebugSb.Append("\nCamera: ");
         DebugSb.AppendFormat("{0:0.0},{1:0.0}", CameraManager.Camera.X, CameraManager.Camera.Y);
         DebugSb.Append("\nCoord: ");
@@ -151,7 +151,7 @@ public class EditorOverlayManager
     {
         FrameTimes.Clear();
         FrameTimes = new(DebugManager.FrameTimes);
-        CacheDelta = GameManager.DeltaTime;
+        CacheDelta = GameManager.DeltaRealTime;
     }
     public string GetDebugString() => DebugSb.ToString();
 }

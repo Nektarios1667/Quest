@@ -35,7 +35,7 @@ public class LevelManager
         // Empty
         Levels = [];
         Level = EmptyLevel;
-        TimerManager.SetTimer("UpdatePathfindingGrid", 1f, () =>
+        TimerManager.SetTimer("UpdatePathfindingGrid", 1f, false, () =>
             PathfindingManager.SetGrid(Level,
                 CameraManager.TopLeftTileCoord - Constants.TileDrawPadding,
                 Constants.NativeResolutionTiles + Constants.TileDrawPadding.Scaled(2)

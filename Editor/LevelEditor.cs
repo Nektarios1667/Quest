@@ -149,7 +149,7 @@ public class LevelEditor : Game, IAdjustableWindow
         editorLevelManager = new(gameManager, levelGenerator);
         editorOverlayManager = new(gameManager, spriteBatch, GraphicsDevice);
         levelManager.LevelLoaded += (_) => editorOverlayManager.InvalidateMinimap();
-        TimerManager.SetTimer("EditorOverlayInvalidateMinimap", 1f, editorOverlayManager.InvalidateMinimap, int.MaxValue);
+        TimerManager.SetTimer("EditorOverlayInvalidateMinimap", 1f, false, editorOverlayManager.InvalidateMinimap, int.MaxValue);
         levelManager.LevelLoaded += (Level level) => Window.Title = $"Quest Level Editor - {level.LevelPath}";
         Window.Title = "Quest Level Editor";
 
@@ -247,7 +247,7 @@ public class LevelEditor : Game, IAdjustableWindow
         CursorArrow = Content.Load<Texture2D>("Images/Gui/CursorArrow");
 
         // Timer
-        TimerManager.NewTimer("FrameTimeUpdate", 1, editorOverlayManager.UpdateFrameTimes, int.MaxValue);
+        TimerManager.NewTimer("FrameTimeUpdate", 1, false, editorOverlayManager.UpdateFrameTimes, int.MaxValue);
 
         // Final
         Logger.System("Level editor finished initializing.");

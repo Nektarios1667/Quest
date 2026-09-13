@@ -2,7 +2,7 @@ namespace Quest.Decals;
 
 public class Checkpoint(Point location) : Decal(location)
 {
-    private readonly Timer cooldown = TimerManager.SetTimer("CheckpointCooldown", 15, null);
+    private readonly Timer cooldown = TimerManager.SetTimer("CheckpointCooldown", 15, true, null);
     public override void Draw(GameManager gameManager)
     {
         Point dest = CameraManager.TileToScreen(Location);

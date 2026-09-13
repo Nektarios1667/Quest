@@ -29,9 +29,9 @@ public class LevelTransition
         }
 
         IsTransitioning = true;
-        TimerManager.SetTimer("ScreenFadeOut", 1.5f, null);
+        TimerManager.SetTimer("ScreenFadeOut", 1.5f, false, null);
         Point finalDest = new(dest.X + (isRelativeX ? CameraManager.TileCoord.X : 0), dest.Y + (isRelativeY ? CameraManager.TileCoord.Y : 0));
-        TimerManager.SetTimer("TransitionToLevel", 1.5f, () => RunTransitionLevel(gameManager, destLevel, finalDest.ToByteCoord()));
+        TimerManager.SetTimer("TransitionToLevel", 1.5f, false, () => RunTransitionLevel(gameManager, destLevel, finalDest.ToByteCoord()));
 
         Logger.System($"Teleporting to level '{destLevel.LevelName}' @ {dest}");
     }
@@ -52,7 +52,7 @@ public class LevelTransition
         CameraManager.Camera = CameraManager.CameraDest;
         CameraManager.Update(gameManager, 0f); // Force update to avoid visual glitches
 
-        TimerManager.SetTimer("ScreenFadeIn", 1.5f, null);
+        TimerManager.SetTimer("ScreenFadeIn", 1.5f, false, null);
         Logger.System($"Teleported to level '{destLevel.LevelName}' @ {dest}");
     }
     public override string ToString()

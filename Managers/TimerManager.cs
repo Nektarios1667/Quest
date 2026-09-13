@@ -11,15 +11,17 @@ public class Timer
     public readonly Action<float>? UpdateAction;
     public readonly float Duration;
     public float Progress => 1 - Left / Duration;
+    public bool UseGameTime { get; private set; }
 
     public bool IsExpired => Left <= 0f && Completions >= Repetitions;
     public event Action? Completed;
-    public Timer(float duration, Action? call, int repetitions = 1, Action<float>? updateAction = null)
+    public Timer(float duration, bool useGameTime, Action? call, int repetitions = 1, Action<float>? updateAction = null)
     {
         Left = duration;
         Repetitions = repetitions;
         CompleteAction = call;
         UpdateAction = updateAction;
+        UseGameTime = useGameTime;
         Duration = duration;
     }
     public void Update(GameManager gameManager)
@@ -28,7 +30,7 @@ public class Timer
 
         if (Left > 0)
         {
-            Left -= GameManager.DeltaTime;
+            Left -= UseGameTime ? GameManager.DeltaGameTime : GameManager.DeltaRealTime;
             UpdateAction?.Invoke(Progress);
         }
 
@@ -68,15 +70,15 @@ public static class TimerManager
 
         DebugManager.EndBenchmark("TimerUpdates");
     }
-    public static Timer NewTimer(string name, float duration, Action? completeAction, int repetitions = 1, Action<float>? updateAction = null)
+    public static Timer NewTimer(string name, float duration, bool useGameTime, Action? completeAction, int repetitions = 1, Action<float>? updateAction = null)
     {
         if (!timers.ContainsKey(name))
-            timers[name] = new(duration, completeAction, repetitions, updateAction);
+            timers[name] = new(duration, useGameTime, completeAction, repetitions, updateAction);
         return timers[name];
     }
-    public static Timer SetTimer(string name, float duration, Action? completeAction, int repetitions = 1, Action<float>? updateAction = null)
+    public static Timer SetTimer(string name, float duration, bool useGameTime, Action? completeAction, int repetitions = 1, Action<float>? updateAction = null)
     {
-        timers[name] = new(duration, completeAction, repetitions, updateAction);
+        timers[name] = new(duration, useGameTime, completeAction, repetitions, updateAction);
         return timers[name];
     }
     public static void Remove(string name)
@@ -103,7 +105,7 @@ public static class TimerManager
         if (timers.TryGetValue(name, out var timer))
             return timer;
         Logger.Error($"No timer with name '{name}' found", true);
-        return new(-1, null);
+        return new(-1, false, null, 1, null);
     }
     public static Dictionary<string, Timer> GetAllTimers() => timers;
 
