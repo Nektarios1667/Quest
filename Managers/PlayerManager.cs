@@ -186,6 +186,13 @@ public class PlayerManager : IEntity, IStatusEffectable
     }
     public void UpdateHealth(GameManager gameManager)
     {
+        // Death
+        if (Health <= 0)
+        {
+            Die(gameManager);
+            return;
+        }
+
         // Hunger
         if (TimerManager.IsCompleteOrMissing("PlayerHungerLoss"))
         {
@@ -598,10 +605,6 @@ public class PlayerManager : IEntity, IStatusEffectable
     {
         Health -= damage;
         gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"-{damage}", Color.Orange, duration: 2);
-        if (Health <= 0)
-        {
-            Die(gameManager);
-        }
     }
     public void Die(GameManager gameManager)
     {
@@ -624,10 +627,6 @@ public class PlayerManager : IEntity, IStatusEffectable
     public void SetHealth(GameManager gameManager, int health, bool notify = false)
     {
         Health = Math.Min(health, MaxHealth);
-        if (Health <= 0)
-        {
-            Die(gameManager);
-        }
         if (notify)
             gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"={Health}", Color.Green, duration: 2);
     }

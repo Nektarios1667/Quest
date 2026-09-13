@@ -222,7 +222,7 @@ public static class CommandManager
     {
         string[] parts = command.Split(' ');
         if (parts[1] == "set") { PlayerManager!.SetHealth(GameManager!, int.Parse(parts[2]), notify: true); return true; }
-        if (parts[1] == "change") { PlayerManager!.Hurt(GameManager!, int.Parse(parts[2])); return true; }
+        if (parts[1] == "change") { PlayerManager!.Heal(GameManager!, int.Parse(parts[2])); return true; }
         return false;
     }
     private static bool CHunger(string command)
