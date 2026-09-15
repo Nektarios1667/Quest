@@ -19,7 +19,7 @@ public class Window : Game, IAdjustableWindow
     private LevelManager levelManager = null!;
     private MenuManager menuManager = null!;
     private static Matrix Scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
-    public RenderTarget2D Render = null!;
+    public static RenderTarget2D Render = null!;
 
     // Time
     private float delta;
@@ -94,6 +94,19 @@ public class Window : Game, IAdjustableWindow
         graphics.SynchronizeWithVerticalRetrace = enabled;
         graphics.ApplyChanges();
     }
+    public void ResetRender()
+    {
+        Render?.Dispose();
+        Render = new RenderTarget2D(
+            GraphicsDevice,
+            Constants.NativeResolution.X, Constants.NativeResolution.Y,
+            false,
+            SurfaceFormat.Color,
+            DepthFormat.None,
+            0,
+            RenderTargetUsage.PreserveContents
+        );
+    }
     public void SetResolution(int width, int height)
     {
         graphics.PreferredBackBufferWidth = width;
@@ -103,14 +116,7 @@ public class Window : Game, IAdjustableWindow
         Scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
 
         // Set Render
-        Render?.Dispose();
-        Render = new RenderTarget2D(
-            GraphicsDevice,
-            Constants.NativeResolution.X, Constants.NativeResolution.Y,
-            false,
-            SurfaceFormat.Color,
-            DepthFormat.None
-        );
+        ResetRender();
 
         // Update shader parameters
         Pixelize?.Parameters["TexSize"]?.SetValue(new Vector2(width, height));
@@ -182,13 +188,7 @@ public class Window : Game, IAdjustableWindow
         Logger.System("Loaded levels.");
 
         // Render Targets
-        Render = new RenderTarget2D(
-            GraphicsDevice,
-            Constants.NativeResolution.X, Constants.NativeResolution.Y,
-            false,
-            SurfaceFormat.Color,
-            DepthFormat.None
-        );
+        ResetRender();
 
         Quill.Interpreter.UpdateSymbols(gameManager, playerManager);
 

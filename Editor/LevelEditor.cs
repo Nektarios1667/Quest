@@ -20,7 +20,6 @@ public class LevelEditor : Game, IAdjustableWindow
     private EditorLevelManager editorLevelManager = null!;
     private EditorOverlayManager editorOverlayManager = null!;
     private GUI gui = null!;
-    private static Matrix Scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
     public RenderTarget2D Render = null!;
 
     // GUIs and menus
@@ -89,6 +88,19 @@ public class LevelEditor : Game, IAdjustableWindow
         graphics.SynchronizeWithVerticalRetrace = enabled;
         graphics.ApplyChanges();
     }
+    public void ResetRender()
+    {
+        Render?.Dispose();
+        Render = new RenderTarget2D(
+            GraphicsDevice,
+            Constants.NativeResolution.X, Constants.NativeResolution.Y,
+            false,
+            SurfaceFormat.Color,
+            DepthFormat.None,
+            0,
+            RenderTargetUsage.PreserveContents
+        );
+    }
     public void SetResolution(int width, int height)
     {
         graphics.PreferredBackBufferWidth = width;
@@ -96,21 +108,9 @@ public class LevelEditor : Game, IAdjustableWindow
 
         // Update stored resolution and scale
         SettingsManager.SetScreenResolution(width, height);
-        Scale = Matrix.CreateScale(SettingsManager.ScreenScale.X, SettingsManager.ScreenScale.Y, 1f);
 
         // Recreate native render target (keep it at Constants.NativeResolution)
-        try
-        {
-            Render?.Dispose();
-            Render = new RenderTarget2D(
-                GraphicsDevice,
-                Constants.NativeResolution.X, Constants.NativeResolution.Y,
-                false,
-                SurfaceFormat.Color,
-                DepthFormat.None
-            );
-        }
-        catch { }
+        ResetRender();
 
         graphics.ApplyChanges();
     }
@@ -149,7 +149,7 @@ public class LevelEditor : Game, IAdjustableWindow
         editorLevelManager = new(gameManager, levelGenerator);
         editorOverlayManager = new(gameManager, spriteBatch, GraphicsDevice);
         levelManager.LevelLoaded += (_) => editorOverlayManager.InvalidateMinimap();
-        TimerManager.SetTimer("EditorOverlayInvalidateMinimap", 1f, false, editorOverlayManager.InvalidateMinimap, int.MaxValue);
+        TimerManager.SetTimer("EditorOverlayInvalidateMinimap", 0.1f, false, editorOverlayManager.InvalidateMinimap, int.MaxValue);
         levelManager.LevelLoaded += (Level level) => Window.Title = $"Quest Level Editor - {level.LevelPath}";
         Window.Title = "Quest Level Editor";
 
@@ -157,13 +157,7 @@ public class LevelEditor : Game, IAdjustableWindow
         Logger.System("Initialized managers.");
 
         // Create native-resolution render target for the editor
-        Render = new RenderTarget2D(
-            GraphicsDevice,
-            Constants.NativeResolution.X, Constants.NativeResolution.Y,
-            false,
-            SurfaceFormat.Color,
-            DepthFormat.None
-        );
+        ResetRender();
 
         // Settings gui
         SettingsMenu = SettingsManager.CreateSettingsMenu(this, this, gameManager, spriteBatch, Content);
@@ -418,7 +412,12 @@ public class LevelEditor : Game, IAdjustableWindow
 
         // Minimap
         if (!DebugManager.ProgramInfo)
+        {
             editorOverlayManager.Minimap = OverlayManager.DrawMiniMap(GraphicsDevice, levelManager, editorOverlayManager.Minimap, spriteBatch, spriteBatch); // Same batch reused for minimap
+
+            spriteBatch.Draw(editorOverlayManager.Minimap, new Vector2(8, Constants.NativeResolution.Y - Constants.MapSize.Y - 8), Color.White);
+            spriteBatch.DrawRectangle(new(8, Constants.NativeResolution.Y - Constants.MapSize.Y - 8, Constants.MapSize.X, Constants.MapSize.Y), Color.Black, 3);
+        }
 
 
         // Ghost tile cursor

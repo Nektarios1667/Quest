@@ -92,10 +92,6 @@ public class OverlayManager
         {
             PlayerNotificationArea.Offset = (CameraManager.CameraDest - CameraManager.Camera).ToPoint();
             Gui.Draw(gameManager.Batch);
-
-            // Minimap
-            if (gameManager.StateManager.OverlayState != OverlayState.None && (playerManager == null || playerManager.Inventory.Has(new(ItemTypes.Map, 1))))
-                Minimap = DrawMiniMap(device, gameManager.LevelManager, Minimap, gameManager.Batch, gameManager.MinimapBatch, gameManager.LevelManager.Level.Explored);
         }
 
         // Inventories
@@ -223,61 +219,56 @@ public class OverlayManager
 
     public static RenderTarget2D? DrawMiniMap(GraphicsDevice device, LevelManager levelManager, RenderTarget2D? minimap, SpriteBatch batch, SpriteBatch mapBatch, bool[]? exploredTiles = null)
     {
+        if (minimap != null) return minimap;
+
         DebugManager.StartBenchmark("DrawMinimap");
-        // Frame
-        batch.DrawRectangle(new(7, Constants.NativeResolution.Y - Constants.MapSize.Y - 13, Constants.MapSize.X + 6, Constants.MapSize.Y + 6), Color.Black, 3);
+        
+        // Setup target - extra space to the right for labels
+        minimap =  new RenderTarget2D(device, Constants.MapSize.X + 150, Constants.MapSize.Y, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+        batch.End();
+        var oldRender = device.GetRenderTargets();
+        device.SetRenderTarget(minimap);
+        device.Clear(Color.Transparent);
+        mapBatch.Begin();
 
-        // Create render if not done already
-        if (minimap == null)
+        // Pixels
+        for (int y = 0; y < Constants.MapSize.Y; y++)
         {
-            // Setup target - extra space to the right for labels
-            minimap = new RenderTarget2D(device, Constants.MapSize.X + 150, Constants.MapSize.Y);
-            batch.End();
-            device.SetRenderTarget(minimap);
-            device.Clear(Color.Transparent);
-            mapBatch.Begin();
-
-            // Pixels
-            for (int y = 0; y < Constants.MapSize.Y; y++)
+            for (int x = 0; x < Constants.MapSize.X; x++)
             {
-                for (int x = 0; x < Constants.MapSize.X; x++)
+                if (exploredTiles != null && !exploredTiles[y * Constants.MapSize.X + x])
                 {
-                    if (exploredTiles != null && !exploredTiles[y * Constants.MapSize.X + x])
-                    {
-                        mapBatch.DrawPoint(new(x, y), Color.Black);
-                        continue;
-                    }
-
-                    // Get tile
-                    Tile tile = levelManager.GetTile(new Point(x, y))!;
-                    mapBatch.DrawPoint(new(x, y), Constants.MiniMapColors[(int)tile.Type.ID]);
-                }
-            }
-
-            // Waypoints
-            foreach (Waypoint waypoint in levelManager.Level.Waypoints)
-            {
-                if (exploredTiles != null && !exploredTiles[waypoint.Position.Y * Constants.MapSize.X + waypoint.Position.X])
+                    mapBatch.DrawPoint(new(x, y), Color.Black);
                     continue;
+                }
 
-                // Name background
-                mapBatch.FillRectangle(new(waypoint.Position.ToVector2(), PixelOperatorVerySmall.MeasureString(waypoint.Name)), Color.Black * 0.6f);
-                // Marker
-                mapBatch.DrawPoint(waypoint.Position.ToVector2(), waypoint.Color, size: 2);
-                // Name
-                mapBatch.DrawString(PixelOperatorVerySmall, waypoint.Name, waypoint.Position.ToVector2(), Color.White);
+                // Get tile
+                Tile tile = levelManager.GetTile(new Point(x, y))!;
+                mapBatch.DrawPoint(new(x, y), Constants.MiniMapColors[(int)tile.Type.ID]);
             }
-
-            // Resume normal render
-            mapBatch.End();
-            device.SetRenderTarget(null);
-            batch.Begin();
         }
-        batch.Draw(minimap, new Rectangle(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10, Constants.MapSize.X + 150, Constants.MapSize.Y), Color.White);
+
+        // Waypoints
+        foreach (Waypoint waypoint in levelManager.Level.Waypoints)
+        {
+            if (exploredTiles != null && !exploredTiles[waypoint.Position.Y * Constants.MapSize.X + waypoint.Position.X])
+                continue;
+
+            // Name background
+            mapBatch.FillRectangle(new(waypoint.Position.ToVector2(), PixelOperatorVerySmall.MeasureString(waypoint.Name)), Color.Black * 0.6f);
+            // Marker
+            mapBatch.DrawPoint(waypoint.Position.ToVector2(), waypoint.Color, size: 2);
+            // Name
+            mapBatch.DrawString(PixelOperatorVerySmall, waypoint.Name, waypoint.Position.ToVector2(), Color.White);
+        }
 
         // Player
-        Point dest = CameraManager.TileCoord + new Point(10, Constants.NativeResolution.Y - Constants.MapSize.Y - 10);
-        batch.DrawPoint(dest.ToVector2(), Color.Red, size: 2);
+        mapBatch.DrawPoint(CameraManager.TileCoord.ToVector2(), Color.Red, size: 2);
+
+        // Resume normal render
+        mapBatch.End();
+        device.SetRenderTargets(oldRender);
+        batch.Begin();
 
         DebugManager.EndBenchmark("DrawMinimap");
         return minimap;

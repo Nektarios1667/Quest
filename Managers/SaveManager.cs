@@ -442,7 +442,6 @@ public class SaveManager
         }
 
         gameManager.OverlayManager.Notification($"Save Loaded", Color.Cyan);
-        Console.WriteLine($"Loaded {GameManager.RealTime}");
         Logger.System("Loaded game state from save.qsv.");
         return true;
     }

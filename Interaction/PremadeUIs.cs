@@ -31,7 +31,7 @@ public partial class UserInterface
         CreateDisplayCaseUI(batch);
         CreateFurnaceUI(batch, levelManager);
         CreateInscriberUI(batch);
-        CreateInventoryUI(batch);
+        CreateInventoryUI(batch, gameManager);
         CreateJukeboxUI(batch, levelManager);
         CreatePedestalUI(batch);
         CreateStoveUI(batch, levelManager);
@@ -303,7 +303,7 @@ public partial class UserInterface
         };
         InscriberUI.AddElement("clear", clear);
     }
-    private static void CreateInventoryUI(SpriteBatch batch)
+    private static void CreateInventoryUI(SpriteBatch batch, GameManager gameManager)
     {
         // ----- Player Inventory UI -----
         InventoryUI = new(batch);
@@ -319,6 +319,10 @@ public partial class UserInterface
                 InventoryUI.AddElement($"slot_{x + y * Chest.Size.X}", slot);
             }
         }
+
+        // Minimap
+        RenderSpace minimap = new(new(7, Constants.NativeResolution.Y - Constants.MapSize.Y - 13), Constants.MapSize, (currentTarget) => OverlayManager.DrawMiniMap(gameManager.Batch.GraphicsDevice, gameManager.LevelManager, currentTarget, gameManager.Batch, gameManager.MinimapBatch, gameManager.LevelManager.Level.Explored), null, Color.Black, 4);
+        InventoryUI.AddElement("minimap", minimap);
     }
     private static void CreateJukeboxUI(SpriteBatch batch, LevelManager levelManager)
     {
