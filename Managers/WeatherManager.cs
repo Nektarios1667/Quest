@@ -216,7 +216,7 @@ public class WeatherManager
         if (currentBiome == null) return Color.Transparent;
 
         Color weatherColor = WeatherTypes.Types.GetValueOrDefault(currentBiome.Value).WeatherColor;
-        weatherColor *= blend + 1 - (weatherColor.A / 255f); // Use alpha channel to adjust transparancy per biome - lower alpha = more opaque
+        weatherColor *= blend + 1 - weatherColor.A / 255f; // Use alpha channel to adjust transparancy per biome - lower alpha = more opaque
         return weatherColor;
     }
 }

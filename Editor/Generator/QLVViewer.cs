@@ -163,7 +163,7 @@ public partial class QLVViewer : Form
 
     private void SelectButton_Click(object sender, EventArgs e)
     {
-        using (OpenFileDialog dialog = new OpenFileDialog())
+        using (OpenFileDialog dialog = new())
         {
             if (dialog.ShowDialog() == DialogResult.OK)
             {

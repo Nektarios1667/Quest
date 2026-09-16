@@ -286,7 +286,7 @@ public class LevelEditor : Game, IAdjustableWindow
         // Change material
         if (InputManager.ScrolledUp || InputManager.BindPressed(InputAction.CycleToolNext))
         {
-            if (currentTool == EditorTool.Tile) TileSelectionIdx = (TileSelectionIdx - 1) + (TileSelectionIdx <= 0 ? Tilesets.TypeToArray[TilesetSelection].Length : 0);
+            if (currentTool == EditorTool.Tile) TileSelectionIdx = TileSelectionIdx - 1 + (TileSelectionIdx <= 0 ? Tilesets.TypeToArray[TilesetSelection].Length : 0);
             else if (currentTool == EditorTool.Decal) NumberTools.CycleDown(ref DecalSelection);
             else if (currentTool == EditorTool.Biome) NumberTools.CycleDown(ref BiomeSelection);
         }
@@ -456,7 +456,7 @@ public class LevelEditor : Game, IAdjustableWindow
         // Draw the native render to the backbuffer, scaling to current backbuffer size
         GraphicsDevice.SetRenderTarget(null);
         GraphicsDevice.Clear(Color.Transparent);
-        Rectangle dest = new Rectangle(0, 0, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
+        Rectangle dest = new(0, 0, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
         spriteBatch.Draw(Render, dest, Color.White);
         spriteBatch.End();

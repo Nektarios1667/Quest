@@ -15,7 +15,7 @@ public class Consumable : Item
     {
         // Timer
         if (!TimerManager.IsCompleteOrMissing("PlayerConsume")) return false;
-        TimerManager.SetTimer("PlayerConsume", 1f, true,null);
+        TimerManager.SetTimer("PlayerConsume", 1f, true, null);
 
         // Check hunger
         if (player.Hunger >= player.MaxHunger && HungerRestored > 0)

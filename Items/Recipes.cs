@@ -74,7 +74,7 @@ public static class RecipeRegistry
 
     public static Item? UseRecipe(Item[] inputs, Item? fuel, RecipeType type)
     {
-        RecipeKey inputsRecipe = new RecipeKey(type, inputs.Select(i => i.GetItemRef()));
+        RecipeKey inputsRecipe = new(type, inputs.Select(i => i.GetItemRef()));
         if (Recipes.TryGetValue(inputsRecipe, out var matchingRecipe))
         {
             // Check to make sure all the ingredients are present in the required amounts

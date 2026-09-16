@@ -282,7 +282,7 @@ public class Window : Game, IAdjustableWindow
         GraphicsDevice.Clear(Color.Transparent);
 
         // Draw the native resolution render target scaled to the current backbuffer size
-        Rectangle dest = new Rectangle(0, 0, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
+        Rectangle dest = new(0, 0, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, effect: Grading);
         spriteBatch.Draw(Render, dest, Color.White);
         spriteBatch.End();
@@ -334,7 +334,7 @@ public class Window : Game, IAdjustableWindow
             memoryDebugSb.Append("\nGC Gen2: ");
             memoryDebugSb.Append(GC.CollectionCount(2));
 
-            TimerManager.SetTimer("UpdateProgramInfo", 1f, false,null);
+            TimerManager.SetTimer("UpdateProgramInfo", 1f, false, null);
         }
 
         if (!DebugManager.ProgramInfo) return;

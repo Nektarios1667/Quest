@@ -135,7 +135,7 @@ public partial class DebugWindow : Form
     {
         RunOnUI(() =>
         {
-            using (SaveFileDialog dialog = new SaveFileDialog())
+            using (SaveFileDialog dialog = new())
             {
                 dialog.Title = "Export log";
                 dialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";

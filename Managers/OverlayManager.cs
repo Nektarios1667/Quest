@@ -205,7 +205,7 @@ public class OverlayManager
                     continue;
 
                 // Draw
-                Rectangle rect = new(CameraManager.WorldToScreen((new Point(x, y) * LM.LuxelSize)), LM.LuxelSize);
+                Rectangle rect = new(CameraManager.WorldToScreen(new Point(x, y) * LM.LuxelSize), LM.LuxelSize);
                 Color sky = gameManager.LevelManager.SkyColor * (1 - intensity);
                 Color weather = LM.BiomeColors[x / LM.LightDivisions, y / LM.LightDivisions] * (1 - intensity);
                 Color color = ColorTools.Blend(weather, sky, 0.5f * sky.A / 255, AlphaBlend.Max);
@@ -222,9 +222,9 @@ public class OverlayManager
         if (minimap != null) return minimap;
 
         DebugManager.StartBenchmark("DrawMinimap");
-        
+
         // Setup target - extra space to the right for labels
-        minimap =  new RenderTarget2D(device, Constants.MapSize.X + 150, Constants.MapSize.Y, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+        minimap = new RenderTarget2D(device, Constants.MapSize.X + 150, Constants.MapSize.Y, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
         batch.End();
         var oldRender = device.GetRenderTargets();
         device.SetRenderTarget(minimap);

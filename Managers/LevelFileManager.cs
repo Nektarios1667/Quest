@@ -138,8 +138,8 @@ public static class LevelFileManager
 
                 byte[] data = reader.ReadBytes(length);
 
-                using MemoryStream sectionStream = new MemoryStream(data);
-                using BinaryReader sectionReader = new BinaryReader(sectionStream);
+                using MemoryStream sectionStream = new(data);
+                using BinaryReader sectionReader = new(sectionStream);
 
                 // Section types
                 switch (id)

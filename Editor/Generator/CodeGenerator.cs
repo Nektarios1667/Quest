@@ -52,7 +52,7 @@ public static class CodeGenerator
                 return;
             else if (resp == "v" || resp == "level viewer")
             {
-                Thread thread = new Thread(() =>
+                Thread thread = new(() =>
                 {
                     Application.Run(new QLVViewer());
                 });

@@ -201,7 +201,7 @@ public class EditorManager
             scale = 1;
         }
         TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), values[3]);
-        NPC npc = new NPC(texture, MouseSelectionCoord, name, dialog, Color.White, scale);
+        NPC npc = new(texture, MouseSelectionCoord, name, dialog, Color.White, scale);
         foreach (ShopOption option in shopOptions)
             npc.AddShopOption(option);
         LevelManager.Level.NPCs[npc.UID] = npc;

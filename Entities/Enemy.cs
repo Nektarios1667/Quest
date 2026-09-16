@@ -69,7 +69,7 @@ public class Enemy : IEntity, IStatusEffectable
     {
         Health = MaxHealth;
 
-        UIDManager.Release(UIDCategory.Enemies, UID);   
+        UIDManager.Release(UIDCategory.Enemies, UID);
         UID = UIDManager.Get(UIDCategory.Enemies);
 
         TimerManager.SetTimer($"EnemyAttack_{UID}", AttackSpeed, true, null);

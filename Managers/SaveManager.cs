@@ -132,8 +132,8 @@ public class SaveManager
     #region WriteSections
     private static void WriteSection(BinaryWriter writer, string id, Action<BinaryWriter, GameManager, PlayerManager> writeData, GameManager gameManager, PlayerManager playerManager)
     {
-        using MemoryStream tempStream = new MemoryStream();
-        using BinaryWriter tempWriter = new BinaryWriter(tempStream);
+        using MemoryStream tempStream = new();
+        using BinaryWriter tempWriter = new(tempStream);
 
         // Write the section normally
         writeData(tempWriter, gameManager, playerManager);
@@ -408,8 +408,8 @@ public class SaveManager
 
                 byte[] data = reader.ReadBytes(length);
 
-                using MemoryStream sectionStream = new MemoryStream(data);
-                using BinaryReader sectionReader = new BinaryReader(sectionStream);
+                using MemoryStream sectionStream = new(data);
+                using BinaryReader sectionReader = new(sectionStream);
 
                 // Section types
                 try

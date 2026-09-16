@@ -1,6 +1,4 @@
-﻿using Xna = Microsoft.Xna.Framework;
-
-namespace Quest.Gui;
+﻿namespace Quest.Gui;
 
 public enum DialogRespeak
 {

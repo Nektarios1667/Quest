@@ -125,8 +125,8 @@ public class EditorLevelManager
     }
     public static void WriteSection(BinaryWriter writer, string id, Action<BinaryWriter> writeData)
     {
-        using MemoryStream tempStream = new MemoryStream();
-        using BinaryWriter tempWriter = new BinaryWriter(tempStream);
+        using MemoryStream tempStream = new();
+        using BinaryWriter tempWriter = new(tempStream);
 
         // Write the section normally
         writeData(tempWriter);

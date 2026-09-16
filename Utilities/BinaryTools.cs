@@ -142,7 +142,7 @@ public static class BinaryReaderExtensions
             Logger.Error($"Failed to read NPC. Invalid texture ID {texID}.");
             texture = TextureID.Null;
         }
-        NPC npc = new NPC(texture, location, name, dialog, Color.White, scale, uid);
+        NPC npc = new(texture, location, name, dialog, Color.White, scale, uid);
         byte shopOptionCount = reader.ReadByte();
         for (int i = 0; i < shopOptionCount; i++)
         {

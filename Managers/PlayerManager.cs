@@ -456,7 +456,7 @@ public class PlayerManager : IEntity, IStatusEffectable
         {
             for (int x = -radius; x <= radius; x++)
             {
-                int idx = (center.X + x) + (center.Y + y) * Constants.MapSize.X;
+                int idx = center.X + x + (center.Y + y) * Constants.MapSize.X;
 
                 // Checks
                 if (Vector2.DistanceSquared(Vector2.Zero, new(x, y)) > radius * radius) continue;
@@ -547,7 +547,7 @@ public class PlayerManager : IEntity, IStatusEffectable
             if (ui.BoundContainer?.Items[slot] == null) return;
 
             // Shift click
-            if ((InputManager.KeyDown(Keys.LeftShift) || InputManager.KeyDown(Keys.RightShift)))
+            if (InputManager.KeyDown(Keys.LeftShift) || InputManager.KeyDown(Keys.RightShift))
             {
                 // Null check
                 if (OpenedInterface == null || OpenedInterface.BoundContainer == null) return;

@@ -218,8 +218,8 @@ public static class LightingManager
 
         float blend = gameManager.WeatherManager.GetWeatherIntensity(GameManager.GameTime);
         // Positioning
-        Point start = (LightingStart + Constants.TileDrawPadding);
-        Point end = (LightingEnd - Constants.TileDrawPadding + Constants.OnePoint);
+        Point start = LightingStart + Constants.TileDrawPadding;
+        Point end = LightingEnd - Constants.TileDrawPadding + Constants.OnePoint;
         int startX = Math.Max(0, start.X);
         int startY = Math.Max(0, start.Y);
         int endX = Math.Min(BiomeColors.GetLength(0), end.X);
@@ -230,7 +230,7 @@ public static class LightingManager
             for (int x = startX; x < endX; x++)
             {
                 // Biome
-                Point worldLoc = new Point(x, y);
+                Point worldLoc = new(x, y);
                 BiomeColors[x, y] = gameManager.WeatherManager.GetWeatherColor(gameManager, worldLoc, blend);
             }
         }

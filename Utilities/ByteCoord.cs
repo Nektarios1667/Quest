@@ -2,7 +2,7 @@
 
 public struct ByteCoord
 {
-    public static readonly ByteCoord Zero = new ByteCoord(0, 0);
+    public static readonly ByteCoord Zero = new(0, 0);
     public byte X;
     public byte Y;
     public ByteCoord(Point pos)
