@@ -85,9 +85,9 @@ public static class CodeGenerator
             intensity[t] = weather.GetWeatherIntensity(t + offset);
         }
 
-        float weatherPercent = values.Where(f => f >= WeatherManager.weatherThreshold).Count() / (float)seconds;
-        float lightPercent = values.Where(f => f >= WeatherManager.weatherThreshold && f < WeatherManager.weatherThreshold + 0.1f).Count() / (float)seconds;
-        float heavyPercent = values.Where(f => f >= 1 - WeatherManager.weatherThreshold / 2).Count() / (float)seconds;
+        float weatherPercent = values.Where(f => f >= WeatherManager.WeatherThreshold).Count() / (float)seconds;
+        float lightPercent = values.Where(f => f >= WeatherManager.WeatherThreshold && f < WeatherManager.WeatherThreshold + 0.1f).Count() / (float)seconds;
+        float heavyPercent = values.Where(f => f >= 1 - WeatherManager.WeatherThreshold / 2).Count() / (float)seconds;
 
         Console.WriteLine($"Weather: {weatherPercent * 100:0.0}%\n  Light: {lightPercent * 100:0.0}%\n  Heavy: {heavyPercent * 100:0.0}%");
 
@@ -106,11 +106,11 @@ public static class CodeGenerator
         weatherVal.MarkerShape = MarkerShape.None;
         weatherVal.LineWidth = 3;
 
-        var lightLine = plot.Add.HorizontalLine(WeatherManager.weatherThreshold, pattern: LinePattern.Dotted);
+        var lightLine = plot.Add.HorizontalLine(WeatherManager.WeatherThreshold, pattern: LinePattern.Dotted);
         lightLine.Color = Colors.Orange;
         lightLine.LineWidth = 2;
 
-        var heavyLine = plot.Add.HorizontalLine(1 - WeatherManager.weatherThreshold / 2, pattern: LinePattern.Dotted);
+        var heavyLine = plot.Add.HorizontalLine(1 - WeatherManager.WeatherThreshold / 2, pattern: LinePattern.Dotted);
         heavyLine.Color = Colors.Red;
         heavyLine.LineWidth = 2;
 
@@ -182,7 +182,7 @@ public static class CodeGenerator
 
         // TextureManager Load and Metadata
         string loadSource = $"Textures[TextureID.{name}] = content.Load<Texture2D>(\"Images/Tiles/{name}\");\r\n";
-        string metadataSource = $"Metadata[TextureID.{name}] = new(Textures[TextureID.{name}].Bounds.Size, new(4, 4), \"tile\");\r\n";
+        string metadataSource = $"Metadata[TextureID.{name}] = new(Textures[TextureID.{name}].Bounds.Size, new(4, 4), TextureType.Tile);\r\n";
         newTextureManagerSource = newTextureManagerSource.Replace("        // TILES INSERT", $"        {loadSource}        // TILES INSERT");
         newTextureManagerSource = newTextureManagerSource.Replace("        // TILES METADATA INSERT", $"        {metadataSource}        // TILES METADATA INSERT");
         File.WriteAllText($"{sourceDirectory}/Managers/TextureManager.cs", newTextureManagerSource);
@@ -192,9 +192,9 @@ public static class CodeGenerator
         // TileType variable in TileTypes class in Tile.cs
         newTileSource = newTileSource.Replace("        // TILES REGISTER", $"        new(TileTypeID.{name}, TextureID.{name}, {isWalkable.ToString().ToLower()}, {isWall.ToString().ToLower()}),\r\n        // TILES REGISTER");
         if (isTriggerTile)
-            newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, level.LevelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null),\r\n            // TILEFROMID\r\n");
+            newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, levelPath.LevelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null),\r\n            // TILEFROMID\r\n");
         else if (isSpecial)
-            newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, level.LevelName),\r\n            // TILEFROMID\r\n");
+            newTileSource = newTileSource.Replace("            // TILEFROMID\r\n", $"            TileTypeID.{name} => new {name}(location, levelPath.LevelName),\r\n            // TILEFROMID\r\n");
 
         File.WriteAllText($"{sourceDirectory}/Tiles/Tile.cs", newTileSource);
 

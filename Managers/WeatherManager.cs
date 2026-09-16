@@ -25,7 +25,8 @@ public class WeatherManager
     public float LastWeather { get; private set; } = 0f;
     // Private
     private int _weatherSeed = Environment.TickCount;
-    public const float weatherThreshold = 0.65f;
+    public const float WeatherThreshold = 0.65f;
+    public const float MaxWeatherBoost = 0.1f;
     private float lastTime = -1f;
     public WeatherManager()
     {
@@ -43,8 +44,8 @@ public class WeatherManager
         LastWeather = lastWeatherTime;
         lastTime = lastTimeValue;
     }
-    public static float NoiseToIntensity(float noise) => Math.Min((float)Math.Sqrt(Math.Max(noise - weatherThreshold, 0) / (1 - weatherThreshold)), 0.8f);
-    public float GetWeatherBoost(float time) => time - LastWeather > 600 ? Math.Min((time - LastWeather - 600) / 1800f, 0.1f) : 0;
+    public static float NoiseToIntensity(float noise) => Math.Min((float)Math.Sqrt(Math.Max(noise - WeatherThreshold, 0) / (1 - WeatherThreshold)), 0.8f);
+    public float GetWeatherBoost(float time) => (time - LastWeather) > 600 ? Math.Min((time - LastWeather - 600) / 1800f, MaxWeatherBoost) : 0;
     public float GetWeatherIntensity(float time) => NoiseToIntensity(GetWeatherValue(time));
     public float GetWeatherValue(float time)
     {
@@ -54,9 +55,9 @@ public class WeatherManager
 
         // Weather buildup
         val += GetWeatherBoost(time);
-        if (val >= weatherThreshold)
+        if (val >= WeatherThreshold)
         {
-            LastWeather += Math.Min(12 * delta * (val - weatherThreshold) / (1 - weatherThreshold), time - LastWeather);
+            LastWeather += Math.Min(12 * delta * (val - WeatherThreshold) / (1 - WeatherThreshold), time - LastWeather);
         }
 
         lastTime = time;

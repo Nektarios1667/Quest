@@ -4,7 +4,7 @@ namespace Quest.Utilities;
 
 public static class NumberTools
 {
-    public static float RoundTo<T>(T num, float multiple) where T : INumber<T>
+    public static float RoundTo<T>(this T num, float multiple) where T : INumber<T>
     {
         if (multiple <= 0 || num == T.Zero)
             return 0;

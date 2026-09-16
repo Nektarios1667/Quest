@@ -225,6 +225,7 @@ public static class TextureManager
         Target,
         LogicGate,
         Sign,
+        WeatherTable,
         // TILES ENUM INSERT
         Torch,
         BlueTorch,
@@ -508,6 +509,7 @@ public static class TextureManager
         Textures[TextureID.Target] = content.Load<Texture2D>("Images/Tiles/Target");
         Textures[TextureID.LogicGate] = content.Load<Texture2D>("Images/Tiles/LogicGate");
         Textures[TextureID.Sign] = content.Load<Texture2D>("Images/Tiles/Sign");
+        Textures[TextureID.WeatherTable] = content.Load<Texture2D>("Images/Tiles/WeatherTable");
         // TILES INSERT
         Textures[TextureID.Torch] = content.Load<Texture2D>("Images/Decals/Torch");
         Textures[TextureID.BlueTorch] = content.Load<Texture2D>("Images/Decals/BlueTorch");
@@ -774,6 +776,7 @@ public static class TextureManager
         Metadata[TextureID.Target] = new(Textures[TextureID.Target].Bounds.Size, new(1, 2), TextureType.Tile);
         Metadata[TextureID.LogicGate] = new(Textures[TextureID.LogicGate].Bounds.Size, new(7, 4), TextureType.Tile);
         Metadata[TextureID.Sign] = new(Textures[TextureID.Sign].Bounds.Size, new(4, 4), TextureType.Tile);
+        Metadata[TextureID.WeatherTable] = new(Textures[TextureID.WeatherTable].Bounds.Size, new(4, 4), TextureType.Tile);
         // TILES METADATA INSERT
         Metadata[TextureID.Torch] = new(Textures[TextureID.Torch].Bounds.Size, new(6, 1), TextureType.Decal);
         Metadata[TextureID.BlueTorch] = new(Textures[TextureID.BlueTorch].Bounds.Size, new(6, 1), TextureType.Decal);

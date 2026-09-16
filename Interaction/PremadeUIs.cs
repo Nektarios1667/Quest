@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using Parlot;
+using Quest.Gui;
+using System.Linq;
 
 namespace Quest.Interaction;
 
@@ -18,6 +20,7 @@ public partial class UserInterface
     public static UserInterface PedestalUI { get; private set; } = null!;
     public static UserInterface StoveUI { get; private set; } = null!;
     public static UserInterface WaypointUI { get; private set; } = null!;
+    public static UserInterface WeatherTableUI { get; private set; } = null!;
     public static void Init(SpriteBatch batch, GameManager gameManager)
     {
         LevelManager levelManager = gameManager.LevelManager;
@@ -36,6 +39,7 @@ public partial class UserInterface
         CreatePedestalUI(batch);
         CreateStoveUI(batch, levelManager);
         CreateWaypointUI(batch, gameManager);
+        CreateWeatherTableUI(batch, gameManager);
     }
 
     private static void CreateChestUI(SpriteBatch batch)
@@ -483,6 +487,54 @@ public partial class UserInterface
         WaypointUI.AddElement("deleteButton", deleteButton);
         WaypointUI.AddElement("messageLabel", messageLabel);
 
-        PedestalUI.AddElement("display", nameInput);
+        WaypointUI.AddElement("display", nameInput);
+    }
+    private static void CreateWeatherTableUI(SpriteBatch batch, GameManager gameManager)
+    {
+        string ToPercentageString(float value) => $"{value * 100:0}%";
+
+        // ----- Weather Table -----
+        WeatherTableUI = new(batch);
+
+        // Title
+        Label title = new(new(Constants.Middle.X, 20), "WEATHER TABLE", PixelOperatorLarge, Color.White, alignment: TextAlignment.Center);
+        WeatherTableUI.AddElement("title", title);
+
+        // Subtitles
+        Label currentLabel = new(new(Constants.Middle.X - 212, 80), "CURRENT", PixelOperatorLarge, Color.White, alignment: TextAlignment.Center);
+        Label forecastLabel = new(new(Constants.Middle.X + 212, 80), "FORECAST", PixelOperatorLarge, Color.White, alignment: TextAlignment.Center);
+
+        // Weather value and intensity
+        Label weatherValueData = new(new(Constants.Middle.X - 425, 120), "Value:", PixelOperatorLarge, Color.Cyan);
+        LinkedBar weatherValueBar = new(new(Constants.Middle.X - 425, 170), () => gameManager.WeatherManager.GetWeatherValue(GameManager.GameTime), (prog) => $"{prog:0.00}", PixelOperatorLarge, new(400, 40), Color.White * 0.6f, Color.Black * 0.6f);
+        Label weatherIntensityData = new(new(Constants.Middle.X - 425, 210), "Intensity:", PixelOperatorLarge, Color.Cyan);
+        LinkedBar weatherIntensityBar = new(new(Constants.Middle.X - 425, 260), () => gameManager.WeatherManager.GetWeatherIntensity(GameManager.GameTime), ToPercentageString, PixelOperatorLarge, new(400, 40), Color.White * 0.6f, Color.Black * 0.6f);
+        Label weatherBoostData = new(new(Constants.Middle.X - 425, 300), "Drought:", PixelOperatorLarge, Color.Cyan);
+        LinkedBar weatherBoostBar = new(new(Constants.Middle.X - 425, 350), () => gameManager.WeatherManager.GetWeatherBoost(GameManager.GameTime) / WeatherManager.MaxWeatherBoost, ToPercentageString, PixelOperatorLarge, new(400, 40), Color.White * 0.6f, Color.Black * 0.6f);
+
+        // Forecast
+        Label weatherValueDataForecast = new(new(Constants.Middle.X + 25, 120), "Value:", PixelOperatorLarge, Color.Cyan);
+        LinkedBar weatherValueBarForecast = new(new(Constants.Middle.X + 25, 170), () => gameManager.WeatherManager.GetWeatherValue(GameManager.GameTime.RoundTo(10) + 60), (prog) => $"{prog:0.00}", PixelOperatorLarge, new(400, 40), Color.White * 0.6f, Color.Black * 0.6f);
+        Label weatherIntensityDataForecast = new(new(Constants.Middle.X + 25, 210), "Intensity:", PixelOperatorLarge, Color.Cyan);
+        LinkedBar weatherIntensityBarForecast = new(new(Constants.Middle.X + 25, 260), () => gameManager.WeatherManager.GetWeatherIntensity(GameManager.GameTime.RoundTo(10) + 60), ToPercentageString, PixelOperatorLarge, new(400, 40), Color.White * 0.6f, Color.Black * 0.6f);
+        Label weatherBoostDataForecast = new(new(Constants.Middle.X + 25, 300), "Drought:", PixelOperatorLarge, Color.Cyan);
+        LinkedBar weatherBoostBarForecast = new(new(Constants.Middle.X + 25, 350), () => gameManager.WeatherManager.GetWeatherBoost(GameManager.GameTime.RoundTo(10) + 60) / WeatherManager.MaxWeatherBoost, ToPercentageString, PixelOperatorLarge, new(400, 40), Color.White * 0.6f, Color.Black * 0.6f);
+
+        WeatherTableUI.AddElement("currentLabel", currentLabel);
+        WeatherTableUI.AddElement("forecastLabel", forecastLabel);
+
+        WeatherTableUI.AddElement("weatherValueData", weatherValueData);
+        WeatherTableUI.AddElement("weatherIntensityData", weatherIntensityData);
+        WeatherTableUI.AddElement("weatherValueBar", weatherValueBar);
+        WeatherTableUI.AddElement("weatherIntensityBar", weatherIntensityBar);
+        WeatherTableUI.AddElement("weatherBoostBar", weatherBoostBar);
+        WeatherTableUI.AddElement("weatherBoostData", weatherBoostData);
+
+        WeatherTableUI.AddElement("weatherValueDataForecast", weatherValueDataForecast);
+        WeatherTableUI.AddElement("weatherIntensityDataForecast", weatherIntensityDataForecast);
+        WeatherTableUI.AddElement("weatherValueBarForecast", weatherValueBarForecast);
+        WeatherTableUI.AddElement("weatherIntensityBarForecast", weatherIntensityBarForecast);
+        WeatherTableUI.AddElement("weatherBoostBarForecast", weatherBoostBarForecast);
+        WeatherTableUI.AddElement("weatherBoostDataForecast", weatherBoostDataForecast);
     }
 }

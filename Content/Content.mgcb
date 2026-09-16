@@ -3071,6 +3071,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Tiles/Water.png
 
+#begin Images/Tiles/WeatherTable.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Tiles/WeatherTable.png
+
 #begin Images/Tiles/WetRedSand.png
 /importer:TextureImporter
 /processor:TextureProcessor

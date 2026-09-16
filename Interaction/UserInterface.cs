@@ -86,11 +86,6 @@ public partial class UserInterface
         foreach (var element in Elements.Values)
             element.Close();
     }
-    public void RemoveElement(string name)
-    {
-        Elements.Remove(name);
-        SlotElements.Remove(name);
-    }
     public Dictionary<string, UIElement> GetAllElements(string? tag = null) => tag == null ? Elements : Elements.Where(kv => kv.Value.Tags.Contains(tag)).ToDictionary(kv => kv.Key, kv => kv.Value);
     public UIElement GetElement(string name) => Elements[name] ?? throw new Exception($"Element '{name}' not found.");
     public Slot GetSlot(string name) => Elements[name] as Slot ?? throw new Exception($"Element '{name}' is not a Slot.");

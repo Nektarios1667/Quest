@@ -168,6 +168,7 @@ public static class Constants
         Color.Pink, // Target
         Color.Gray, // LogicGate
         Color.Brown, // Sign
+        Color.Brown, // WeatherTable
         // MINIMAPCOLORS
     ];
 }

@@ -75,6 +75,7 @@ public enum TileTypeIDOld : byte
     Target,
     LogicGate,
     Sign,
+    WeatherTable,
     // TILES ID
 }
 public enum TileTypeID : byte
@@ -151,6 +152,7 @@ public enum TileTypeID : byte
     Target,
     LogicGate,
     Sign,
+    WeatherTable,
     // TILES ID
 }
 public class TileType
@@ -248,6 +250,7 @@ public static class TileTypes
         new(TileTypeID.Target, TextureID.Target, false, true),
         new(TileTypeID.LogicGate, TextureID.LogicGate, true, false),
         new(TileTypeID.Sign, TextureID.Sign, true, false),
+        new(TileTypeID.WeatherTable, TextureID.WeatherTable, false, false),
         // TILES REGISTER
     ];
 }
@@ -318,6 +321,7 @@ public class Tile
             TileTypeID.Target => new Target(location, levelPath.LevelName, TileEffect.None, ByteCoord.Zero, levelPath),
             TileTypeID.LogicGate => new LogicGate(location, levelPath.LevelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null, LogicGateType.And),
             TileTypeID.Sign => new Sign(location, "..."),
+            TileTypeID.WeatherTable => new WeatherTable(location),
             // TILEFROMID
             _ => new(location, type)
         };

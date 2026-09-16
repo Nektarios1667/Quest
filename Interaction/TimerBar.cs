@@ -8,7 +8,7 @@ public class TimerBar : ProgressBar
     public bool IsRunning { get; set; }
     public int RepeatCount { get; set; }
     public int MaxRepeatCount { get; set; }
-    public TimerBar(Point location, float time, Point size, Color bg, Color fg, int border, int reps = 1) : base(location, size, bg, fg, border)
+    public TimerBar(Point location, float time, Point size, Color bg, Color fg, int border = 3, int reps = 1) : base(location, size, bg, fg, border: border)
     {
         Time = time;
         CurrentTime = 0;

@@ -28,6 +28,8 @@ public class LinkedLabel : UIElement
     }
     public override void Update(UserInterface ui, GameManager gameManager)
     {
+        if (!IsEnabled) return;
+
         UpdateDisplayedText();
     }
     public void UpdateDisplayedText()
@@ -44,6 +46,8 @@ public class LinkedLabel : UIElement
     }
     public override void Draw(UserInterface ui)
     {
+        if (!IsVisible) return;
+
         // Background
         if (Background.HasValue)
             ui.Batch.FillRectangle(Bounds, Background.Value);
