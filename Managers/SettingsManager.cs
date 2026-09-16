@@ -94,7 +94,7 @@ public static class SettingsManager
         fpsSlider.ValueChanged += (value) => fpsValue.Text = ((int)(value * 211 + 30) == 241) ? "Unlimited" : $"{(int)(value * 211 + 30)}";
 
         // Vsync
-        vsyncCheckbox = new(settingsMenu, new(100, 355), 40, Color.Black, Color.Gray, Color.DarkGray);
+        vsyncCheckbox = new(settingsMenu, new(100, 355), 40, Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, border: 0);
         Label vsyncLabel = new(settingsMenu, new(150, 355), Color.White, "V-Sync", PixelOperator);
         vsyncCheckbox.SetValue(SettingsManager.VSYNC);
         vsyncCheckbox.ValueChanged += (isChecked) =>
@@ -104,7 +104,7 @@ public static class SettingsManager
         };
 
         // Resolution
-        resolutionDropdown = new(settingsMenu, new(100, 420), new(200, 30), Color.Black, Color.Gray, Color.DarkGray, font: PixelOperator);
+        resolutionDropdown = new(settingsMenu, new(100, 420), new(200, 30), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, font: PixelOperator, border: 0);
         resolutionDropdown.AddItems(["1280x720", "1366x768", "1600x900", "1920x1080", "2560x1440", "3840x2160"]);
         resolutionDropdown.SelectItem($"{ScreenResolution.X}x{ScreenResolution.Y}");
         resolutionDropdown.ItemSelected += (item) =>
@@ -118,7 +118,7 @@ public static class SettingsManager
         };
 
         // Fullscreen checkbox
-        fullscreenCheckbox = new(settingsMenu, new(100, 485), 40, Color.Black, Color.Gray, Color.DarkGray);
+        fullscreenCheckbox = new(settingsMenu, new(100, 485), 40, Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, border: 0);
         Label fullscreenLabel = new(settingsMenu, new(150, 485), Color.White, "Fullscreen", PixelOperator);
         fullscreenCheckbox.SetValue(SettingsManager.Fullscreen);
         fullscreenCheckbox.ValueChanged += (isChecked) =>
