@@ -57,7 +57,7 @@ public class Dialog : Widget
     }
     public void UpdateSize()
     {
-        Dimensions = new(Dimensions.X, (int)Font.MeasureString(LimitLines(SoftwrapWords(Text, Font, Dimensions.ToVector2()), Font, 200)).Y + 20);
+        Dimensions = new(Dimensions.X, (int)Font.MeasureString(SoftwrapWords(Text, Font, Inside)).Y + 20);
         Inside = new(Dimensions.X - Border * 2 - 2, Dimensions.Y - Border * 2 - 2);
         Rect = new(Position.X, Position.Y, Dimensions.X, Dimensions.Y);
     }
@@ -75,19 +75,15 @@ public class Dialog : Widget
     }
     public void SetText(string text, DialogRespeak respeak = DialogRespeak.Auto)
     {
-        if (respeak == DialogRespeak.Always || (Text != text && respeak == DialogRespeak.Auto))
-        {
-            Text = text;
-            Displayed = "";
-        }
-        if (respeak == DialogRespeak.Instant)
-        {
-            Text = text;
-            Displayed = SoftwrapWords(text, Font, Inside);
-        }
+        Text = text;
         UpdateSize();
+
+        if (respeak == DialogRespeak.Always || (Text != text && respeak == DialogRespeak.Auto))
+            Displayed = "";
+        if (respeak == DialogRespeak.Instant)
+            Displayed = SoftwrapWords(text, Font, Inside);
     }
-    public static string SoftwrapWords(string text, SpriteFont font, Xna.Vector2 dimensions)
+    public static string SoftwrapWords(string text, SpriteFont font, Vector2 dimensions)
     {
         // setup
         string wrapped = "";

@@ -60,7 +60,7 @@ public class OverlayManager
         {
             ItemInfobox.IsVisible = true;
             Item item = playerManager.HoveredItem;
-            ItemInfobox.SetText($"--- {item.Name} ---\n{item.Description}", respeak: DialogRespeak.Instant);
+            ItemInfobox.SetText($"--- {StringTools.FillCamelSpaces(item.Name)} ---\n{item.Description}", respeak: DialogRespeak.Instant);
         }
         else
             ItemInfobox.IsVisible = false;

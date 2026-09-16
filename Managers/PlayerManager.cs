@@ -72,7 +72,6 @@ public class PlayerManager : IEntity, IStatusEffectable
     public PlayerManager()
     {
         TimerManager.SetTimer("PlayerHungerLoss", Constants.SecondsPerHungerLoss, true, null);
-
     }
     public void InitUI()
     {
