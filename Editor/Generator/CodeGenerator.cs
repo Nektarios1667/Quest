@@ -72,16 +72,13 @@ public static class CodeGenerator
 
         float[] values = new float[seconds];
         int[] times = new int[seconds];
-        float[] boost = new float[seconds];
         float[] intensity = new float[seconds];
 
         int offset = DateTime.Now.Millisecond;
-        weather.SetWeatherPersistent(lastTimeValue: offset);
         for (int t = 0; t < seconds; t++)
         {
             values[t] = weather.GetWeatherValue(t + offset);
             times[t] = t;
-            boost[t] = weather.GetWeatherBoost(t + offset);
             intensity[t] = weather.GetWeatherIntensity(t + offset);
         }
 
@@ -97,10 +94,6 @@ public static class CodeGenerator
         var intensityVal = plot.Add.Scatter(times, intensity, color: Colors.Orange);
         intensityVal.MarkerShape = MarkerShape.None;
         intensityVal.LineWidth = 2;
-
-        var boostVal = plot.Add.Scatter(times, boost, color: Colors.Green);
-        boostVal.MarkerShape = MarkerShape.None;
-        boostVal.LineWidth = 2;
 
         var weatherVal = plot.Add.Scatter(times, values, color: Colors.Blue);
         weatherVal.MarkerShape = MarkerShape.None;

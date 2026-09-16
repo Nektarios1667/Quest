@@ -1,5 +1,6 @@
 ﻿using Quest.World;
 using System.Linq;
+using System.Runtime;
 
 namespace Quest.Managers;
 
@@ -22,45 +23,30 @@ public class WeatherManager
     public int WeatherSeed { get => _weatherSeed; set { _weatherSeed = value; WeatherNoise.SetSeed(value); } }
     public float WeatherIntensity { get; private set; }
     public float WeatherValue { get; private set; }
-    public float LastWeather { get; private set; } = 0f;
     // Private
     private int _weatherSeed = Environment.TickCount;
-    public const float WeatherThreshold = 0.65f;
+    public const float WeatherThreshold = 0.6f;
     public const float MaxWeatherBoost = 0.1f;
-    private float lastTime = -1f;
     public WeatherManager()
     {
         WeatherNoise.SetSeed(WeatherSeed);
         WeatherNoise.SetNoiseType(FastNoiseLite.NoiseType.ValueCubic);
-        WeatherNoise.SetFrequency(0.005f);
+        WeatherNoise.SetFrequency(0.003f);
         WeatherNoise.SetFractalType(FastNoiseLite.FractalType.FBm);
         WeatherNoise.SetFractalOctaves(3);
     }
     // Values
-    public void SetWeatherPersistent(int seed = -1, float lastWeatherTime = 0f, float lastTimeValue = -1f)
+    public void SetWeatherPersistent(int seed = -1)
     {
         if (seed != -1)
             WeatherNoise.SetSeed(seed);
-        LastWeather = lastWeatherTime;
-        lastTime = lastTimeValue;
     }
     public static float NoiseToIntensity(float noise) => Math.Min((float)Math.Sqrt(Math.Max(noise - WeatherThreshold, 0) / (1 - WeatherThreshold)), 0.8f);
-    public float GetWeatherBoost(float time) => (time - LastWeather) > 600 ? Math.Min((time - LastWeather - 600) / 1800f, MaxWeatherBoost) : 0;
     public float GetWeatherIntensity(float time) => NoiseToIntensity(GetWeatherValue(time));
     public float GetWeatherValue(float time)
     {
         float val = WeatherNoise.GetNoise(time, 0) * 0.5f + 0.5f;
         val = 1f / (1 + (float)Math.Pow(MathHelper.E, -8 * (val - 0.5f)));
-        float delta = lastTime == -1 ? 0 : (time - lastTime);
-
-        // Weather buildup
-        val += GetWeatherBoost(time);
-        if (val >= WeatherThreshold)
-        {
-            LastWeather += Math.Min(12 * delta * (val - WeatherThreshold) / (1 - WeatherThreshold), time - LastWeather);
-        }
-
-        lastTime = time;
 
         return val;
     }
@@ -197,10 +183,6 @@ public class WeatherManager
 
         float lerp = start.time == end.time ? 1f : (cycle - start.time) / (end.time - start.time);
         Color color = Color.Lerp(start.color, end.color, lerp);
-        if (color == Color.Transparent)
-        {
-            Console.WriteLine("uh oh ");
-        }
         return color;
     }
     public static float GetDaylightPercent(float time)

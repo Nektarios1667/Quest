@@ -167,7 +167,6 @@ public class SaveManager
         writer.Write(GameManager.DayTime);
         writer.Write(GameManager.GameTime);
         writer.Write(gameManager.WeatherManager.WeatherSeed);
-        writer.Write(gameManager.WeatherManager.LastWeather);
 
         TasksComplete++;
     }
@@ -466,8 +465,7 @@ public class SaveManager
         GameManager.DayTime = reader.ReadSingle();
         GameManager.GameTime = reader.ReadSingle();
         int weatherSeed = reader.ReadInt32();
-        float lastWeather = reader.ReadSingle();
-        gameManager.WeatherManager.SetWeatherPersistent(seed: weatherSeed, lastWeatherTime: lastWeather, lastTimeValue: GameManager.GameTime);
+        gameManager.WeatherManager.SetWeatherPersistent(seed: weatherSeed);
         gameManager.LevelManager.TasksComplete++;
     }
     public static void ReadCameraSection(GameManager gameManager, BinaryReader reader, Dictionary<ushort, Level> levelTable)

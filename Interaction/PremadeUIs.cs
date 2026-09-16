@@ -509,16 +509,12 @@ public partial class UserInterface
         LinkedBar weatherValueBar = new(new(Constants.Middle.X - 425, 170), () => gameManager.WeatherManager.GetWeatherValue(GameManager.GameTime), (prog) => $"{prog:0.00}", PixelOperatorLarge, new(400, 40), Color.White * 0.6f, Color.Black * 0.6f);
         Label weatherIntensityData = new(new(Constants.Middle.X - 425, 210), "Intensity:", PixelOperatorLarge, Color.Cyan);
         LinkedBar weatherIntensityBar = new(new(Constants.Middle.X - 425, 260), () => gameManager.WeatherManager.GetWeatherIntensity(GameManager.GameTime), ToPercentageString, PixelOperatorLarge, new(400, 40), Color.White * 0.6f, Color.Black * 0.6f);
-        Label weatherBoostData = new(new(Constants.Middle.X - 425, 300), "Drought:", PixelOperatorLarge, Color.Cyan);
-        LinkedBar weatherBoostBar = new(new(Constants.Middle.X - 425, 350), () => gameManager.WeatherManager.GetWeatherBoost(GameManager.GameTime) / WeatherManager.MaxWeatherBoost, ToPercentageString, PixelOperatorLarge, new(400, 40), Color.White * 0.6f, Color.Black * 0.6f);
 
         // Forecast
         Label weatherValueDataForecast = new(new(Constants.Middle.X + 25, 120), "Value:", PixelOperatorLarge, Color.Cyan);
         LinkedBar weatherValueBarForecast = new(new(Constants.Middle.X + 25, 170), () => gameManager.WeatherManager.GetWeatherValue(GameManager.GameTime.RoundTo(10) + 60), (prog) => $"{prog:0.00}", PixelOperatorLarge, new(400, 40), Color.White * 0.6f, Color.Black * 0.6f);
         Label weatherIntensityDataForecast = new(new(Constants.Middle.X + 25, 210), "Intensity:", PixelOperatorLarge, Color.Cyan);
         LinkedBar weatherIntensityBarForecast = new(new(Constants.Middle.X + 25, 260), () => gameManager.WeatherManager.GetWeatherIntensity(GameManager.GameTime.RoundTo(10) + 60), ToPercentageString, PixelOperatorLarge, new(400, 40), Color.White * 0.6f, Color.Black * 0.6f);
-        Label weatherBoostDataForecast = new(new(Constants.Middle.X + 25, 300), "Drought:", PixelOperatorLarge, Color.Cyan);
-        LinkedBar weatherBoostBarForecast = new(new(Constants.Middle.X + 25, 350), () => gameManager.WeatherManager.GetWeatherBoost(GameManager.GameTime.RoundTo(10) + 60) / WeatherManager.MaxWeatherBoost, ToPercentageString, PixelOperatorLarge, new(400, 40), Color.White * 0.6f, Color.Black * 0.6f);
 
         WeatherTableUI.AddElement("currentLabel", currentLabel);
         WeatherTableUI.AddElement("forecastLabel", forecastLabel);
@@ -527,14 +523,10 @@ public partial class UserInterface
         WeatherTableUI.AddElement("weatherIntensityData", weatherIntensityData);
         WeatherTableUI.AddElement("weatherValueBar", weatherValueBar);
         WeatherTableUI.AddElement("weatherIntensityBar", weatherIntensityBar);
-        WeatherTableUI.AddElement("weatherBoostBar", weatherBoostBar);
-        WeatherTableUI.AddElement("weatherBoostData", weatherBoostData);
 
         WeatherTableUI.AddElement("weatherValueDataForecast", weatherValueDataForecast);
         WeatherTableUI.AddElement("weatherIntensityDataForecast", weatherIntensityDataForecast);
         WeatherTableUI.AddElement("weatherValueBarForecast", weatherValueBarForecast);
         WeatherTableUI.AddElement("weatherIntensityBarForecast", weatherIntensityBarForecast);
-        WeatherTableUI.AddElement("weatherBoostBarForecast", weatherBoostBarForecast);
-        WeatherTableUI.AddElement("weatherBoostDataForecast", weatherBoostDataForecast);
     }
 }
