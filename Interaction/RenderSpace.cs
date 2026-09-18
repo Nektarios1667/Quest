@@ -9,6 +9,7 @@ public class RenderSpace : UIElement
     public Color? Background { get; private set; }
     public Color? BorderColor { get; private set; }
     public int BorderThickness { get; private set; }
+    public RenderSpace(Point location, Point size, Func<RenderTarget2D?, RenderTarget2D?> renderer, ElementTheme theme) : this(location, size, renderer, theme.Background, theme.BorderColor, theme.BorderThickness) { }
     public RenderSpace(Point location, Point size, Func<RenderTarget2D?, RenderTarget2D?> renderer, Color? bg = null, Color? borderColor = null, int borderThickness = 0) : base(location)
     {
         Size = size;

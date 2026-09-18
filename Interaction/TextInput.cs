@@ -24,6 +24,7 @@ public class TextInput : UIElement
     public int BorderThickness { get; set; }
     public ButtonState State { get; private set; } = ButtonState.None;
     public string AllowedChars { get; set; } = AllChars;
+    public TextInput(Point location, Point size, ElementTheme theme) : this(location, size, theme.Font, theme.Foreground, theme.Background, theme.Highlight, theme.BorderColor, theme.BorderThickness) { }
     public TextInput(Point location, Point size, SpriteFont font, Color fg, Color bg, Color hl, Color? borderColor = null, int borderThickness = 2) : base(location)
     {
         Size = size;

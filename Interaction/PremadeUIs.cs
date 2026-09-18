@@ -6,6 +6,7 @@ namespace Quest.Interaction;
 
 public partial class UserInterface
 {
+    // UIs
     public static UserInterface ChestUI { get; private set; } = null!;
     public static UserInterface ClockUI { get; private set; } = null!;
     public static UserInterface CompassUI { get; private set; } = null!;
@@ -21,6 +22,10 @@ public partial class UserInterface
     public static UserInterface StoveUI { get; private set; } = null!;
     public static UserInterface WaypointUI { get; private set; } = null!;
     public static UserInterface WeatherTableUI { get; private set; } = null!;
+
+    // Themes
+    public static ElementTheme FloatingBlack { get; private set; } = new(Color.White, Color.Black * 0.6f, Color.Black * 0.4f, Color.Blue * 0.6f, 0, PixelOperatorSmall, TextAlignment.Center);
+    public static ElementTheme FloatingBlackBordered { get; private set; } = new(Color.White, Color.Black * 0.6f, Color.Black * 0.4f, Color.Blue * 0.6f, 2, PixelOperatorSmall, TextAlignment.Center);
     public static void Init(SpriteBatch batch, GameManager gameManager)
     {
         LevelManager levelManager = gameManager.LevelManager;
@@ -506,15 +511,15 @@ public partial class UserInterface
 
         // Weather value and intensity
         Label weatherValueData = new(new(Constants.Middle.X - 425, 120), "Value:", PixelOperatorLarge, Color.Cyan);
-        LinkedBar weatherValueBar = new(new(Constants.Middle.X - 425, 170), () => gameManager.WeatherManager.GetWeatherValue(GameManager.GameTime), (prog) => $"{prog:0.00}", PixelOperatorLarge, new(400, 40), Color.White * 0.6f, Color.Black * 0.6f);
+        LinkedBar weatherValueBar = new(new(Constants.Middle.X - 425, 170), new(400, 40), () => gameManager.WeatherManager.GetWeatherValue(GameManager.GameTime), (prog) => $"{prog:0.00}", PixelOperatorLarge, Color.White * 0.6f, Color.Black * 0.6f);
         Label weatherIntensityData = new(new(Constants.Middle.X - 425, 210), "Intensity:", PixelOperatorLarge, Color.Cyan);
-        LinkedBar weatherIntensityBar = new(new(Constants.Middle.X - 425, 260), () => gameManager.WeatherManager.GetWeatherIntensity(GameManager.GameTime), ToPercentageString, PixelOperatorLarge, new(400, 40), Color.White * 0.6f, Color.Black * 0.6f);
+        LinkedBar weatherIntensityBar = new(new(Constants.Middle.X - 425, 260), new(400, 40), () => gameManager.WeatherManager.GetWeatherIntensity(GameManager.GameTime), ToPercentageString, PixelOperatorLarge, Color.White * 0.6f, Color.Black * 0.6f);
 
         // Forecast
         Label weatherValueDataForecast = new(new(Constants.Middle.X + 25, 120), "Value:", PixelOperatorLarge, Color.Cyan);
-        LinkedBar weatherValueBarForecast = new(new(Constants.Middle.X + 25, 170), () => gameManager.WeatherManager.GetWeatherValue(GameManager.GameTime.RoundTo(10) + 60), (prog) => $"{prog:0.00}", PixelOperatorLarge, new(400, 40), Color.White * 0.6f, Color.Black * 0.6f);
+        LinkedBar weatherValueBarForecast = new(new(Constants.Middle.X + 25, 170), new(400, 40), () => gameManager.WeatherManager.GetWeatherValue(GameManager.GameTime.RoundTo(10) + 60), (prog) => $"{prog:0.00}", PixelOperatorLarge, Color.White * 0.6f, Color.Black * 0.6f);
         Label weatherIntensityDataForecast = new(new(Constants.Middle.X + 25, 210), "Intensity:", PixelOperatorLarge, Color.Cyan);
-        LinkedBar weatherIntensityBarForecast = new(new(Constants.Middle.X + 25, 260), () => gameManager.WeatherManager.GetWeatherIntensity(GameManager.GameTime.RoundTo(10) + 60), ToPercentageString, PixelOperatorLarge, new(400, 40), Color.White * 0.6f, Color.Black * 0.6f);
+        LinkedBar weatherIntensityBarForecast = new(new(Constants.Middle.X + 25, 260), new(400, 40), () => gameManager.WeatherManager.GetWeatherIntensity(GameManager.GameTime.RoundTo(10) + 60), ToPercentageString, PixelOperatorLarge, Color.White * 0.6f, Color.Black * 0.6f);
 
         WeatherTableUI.AddElement("currentLabel", currentLabel);
         WeatherTableUI.AddElement("forecastLabel", forecastLabel);

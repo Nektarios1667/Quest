@@ -6,7 +6,8 @@ public class LinkedBar : ProgressBar
     public Func<float, string>? DisplayFunc { get; private set; }
     public string DisplayedText { get; private set; }
 
-    public LinkedBar(Point location, Func<float> progressFunc, Func<float, string>? displayFunc, SpriteFont font, Point size, Color bg, Color fg, int border = 3) : base(location, size, bg, fg, font, "", border)
+    public LinkedBar(Point location, Point size, Func<float> progressFunc, Func<float, string>? displayFunc, ElementTheme theme) : this(location, size, progressFunc, displayFunc, theme.Font, theme.Background, theme.Foreground, theme.BorderThickness) { }
+    public LinkedBar(Point location, Point size, Func<float> progressFunc, Func<float, string>? displayFunc, SpriteFont font, Color bg, Color fg, int border = 3) : base(location, size, bg, fg, font, "", border)
     {
         DisplayFunc = displayFunc;
         ProgressFunction = progressFunc;

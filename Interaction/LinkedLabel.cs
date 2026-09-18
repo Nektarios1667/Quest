@@ -12,6 +12,7 @@ public class LinkedLabel : UIElement
     public Color? BorderColor { get; set; }
     public int BorderThickness { get; set; }
     public TextAlignment Alignment { get; set; }
+    public LinkedLabel(Point location, string text, Func<string>[] links, ElementTheme theme) : this(location, text, links, theme.Font, theme.Foreground, theme.Background, theme.BorderColor, theme.BorderThickness, theme.Alignment) { }
     public LinkedLabel(Point location, string text, Func<string>[] links, SpriteFont font, Color fg, Color? bg = null, Color? borderColor = null, int borderThickness = 2, TextAlignment alignment = TextAlignment.Left) : base(location)
     {
         OriginalText = text;

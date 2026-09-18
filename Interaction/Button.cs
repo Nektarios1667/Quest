@@ -20,6 +20,7 @@ public class Button : UIElement
     public int BorderThickness { get; set; }
     public ButtonState State { get; private set; } = ButtonState.None;
     private Point textPosition { get; set; }
+    public Button(Point location, Point size, string text, ElementTheme theme) : this(location, size,text, theme.Font, theme.Foreground, theme.Background, theme.Highlight, theme.BorderColor, theme.BorderThickness) { }
     public Button(Point location, Point size, string text, SpriteFont font, Color fg, Color bg, Color hl, Color? borderColor = null, int borderThickness = 2) : base(location)
     {
         Size = size;

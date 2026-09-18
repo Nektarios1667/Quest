@@ -12,6 +12,7 @@ public class ProgressBar : UIElement
     public int Border { get; protected set; }
     public SpriteFont? Font { get; protected set; }
     public string Text { get; protected set; }
+    public ProgressBar(Point location, Point size, ElementTheme theme, string text = "") : this(location, size, theme.Background, theme.Foreground, theme.Font, text, theme.BorderThickness) { }
     public ProgressBar(Point location, Point size, Color bg, Color fg, SpriteFont? font = null, string text = "", int border = 3) : base(location)
     {
         Bounds = new(location, size);

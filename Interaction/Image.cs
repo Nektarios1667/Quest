@@ -6,6 +6,7 @@ public class Image : UIElement
     public Color? BorderColor { get; set; }
     public int BorderThickness { get; set; }
     public Texture2D Texture { get; private set; }
+    public Image(Point location, Texture2D tex, ElementTheme theme) : this(location, tex, theme.BorderColor, theme.BorderThickness) { }
     public Image(Point location, Texture2D tex, Color? borderColor = null, int borderThickness = 2) : base(location)
     {
         BorderColor = borderColor;
