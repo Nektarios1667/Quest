@@ -41,5 +41,4 @@ public class RenderSpace : UIElement
         if (BorderColor != null)
             ui.Batch.DrawRectangle(Rect, BorderColor.Value, BorderThickness);
     }
-    public void MarkReRenderFlag() => CurrentRender = null;
 }

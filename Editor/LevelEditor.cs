@@ -3,12 +3,14 @@ using MonoGUI.Widgets;
 using Quest.Editor.Generator;
 using Quest.Editor.Managers;
 using Quest.World;
+using System.Linq;
 using System.Text;
 
 namespace Quest.Editor;
 
 public class LevelEditor : Game, IAdjustableWindow
 {
+
     readonly StringBuilder memoryDebugSb = new();
     // Devices and managers
     private readonly GraphicsDeviceManager graphics;
@@ -53,6 +55,7 @@ public class LevelEditor : Game, IAdjustableWindow
     private LevelGenerator levelGenerator = null!;
     private MouseMenu mouseMenu = null!;
     private EditorTool currentTool = EditorTool.Tile;
+    private Rectangle[] noDrawZones = [];
 
     // Time
     private float delta = 0;
@@ -233,6 +236,15 @@ public class LevelEditor : Game, IAdjustableWindow
         tilesetGroup.AddWidget(tilesetHighlight);
 
         gui.AddWidgets(tilesetGroup);
+
+        // Add no draw zones from buttons
+        List<Rectangle> rects = [];
+        foreach (var widget in gui.Widgets.Concat(tilesetGroup.Widgets).Concat(SettingsMenu.Widgets))
+        {
+            if (widget is Button button)
+                rects.Add(button.Rect);
+        }
+        noDrawZones = [.. rects];
 
         gui.LoadContent();
         Logger.System("Initialized GUI.");
@@ -493,6 +505,9 @@ public class LevelEditor : Game, IAdjustableWindow
     }
     public void UpdateTilePlacing()
     {
+        foreach (var noDraw in noDrawZones)
+            if (noDraw.Contains(InputManager.MousePosition)) return;
+ 
         // Check skip
         if (!InputManager.LMouseDown || mouseMenu.Visible || gameManager.StateManager.State != GameState.Editor) return;
 
