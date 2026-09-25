@@ -2,8 +2,8 @@
 
 namespace Quest.Tiles;
 
-// Used for tiles that need to save their current state to the .qsv save files.
-// For example, Doors need to save whether they have been opemed or not.
+// Used for tiles that have extra information attached for .qlv files.
+// For example, signs store what text they contain.
 public interface IHasLevelData
 {
     public void WriteLevelData(BinaryWriter writer);

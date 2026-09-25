@@ -13,6 +13,7 @@ public enum LogicGateType : byte
     Nand,
     Nor,
     XNor,
+    Store,
 }
 public enum InputType { A, B }
 public class LogicGate : TriggerTile
@@ -97,6 +98,7 @@ public class LogicGate : TriggerTile
             LogicGateType.Nand => !(a && bValue),
             LogicGateType.Nor => !(a || bValue),
             LogicGateType.XNor => a == bValue,
+            LogicGateType.Store => a && !(!a && bValue),
             _ => false,
         };
     }

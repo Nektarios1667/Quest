@@ -774,7 +774,7 @@ public static class TextureManager
         Metadata[TextureID.TimedPressurePlate] = new(Textures[TextureID.TimedPressurePlate].Bounds.Size, new(1, 5), TextureType.Tile);
         Metadata[TextureID.Lever] = new(Textures[TextureID.Lever].Bounds.Size, new(1, 2), TextureType.Tile);
         Metadata[TextureID.Target] = new(Textures[TextureID.Target].Bounds.Size, new(1, 2), TextureType.Tile);
-        Metadata[TextureID.LogicGate] = new(Textures[TextureID.LogicGate].Bounds.Size, new(7, 4), TextureType.Tile);
+        Metadata[TextureID.LogicGate] = new(Textures[TextureID.LogicGate].Bounds.Size, new(8, 4), TextureType.Tile);
         Metadata[TextureID.Sign] = new(Textures[TextureID.Sign].Bounds.Size, new(4, 4), TextureType.Tile);
         Metadata[TextureID.WeatherTable] = new(Textures[TextureID.WeatherTable].Bounds.Size, new(4, 4), TextureType.Tile);
         // TILES METADATA INSERT

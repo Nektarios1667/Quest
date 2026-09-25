@@ -2,6 +2,14 @@
 
 namespace Quest.Utilities;
 
+public class ByteFloat
+{
+    public const int DecimalPlaces = 1;
+    private byte _value;
+    public float Value { get => _value / (float)NumberTools.Pow(10, DecimalPlaces); set => _value = (byte)Math.Clamp(value * NumberTools.Pow(10, DecimalPlaces), 0, 255); }
+    public ByteFloat(float val) { Value = val; }
+    public override string ToString() => Value.ToString();
+}
 public static class NumberTools
 {
     public static float RoundTo<T>(this T num, float multiple) where T : INumber<T>
@@ -78,6 +86,16 @@ public static class NumberTools
         }
         return result;
     }
+    public static float Pow<T>(T num, int pow) where T : INumber<T>
+    {
+        if (pow < 0) throw new ArgumentOutOfRangeException(nameof(pow));
+        if (pow == 0) return 1;
+
+        T total = num;
+        for (int i = 0; i < pow - 1; i++)
+            total *= num;
+        return int.CreateChecked(total);
+    }
 }
 
 public static class IntExtensions
@@ -86,14 +104,5 @@ public static class IntExtensions
     {
         return (byte)Math.Clamp(num, byte.MinValue, byte.MaxValue);
     }
-    public static float Pow(this float num, int pow)
-    {
-        if (pow < 0) throw new ArgumentOutOfRangeException(nameof(pow));
-        if (pow == 0) return 1;
 
-        float total = num;
-        for (int i = 0; i < pow - 1; i++)
-            total *= num;
-        return total;
-    }
 }

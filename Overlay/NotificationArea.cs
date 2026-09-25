@@ -33,7 +33,7 @@ public class NotificationArea(Point location, int height, SpriteFont font, Color
             }
 
             // Fade away
-            notif.Color = notif.BaseColor * (1 - (notif.Timer / notif.Duration).Pow(4));
+            notif.Color = notif.BaseColor * NumberTools.Pow(1 - (notif.Timer / notif.Duration), 4);
         }
     }
     public override void Draw(SpriteBatch batch)
