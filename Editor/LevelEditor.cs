@@ -452,7 +452,7 @@ public class LevelEditor : Game, IAdjustableWindow
 
         // Tile info
         if (currentTool == EditorTool.Tile)
-            EditorOverlayManager.DrawTileOverlay(spriteBatch, TileSelection, mouseTile);
+            EditorOverlayManager.DrawTileOverlay(spriteBatch, PreviewTile, mouseTile);
         else if (currentTool == EditorTool.Decal)
             EditorOverlayManager.DrawDecalOverlay(spriteBatch, DecalSelection, mouseDecal);
         else if (currentTool == EditorTool.Biome)

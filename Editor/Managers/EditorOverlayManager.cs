@@ -35,31 +35,40 @@ public class EditorOverlayManager
 
     }
     public void InvalidateMinimap() => Minimap = null;
-    public static void DrawTileOverlay(SpriteBatch spriteBatch, TileTypeID selection, Tile? mouseTile)
+    public static void DrawTileOverlay(SpriteBatch spriteBatch, Tile? previewTile, Tile? mouseTile)
     {
-        if (mouseTile == null)
+        // Selected tile
+        if (previewTile != null)
         {
-            DrawBottomInfo(spriteBatch, $"{selection} @ NULL");
-            return;
+            string text = $"{previewTile.TypeID} @ {previewTile.Location}";
+            if (previewTile is IHasLevelData dataTile) text += $" | {dataTile.GetDataString()}";
+            DrawCornerInfo(spriteBatch, text, 0);
         }
 
-        string data;
-        if (mouseTile is IHasLevelData dataTile)
-            data = dataTile.GetDataString();
-        else
-            data = $"[{mouseTile.Type.Texture}]";
-
-        DrawBottomInfo(spriteBatch, $"{selection} @ {mouseTile.Location} | {data}");
+        // Hovered tile
+        if (mouseTile != null)
+        {
+            string text = $"{mouseTile.TypeID}";
+            if (mouseTile is IHasLevelData dataTile) text += $" | {dataTile.GetDataString()}";
+            DrawCornerInfo(spriteBatch, text, 24);
+        }
     }
-    public static void DrawDecalOverlay(SpriteBatch spriteBatch, DecalType selection, DecalType? mouseDecal) => DrawBottomInfo(spriteBatch, $"{selection} | [{mouseDecal}]");
-    public static void DrawBiomeOverlay(SpriteBatch spriteBatch, BiomeType selection, BiomeType? mouseBiome) => DrawBottomInfo(spriteBatch, $"{selection} | [{mouseBiome}]");
-    public static void DrawBottomInfo(SpriteBatch spriteBatch, string text)
+    public static void DrawDecalOverlay(SpriteBatch spriteBatch, DecalType selection, DecalType? mouseDecal)
     {
-        Vector2 textSize = Arial.MeasureString(text);
-        Vector2 pos = new(MathF.Round(Constants.Middle.X - textSize.X / 2), MathF.Round(Constants.NativeResolution.Y - textSize.Y - 3));
-        spriteBatch.FillRectangle(new(pos - Vector2.One * 4, textSize + Vector2.One * 8), Color.Gray * 0.5f);
-        spriteBatch.DrawRectangle(new(pos - Vector2.One * 4, textSize + Vector2.One * 8), Color.Black * 0.5f);
-        spriteBatch.DrawString(Arial, text, pos, Color.Black);
+        DrawCornerInfo(spriteBatch, $"{selection}", 0);
+        DrawCornerInfo(spriteBatch, $"{mouseDecal}", 50);
+    }
+    public static void DrawBiomeOverlay(SpriteBatch spriteBatch, BiomeType selection, BiomeType? mouseBiome) {
+        DrawCornerInfo(spriteBatch, $"{selection}", 0);
+        DrawCornerInfo(spriteBatch, $"{mouseBiome}", 50);
+    }
+    public static void DrawCornerInfo(SpriteBatch spriteBatch, string text, int offsetY = 0)
+    {
+        Vector2 textSize = PixelOperatorVerySmall.MeasureString(text);
+        Vector2 pos = new(MathF.Round(Constants.NativeResolution.X - textSize.X - 4), 4 + offsetY);
+        spriteBatch.FillRectangle(new(pos - Vector2.One * 4, textSize + Vector2.One * 8), Color.Gray * 0.6f);
+        spriteBatch.DrawRectangle(new(pos - Vector2.One * 4, textSize + Vector2.One * 8), Color.Black * 0.6f, thickness: 2);
+        spriteBatch.DrawString(PixelOperatorVerySmall, text, pos, Color.White);
     }
     public void DrawBiomes()
     {
