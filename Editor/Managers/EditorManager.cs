@@ -1,4 +1,5 @@
 ﻿using Quest.World;
+using SharpDX.MediaFoundation;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -29,6 +30,7 @@ public class EditorManager
     private Point MouseSelection;
     private Point MouseSelectionCoord;
     private TileTypeID TileSelection;
+    private byte[] TileSelectionData;
     private EditorTool CurrentTool;
     private BiomeType BiomeSelection;
 
@@ -37,15 +39,16 @@ public class EditorManager
     {
         GameManager = gameManager;
     }
-    public void Update(TileTypeID material, BiomeType biome, EditorTool tool, float deltaTime, Tile? mouseTile, Point mouseCoord, Point mouseSelection, Point mouseSelectionCoord)
+    public void Update(TileTypeID tileSelection, byte[] tileData, BiomeType biomeSelection, EditorTool tool, float deltaTime, Tile? mouseTile, Point mouseCoord, Point mouseSelection, Point mouseSelectionCoord)
     {
         MouseTile = mouseTile;
         MouseCoord = mouseCoord;
         MouseSelection = mouseSelection;
         MouseSelectionCoord = mouseSelectionCoord;
         CurrentTool = tool;
-        TileSelection = material;
-        BiomeSelection = biome;
+        TileSelection = tileSelection;
+        TileSelectionData = tileData;
+        BiomeSelection = biomeSelection;
     }
 
     public void EditTile()
@@ -75,11 +78,21 @@ public class EditorManager
 
             while (queue.Count > 0)
             {
+                // Get tile
                 Tile current = queue.Dequeue();
                 if (current.Type.ID == TileSelection || visited.Contains(current.Location)) continue; // Skip if already filled
                 count++;
-                SetTile(Tile.TileFromId(TileSelection, current.Location.ToPoint(), LevelPath.Null));
-                visited.Add(current.Location); // Mark as visited
+
+                // Set tile
+                Tile newTile = Tile.TileFromId(TileSelection, current.Location.ToPoint(), LevelPath.Null);
+                if (newTile is IHasLevelData dataTile) dataTile.SetLevelData(TileSelectionData, LevelPath.Null);
+                SetTile(newTile);
+
+                // Mark as visited
+                visited.Add(current.Location); 
+
+                // Block fill
+                if (current.Type.ID == TileSelection) continue;
 
                 // Check neighbors
                 foreach (Point neighbor in Constants.NeighborTiles)
@@ -87,7 +100,7 @@ public class EditorManager
                     Point neighborCoord = current.Location + neighbor;
                     if (neighborCoord.X < 0 || neighborCoord.X >= Constants.MapSize.X || neighborCoord.Y < 0 || neighborCoord.Y >= Constants.MapSize.Y) continue;
                     Tile neighborTile = GetTile(neighborCoord);
-                    if (neighborTile.Type == tileBelow.Type && neighborTile.Type.ID != TileSelection)
+                    if (neighborTile.Type == tileBelow.Type)
                         queue.Enqueue(neighborTile);
                 }
             }

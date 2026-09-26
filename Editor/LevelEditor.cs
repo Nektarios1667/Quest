@@ -301,7 +301,7 @@ public class LevelEditor : Game, IAdjustableWindow
         DebugManager.EndBenchmark("InputUpdate");
 
         // Manager
-        editorManager.Update(TileSelection, BiomeSelection, currentTool, delta, mouseTile, mouseCoord, mouseSelection, mouseSelectionCoord);
+        editorManager.Update(TileSelection, TileSelectionData, BiomeSelection, currentTool, delta, mouseTile, mouseCoord, mouseSelection, mouseSelectionCoord);
         if (gameManager.StateManager.State == GameState.Settings)
             SettingsMenu.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
 
@@ -608,7 +608,7 @@ public class LevelEditor : Game, IAdjustableWindow
     {
         mouseSelection = CameraManager.ScreenToWorld(InputManager.MousePosition);
         mouseSelectionCoord = mouseCoord;
-        editorManager.Update(TileSelection, BiomeSelection, currentTool, delta, mouseTile, mouseCoord, mouseSelection, mouseSelectionCoord);
+        editorManager.Update(TileSelection, TileSelectionData, BiomeSelection, currentTool, delta, mouseTile, mouseCoord, mouseSelection, mouseSelectionCoord);
     }
     public static byte IntToByte(int value)
     {
