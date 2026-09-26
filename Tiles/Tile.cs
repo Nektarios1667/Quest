@@ -322,6 +322,7 @@ public class Tile
             TileTypeID.LogicGate => new LogicGate(location, levelPath.LevelName, TileEffect.None, ByteCoord.Zero, LevelPath.Null, LogicGateType.And),
             TileTypeID.Sign => new Sign(location, "..."),
             TileTypeID.WeatherTable => new WeatherTable(location),
+            TileTypeID.DryWall => new DryWall(location),
             // TILEFROMID
             _ => new(location, type)
         };
