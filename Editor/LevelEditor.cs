@@ -3,8 +3,10 @@ using MonoGUI.Widgets;
 using Quest.Editor.Generator;
 using Quest.Editor.Managers;
 using Quest.World;
+using System.IO;
 using System.Linq;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Quest.Editor;
 
@@ -42,6 +44,7 @@ public class LevelEditor : Game, IAdjustableWindow
             _tilesetSelection = value;
         }
     }
+    private byte[] TileSelectionData = [];
     private TileTypeID TileSelection => Tilesets.TypeToArray[TilesetSelection][TileSelectionIdx];
     private DecalType DecalSelection;
     private BiomeType BiomeSelection;
@@ -301,12 +304,14 @@ public class LevelEditor : Game, IAdjustableWindow
             if (currentTool == EditorTool.Tile) TileSelectionIdx = TileSelectionIdx - 1 + (TileSelectionIdx <= 0 ? Tilesets.TypeToArray[TilesetSelection].Length : 0);
             else if (currentTool == EditorTool.Decal) NumberTools.CycleDown(ref DecalSelection);
             else if (currentTool == EditorTool.Biome) NumberTools.CycleDown(ref BiomeSelection);
+            TileSelectionData = [];
         }
         if (InputManager.ScrolledDown || InputManager.BindPressed(InputAction.CycleToolPrevious))
         {
             if (currentTool == EditorTool.Tile) TileSelectionIdx = (TileSelectionIdx + 1) % Tilesets.TypeToArray[TilesetSelection].Length;
             else if (currentTool == EditorTool.Decal) NumberTools.CycleUp(ref DecalSelection);
             else if (currentTool == EditorTool.Biome) NumberTools.CycleUp(ref BiomeSelection);
+            TileSelectionData = [];
         }
 
         // Change tileset
@@ -483,8 +488,14 @@ public class LevelEditor : Game, IAdjustableWindow
         // Tool ghosts
         if (currentTool == EditorTool.Tile)
         {
-            TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), TileSelection.ToString());
-            DrawTexture(spriteBatch, texture, mouseCoordDraw, source: new(Point.Zero, Constants.TilePixelSize), scale: Constants.TileSizeScale, color: Constants.SemiTransparent);
+            // Recreate tile
+            Tile tile = Tile.TileFromId(TileSelection, mouseCoord, LevelPath.Null);
+            if (tile is IHasLevelData dataTile && TileSelectionData.Length > 0)
+                dataTile.SetLevelData(TileSelectionData, LevelPath.Null);
+
+            // Render
+            tile.Draw(gameManager);
+            spriteBatch.DrawRectangle(new(mouseCoordDraw.ToVector2(), Constants.TileSize), Color.Red * 0.6f, thickness: 3);
         }
         else if (currentTool == EditorTool.Decal)
         {
@@ -515,6 +526,8 @@ public class LevelEditor : Game, IAdjustableWindow
         if (currentTool == EditorTool.Tile)
         {
             Tile tile = Tile.TileFromId(TileSelection, mouseCoord, LevelPath.Null);
+            if (tile is IHasLevelData dataTile && TileSelectionData.Length > 0)
+                dataTile.SetLevelData(TileSelectionData, levelManager.Level.LevelPath);
 
             editorManager.SetTile(tile);
         }
@@ -557,6 +570,8 @@ public class LevelEditor : Game, IAdjustableWindow
                 {
                     TilesetSelection = type;
                     TileSelectionIdx = idx;
+                    if (mouseTile is IHasLevelData dataTile)
+                        TileSelectionData = dataTile.GetLevelData();
                 }
             }
         }
