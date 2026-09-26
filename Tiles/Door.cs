@@ -101,4 +101,8 @@ public class Door : Tile, IHasState, IEditableTile, IHasLevelData
         Key = SaveManager.ReadItemData(reader)?.GetItemRef();
         ConsumeKey = reader.ReadBoolean();
     }
+    public string GetDataString()
+    {
+        return $"[Door] key: {(Key == null ? "NUL" : $"'{Key.Name}' x{Key.Amount}")} consume: {ConsumeKey}";
+    }
 }

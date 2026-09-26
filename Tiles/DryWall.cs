@@ -37,4 +37,8 @@ public class DryWall : Tile, IEditableTile, IHasLevelData
     {
         Color = reader.ReadColor();
     }
+    public string GetDataString()
+    {
+        return $"[DryWall] color: {Color.R},{Color.G},{Color.B}";
+    }
 }

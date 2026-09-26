@@ -133,4 +133,8 @@ public class Chest : Tile, IContainer, IEditableTile, IHasLevelData
         Key = SaveManager.ReadItemData(reader)?.GetItemRef();
         ConsumeKey = reader.ReadBoolean();
     }
+    public string GetDataString()
+    {
+        return $"[Chest] gen: '{LootGenerator.FileName}' key: {(Key == null ? "NUL" : $"'{Key.Name}' x{Key.Amount}")} consume: {ConsumeKey}";
+    }
 }

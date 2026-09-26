@@ -56,4 +56,8 @@ public class Stairs : Tile, IEditableTile, IHasLevelData
         DestLevel = new LevelPath(levelPath.WorldName, reader.ReadString());
         Dest = new(reader.ReadByte(), reader.ReadByte());
     }
+    public string GetDataString()
+    {
+        return $"[Stairs] dest: '{DestLevel.LevelName}' @ {Dest}";
+    }
 }

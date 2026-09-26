@@ -27,4 +27,5 @@ public interface IHasLevelData
 
         ReadLevelData(reader, levelPath);
     }
+    public string GetDataString();
 }

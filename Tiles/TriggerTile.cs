@@ -175,4 +175,8 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
         EffectLevel = new(levelPath.WorldName, reader.ReadString());
         if (EffectLevel.IsNull()) EffectLevel = LevelPath.Null;
     }
+    public virtual string GetDataString()
+    {
+        return $"[Trigger] {EffectType} -> '{EffectLevel.LevelName}' @ {EffectCoord}";
+    }
 }

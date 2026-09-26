@@ -39,4 +39,8 @@ public class Lamp : Tile, IDynamicTile, IEditableTile, IHasLevelData
     {
         LightRadius = reader.ReadByte();
     }
+    public string GetDataString()
+    {
+        return $"[Lamp] radius: {LightRadius}";
+    }
 }

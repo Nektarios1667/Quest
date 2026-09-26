@@ -51,5 +51,10 @@ public class DisplayCase : Tile, IContainer, IHasLevelData
         Item? item = SaveManager.ReadItemData(reader);
         Container.Items[0] = item;
     }
+    public string GetDataString()
+    {
+        var item = Container.Items[0];
+        return $"[Display Case] item: {item?.Name} x{item?.Amount}";
+    }
 }
 
