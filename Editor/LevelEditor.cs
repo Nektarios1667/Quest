@@ -302,7 +302,8 @@ public class LevelEditor : Game, IAdjustableWindow
 
         // Manager
         editorManager.Update(TileSelection, BiomeSelection, currentTool, delta, mouseTile, mouseCoord, mouseSelection, mouseSelectionCoord);
-        SettingsMenu.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
+        if (gameManager.StateManager.State == GameState.Settings)
+            SettingsMenu.Update(delta, InputManager.MouseState, InputManager.KeyboardState);
 
         // Mouse selection coord
         if (InputManager.RMouseClicked) MouseSelect();
