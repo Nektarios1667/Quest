@@ -10,8 +10,8 @@ public interface IHasLevelData
     public void ReadLevelData(BinaryReader reader, LevelPath levelPath);
     public byte[] GetLevelData()
     {
-        var stream = new MemoryStream();
-        var writer = new BinaryWriter(stream);
+        using var stream = new MemoryStream();
+        using var writer = new BinaryWriter(stream);
 
         WriteLevelData(writer);
         writer.Close();
@@ -20,8 +20,10 @@ public interface IHasLevelData
     }
     public void SetLevelData(byte[] data, LevelPath levelPath)
     {
-        var stream = new MemoryStream(data);
-        var reader = new BinaryReader(stream);
+        if (data.Length <= 0) return;
+
+        using var stream = new MemoryStream(data);
+        using var reader = new BinaryReader(stream);
 
         ReadLevelData(reader, levelPath);
     }
