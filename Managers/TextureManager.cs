@@ -8,6 +8,7 @@ public class Metadata(Point size, Point tileMap, TextureType type)
 {
     public Point Size { get; private set; } = size;
     public Point TileMap { get; private set; } = tileMap;
+    public Point TileSize => Size / TileMap;
     public TextureType Type { get; private set; } = type;
 }
 public static class TextureManager

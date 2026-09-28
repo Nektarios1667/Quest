@@ -3,8 +3,6 @@ using MonoGUI.Widgets;
 using Quest.Editor.Generator;
 using Quest.Editor.Managers;
 using Quest.World;
-using SharpDX.MediaFoundation;
-using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -56,6 +54,9 @@ public class LevelEditor : Game, IAdjustableWindow
     private TileTypeID TileSelection => Tilesets.TypeToArray[TilesetSelection][TileSelectionIdx];
     private DecalType DecalSelection;
     private BiomeType BiomeSelection;
+    private ItemTypeID LootSelection;
+    private byte LootAmountSelection;
+    private EnemyPresetType EnemySelection;
     private Tile? PreviewTile;
 
     private Point mouseCoord;
@@ -225,11 +226,15 @@ public class LevelEditor : Game, IAdjustableWindow
         gui.AddWidget(mouseMenu);
 
         // Mouse select
-        Button tileDrawSelect = new(gui, new(Constants.Middle.X - 100, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Tile, [], "Tiles", border: 0);
-        Button decalDrawSelect = new(gui, new(Constants.Middle.X, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Decal, [], "Decals", border: 0);
-        Button biomeDrawSelect = new(gui, new(Constants.Middle.X + 100, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Biome, [], "Biomes", border: 0);
+        Button tileDrawSelect = new(gui, new(Constants.Middle.X - 250, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Tile, [], "Tiles", border: 0);
+        Button decalDrawSelect = new(gui, new(Constants.Middle.X - 150, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Decal, [], "Decals", border: 0);
+        Button biomeDrawSelect = new(gui, new(Constants.Middle.X - 50, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Biome, [], "Biomes", border: 0);
+        Button lootDrawSelect = new(gui, new(Constants.Middle.X + 50, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Loot, [], "Loot", border: 0);
+        Button enemyDrawSelect = new(gui, new(Constants.Middle.X + 150, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.Enemy, [], "Enemies", border: 0);
+        Button npcDrawSelect = new(gui, new(Constants.Middle.X + 250, 10), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => currentTool = EditorTool.NPC, [], "NPCs", border: 0);
+        
         toolHighlight = new(gui, new(Constants.Middle.X - 100, 10), new(90, 30), Color.Transparent, Color.White, 2);
-        gui.AddWidgets(tileDrawSelect, decalDrawSelect, biomeDrawSelect, toolHighlight);
+        gui.AddWidgets(tileDrawSelect, decalDrawSelect, biomeDrawSelect, lootDrawSelect, enemyDrawSelect, npcDrawSelect, toolHighlight);
 
         // Settings button
         Button settingsButton = new(gui, new(Constants.NativeResolution.X - 100, Constants.NativeResolution.Y - 40), new(90, 30), Color.White, Color.Black * 0.6f, ColorTools.NearBlack * 0.6f, () => gameManager.StateManager.State = GameState.Settings, [], "Settings", border: 0);
@@ -314,6 +319,8 @@ public class LevelEditor : Game, IAdjustableWindow
             if (currentTool == EditorTool.Tile) TileSelectionIdx = TileSelectionIdx - 1 + (TileSelectionIdx <= 0 ? Tilesets.TypeToArray[TilesetSelection].Length : 0);
             else if (currentTool == EditorTool.Decal) NumberTools.CycleDown(ref DecalSelection);
             else if (currentTool == EditorTool.Biome) NumberTools.CycleDown(ref BiomeSelection);
+            else if (currentTool == EditorTool.Loot) NumberTools.CycleDown(ref LootSelection);
+            else if (currentTool == EditorTool.Enemy) NumberTools.CycleDown(ref EnemySelection);
             TileSelectionData = [];
         }
         if (InputManager.ScrolledDown || InputManager.BindPressed(InputAction.CycleToolPrevious))
@@ -321,8 +328,17 @@ public class LevelEditor : Game, IAdjustableWindow
             if (currentTool == EditorTool.Tile) TileSelectionIdx = (TileSelectionIdx + 1) % Tilesets.TypeToArray[TilesetSelection].Length;
             else if (currentTool == EditorTool.Decal) NumberTools.CycleUp(ref DecalSelection);
             else if (currentTool == EditorTool.Biome) NumberTools.CycleUp(ref BiomeSelection);
+            else if (currentTool == EditorTool.Loot) NumberTools.CycleUp(ref LootSelection);
+            else if (currentTool == EditorTool.Enemy) NumberTools.CycleUp(ref EnemySelection);
             TileSelectionData = [];
         }
+
+        // Change item amount
+        if (InputManager.BindPressed(InputAction.IncreaseLootTool))
+            LootAmountSelection++;
+        if (InputManager.BindPressed(InputAction.DecreaseLootTool))
+            LootAmountSelection--;
+
 
         // Change tileset
         if (InputManager.BindPressed(InputAction.CycleTilesetNext))
@@ -331,7 +347,7 @@ public class LevelEditor : Game, IAdjustableWindow
             TilesetSelection = NumberTools.CycleUp(TilesetSelection); // Non-ref version since TilesetSelection is a property
 
         // Placing tiles
-        UpdateTilePlacing();
+        UpdatePlacing();
 
         // Edit options
         if (InputManager.BindPressed(InputAction.EditTile)) editorManager.EditTile();
@@ -367,6 +383,9 @@ public class LevelEditor : Game, IAdjustableWindow
         if (InputManager.BindPressed(InputAction.SelectTileTool)) currentTool = EditorTool.Tile;
         if (InputManager.BindPressed(InputAction.SelectDecalTool)) currentTool = EditorTool.Decal;
         if (InputManager.BindPressed(InputAction.SelectBiomeTool)) currentTool = EditorTool.Biome;
+        if (InputManager.BindPressed(InputAction.SelectLootTool)) currentTool = EditorTool.Loot;
+        if (InputManager.BindPressed(InputAction.SelectEnemyTool)) currentTool = EditorTool.Enemy;
+        if (InputManager.BindPressed(InputAction.SelectNPCTool)) currentTool = EditorTool.NPC;
         // Waypoints
         if (InputManager.BindPressed(InputAction.NewWaypoint)) { MouseSelect(); editorManager.NewWaypoint(); }
         if (InputManager.BindPressed(InputAction.DeleteWaypoint)) { MouseSelect(); editorManager.DeleteWaypoint(); }
@@ -448,7 +467,7 @@ public class LevelEditor : Game, IAdjustableWindow
 
 
         // Ghost tile cursor
-        DrawTileGhostCursor(mouseCoordDraw);
+        DrawGhostCursor(mouseCoordDraw);
 
         // Tile info
         if (currentTool == EditorTool.Tile)
@@ -469,13 +488,13 @@ public class LevelEditor : Game, IAdjustableWindow
             // Main gui
             tilesetGroup.Visible = currentTool == EditorTool.Tile;
             tilesetHighlight.Location = new Point(10, (int)TilesetSelection * 35 + 10);
-            toolHighlight.Location = new Point(Constants.Middle.X - 100 + (int)currentTool * 100, 10);
+            toolHighlight.Location = new Point(Constants.Middle.X - 250 + (int)currentTool * 100, 10);
 
             gui.Draw();
         }
 
         // Cursor
-        DrawTexture(spriteBatch, TextureID.CursorArrow, InputManager.MousePosition);
+        DrawTexture(spriteBatch, TextureID.CursorArrow, InputManager.MousePosition, color: Constants.SemiTransparent);
 
         // Finalize scene render
         spriteBatch.End();
@@ -490,7 +509,7 @@ public class LevelEditor : Game, IAdjustableWindow
 
         base.Draw(gameTime);
     }
-    public void DrawTileGhostCursor(Point mouseCoordDraw)
+    public void DrawGhostCursor(Point mouseCoordDraw)
     {
         // Check skip
         if (gameManager.StateManager.State != GameState.Editor) return;
@@ -508,8 +527,7 @@ public class LevelEditor : Game, IAdjustableWindow
 
             // Render tile
             PreviewTile?.Draw(gameManager);
-
-            spriteBatch.DrawRectangle(new(mouseCoordDraw.ToVector2(), Constants.TileSize), Color.Red * 0.6f, thickness: 3);
+            spriteBatch.FillRectangle(new(mouseCoordDraw.ToVector2(), Constants.TileSize), Color.White * 0.2f);
         }
         else if (currentTool == EditorTool.Decal)
         {
@@ -526,9 +544,21 @@ public class LevelEditor : Game, IAdjustableWindow
             DrawTexture(spriteBatch, TextureID.TileOutline, mouseCoordDraw, source: new(Point.Zero, Constants.TilePixelSize), scale: Constants.TileSizeScale, color: Biome.BiomeTileColors[(int)BiomeSelection]);
             Vector2 textCenter = Arial.MeasureString(BiomeSelection.ToString()) / 2;
             spriteBatch.DrawString(Arial, BiomeSelection.ToString(), (mouseCoordDraw + Constants.TileHalfSize).ToVector2(), Color.Black, MathHelper.PiOver4, textCenter, 1.0f, SpriteEffects.None, 1.0f);
+        } else if (currentTool == EditorTool.Loot)
+        {
+            TextureID tex = ItemTypes.All[(int)LootSelection].Texture;
+            DrawTexture(spriteBatch, tex, InputManager.MousePosition, scale: new(2), color: Constants.SemiTransparent, source: new(Point.Zero, TextureManager.Metadata[tex].TileSize));
+            spriteBatch.DrawString(PixelOperatorSmall, LootAmountSelection.ToString(), (InputManager.MousePosition + Loot.lootStackOffset * 5).ToVector2(), Color.White);
+        } else if (currentTool == EditorTool.Enemy) {
+            TextureID tex = Enemy.PresetTextures.GetValueOrDefault(EnemySelection);
+            DrawTexture(spriteBatch, tex, InputManager.MousePosition, source: new(Point.Zero, TextureManager.Metadata[tex].TileSize), color: Constants.SemiTransparent);
+        }
+        else if (currentTool == EditorTool.NPC)
+        {
+            DrawTexture(spriteBatch, TextureID.CyanVillager, InputManager.MousePosition, source: new(Point.Zero, TextureManager.Metadata[TextureID.CyanVillager].TileSize), color: Constants.SemiTransparent);
         }
     }
-    public void UpdateTilePlacing()
+    public void UpdatePlacing()
     {
         foreach (var noDraw in noDrawZones)
             if (noDraw.Contains(InputManager.MousePosition)) return;
@@ -571,6 +601,23 @@ public class LevelEditor : Game, IAdjustableWindow
         {
             int idx = LevelManager.Flatten(mouseCoord);
             levelManager.Level.Biome[idx] = BiomeSelection;
+        }
+        // Make loot
+        else if (InputManager.LMouseClicked && currentTool == EditorTool.Loot)
+        {
+            levelManager.Level.Loot.Add(new(new(ItemTypes.All[(int)LootSelection], LootAmountSelection), CameraManager.ScreenToWorld(InputManager.MousePosition)));
+        }
+        // Make enemy
+        else if (InputManager.LMouseClicked && currentTool == EditorTool.Enemy)
+        {
+            Enemy enemy = Enemy.GetPreset(EnemySelection, CameraManager.ScreenToWorld(InputManager.MousePosition).ToVector2());
+            levelManager.Level.Enemies[enemy.UID] = enemy;
+        }
+        // Make NPC
+        else if (InputManager.LMouseClicked && currentTool == EditorTool.NPC)
+        {
+            NPC npc = new(TextureID.CyanVillager, CameraManager.ScreenToTile(InputManager.MousePosition), "NPC", "Hello!");
+            levelManager.Level.NPCs[npc.UID] = npc;
         }
     }
     private void UpdatePreviewTile()

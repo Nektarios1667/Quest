@@ -12,6 +12,9 @@ public enum EditorTool : byte
     Tile,
     Decal,
     Biome,
+    Loot,
+    Enemy,
+    NPC,
 }
 public class EditorManager
 {
@@ -62,6 +65,9 @@ public class EditorManager
         if (CurrentTool == EditorTool.Tile) FloodFillTiles();
         else if (CurrentTool == EditorTool.Decal) { }
         else if (CurrentTool == EditorTool.Biome) FloodFillBiome();
+        else if (CurrentTool == EditorTool.Loot) { }
+        else if (CurrentTool == EditorTool.NPC) { }
+        else if (CurrentTool == EditorTool.Enemy) { }
     }
     public void FloodFillTiles()
     {

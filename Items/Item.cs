@@ -416,12 +416,6 @@ public class Item
         return new Item(Type, amount, CustomName);
     }
     public bool Consume(byte amount) => Take(amount) != null;
-    private string Tags()
-    {
-        string tags = "";
-        if (this is Light) tags += "L";
-        return tags;
-    }
     public ItemRef GetItemRef() => new(Type, Amount, CustomName);
     public override string ToString() => $"{Name}{(CustomName != null ? $" [{CustomName}]" : "")} x{Amount}";
 }

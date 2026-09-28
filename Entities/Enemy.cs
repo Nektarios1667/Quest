@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Quest.Entities;
 
-public class Enemy : IEntity, IStatusEffectable
+public partial class Enemy : IEntity, IStatusEffectable
 {
     public Dictionary<StatusEffect, float> StatusEffects { get; set; } = new();
     public ushort UID { get; private set; }
@@ -170,5 +170,39 @@ public class Enemy : IEntity, IStatusEffectable
     public virtual void Dispose()
     {
         UIDManager.Release(UIDCategory.Enemies, UID);
+    }
+}
+
+// Presets
+public enum EnemyPresetType
+{
+    Sauron,
+    Guard,
+    DarkGuard,
+    RoyalGuard,
+    GuardLeader,
+
+}
+public partial class Enemy
+{
+    public static readonly Dictionary<EnemyPresetType, TextureID> PresetTextures = new() {
+        { EnemyPresetType.Sauron, TextureID.WhiteWizard },
+        { EnemyPresetType.Guard, TextureID.Guard },
+        { EnemyPresetType.DarkGuard, TextureID.DarkGuard },
+        { EnemyPresetType.RoyalGuard, TextureID.RoyalGuard },
+        { EnemyPresetType.GuardLeader, TextureID.GuardLeader },
+    };
+    public static Enemy GetPreset(EnemyPresetType preset, Vector2 pos)
+    {
+        return preset switch
+        {
+            //                                 pos health dmg atkSpeed def speed projSpeed view attack tex projTex
+            EnemyPresetType.Sauron => new(pos, 200, 30, 2f, 25, 3, 4f, 10f, 6f, PresetTextures[preset], TextureID.Fireball),
+            EnemyPresetType.Guard => new(pos, 100, 22, 1.2f, 18, 2.5f, 0, 8f, 1.25f, PresetTextures[preset], TextureID.Slash),
+            EnemyPresetType.DarkGuard => new(pos, 150, 33, 1.3f, 25, 2f, 0, 8f, 1.75f, PresetTextures[preset], TextureID.Slash),
+            EnemyPresetType.RoyalGuard => new(pos, 125, 28, 1.1f, 20, 3f, 0, 10f, 1.75f, PresetTextures[preset], TextureID.Slash),
+            EnemyPresetType.GuardLeader => new(pos, 200, 42, 1.8f, 38, 2f, 0, 10f, 1.75f, PresetTextures[preset], TextureID.Slash),
+            _ => new(pos, 0, 0, 0, 0, 0, 0, 0, 0, TextureID.Null, TextureID.Null)
+        };
     }
 }
