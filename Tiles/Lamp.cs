@@ -41,6 +41,6 @@ public class Lamp : Tile, IDynamicTile, IEditableTile, IHasLevelData
     }
     public string GetDataString()
     {
-        return $"[Lamp] radius: {LightRadius}";
+        return $"radius: {LightRadius}";
     }
 }

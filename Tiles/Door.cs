@@ -103,6 +103,6 @@ public class Door : Tile, IHasState, IEditableTile, IHasLevelData
     }
     public string GetDataString()
     {
-        return $"[Door] key: {(Key == null ? "NUL" : $"'{Key.Name}' x{Key.Amount}")} consume: {ConsumeKey}";
+        return $"key: {(Key == null ? "NUL" : $"'{Key.Name}' x{Key.Amount}")} consume: {ConsumeKey}";
     }
 }

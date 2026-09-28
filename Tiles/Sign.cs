@@ -53,7 +53,7 @@ public class Sign : Tile, IHasDialog, IHasLevelData, IEditableTile
     }
     public string GetDataString()
     {
-        return GetFullDialog();
+        return Text;
     }
 }
 

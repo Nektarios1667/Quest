@@ -54,7 +54,7 @@ public class DisplayCase : Tile, IContainer, IHasLevelData
     public string GetDataString()
     {
         var item = Container.Items[0];
-        return $"[Display Case] item: {item?.Name} x{item?.Amount}";
+        return $"item: {item?.Name} x{item?.Amount}";
     }
 }
 

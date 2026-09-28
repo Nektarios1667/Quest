@@ -58,6 +58,6 @@ public class Stairs : Tile, IEditableTile, IHasLevelData
     }
     public string GetDataString()
     {
-        return $"[Stairs] dest: '{DestLevel.LevelName}' @ {Dest}";
+        return $"dest: '{DestLevel.LevelName}' @ {Dest}";
     }
 }

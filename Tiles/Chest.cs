@@ -135,6 +135,6 @@ public class Chest : Tile, IContainer, IEditableTile, IHasLevelData
     }
     public string GetDataString()
     {
-        return $"[Chest] gen: '{LootGenerator.FileName}' key: {(Key == null ? "NUL" : $"'{Key.Name}' x{Key.Amount}")} consume: {ConsumeKey}";
+        return $"gen: '{LootGenerator.FileName}' key: {(Key == null ? "NUL" : $"'{Key.Name}' x{Key.Amount}")} consume: {ConsumeKey}";
     }
 }

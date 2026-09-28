@@ -177,6 +177,6 @@ public abstract class TriggerTile : Tile, IHasState, IEditableTile, IHasLevelDat
     }
     public virtual string GetDataString()
     {
-        return $"[Trigger] {EffectType} -> '{EffectLevel.LevelName}' @ {EffectCoord}";
+        return $"{EffectType} -> '{EffectLevel.LevelName}' @ {EffectCoord}";
     }
 }
