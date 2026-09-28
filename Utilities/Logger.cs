@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 
 namespace Quest.Utilities;
 
@@ -7,7 +8,14 @@ public static class Logger
     private static readonly List<string> MessageLevels = ["Input", "System", "Log", "Warning", "Error"];
     private static readonly List<ConsoleColor> MessageColors = [ConsoleColor.Cyan, ConsoleColor.Blue, ConsoleColor.Green, ConsoleColor.Yellow, ConsoleColor.Red];
     private static string Timestamp => DateTime.Now.ToString("HH:mm:ss.fff");
-    public static List<string> Logs { get; private set; } = new();
+    private static readonly string[] recentMessages = new string[5];
+    private static int messageIdx = 0;
+    private static void RecordRecentMessage(string message)
+    {
+        recentMessages[messageIdx] = message;
+        messageIdx = (messageIdx + 1) % recentMessages.Length;
+    }
+    private static bool MessageRecentlyPrinted(string message) => recentMessages.Contains(message);
     public static void CreateLevel(string levelName, ConsoleColor color)
     {
         if (!MessageLevels.Contains(levelName))
@@ -82,8 +90,14 @@ public static class Logger
     }
     public static void Log(string message)
     {
+        // Prevent same message from being spammed
+        if (MessageRecentlyPrinted(message)) return;
+        RecordRecentMessage(message);
+
+        // Log for window
         DebugManager.Log($"({Timestamp}) [Log] {message}");
 
+        // Print to console
         if (!DebugManager.LogInfo) return; // Skip logging if not enabled
 
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Log")];
@@ -92,19 +106,33 @@ public static class Logger
     }
     public static void Warning(string message)
     {
+        // Prevent same message from being spammed
+        if (MessageRecentlyPrinted(message)) return;
+        RecordRecentMessage(message);
+
+        // Log for window
         DebugManager.Log($"({Timestamp}) [Warning] {message}");
 
+        // Print to console
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Warning")];
         Console.WriteLine($"({Timestamp}) [Warning] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color
     }
     public static void Error(string message, bool exit = false)
     {
+        // Prevent same message from being spammed
+        if (!exit && MessageRecentlyPrinted(message)) return;
+        RecordRecentMessage(message);
+
+        // Log for window
         DebugManager.Log($"({Timestamp}) [Error] {message}");
 
+        // Print to console
         Console.ForegroundColor = MessageColors[MessageLevels.IndexOf("Error")];
         Console.WriteLine($"({Timestamp}) [Error] {message}");
         Console.ForegroundColor = ConsoleColor.White; // Reset color
+        
+        // Write log to file
         if (exit)
         {
             Directory.CreateDirectory("Logs");
