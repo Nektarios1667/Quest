@@ -65,6 +65,14 @@ public class EditorOverlayManager
     public static void DrawLootOverlay(SpriteBatch spriteBatch, ItemTypeID selection, int selectionAmount) {
         DrawCornerInfo(spriteBatch, $"{selection} x {selectionAmount}", 0);
     }
+    public static void DrawEnemyOverlay(SpriteBatch spriteBatch, EnemyPresetType selection)
+    {
+        DrawCornerInfo(spriteBatch, $"{selection}", 0);
+    }
+    public static void DrawNPCOverlay(SpriteBatch spriteBatch, TextureID selection)
+    {
+        DrawCornerInfo(spriteBatch, $"{selection}", 0);
+    }
     public static void DrawCornerInfo(SpriteBatch spriteBatch, string text, int offsetY = 0)
     {
         Vector2 textSize = PixelOperatorVerySmall.MeasureString(text);
@@ -85,7 +93,7 @@ public class EditorOverlayManager
                 Point dest = CameraManager.TileToScreen(loc);
                 BiomeType? biome = LevelManager.GetBiome(loc);
                 Color color = biome == null ? Color.Magenta : Biome.BiomeTileColors[(int)biome];
-                GameManager.Batch.Draw(Textures[TextureID.TileOutline], dest.ToVector2(), LevelManager.BiomeTextureSource(loc), color, 0, Vector2.Zero, Constants.TileSizeScale, SpriteEffects.None, 1.0f);
+                DrawTexture(GameManager.Batch, TextureID.TileOutline, dest, LevelManager.BiomeTextureSource(loc), color, scale: Constants.TileSizeScale);
             }
         }
     }

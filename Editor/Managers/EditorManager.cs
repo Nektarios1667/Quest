@@ -9,6 +9,7 @@ namespace Quest.Editor.Managers;
 
 public enum EditorTool : byte
 {
+    None,
     Tile,
     Decal,
     Biome,
@@ -180,7 +181,7 @@ public class EditorManager
             new("Name", IsAlphaOrSpace),
             new("Dialog", null),
             new("Size [0.1-25.5]", IsScaleValue),
-            new("Texture", IsAlphaNum, [.. CharacterTextures.Select(t => t.ToString())]),
+            new("Texture", IsAlphaNum, [.. TypeTextures[TextureType.Character].Select(t => t.ToString())]),
             new("Shop Option 1", null),
             new("Shop Option 2", null),
             new("Shop Option 3", null),
@@ -256,7 +257,7 @@ public class EditorManager
             new("Name", IsAlphaOrSpace, placeholder: editing.Name),
             new("Dialog", null, placeholder: editing.Dialog),
             new("Size [0.1-25.5]", IsScaleValue, placeholder: editing.Scale.ToString()),
-            new("Texture", IsAlphaNum, [.. CharacterTextures.Select(t => t.ToString())], placeholder: editing.Texture.ToString()),
+            new("Texture", IsAlphaNum, [.. TypeTextures[TextureType.Character].Select(t => t.ToString())], placeholder: editing.Texture.ToString()),
             new("Shop Option 1", null, placeholder: editing.ShopOptions.ElementAtOrDefault(0)?.ToString() ?? ""),
             new("Shop Option 2", null, placeholder: editing.ShopOptions.ElementAtOrDefault(1)?.ToString() ?? ""),
             new("Shop Option 3", null, placeholder: editing.ShopOptions.ElementAtOrDefault(2)?.ToString() ?? ""),
@@ -316,8 +317,8 @@ public class EditorManager
             new("Projectile Speed (tiles/s)", IsUInt16),
             new("View Range (tiles)", IsUInt16),
             new("Attack Range (tiles)", IsUInt16),
-            new("Texture", IsAlphaNum, [.. CharacterTextures.Select(t => t.ToString())]),
-            new("Projectile Texture", IsAlphaNum, [.. ProjectileTextures.Select(t => t.ToString())])
+            new("Texture", IsAlphaNum, [.. TypeTextures[TextureType.Character].Select(t => t.ToString())]),
+            new("Projectile Texture", IsAlphaNum, [.. TypeTextures[TextureType.Projectile].Select(t => t.ToString())])
         ]);
         if (!success)
         {
@@ -379,8 +380,8 @@ public class EditorManager
             new("Projectile Speed", IsUInt16, placeholder: editing.ProjectileSpeed),
             new("View Range", IsUInt16, placeholder: editing.ViewRange),
             new("Attack Range", IsUInt16, placeholder: editing.AttackRange),
-            new("Texture", IsAlphaNum, [.. CharacterTextures.Select(t => t.ToString())], placeholder: editing.Texture),
-            new("Projectile Texture", IsAlphaNum, [.. ProjectileTextures.Select(t => t.ToString())], placeholder: editing.ProjectileTexture)
+            new("Texture", IsAlphaNum, [.. TypeTextures[TextureType.Character].Select(t => t.ToString())], placeholder: editing.Texture),
+            new("Projectile Texture", IsAlphaNum, [.. TypeTextures[TextureType.Projectile].Select(t => t.ToString())], placeholder: editing.ProjectileTexture)
         ]);
         if (!success)
         {

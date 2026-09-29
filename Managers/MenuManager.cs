@@ -325,9 +325,9 @@ public class MenuManager
     private void DrawMenu(SpriteBatch batch)
     {
 
-        TextureManager.DrawTexture(batch, MenuBackground, Point.Zero, scale: MenuBackgroundScale);
-        Vector2 logoCenter = new(Constants.Middle.X - TextureManager.Metadata[TextureID.QuestTitle].Size.X / 2, 20);
-        gameManager.Batch.Draw(Textures[TextureID.QuestTitle], logoCenter, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.0f);
+        DrawTexture(batch, MenuBackground, Point.Zero, scale: MenuBackgroundScale);
+        Point logoCenter = new(Constants.Middle.X - TextureManager.Metadata[TextureID.QuestTitle].Size.X / 2, 20);
+        DrawTexture(batch, TextureID.QuestTitle, logoCenter);
 
         MainMenu.Draw();
     }

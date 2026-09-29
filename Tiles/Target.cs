@@ -52,7 +52,7 @@ public class Target : TriggerTile
 
         // Input fields
         List<InputField> fields = [
-            new("Required Projectile", null, dropdownOptions: [.. ProjectileTextures.Select(t => t.ToString()), "NONE"], placeholder: EffectType),
+            new("Required Projectile", null, dropdownOptions: [.. TypeTextures[TextureType.Projectile].Select(t => t.ToString()), "NONE"], placeholder: EffectType),
         ];
 
 

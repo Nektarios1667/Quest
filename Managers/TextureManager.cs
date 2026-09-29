@@ -288,8 +288,6 @@ public static class TextureManager
     public static Dictionary<TextureID, Texture2D> Textures { get; private set; } = [];
     public static Texture2D NullTexture { get; private set; } = null!;
     public static Dictionary<TextureID, Metadata> Metadata { get; private set; } = [];
-    public static TextureID[] CharacterTextures { get; private set; } = [];
-    public static TextureID[] ProjectileTextures { get; private set; } = [];
     private static Texture2D Pixel { get; set; } = null!;
     // Fonts
     public static SpriteFont PixelOperator { get; private set; } = null!;
@@ -584,7 +582,7 @@ public static class TextureManager
         Metadata[TextureID.WhiteMage] = new(Textures[TextureID.WhiteMage].Bounds.Size, new(2, 1), TextureType.Character);
         Metadata[TextureID.PurpleWizard] = new(Textures[TextureID.PurpleWizard].Bounds.Size, new(2, 1), TextureType.Character);
         Metadata[TextureID.WhiteWizard] = new(Textures[TextureID.WhiteWizard].Bounds.Size, new(2, 1), TextureType.Character);
-        Metadata[TextureID.Ghost] = new(Textures[TextureID.Ghost].Bounds.Size, new(4, 1), TextureType.Character);
+        Metadata[TextureID.Ghost] = new(Textures[TextureID.Ghost].Bounds.Size, new(4, 1), TextureType.Other); // TODO FIX When/if ghost gets an actual texture, change the TextureType to .Character
         Metadata[TextureID.Miner] = new(Textures[TextureID.Miner].Bounds.Size, new(2, 1), TextureType.Character);
         Metadata[TextureID.CyanVillager] = new(Textures[TextureID.CyanVillager].Bounds.Size, new(2, 1), TextureType.Character);
         Metadata[TextureID.GreenVillager] = new(Textures[TextureID.GreenVillager].Bounds.Size, new(2, 1), TextureType.Character);
@@ -841,10 +839,6 @@ public static class TextureManager
 
         // Null texture
         NullTexture = Textures[TextureID.Null];
-
-        // Generate characters
-        CharacterTextures = [.. Textures.Where(kv => Metadata[kv.Key].Type == TextureType.Character).Select(kv => kv.Key)];
-        ProjectileTextures = [.. Textures.Where(kv => Metadata[kv.Key].Type == TextureType.Projectile).Select(kv => kv.Key)];
 
         // Create type dict
         foreach (TextureType type in Enum.GetValues<TextureType>())
