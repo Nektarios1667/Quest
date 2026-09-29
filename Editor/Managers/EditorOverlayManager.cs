@@ -56,11 +56,14 @@ public class EditorOverlayManager
     public static void DrawDecalOverlay(SpriteBatch spriteBatch, DecalType selection, DecalType? mouseDecal)
     {
         DrawCornerInfo(spriteBatch, $"{selection}", 0);
-        DrawCornerInfo(spriteBatch, $"{mouseDecal}", 50);
+        DrawCornerInfo(spriteBatch, $"{mouseDecal}", 24);
     }
     public static void DrawBiomeOverlay(SpriteBatch spriteBatch, BiomeType selection, BiomeType? mouseBiome) {
         DrawCornerInfo(spriteBatch, $"{selection}", 0);
-        DrawCornerInfo(spriteBatch, $"{mouseBiome}", 50);
+        DrawCornerInfo(spriteBatch, $"{mouseBiome}", 24);
+    }
+    public static void DrawLootOverlay(SpriteBatch spriteBatch, ItemTypeID selection, int selectionAmount) {
+        DrawCornerInfo(spriteBatch, $"{selection} x {selectionAmount}", 0);
     }
     public static void DrawCornerInfo(SpriteBatch spriteBatch, string text, int offsetY = 0)
     {

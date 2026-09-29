@@ -55,7 +55,7 @@ public class LevelEditor : Game, IAdjustableWindow
     private DecalType DecalSelection;
     private BiomeType BiomeSelection;
     private ItemTypeID LootSelection;
-    private byte LootAmountSelection;
+    private byte LootAmountSelection = 1;
     private EnemyPresetType EnemySelection;
     private Tile? PreviewTile;
 
@@ -476,6 +476,8 @@ public class LevelEditor : Game, IAdjustableWindow
             EditorOverlayManager.DrawDecalOverlay(spriteBatch, DecalSelection, mouseDecal);
         else if (currentTool == EditorTool.Biome)
             EditorOverlayManager.DrawBiomeOverlay(spriteBatch, BiomeSelection, mouseBiome);
+        else if (currentTool == EditorTool.Loot)
+            EditorOverlayManager.DrawLootOverlay(spriteBatch, LootSelection, LootAmountSelection);
 
         // Gui
         if (gameManager.StateManager.State == GameState.Settings)
