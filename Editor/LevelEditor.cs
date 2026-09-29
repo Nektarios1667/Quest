@@ -551,11 +551,11 @@ public class LevelEditor : Game, IAdjustableWindow
             spriteBatch.DrawString(PixelOperatorSmall, LootAmountSelection.ToString(), (InputManager.MousePosition + Loot.lootStackOffset * 5).ToVector2(), Color.White);
         } else if (currentTool == EditorTool.Enemy) {
             TextureID tex = Enemy.PresetTextures.GetValueOrDefault(EnemySelection);
-            DrawTexture(spriteBatch, tex, InputManager.MousePosition, source: new(Point.Zero, TextureManager.Metadata[tex].TileSize), color: Constants.SemiTransparent);
+            DrawTexture(spriteBatch, tex, InputManager.MousePosition, source: new(Point.Zero, TextureManager.Metadata[tex].TileSize), color: Constants.SemiTransparent, scale: new(2));
         }
         else if (currentTool == EditorTool.NPC)
         {
-            DrawTexture(spriteBatch, TextureID.CyanVillager, InputManager.MousePosition, source: new(Point.Zero, TextureManager.Metadata[TextureID.CyanVillager].TileSize), color: Constants.SemiTransparent);
+            DrawTexture(spriteBatch, TextureID.CyanVillager, InputManager.MousePosition, source: new(Point.Zero, TextureManager.Metadata[TextureID.CyanVillager].TileSize), color: Constants.SemiTransparent, scale: new(2));
         }
     }
     public void UpdatePlacing()

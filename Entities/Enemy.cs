@@ -60,7 +60,7 @@ public partial class Enemy : IEntity, IStatusEffectable
 
         TimerManager.SetTimer($"EnemyAttack_{UID}", AttackSpeed, true, null);
         Metadata meta = TextureManager.Metadata.GetValueOrDefault(Texture, new(Constants.OnePoint, Constants.OnePoint, TextureType.Other));
-        Size = (meta.Size / meta.TileMap).Scaled(Scale);
+        Size = meta.TileSize.Scaled(Scale);
 
         HealthBar = new(Point.Zero, new(Size.X, 10), Color.Green * 0.7f, Color.Red * 0.7f, Health, Health, textType: StatusTextType.Fraction, font: PixelOperatorVerySmall);
         DamageNotifs = new(Point.Zero, 50, PixelOperatorSubtitle, Color.Orange);

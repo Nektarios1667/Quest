@@ -6,7 +6,7 @@ public class Torch(Point location) : Decal(location)
     public override void Draw(GameManager game)
     {
         Point dest = CameraManager.TileToScreen(Location);
-        dest += TextureManager.Metadata[Texture].Size / TextureManager.Metadata[Texture].TileMap / Constants.TwoPoint - TextureManager.Metadata[TextureID.Glow].Size / Constants.TwoPoint + new Point(0, -15);
+        dest += TextureManager.Metadata[Texture].TileSize / Constants.TwoPoint - TextureManager.Metadata[TextureID.Glow].Size / Constants.TwoPoint + new Point(0, -15);
         Color tint = Color.Lerp(Color.Red, Color.LightYellow, (float)Math.Sin(GameManager.GameTime) + .5f);
         DrawTexture(game.Batch, TextureID.Glow, dest, scale: Constants.TileSizeScale, color: Color.Lerp(tint, Color.DarkOrange, .8f) * ((float)Math.Cos(GameManager.GameTime) / 8 + .4f));
 

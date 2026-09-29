@@ -930,7 +930,7 @@ public static class TextureManager
             return new(0, 0, 64, 64);
         }
 
-        Point frameSize = meta.Size / meta.TileMap;
+        Point frameSize = meta.TileSize;
         float invDuration = 1 / duration;
         int frame = (int)((time - start) * invDuration) % meta.TileMap.X;
         return new Rectangle(frame * frameSize.X, row * frameSize.Y, frameSize.X, frameSize.Y);

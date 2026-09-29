@@ -85,7 +85,7 @@ public class NPC : IEntity, IHasDialog
 
         // Private
         Metadata meta = TextureManager.Metadata.GetValueOrDefault(Texture, new(Constants.OnePoint, Constants.OnePoint, TextureType.Other));
-        spritesize = meta.Size / meta.TileMap;
+        spritesize = meta.TileSize;
 
         Position = position;
         Name = name;
