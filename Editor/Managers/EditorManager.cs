@@ -167,10 +167,10 @@ public class EditorManager
         }
         LevelManager.Level.Tint = new Color(byte.Parse(values[0]), byte.Parse(values[1]), byte.Parse(values[2])) * (byte.Parse(values[3]) / 255f);
     }
-    public void NewNPC()
+    public void NewNPC(NPC? placeholder = null)
     {
         // Check
-        if (LevelManager.Level.NPCs.Count >= ushort.MaxValue)
+        if (placeholder == null && LevelManager.Level.NPCs.Count >= ushort.MaxValue)
         {
             Logger.Error("Maximum number of NPCs reached (65,535).");
             return;
@@ -178,15 +178,15 @@ public class EditorManager
 
         // Winforms
         var (success, values) = ShowInputForm("NPC Editor", [
-            new("Name", IsAlphaOrSpace),
-            new("Dialog", null),
-            new("Size [0.1-25.5]", IsScaleValue),
-            new("Texture", IsAlphaNum, [.. TypeTextures[TextureType.Character].Select(t => t.ToString())]),
-            new("Shop Option 1", null),
-            new("Shop Option 2", null),
-            new("Shop Option 3", null),
-            new("Shop Option 4", null),
-            new("Shop Option 5", null)
+            new("Name", IsAlphaOrSpace, placeholder: placeholder?.Name),
+            new("Dialog", null, placeholder: placeholder?.Dialog),
+            new("Size [0.1-25.5]", IsScaleValue, placeholder: placeholder?.Scale),
+            new("Texture", IsAlphaNum, [.. TypeTextures[TextureType.Character].Select(t => t.ToString())], placeholder: placeholder?.Texture),
+            new("Shop Option 1", null, placeholder: placeholder?.ShopOptions.ElementAtOrDefault(0)?.ToString() ?? ""),
+            new("Shop Option 2", null, placeholder: placeholder?.ShopOptions.ElementAtOrDefault(1)?.ToString() ?? ""),
+            new("Shop Option 3", null, placeholder: placeholder?.ShopOptions.ElementAtOrDefault(2)?.ToString() ?? ""),
+            new("Shop Option 4", null, placeholder: placeholder?.ShopOptions.ElementAtOrDefault(3)?.ToString() ?? ""),
+            new("Shop Option 5", null, placeholder: placeholder?.ShopOptions.ElementAtOrDefault(4)?.ToString() ?? "")
         ]);
         if (!success)
         {
@@ -194,7 +194,6 @@ public class EditorManager
             return;
         }
 
-        // Create
         string name = values[0];
         string dialog = values[1];
         float scale = float.Parse(values[2]);
@@ -221,10 +220,12 @@ public class EditorManager
             scale = 1;
         }
         TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), values[3]);
-        NPC npc = new(texture, MouseSelectionCoord, name, dialog, Color.White, scale);
+        NPC npc = placeholder ?? new(texture, MouseSelectionCoord, name, dialog, Color.White, scale);
+        npc.ShopOptions.Clear();
         foreach (ShopOption option in shopOptions)
             npc.AddShopOption(option);
-        LevelManager.Level.NPCs[npc.UID] = npc;
+        if (placeholder == null)
+            LevelManager.Level.NPCs[npc.UID] = npc;
     }
     public void DeleteNPC()
     {
@@ -240,7 +241,6 @@ public class EditorManager
     }
     public void EditNPC()
     {
-        // Grab NPC
         NPC? editing = null;
         foreach (NPC npc in LevelManager.Level.NPCs.Values)
         {
@@ -251,57 +251,12 @@ public class EditorManager
             }
         }
         if (editing == null) return;
-
-        // Remake
-        var (success, values) = ShowInputForm("NPC Editor", [
-            new("Name", IsAlphaOrSpace, placeholder: editing.Name),
-            new("Dialog", null, placeholder: editing.Dialog),
-            new("Size [0.1-25.5]", IsScaleValue, placeholder: editing.Scale.ToString()),
-            new("Texture", IsAlphaNum, [.. TypeTextures[TextureType.Character].Select(t => t.ToString())], placeholder: editing.Texture.ToString()),
-            new("Shop Option 1", null, placeholder: editing.ShopOptions.ElementAtOrDefault(0)?.ToString() ?? ""),
-            new("Shop Option 2", null, placeholder: editing.ShopOptions.ElementAtOrDefault(1)?.ToString() ?? ""),
-            new("Shop Option 3", null, placeholder: editing.ShopOptions.ElementAtOrDefault(2)?.ToString() ?? ""),
-            new("Shop Option 4", null, placeholder: editing.ShopOptions.ElementAtOrDefault(3)?.ToString() ?? ""),
-            new("Shop Option 5", null, placeholder: editing.ShopOptions.ElementAtOrDefault(4)?.ToString() ?? "")
-        ]);
-        if (!success)
-        {
-            if (!PopupOpen) Logger.Error("NPC creation failed.");
-            return;
-        }
-
-        // Create
-        editing.Name = values[0];
-        editing.Dialog = values[1];
-        float scale = float.Parse(values[2]);
-        if (scale < 0.1 || scale > 25.5)
-        {
-            Logger.Warning("Scale must be between 0.1 and 25.5. Scale defaulted to 1.");
-            scale = 1;
-        }
-        editing.Scale = scale;
-        editing.Texture = (TextureID)Enum.Parse(typeof(TextureID), values[3]);
-
-        // Shop options parsing
-        editing.ShopOptions.Clear();
-        foreach (string line in values[4].Split('\n'))
-        {
-            if (string.IsNullOrWhiteSpace(line)) continue;
-            try
-            {
-                editing.AddShopOption(ShopOption.ParseText(line));
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Failed to parse shop option '{line}': {ex.Message}");
-                return;
-            }
-        }
+        NewNPC(editing);
     }
-    public void NewEnemy()
+    public void NewEnemy(Enemy? placeholder = null)
     {
         // Check
-        if (LevelManager.Level.Enemies.Count >= ushort.MaxValue)
+        if (placeholder == null && LevelManager.Level.Enemies.Count >= ushort.MaxValue)
         {
             Logger.Error("Maximum number of Enemies reached (65,535).");
             return;
@@ -309,16 +264,16 @@ public class EditorManager
 
         // Winforms
         var (success, values) = ShowInputForm("Enemy Editor", [
-            new("Health", IsUInt16),
-            new("Damage", IsUInt16),
-            new("Attack Speed", IsPositiveFloatOrZero),
-            new("Defense", IsUInt16),
-            new("Speed (tiles/s)", IsPositiveFloatOrZero),
-            new("Projectile Speed (tiles/s)", IsPositiveFloatOrZero),
-            new("View Range (tiles)", IsPositiveFloatOrZero),
-            new("Attack Range (tiles)", IsPositiveFloatOrZero),
-            new("Texture", IsAlphaNum, [.. TypeTextures[TextureType.Character].Select(t => t.ToString())]),
-            new("Projectile Texture", IsAlphaNum, [.. TypeTextures[TextureType.Projectile].Select(t => t.ToString())])
+            new("Health", IsUInt16, placeholder: placeholder?.Health),
+            new("Damage", IsUInt16, placeholder: placeholder?.Damage),
+            new("Attack Speed", IsPositiveFloatOrZero, placeholder: placeholder?.AttackSpeed),
+            new("Defense", IsUInt16, placeholder: placeholder?.Defense),
+            new("Speed (tiles/s)", IsPositiveFloatOrZero, placeholder: placeholder?.Speed),
+            new("Projectile Speed (tiles/s)", IsPositiveFloatOrZero, placeholder: placeholder?.ProjectileSpeed),
+            new("View Range (tiles)", IsPositiveFloatOrZero, placeholder: placeholder?.ViewRange),
+            new("Attack Range (tiles)", IsPositiveFloatOrZero, placeholder: placeholder?.AttackRange),
+            new("Texture", IsAlphaNum, [.. TypeTextures[TextureType.Character].Select(t => t.ToString())], placeholder: placeholder?.Texture),
+            new("Projectile Texture", IsAlphaNum, [.. TypeTextures[TextureType.Projectile].Select(t => t.ToString())], placeholder: placeholder?.ProjectileTexture)
         ]);
         if (!success)
         {
@@ -326,23 +281,20 @@ public class EditorManager
             return;
         }
 
-        // Create
         TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), values[8]);
         TextureID projTexture = (TextureID)Enum.Parse(typeof(TextureID), values[9]);
-        Enemy enemy = new(
-            MouseSelection.ToVector2(),
-            ushort.Parse(values[0]),
-            ushort.Parse(values[1]),
-            float.Parse(values[2]),
-            ushort.Parse(values[3]),
-            float.Parse(values[4]),
-            float.Parse(values[5]),
-            float.Parse(values[6]),
-            float.Parse(values[7]),
-            texture,
-            projTexture
-        );
-        LevelManager.Level.Enemies[enemy.UID] = enemy;
+        ushort health = ushort.Parse(values[0]);
+        ushort damage = ushort.Parse(values[1]);
+        float attackSpeed = float.Parse(values[2]);
+        ushort defense = ushort.Parse(values[3]);
+        float speed = float.Parse(values[4]);
+        float projectileSpeed = float.Parse(values[5]);
+        float viewRange = float.Parse(values[6]);
+        float attackRange = float.Parse(values[7]);
+
+        Enemy enemy = placeholder ?? new(MouseSelection.ToVector2(), health, damage, attackSpeed, defense, speed, projectileSpeed, viewRange, attackRange, texture, projTexture);
+        if (placeholder == null)
+            LevelManager.Level.Enemies[enemy.UID] = enemy;
     }
     public void DeleteEnemy()
     {
@@ -358,7 +310,6 @@ public class EditorManager
     }
     public void EditEnemy()
     {
-        // Grab NPC
         Enemy? editing = null;
         foreach (Enemy enemy in LevelManager.Level.Enemies.Values)
         {
@@ -369,39 +320,7 @@ public class EditorManager
             }
         }
         if (editing == null) return;
-
-        // Remake
-        var (success, values) = ShowInputForm("Enemy Editor", [
-            new("Health", IsUInt16, placeholder: editing.Health),
-            new("Damage", IsUInt16, placeholder: editing.Damage),
-            new("Attack Speed", IsPositiveFloatOrZero, placeholder: editing.AttackSpeed),
-            new("Defense", IsUInt16, placeholder: editing.Defense),
-            new("Speed", IsPositiveFloatOrZero, placeholder: editing.Speed),
-            new("Projectile Speed", IsPositiveFloatOrZero, placeholder: editing.ProjectileSpeed),
-            new("View Range", IsPositiveFloatOrZero, placeholder: editing.ViewRange),
-            new("Attack Range", IsPositiveFloatOrZero, placeholder: editing.AttackRange),
-            new("Texture", IsAlphaNum, [.. TypeTextures[TextureType.Character].Select(t => t.ToString())], placeholder: editing.Texture),
-            new("Projectile Texture", IsAlphaNum, [.. TypeTextures[TextureType.Projectile].Select(t => t.ToString())], placeholder: editing.ProjectileTexture)
-        ]);
-        if (!success)
-        {
-            if (!PopupOpen) Logger.Error("NPC creation failed.");
-            return;
-        }
-
-        // Create
-        TextureID texture = (TextureID)Enum.Parse(typeof(TextureID), values[8]);
-        TextureID projTexture = (TextureID)Enum.Parse(typeof(TextureID), values[9]);
-        editing.Health = ushort.Parse(values[0]);
-        editing.Damage = ushort.Parse(values[1]);
-        editing.AttackSpeed = float.Parse(values[2]);
-        editing.Defense = ushort.Parse(values[3]);
-        editing.Speed = float.Parse(values[4]);
-        editing.ProjectileSpeed = float.Parse(values[5]);
-        editing.ViewRange = float.Parse(values[6]);
-        editing.AttackRange = float.Parse(values[7]);
-        editing.Texture = texture;
-        editing.ProjectileTexture = projTexture;
+        NewEnemy(editing);
     }
     public void NewWaypoint()
     {

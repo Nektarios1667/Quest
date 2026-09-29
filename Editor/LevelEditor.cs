@@ -212,8 +212,8 @@ public class LevelEditor : Game, IAdjustableWindow
         mouseMenu.AddSubMenu("Edit...", editMenu);
 
         MouseMenu newMenu = new(gui, Point.Zero, new(120, 145), Color.White, Color.Black * 0.6f, GUI.NearBlack * 0.6f, border: 0, seperation: 1, borderColor: Color.Blue * 0.6f) { ItemBorder = 0 };
-        newMenu.AddItem("New NPC", editorManager.NewNPC, []);
-        newMenu.AddItem("New Enemy", editorManager.NewEnemy, []);
+        newMenu.AddItem("New NPC", () => editorManager.NewNPC(), []);
+        newMenu.AddItem("New Enemy", () => editorManager.NewEnemy(), []);
         newMenu.AddItem("New Loot", editorManager.NewLoot, []);
         newMenu.AddItem("New Decal", editorManager.NewDecal, []);
         newMenu.AddItem("New Script", editorManager.NewScript, []);
