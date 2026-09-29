@@ -827,9 +827,9 @@ public static class TextureManager
         Metadata[TextureID.LifestealSpell] = new(Textures[TextureID.LifestealSpell].Bounds.Size, new(4, 1), TextureType.Projectile);
         Metadata[TextureID.NinjaStarProjectile] = new(Textures[TextureID.NinjaStarProjectile].Bounds.Size, new(4, 1), TextureType.Projectile);
         Metadata[TextureID.RockProjectile] = new(Textures[TextureID.RockProjectile].Bounds.Size, new(4, 1), TextureType.Projectile);
+        Metadata[TextureID.Slash] = new(Textures[TextureID.Slash].Bounds.Size, new(1, 1), TextureType.Projectile);
         // PROJECTILES METADATA INSERT
         Metadata[TextureID.Glow] = new(Textures[TextureID.Glow].Bounds.Size, new(1, 1), TextureType.Effect);
-        Metadata[TextureID.Slash] = new(Textures[TextureID.Slash].Bounds.Size, new(1, 1), TextureType.Effect);
         // EFFECTS METADATA INSERT
         foreach (var kv in Metadata)
             if (kv.Value == null)

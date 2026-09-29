@@ -311,12 +311,12 @@ public class EditorManager
         var (success, values) = ShowInputForm("Enemy Editor", [
             new("Health", IsUInt16),
             new("Damage", IsUInt16),
-            new("Attack Speed", IsPositiveFloat),
+            new("Attack Speed", IsPositiveFloatOrZero),
             new("Defense", IsUInt16),
-            new("Speed (tiles/s)", IsUInt16),
-            new("Projectile Speed (tiles/s)", IsUInt16),
-            new("View Range (tiles)", IsUInt16),
-            new("Attack Range (tiles)", IsUInt16),
+            new("Speed (tiles/s)", IsPositiveFloatOrZero),
+            new("Projectile Speed (tiles/s)", IsPositiveFloatOrZero),
+            new("View Range (tiles)", IsPositiveFloatOrZero),
+            new("Attack Range (tiles)", IsPositiveFloatOrZero),
             new("Texture", IsAlphaNum, [.. TypeTextures[TextureType.Character].Select(t => t.ToString())]),
             new("Projectile Texture", IsAlphaNum, [.. TypeTextures[TextureType.Projectile].Select(t => t.ToString())])
         ]);
@@ -335,10 +335,10 @@ public class EditorManager
             ushort.Parse(values[1]),
             float.Parse(values[2]),
             ushort.Parse(values[3]),
-            ushort.Parse(values[4]),
-            ushort.Parse(values[5]),
-            ushort.Parse(values[6]),
-            ushort.Parse(values[7]),
+            float.Parse(values[4]),
+            float.Parse(values[5]),
+            float.Parse(values[6]),
+            float.Parse(values[7]),
             texture,
             projTexture
         );
@@ -374,12 +374,12 @@ public class EditorManager
         var (success, values) = ShowInputForm("Enemy Editor", [
             new("Health", IsUInt16, placeholder: editing.Health),
             new("Damage", IsUInt16, placeholder: editing.Damage),
-            new("Attack Speed", IsPositiveFloat, placeholder: editing.AttackSpeed),
+            new("Attack Speed", IsPositiveFloatOrZero, placeholder: editing.AttackSpeed),
             new("Defense", IsUInt16, placeholder: editing.Defense),
-            new("Speed", IsUInt16, placeholder: editing.Speed),
-            new("Projectile Speed", IsUInt16, placeholder: editing.ProjectileSpeed),
-            new("View Range", IsUInt16, placeholder: editing.ViewRange),
-            new("Attack Range", IsUInt16, placeholder: editing.AttackRange),
+            new("Speed", IsPositiveFloatOrZero, placeholder: editing.Speed),
+            new("Projectile Speed", IsPositiveFloatOrZero, placeholder: editing.ProjectileSpeed),
+            new("View Range", IsPositiveFloatOrZero, placeholder: editing.ViewRange),
+            new("Attack Range", IsPositiveFloatOrZero, placeholder: editing.AttackRange),
             new("Texture", IsAlphaNum, [.. TypeTextures[TextureType.Character].Select(t => t.ToString())], placeholder: editing.Texture),
             new("Projectile Texture", IsAlphaNum, [.. TypeTextures[TextureType.Projectile].Select(t => t.ToString())], placeholder: editing.ProjectileTexture)
         ]);
@@ -396,10 +396,10 @@ public class EditorManager
         editing.Damage = ushort.Parse(values[1]);
         editing.AttackSpeed = float.Parse(values[2]);
         editing.Defense = ushort.Parse(values[3]);
-        editing.Speed = ushort.Parse(values[4]);
-        editing.ProjectileSpeed = ushort.Parse(values[5]);
-        editing.ViewRange = ushort.Parse(values[6]);
-        editing.AttackRange = ushort.Parse(values[7]);
+        editing.Speed = float.Parse(values[4]);
+        editing.ProjectileSpeed = float.Parse(values[5]);
+        editing.ViewRange = float.Parse(values[6]);
+        editing.AttackRange = float.Parse(values[7]);
         editing.Texture = texture;
         editing.ProjectileTexture = projTexture;
     }
