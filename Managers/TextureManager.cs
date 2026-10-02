@@ -60,17 +60,6 @@ public static class TextureManager
         WhiteVillager,
         YellowMage,
         // CHARACTERS ENUM INSERT
-        CursorArrow,
-        DialogBox,
-        GuiBackground,
-        Slot,
-        Speech,
-        QuestValleyBackground,
-        QuestTundraBackground,
-        QuestTitle,
-        TileOutline,
-        RedX,
-        // GUI ENUM INSERT
         Lantern,
         Pickaxe,
         PhiCoin,
@@ -279,6 +268,18 @@ public static class TextureManager
         NinjaStarProjectile,
         RockProjectile,
         // PROJECTILES ENUM INSERT
+        CursorArrow,
+        DialogBox,
+        GuiBackground,
+        Slot,
+        Speech,
+        QuestValleyBackground,
+        QuestTundraBackground,
+        QuestArchipelagoBackground,
+        QuestTitle,
+        TileOutline,
+        RedX,
+        // GUI ENUM INSERT
         Glow,
         Slash,
         // EFFECTS ENUM INSERT
@@ -347,6 +348,7 @@ public static class TextureManager
         Textures[TextureID.Speech] = content.Load<Texture2D>("Images/Gui/Speech");
         Textures[TextureID.QuestValleyBackground] = content.Load<Texture2D>("Images/Gui/QuestValley");
         Textures[TextureID.QuestTundraBackground] = content.Load<Texture2D>("Images/Gui/QuestTundra");
+        Textures[TextureID.QuestArchipelagoBackground] = content.Load<Texture2D>("Images/Gui/QuestArchipelago");
         Textures[TextureID.QuestTitle] = content.Load<Texture2D>("Images/Gui/QuestTitle");
         Textures[TextureID.TileOutline] = content.Load<Texture2D>("Images/Gui/TileOutline");
         Textures[TextureID.RedX] = content.Load<Texture2D>("Images/Gui/RedX");
@@ -614,6 +616,7 @@ public static class TextureManager
         Metadata[TextureID.Speech] = new(Textures[TextureID.Speech].Bounds.Size, new(1, 4), TextureType.GUI);
         Metadata[TextureID.QuestValleyBackground] = new(Textures[TextureID.QuestValleyBackground].Bounds.Size, new(1, 1), TextureType.Background);
         Metadata[TextureID.QuestTundraBackground] = new(Textures[TextureID.QuestTundraBackground].Bounds.Size, new(1, 1), TextureType.Background);
+        Metadata[TextureID.QuestArchipelagoBackground] = new(Textures[TextureID.QuestArchipelagoBackground].Bounds.Size, new(1, 1), TextureType.Background);
         Metadata[TextureID.QuestTitle] = new(Textures[TextureID.QuestTitle].Bounds.Size, new(1, 1), TextureType.GUI);
         Metadata[TextureID.TileOutline] = new(Textures[TextureID.TileOutline].Bounds.Size, new(4, 4), TextureType.Tile);
         Metadata[TextureID.RedX] = new(Textures[TextureID.RedX].Bounds.Size, new(1, 1), TextureType.GUI);

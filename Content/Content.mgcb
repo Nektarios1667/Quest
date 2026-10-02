@@ -1031,6 +1031,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Gui/GuiBackground.png
 
+#begin Images/Gui/QuestArchipelago.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Gui/QuestArchipelago.png
+
 #begin Images/Gui/QuestTitle.png
 /importer:TextureImporter
 /processor:TextureProcessor
