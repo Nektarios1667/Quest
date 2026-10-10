@@ -572,7 +572,7 @@ public class PlayerManager : IEntity, IStatusEffectable
         }
         else if (MouseSelection.Value.ui.BoundContainer != null && ui.BoundContainer != null)
         {
-            bool success = Container.MoveItemUI(MouseSelection.Value.ui, MouseSelection.Value.idx, ui, slot, split: InputManager.RMouseDown);
+            bool success = Container.MoveItemUI(MouseSelection.Value.ui, MouseSelection.Value.idx, ui, slot, split: InputManager.RMouseDown, allowSwap: true);
             if (success)
                 MouseSelection = null;
         }

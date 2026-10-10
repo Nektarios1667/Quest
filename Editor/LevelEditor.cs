@@ -329,7 +329,7 @@ public class LevelEditor : Game, IAdjustableWindow
         moveX += InputManager.BindDown(InputAction.MoveRight) ? Constants.PlayerBaseSpeed : 0;
         moveY += InputManager.BindDown(InputAction.MoveUp) ? -Constants.PlayerBaseSpeed : 0;
         moveY += InputManager.BindDown(InputAction.MoveDown) ? Constants.PlayerBaseSpeed : 0;
-        CameraManager.CameraDest += new Vector2(moveX, moveY) * delta * speedup;
+        CameraManager.CameraDest += new Vector2(moveX, moveY) * delta * speedup; 
         DebugManager.EndBenchmark("InputUpdate");
 
         // Manager
