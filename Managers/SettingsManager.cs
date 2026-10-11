@@ -59,8 +59,13 @@ public static class SettingsManager
 
         // Binds button in bottom left
         Button bindsButton = new(settingsMenu, new(20, Constants.NativeResolution.Y - 60), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, OpenKeybindsSettings, [], text: "Binds", font: PixelOperator, border: 0);
-        // Editor button bottom right
-        Button editorButton = new(settingsMenu, new(20, Constants.NativeResolution.Y - 110), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, () => Process.Start(Environment.ProcessPath!, "--level-editor"), [], text: "Editor", font: PixelOperator, border: 0);
+        // Editor button bottom right, or game button if in editor
+        Button editorOrGameButton;
+        if (gameManager.StateManager.State == GameState.Editor)
+            editorOrGameButton = new(settingsMenu, Point.Zero, Point.Zero, Color.Transparent, Color.Transparent, Color.Transparent, null, [], text: "", font: PixelOperator, border: 0);
+        //editorOrGameButton = new(settingsMenu, new(20, Constants.NativeResolution.Y - 110), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, () => Process.Start(Environment.ProcessPath!), [], text: "Game", font: PixelOperator, border: 0);
+        else
+            editorOrGameButton = new(settingsMenu, new(20, Constants.NativeResolution.Y - 110), new(100, 40), Color.White, Color.Gray * 0.5f, Color.DarkGray * 0.5f, () => Process.Start(Environment.ProcessPath!, "--level-editor"), [], text: "Editor", font: PixelOperator, border: 0);
 
         // Sound
         // Music
@@ -127,7 +132,7 @@ public static class SettingsManager
             window.SetFullscreen(SettingsManager.Fullscreen);
         };
 
-        settingsMenu.AddWidgets(saveButton, revertButton, bindsButton, editorButton, settingsLabel, settingsBackButton, musicSlider, musicLabel, musicValue, soundSlider, soundLabel, soundValue, fpsSlider, fpsLabel, fpsValue, vsyncCheckbox, vsyncLabel, fullscreenCheckbox, fullscreenLabel, resolutionDropdown);
+        settingsMenu.AddWidgets(saveButton, revertButton, bindsButton, editorOrGameButton, settingsLabel, settingsBackButton, musicSlider, musicLabel, musicValue, soundSlider, soundLabel, soundValue, fpsSlider, fpsLabel, fpsValue, vsyncCheckbox, vsyncLabel, fullscreenCheckbox, fullscreenLabel, resolutionDropdown);
         LoadSettings(window);
         return settingsMenu;
     }
