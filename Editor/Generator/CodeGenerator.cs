@@ -222,7 +222,7 @@ public static class CodeGenerator
 
         // TextureManager Load and Metadata
         string loadSource = $"Textures[TextureID.{name}] = content.Load<Texture2D>(\"Images/Decals/{name}\");\r\n";
-        string metadataSource = $"Metadata[TextureID.{name}] = new(Textures[TextureID.{name}].Bounds.Size, new(1, 1), \"decal\");\r\n";
+        string metadataSource = $"Metadata[TextureID.{name}] = new(Textures[TextureID.{name}].Bounds.Size, new(1, 1), TextureType.Decal);\r\n";
         newTextureManagerSource = newTextureManagerSource.Replace("        // DECALS INSERT", $"        {loadSource}        // DECALS INSERT");
         newTextureManagerSource = newTextureManagerSource.Replace("        // DECALS METADATA INSERT", $"        {metadataSource}        // DECALS METADATA INSERT");
         File.WriteAllText($"{sourceDirectory}/Managers/TextureManager.cs", newTextureManagerSource);
@@ -258,7 +258,7 @@ public static class CodeGenerator
 
         // TextureManager Load and Metadata
         string loadSource = $"Textures[TextureID.{name}] = content.Load<Texture2D>(\"Images/Items/{name}\");\r\n";
-        string metadataSource = $"Metadata[TextureID.{name}] = new(Textures[TextureID.{name}].Bounds.Size, new(1, 1), \"item\");\r\n";
+        string metadataSource = $"Metadata[TextureID.{name}] = new(Textures[TextureID.{name}].Bounds.Size, new(1, 1), TextureType.Item);\r\n";
         newTextureManagerSource = newTextureManagerSource.Replace("        // ITEMS INSERT", $"        {loadSource}        // ITEMS INSERT");
         newTextureManagerSource = newTextureManagerSource.Replace("        // ITEMS METADATA INSERT", $"        {metadataSource}        // ITEMS METADATA INSERT");
         File.WriteAllText($"{sourceDirectory}/Managers/TextureManager.cs", newTextureManagerSource);

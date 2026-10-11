@@ -1,6 +1,6 @@
 namespace Quest.Items;
 
-public class Lantern : Light
+public class Lantern : LightItem
 {
     public Lantern(int amount, string? name = null) : base(ItemTypes.Lantern, amount, name)
     {

@@ -255,6 +255,7 @@ public static class TextureManager
         Damage,
         Kill,
         Heal,
+        LightDecal,
         // DECALS ENUM INSERT
         Fireball,
         ArrowProjectile,
@@ -550,6 +551,7 @@ public static class TextureManager
         Textures[TextureID.Damage] = content.Load<Texture2D>("Images/Decals/Damage");
         Textures[TextureID.Kill] = content.Load<Texture2D>("Images/Decals/Kill");
         Textures[TextureID.Heal] = content.Load<Texture2D>("Images/Decals/Heal");
+        Textures[TextureID.LightDecal] = content.Load<Texture2D>("Images/Decals/LightDecal");
         // DECALS INSERT
         Textures[TextureID.Fireball] = content.Load<Texture2D>("Images/Projectiles/Fireball");
         Textures[TextureID.ArrowProjectile] = content.Load<Texture2D>("Images/Projectiles/Arrow");
@@ -818,6 +820,7 @@ public static class TextureManager
         Metadata[TextureID.Damage] = new(Textures[TextureID.Damage].Bounds.Size, new(1, 1), TextureType.Decal);
         Metadata[TextureID.Kill] = new(Textures[TextureID.Kill].Bounds.Size, new(1, 1), TextureType.Decal);
         Metadata[TextureID.Heal] = new(Textures[TextureID.Heal].Bounds.Size, new(1, 1), TextureType.Decal);
+        Metadata[TextureID.LightDecal] = new(Textures[TextureID.LightDecal].Bounds.Size, new(1, 1), TextureType.Decal);
         // DECALS METADATA INSERT
         Metadata[TextureID.Fireball] = new(Textures[TextureID.Fireball].Bounds.Size, new(1, 1), TextureType.Projectile);
         Metadata[TextureID.ArrowProjectile] = new(Textures[TextureID.ArrowProjectile].Bounds.Size, new(1, 1), TextureType.Projectile);

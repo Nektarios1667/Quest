@@ -42,6 +42,7 @@ public enum DecalType : byte
     Damage,
     Kill,
     Heal,
+    LightDecal,
     // DECALS
 }
 public class Decal
@@ -83,6 +84,7 @@ public class Decal
             DecalType.BlueTorch => new BlueTorch(location),
             DecalType.Finish => new Finish(location),
             DecalType.Checkpoint => new Checkpoint(location),
+            DecalType.LightDecal => new LightDecal(location),
             _ => new Decal(location, type)
         };
     }

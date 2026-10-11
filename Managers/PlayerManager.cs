@@ -178,7 +178,7 @@ public class PlayerManager : IEntity, IStatusEffectable
         UpdateNPCInteractions(gameManager);
 
         // Player lighting
-        if (EquippedItem is Light light)
+        if (EquippedItem is LightItem light)
             LightingManager.SetLight("PlayerLightItem", CameraManager.TileCoord, light.LightStrength);
         else
             LightingManager.RemoveLight("PlayerLightItem");
