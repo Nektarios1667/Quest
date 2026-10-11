@@ -18,7 +18,7 @@ public class StatusBar : Widget
     public Color Background { get; set; }
     public StatusTextType TextType { get; set; }
     public SpriteFont Font { get; set; }
-    public StatusBar(Point location, Point size, Color foreground, Color background, int currentValue, int maxValue, StatusTextType textType = default, SpriteFont font = null) : base(location)
+    public StatusBar(Point location, Point size, Color foreground, Color background, int currentValue, int maxValue, StatusTextType textType = default, SpriteFont? font = null) : base(location)
     {
         Size = size;
         CurrentValue = currentValue;

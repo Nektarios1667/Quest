@@ -454,7 +454,6 @@ public partial class UserInterface
 
             // Add waypoiny
             gameManager.LevelManager.Level.AddWaypoint(new(CameraManager.TileCoord.ToByteCoord(), nameInput.Text, color.Value, playerMade: true));
-            gameManager.OverlayManager.InvalidateMinimap();
 
             messageLabel.Foreground = Color.Green;
             messageLabel.SetText($"Added '{nameInput.Text}'");
@@ -467,7 +466,6 @@ public partial class UserInterface
         deleteButton.Clicked += () =>
         {
             bool success = gameManager.LevelManager.Level.RemoveWaypoint(nameInput.Text);
-            gameManager.OverlayManager.InvalidateMinimap();
 
             // Success label
             if (success)

@@ -414,7 +414,7 @@ public static class CommandManager
         string effectName = command.Split(' ')[1];
         int effectLength = int.Parse(command.Split(' ')[2]);
         if (!Enum.TryParse<StatusEffect>(effectName, out var effect)) return false;
-        StatusManager.AddStatusEffect(PlayerManager, effect, effectLength);
+        StatusManager.AddStatusEffect(PlayerManager!, effect, effectLength);
         return true;
     }
     private static bool CReload(string command)

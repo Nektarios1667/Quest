@@ -13,7 +13,6 @@ public class OverlayManager
     public Dialog WorldInfobox { get; private set; }
     public Dialog ItemInfobox { get; private set; }
     public static readonly Point lootStackOffset = new(4, 4);
-    private RenderTarget2D? Minimap = null;
     public OverlayManager(PlayerManager playerManager)
     {
         Gui = new();
@@ -277,5 +276,4 @@ public class OverlayManager
     {
         PlayerNotificationArea.AddNotification(text, color, duration);
     }
-    public void InvalidateMinimap() { Minimap = null; }
 }

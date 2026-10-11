@@ -34,11 +34,10 @@ public class EditorManager
     private Point MouseSelection;
     private Point MouseSelectionCoord;
     private TileTypeID TileSelection;
-    private byte[] TileSelectionData;
+    private byte[] TileSelectionData = [];
     private EditorTool CurrentTool;
     private BiomeType BiomeSelection;
 
-    private DecalType? PreviousDecal = null;
     public EditorManager(GameManager gameManager)
     {
         GameManager = gameManager;
@@ -428,7 +427,6 @@ public class EditorManager
 
         string name = values[0];
         DecalType decal = Enum.TryParse<DecalType>(name, true, out var dec) ? dec : DecalType.Torch;
-        PreviousDecal = decal;
         LevelManager.Level.Decals[MouseSelectionCoord.ToByteCoord()] = LevelManager.DecalFromId(decal, MouseSelectionCoord);
     }
     public void DeleteDecal()

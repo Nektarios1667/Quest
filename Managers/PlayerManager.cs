@@ -7,7 +7,7 @@ public class PlayerManager : IEntity, IStatusEffectable
 {
     public ushort UID => 0;
     // Status effect
-    public Dictionary<StatusEffect, float> StatusEffects { get; set; } = new();
+    public Dictionary<StatusEffect, float> StatusEffects { get; set; } = [];
     // Events
     public event Action<int>? EquippedSlotChanged;
     // Properties
@@ -466,8 +466,6 @@ public class PlayerManager : IEntity, IStatusEffectable
                 gameManager.LevelManager.Level.Explored[idx] = true;
             }
         }
-
-        gameManager.OverlayManager.InvalidateMinimap();
     }
     public bool IsColliding(GameManager gameManager)
     {

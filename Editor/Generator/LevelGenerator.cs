@@ -17,10 +17,10 @@ public class LevelGenerator
 {
     private FastNoiseLite Noise { get; set; } = new();
     private int _seed;
-    private readonly Dictionary<string, Structure> Structures = new();
+    private readonly Dictionary<string, Structure> Structures = [];
     private readonly List<Rectangle> GeneratedStructures = [];
-    public Terrain Terrain { get; set; }
-    public Dictionary<string, Terrain> Terrains { get; set; } = new();
+    public Terrain? Terrain { get; set; }
+    public Dictionary<string, Terrain> Terrains { get; set; } = [];
     public int Seed
     {
         get => _seed;
@@ -77,6 +77,8 @@ public class LevelGenerator
     }
     public TileTypeID GetGeneratedTile(int x, int y, float value)
     {
+        if (Terrain == null) return TileTypeID.Sky;
+
         foreach (var (min, max, tile) in Terrain.Ranges)
         {
             // Check if value is in range

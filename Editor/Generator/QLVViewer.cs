@@ -10,19 +10,19 @@ public partial class QLVViewer : Form
     private int tilesDisplayed = 200;
     private int biomesDisplayed = 200;
     private int decalsDisplayed = 200;
-    private Level level;
+    private Level level = null!;
     // Parent nodes
-    private TreeNode levelNode;
-    private TreeNode tilesNode;
-    private TreeNode biomesNode;
-    private TreeNode npcsNode;
-    private TreeNode lootsNode;
-    private TreeNode decalsNode;
-    private TreeNode enemiesNode;
-    private TreeNode scriptsNode;
-    private TreeNode loadTiles;
-    private TreeNode loadBiomes;
-    private TreeNode loadDecals;
+    private TreeNode levelNode = null!;
+    private TreeNode tilesNode = null!;
+    private TreeNode biomesNode = null!;
+    private TreeNode npcsNode = null!;
+    private TreeNode lootsNode = null!;
+    private TreeNode decalsNode = null!;
+    private TreeNode enemiesNode = null!;
+    private TreeNode scriptsNode = null!;
+    private TreeNode loadTiles = null!;
+    private TreeNode loadBiomes = null!;
+    private TreeNode loadDecals = null!;
 
     public QLVViewer()
     {
@@ -164,16 +164,15 @@ public partial class QLVViewer : Form
     private void SelectButton_Click(object sender, EventArgs e)
     {
         using (OpenFileDialog dialog = new())
+
+        if (dialog.ShowDialog() == DialogResult.OK)
         {
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                string[] parts = dialog.FileName.Split(System.IO.Path.DirectorySeparatorChar);
-                string fileName = System.IO.Path.GetFileNameWithoutExtension(parts[^1]);
+            string[] parts = dialog.FileName.Split(System.IO.Path.DirectorySeparatorChar);
+            string fileName = System.IO.Path.GetFileNameWithoutExtension(parts[^1]);
 
-                string result = System.IO.Path.Combine(parts[^3], fileName);
+            string result = System.IO.Path.Combine(parts[^3], fileName);
 
-                LoadLevel(new(result));
-            }
+            LoadLevel(new(result));
         }
     }
     private void SaveTree_AfterExpand(object? sender, TreeViewEventArgs e)

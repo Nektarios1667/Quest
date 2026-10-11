@@ -203,9 +203,6 @@ public class LevelManager
         // Load the level data
         Level = level;
 
-        // MiniMap
-        gameManager.OverlayManager?.InvalidateMinimap();
-
         // Pathfinding
         PathfindingManager.SetGrid(Level,
             CameraManager.TopLeftTileCoord - Constants.TileDrawPadding,           // Start
