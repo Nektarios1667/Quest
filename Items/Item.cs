@@ -88,8 +88,8 @@ public enum ItemTypeID : byte
 public class ItemType
 {
     public ItemTypeID TypeID { get; protected set; }
-    public string Name { get; protected set; } = "NUL_NAME";
-    public string Description { get; protected set; } = "NUL_DESCR";
+    public string Name { get; protected set; } = "DEF";
+    public string Description { get; protected set; } = "DEF";
     public TextureID Texture { get; protected set; }
     public byte MaxAmount { get; protected set; }
     public bool IsLight { get; protected set; }

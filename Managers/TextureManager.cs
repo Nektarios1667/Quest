@@ -277,6 +277,7 @@ public static class TextureManager
         QuestValleyBackground,
         QuestTundraBackground,
         QuestArchipelagoBackground,
+        QuestSnowyMountainsBackground,
         QuestTitle,
         TileOutline,
         RedX,
@@ -350,6 +351,7 @@ public static class TextureManager
         Textures[TextureID.QuestValleyBackground] = content.Load<Texture2D>("Images/Gui/QuestValley");
         Textures[TextureID.QuestTundraBackground] = content.Load<Texture2D>("Images/Gui/QuestTundra");
         Textures[TextureID.QuestArchipelagoBackground] = content.Load<Texture2D>("Images/Gui/QuestArchipelago");
+        Textures[TextureID.QuestSnowyMountainsBackground] = content.Load<Texture2D>("Images/Gui/QuestSnowyMountains");
         Textures[TextureID.QuestTitle] = content.Load<Texture2D>("Images/Gui/QuestTitle");
         Textures[TextureID.TileOutline] = content.Load<Texture2D>("Images/Gui/TileOutline");
         Textures[TextureID.RedX] = content.Load<Texture2D>("Images/Gui/RedX");
@@ -619,6 +621,7 @@ public static class TextureManager
         Metadata[TextureID.QuestValleyBackground] = new(Textures[TextureID.QuestValleyBackground].Bounds.Size, new(1, 1), TextureType.Background);
         Metadata[TextureID.QuestTundraBackground] = new(Textures[TextureID.QuestTundraBackground].Bounds.Size, new(1, 1), TextureType.Background);
         Metadata[TextureID.QuestArchipelagoBackground] = new(Textures[TextureID.QuestArchipelagoBackground].Bounds.Size, new(1, 1), TextureType.Background);
+        Metadata[TextureID.QuestSnowyMountainsBackground] = new(Textures[TextureID.QuestSnowyMountainsBackground].Bounds.Size, new(1, 1), TextureType.Background);
         Metadata[TextureID.QuestTitle] = new(Textures[TextureID.QuestTitle].Bounds.Size, new(1, 1), TextureType.GUI);
         Metadata[TextureID.TileOutline] = new(Textures[TextureID.TileOutline].Bounds.Size, new(4, 4), TextureType.Tile);
         Metadata[TextureID.RedX] = new(Textures[TextureID.RedX].Bounds.Size, new(1, 1), TextureType.GUI);

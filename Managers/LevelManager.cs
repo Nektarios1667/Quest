@@ -25,7 +25,7 @@ public class LevelManager
     public Color SkyColor { get; set; }
     public static readonly Point lootStackOffset = new(4, 4);
     private static readonly Tile[] grassTiles = new Tile[256 * 256];
-    public static Level EmptyLevel => new("NUL/NUL", grassTiles, [], new(128, 128), WorldMetadata.Null);
+    public static Level EmptyLevel => new("DEF/DEF", grassTiles, [], new(128, 128), WorldMetadata.Null);
     static LevelManager()
     {
         for (int t = 0; t < Constants.MapSize.X * Constants.MapSize.Y; t++) grassTiles[t] = new Grass(new(t % Constants.MapSize.X, t / Constants.MapSize.Y));

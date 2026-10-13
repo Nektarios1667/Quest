@@ -62,7 +62,7 @@ public class ShopOption
 
 public class NPC : IEntity, IHasDialog
 {
-    public static readonly NPC Null = new(TextureID.Null, Point.Zero, "NUL_NAME", "NUL_DIALOG");
+    public static readonly NPC Null = new(TextureID.Null, Point.Zero, "DEF", "DEF");
     public static Dialog? DialogBox { get; set; }
     public static List<(IHasDialog entity, float distSq)> DialogsNearby { get; set; } = [];
     public ushort UID { get; }

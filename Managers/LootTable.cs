@@ -27,7 +27,7 @@ public interface ILootGenerator
 public class LootPreset : ILootGenerator
 {
     public string FileName { get; }
-    public static readonly LootPreset EmptyPreset = new(new Item?[Chest.Size.X, Chest.Size.Y], "NUL");
+    public static readonly LootPreset EmptyPreset = new(new Item?[Chest.Size.X, Chest.Size.Y], "DEF");
     public Item?[,] Preset { get; }
     public LootPreset(Item?[,] items, string filename)
     {

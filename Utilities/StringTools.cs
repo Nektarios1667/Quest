@@ -96,6 +96,6 @@ public static class StringExtensions
     }
     public static bool IsNUL(this string? str)
     {
-        return string.IsNullOrEmpty(str) || str == "NUL";
+        return string.IsNullOrEmpty(str) || str == "NUL" || str == "DEF";
     }
 }
