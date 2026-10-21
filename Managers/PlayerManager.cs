@@ -37,7 +37,7 @@ public class PlayerManager : IEntity, IStatusEffectable
         get => _maxHunger;
         set { _maxHunger = value; GameManager.OverlayManager.HungerBar.MaxValue = value; }
     }
-    public bool IsAlive => _health > 0;
+    public bool IsDead = false;
     public int Speed => (int)(Constants.PlayerBaseSpeed * StatusManager.GetSpeedMult(this));
     // Inventory and UI
     public NotificationArea StatusArea { get; } = new(new(5, 5), 400, PixelOperatorSubtitle, color: Color.Gray, hAlign: HorizontalAlignment.Left, vAlign: VerticalAlignment.Top);
@@ -605,6 +605,9 @@ public class PlayerManager : IEntity, IStatusEffectable
     }
     public void Die(GameManager gameManager)
     {
+        if (IsDead) return;
+        IsDead = true;
+
         Health = 0;
 
         CloseInterface();
@@ -618,12 +621,14 @@ public class PlayerManager : IEntity, IStatusEffectable
     {
         health = Math.Min(health, MaxHealth - Health);
         Health += health;
+        if (Health > 0) IsDead = false;
         if (health > 0)
             gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"+{health}", Color.Green, duration: 2);
     }
     public void SetHealth(GameManager gameManager, int health, bool notify = false)
     {
         Health = Math.Min(health, MaxHealth);
+        if (Health > 0) IsDead = false;
         if (notify)
             gameManager.OverlayManager.PlayerNotificationArea.AddNotification($"={Health}", Color.Green, duration: 2);
     }

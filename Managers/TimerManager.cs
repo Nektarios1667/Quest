@@ -1,4 +1,6 @@
-﻿namespace Quest.Managers;
+﻿using SkiaSharp;
+
+namespace Quest.Managers;
 
 public class Timer
 {

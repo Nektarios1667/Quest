@@ -94,7 +94,7 @@ public class OverlayManager
         }
 
         // Inventories
-        if (playerManager != null && playerManager.IsAlive)
+        if (playerManager != null && !playerManager.IsDead)
             DrawUI(gameManager, playerManager);
     }
     public void DrawUI(GameManager gameManager, PlayerManager playerManager)
