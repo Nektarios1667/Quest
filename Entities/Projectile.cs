@@ -13,6 +13,7 @@ public class Projectile : IEntity
     public ushort Damage { get; private set; }
     public float Speed { get; private set; } // Tiles
     public bool IsAlive { get; private set; } = true;
+    public bool IsStuck { get; private set; } = false;
     public Projectile(GameManager gameManager, ushort ownerUID, Vector2 position, float direction, TextureID tex, ushort damage, float speed, Point? size = null)
     {
         OwnerUID = ownerUID;
@@ -29,7 +30,7 @@ public class Projectile : IEntity
     }
     public void Update(GameManager gameManager)
     {
-        if (gameManager.StateManager.State != GameState.Game) return;
+        if (gameManager.StateManager.State != GameState.Game || IsStuck) return;
 
         // Move
         Position += new Vector2(MathF.Cos(Direction), MathF.Sin(Direction)) * Speed * Constants.TileSize.ToVector2() * GameManager.DeltaGameTime;
@@ -42,12 +43,17 @@ public class Projectile : IEntity
         // Debug
         DebugManager.DrawHitbox(gameManager.Batch, this);
     }
+    public void Hit()
+    {
+        TimerManager.TryRemove($"ProjectileCollision_{UID}");
+        TimerManager.SetTimer($"ProjectileDespawn_{UID}", 1f, false, Destroy, updateAction: (prog) => Alpha = 1 - prog * prog * prog);
+        IsStuck = true;
+    }
     public void Destroy()
     {
         // Cleanup
         UIDManager.Release(UIDCategory.Projectiles, UID);
         IsAlive = false;
-        TimerManager.TryRemove($"ProjectileCollision_{UID}");
     }
 
     private void UpdateCollision(GameManager gameManager)
@@ -58,8 +64,8 @@ public class Projectile : IEntity
         // Either OOB, or non-walkable wall
         if (tile == null || (tile.IsWall && !tile.IsWalkable))
         {
-            Destroy();
             tile?.OnProjectileCollide(gameManager, this);
+            Hit();
         }
     }
     public (StatusEffect effect, float duration)? GetProjectileEffect()

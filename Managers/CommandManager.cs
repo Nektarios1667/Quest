@@ -398,7 +398,7 @@ public static class CommandManager
             Projectile? projectile = GameManager!.LevelManager.Level.Projectiles.FirstOrDefault(p => p.UID == uid);
             if (projectile != null)
             {
-                projectile.Destroy();
+                projectile.Hit();
                 return true;
             }
         }

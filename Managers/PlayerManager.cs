@@ -1,6 +1,7 @@
 ﻿using Quest.Gui;
 using Quest.Interaction;
 using Quest.World;
+using System.Net.Http.Headers;
 namespace Quest.Managers;
 
 public class PlayerManager : IEntity, IStatusEffectable
@@ -255,6 +256,10 @@ public class PlayerManager : IEntity, IStatusEffectable
         for (int p = gameManager.LevelManager.Level.Projectiles.Count - 1; p >= 0; p--)
         {
             Projectile proj = gameManager.LevelManager.Level.Projectiles[p];
+
+            // Proj checks
+            if (proj.IsStuck || !proj.IsAlive) continue;
+
             // Iterate entities
             foreach (IEntity entity in entities)
             {
@@ -282,7 +287,7 @@ public class PlayerManager : IEntity, IStatusEffectable
                     }
 
                     // Destroy
-                    proj.Destroy();
+                    proj.Hit();
                     break;
                 }
             }
