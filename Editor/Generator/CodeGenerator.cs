@@ -116,7 +116,7 @@ public static class CodeGenerator
     }
     public static void TestSky()
     {
-        const int width = Constants.DayLength;
+        int width = Constants.DayLength;
         const int height = 100;
 
         using Bitmap image = new(width, height);

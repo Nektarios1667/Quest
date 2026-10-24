@@ -265,31 +265,31 @@ public class PlayerManager : IEntity, IStatusEffectable
             {
                 // Checks
                 if (entity.UID == proj.OwnerUID) continue;
-                if (proj.Bounds.Intersects(entity.Bounds))
+                if (!proj.Bounds.Intersects(entity.Bounds)) continue;
+
+                // Damage enemy / player
+                if (entity is Enemy enemy)
                 {
-                    // Damage enemy / player
-                    if (entity is Enemy enemy)
-                    {
-                        enemy.Hurt(gameManager, (int)(proj.Damage * StatusManager.GetDamageMult(this)));
-                        Heal(gameManager, (int)(proj.Damage * StatusManager.GetLifestealMult(this)));
-                    }
-                    else if (entity is PlayerManager)
-                    {
-                        Hurt(gameManager, (int)(proj.Damage * StatusManager.GetDefenseMult(this)));
-                    }
-
-                    // Status effects
-                    if (entity is IStatusEffectable effectable)
-                    {
-                        var projEffect = proj.GetProjectileEffect();
-                        if (projEffect != null)
-                            StatusManager.AddStatusEffect(effectable, projEffect.Value.effect, projEffect.Value.duration);
-                    }
-
-                    // Destroy
-                    proj.Hit();
-                    break;
+                    enemy.Hurt(gameManager, (int)(proj.Damage * StatusManager.GetDamageMult(this)));
+                    Heal(gameManager, (int)(proj.Damage * StatusManager.GetLifestealMult(this)));
                 }
+                else if (entity is PlayerManager)
+                {
+                    Hurt(gameManager, (int)(proj.Damage * StatusManager.GetDefenseMult(this)));
+                }
+
+                // Status effects
+                if (entity is IStatusEffectable effectable)
+                {
+                    var projEffect = proj.GetProjectileEffect();
+                    if (projEffect != null)
+                        StatusManager.AddStatusEffect(effectable, projEffect.Value.effect, projEffect.Value.duration);
+                }
+
+                // Destroy
+                proj.Hit();
+                break;
+
             }
 
             // Clean up dead projectiles

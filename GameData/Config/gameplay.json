@@ -1,0 +1,12 @@
+{
+  "PlayerBaseSpeed": 300,
+  "MaxStack": 10,
+  "DayLength": 600,
+  "PlayerBaseHealth": 100,
+  "PlayerBaseHunger": 20,
+  "SecondsPerHungerLoss": 45,
+  "SecondsPerNaturalRegen": 3,
+  "NaturalRegenRate": 5,
+  "SecondsPerStarvation": 5,
+  "StarvationRate": 5
+}

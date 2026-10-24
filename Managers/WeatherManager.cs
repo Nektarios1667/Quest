@@ -9,15 +9,16 @@ public class WeatherManager
     // Weather
     private const float WeatherFadeOut = 3;
     private const float WeatherFadeIn = 2;
-    private readonly Dictionary<WeatherTypeID, float> FadeStartVolume = new();
-    private readonly Dictionary<WeatherTypeID, float> TimeSinceSound = new()
+    private readonly Dictionary<BiomeType, float> FadeStartVolume = new();
+    private readonly Dictionary<BiomeType, float> TimeSinceSound = new()
     {
-        { WeatherTypeID.None, float.MaxValue },
-        { WeatherTypeID.Rain, float.MaxValue },
-        { WeatherTypeID.Ocean, float.MaxValue },
-        { WeatherTypeID.Snow, float.MaxValue },
-        { WeatherTypeID.Sandstorm, float.MaxValue },
-        { WeatherTypeID.Volcano, float.MaxValue },
+        { BiomeType.Indoors, float.MaxValue },
+        { BiomeType.Temperate, float.MaxValue },
+        { BiomeType.Ocean, float.MaxValue },
+        { BiomeType.Snowy, float.MaxValue },
+        { BiomeType.Desert, float.MaxValue },
+        { BiomeType.Volcanic, float.MaxValue },
+        { BiomeType.Underground, float.MaxValue },
     };
     public readonly FastNoiseLite WeatherNoise = new((int)(DateTime.Now.Ticks ^ (DateTime.Now.Ticks >> 32)));
     public int WeatherSeed { get => _weatherSeed; set { _weatherSeed = value; WeatherNoise.SetSeed(value); } }
@@ -84,55 +85,56 @@ public class WeatherManager
     }
     private void UpdateAmbientWeatherSound(BiomeType biome)
     {
-        WeatherTypes.Types.TryGetValue(biome, out var weatherType);
+        if (!WeatherTypes.Types.TryGetValue(biome, out var weatherType))
+            weatherType = WeatherTypes.None;
 
         // -TimeSinceSound = how long the player has been in that biome
         // TimeSinceSound = how long the player has been out of that biome
 
         // Play sounds
-        if (weatherType.Type != WeatherTypeID.None)
+        if (weatherType != WeatherTypes.None)
         {
             float volume = WeatherIntensity * weatherType.AmbientSoundVolumeMult;
             // Reset time and count how long in biome
-            float time = TimeSinceSound[weatherType.Type];
+            float time = TimeSinceSound[weatherType.Biome];
             if (time > 0)
             {
-                FadeStartVolume.Remove(weatherType.Type);
+                FadeStartVolume.Remove(weatherType.Biome);
 
                 // If its in the process of fading out, swap it to fade in at same volume
                 if (time < WeatherFadeOut)
                     // Since fade out and fade in might not be the same length, do the equivalent amount complete
-                    TimeSinceSound[weatherType.Type] = -(time / WeatherFadeOut) * WeatherFadeIn;
+                    TimeSinceSound[weatherType.Biome] = -(time / WeatherFadeOut) * WeatherFadeIn;
                 else
-                    TimeSinceSound[weatherType.Type] = 0;
+                    TimeSinceSound[weatherType.Biome] = 0;
             }
-            TimeSinceSound[weatherType.Type] -= GameManager.DeltaRealTime;
+            TimeSinceSound[weatherType.Biome] -= GameManager.DeltaRealTime;
 
-            SoundManager.PlaySoundInstance(weatherType.AmbientSoundName, volume * Math.Clamp(-TimeSinceSound[weatherType.Type] / WeatherFadeIn, 0, 1), loop: true);
+            SoundManager.PlaySoundInstance(weatherType.AmbientSoundName, volume * Math.Clamp(-TimeSinceSound[weatherType.Biome] / WeatherFadeIn, 0, 1), loop: true);
         }
 
         // End others sounds
         foreach (var weathers in WeatherTypes.Types.Values)
         {
-            if (weathers.Type != weatherType.Type && weathers.Type != WeatherTypeID.None)
+            if (weathers != weatherType && weathers != WeatherTypes.None)
             {
                 // Reset time and count how long since in biome
-                if (TimeSinceSound[weathers.Type] < 0)
-                    TimeSinceSound[weathers.Type] = 0;
-                TimeSinceSound[weathers.Type] += GameManager.DeltaRealTime;
+                if (TimeSinceSound[weathers.Biome] < 0)
+                    TimeSinceSound[weathers.Biome] = 0;
+                TimeSinceSound[weathers.Biome] += GameManager.DeltaRealTime;
 
                 // Fade out or clear
                 var instance = SoundManager.GetInstance(weathers.AmbientSoundName);
-                if (TimeSinceSound[weathers.Type] >= WeatherFadeOut)
+                if (TimeSinceSound[weathers.Biome] >= WeatherFadeOut)
                 {
                     // Clear
                     SoundManager.EndInstance(weathers.AmbientSoundName);
-                    FadeStartVolume.Remove(weathers.Type);
+                    FadeStartVolume.Remove(weathers.Biome);
                 }
                 else if (instance != null)
                 {
-                    if (!FadeStartVolume.ContainsKey(weathers.Type)) FadeStartVolume[weathers.Type] = instance.Volume; // When first starting to fade record what the original volume was
-                    instance.Volume = (WeatherFadeOut - TimeSinceSound[weathers.Type]) / WeatherFadeOut * FadeStartVolume[weathers.Type]; // Fade away logic
+                    if (!FadeStartVolume.ContainsKey(weathers.Biome)) FadeStartVolume[weathers.Biome] = instance.Volume; // When first starting to fade record what the original volume was
+                    instance.Volume = (WeatherFadeOut - TimeSinceSound[weathers.Biome]) / WeatherFadeOut * FadeStartVolume[weathers.Biome]; // Fade away logic
                 }
             }
         }
@@ -141,7 +143,7 @@ public class WeatherManager
     {
         WeatherType type = WeatherTypes.Types[currentBiome];
 
-        if (WeatherIntensity > type.SoundEffectThreshold && RandomManager.ChancePerSecond(type.SoundEffectChance))
+        if (WeatherIntensity >= type.SoundEffectThreshold && RandomManager.ChancePerSecond(type.SoundEffectChance))
         {
             var sound = ArrayTools.Random(type.SoundEffectNames);
             if (sound != null)

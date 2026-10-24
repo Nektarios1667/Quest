@@ -93,13 +93,13 @@ public class ItemType
     public TextureID Texture { get; protected set; }
     public byte MaxAmount { get; protected set; }
     public bool IsLight { get; protected set; }
-    public ItemType(ItemTypeID typeID, string descr, int maxAmount = Constants.MaxStack, bool isLight = false, string? name = null)
+    public ItemType(ItemTypeID typeID, string descr, int maxAmount = 0, bool isLight = false, string? name = null)
     {
         TypeID = typeID;
         Name = name ?? typeID.ToString();
         Texture = (TextureID)Enum.Parse(typeof(TextureID), Name);
         Description = descr;
-        MaxAmount = (byte)maxAmount;
+        MaxAmount = (byte)(maxAmount == 0 ? GameConfig.Gameplay.MaxStack : maxAmount);
         IsLight = isLight;
     }
 }

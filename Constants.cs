@@ -18,16 +18,16 @@ public static class Constants
 #endif
 
     // Game
-    public const int PlayerBaseSpeed = 300; // normal is 300
-    public const int MaxStack = 10;
-    public const int DayLength = 600; // Length of a day in seconds
-    public const int PlayerBaseHealth = 100;
-    public const int PlayerBaseHunger = 20;
-    public const int SecondsPerHungerLoss = 45; // How many seconds it takes to lose 1 hunger point
-    public const int SecondsPerNaturalRegen = 3; // How many seconds it takes to regenerate health when hungry
-    public const int NaturalRegenRate = 5; // How many hp for each hunger point when regenerating health
-    public const int SecondsPerStarvation = 5; // How many seconds it takes to lose hp when starving
-    public const int StarvationRate = 5;
+    public static int PlayerBaseSpeed => GameConfig.Gameplay.PlayerBaseSpeed; // normal is 300
+    public static int MaxStack => GameConfig.Gameplay.MaxStack;
+    public static int DayLength => GameConfig.Gameplay.DayLength; // Length of a day in seconds
+    public static int PlayerBaseHealth => GameConfig.Gameplay.PlayerBaseHealth;
+    public static int PlayerBaseHunger => GameConfig.Gameplay.PlayerBaseHunger;
+    public static int SecondsPerHungerLoss => GameConfig.Gameplay.SecondsPerHungerLoss; // How many seconds it takes to lose 1 hunger point
+    public static int SecondsPerNaturalRegen => GameConfig.Gameplay.SecondsPerNaturalRegen; // How many seconds it takes to regenerate health when hungry
+    public static int NaturalRegenRate => GameConfig.Gameplay.NaturalRegenRate; // How many hp for each hunger point when regenerating health
+    public static int SecondsPerStarvation => GameConfig.Gameplay.SecondsPerStarvation; // How many seconds it takes to lose hp when starving
+    public static int StarvationRate => GameConfig.Gameplay.StarvationRate;
 
     // Tile and map
     public static readonly Point TileSize = new(64, 64); // In-game tile size

@@ -92,7 +92,7 @@ public class EditorOverlayManager
                 Point loc = new(x, y);
                 Point dest = CameraManager.TileToScreen(loc);
                 BiomeType? biome = LevelManager.GetBiome(loc);
-                Color color = biome == null ? Color.Magenta : Biome.BiomeTileColors[(int)biome];
+                Color color = biome == null ? Color.Magenta : Biome.BiomeTileColors[biome.Value];
                 DrawTexture(GameManager.Batch, TextureID.TileOutline, dest, LevelManager.BiomeTextureSource(loc), color, scale: Constants.TileSizeScale);
             }
         }
