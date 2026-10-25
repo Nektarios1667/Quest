@@ -241,7 +241,7 @@ public class EditorLevelManager
 
         // Generate
         LevelGenerator.Seed = int.Parse(values[0]);
-        LevelGenerator.Terrain = LevelGenerator.Terrains.GetValueOrDefault(values[1], LevelGenerator.Terrain);
+        LevelGenerator.Terrain = LevelGenerator.Terrains!.GetValueOrDefault(values[1], LevelGenerator.Terrain);
         Tile[] tiles = LevelGenerator.GenerateLevel(Constants.MapSize, int.Parse(values[2]));
 
         Level current = LevelManager.Level;
