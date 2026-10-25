@@ -65,6 +65,10 @@ public class EditorOverlayManager
     public static void DrawLootOverlay(SpriteBatch spriteBatch, ItemTypeID selection, int selectionAmount) {
         DrawCornerInfo(spriteBatch, $"{selection} x {selectionAmount}", 0);
     }
+    public static void DrawStructureOverlay(SpriteBatch spriteBatch, string selection)
+    {
+        DrawCornerInfo(spriteBatch, selection, 0);
+    }
     public static void DrawEnemyOverlay(SpriteBatch spriteBatch, EnemyPresetType selection)
     {
         DrawCornerInfo(spriteBatch, $"{selection}", 0);

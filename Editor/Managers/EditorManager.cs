@@ -10,10 +10,12 @@ namespace Quest.Editor.Managers;
 public enum EditorTool : byte
 {
     None,
+    Selection,
     Tile,
     Decal,
     Biome,
     Loot,
+    Structure,
     Enemy,
     NPC,
 }

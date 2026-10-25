@@ -17,7 +17,8 @@ public class LevelGenerator
 {
     private FastNoiseLite Noise { get; set; } = new();
     private int _seed;
-    private readonly Dictionary<string, Structure> Structures = [];
+    public Dictionary<string, Structure> Structures { get; } = [];
+    public string[] StructureNames => [.. Structures.Keys];
     private readonly List<Rectangle> GeneratedStructures = [];
     public Terrain? Terrain { get; set; }
     public Dictionary<string, Terrain> Terrains { get; set; } = [];
@@ -140,6 +141,44 @@ public class LevelGenerator
         return level;
     }
     public Tile[] GenerateLevel(Point size, int structureAttempts) => GenerateLevel(size.X, size.Y, structureAttempts);
+    public static string ResolveProjectPath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return path;
+
+        if (System.IO.Path.IsPathRooted(path))
+            return path;
+
+        string projectRoot = System.IO.Path.GetFullPath(System.IO.Path.Combine(AppContext.BaseDirectory, "../../.."));
+        return System.IO.Path.GetFullPath(System.IO.Path.Combine(projectRoot, path));
+    }
+    public static void WriteStructure(string file, Structure structure)
+    {
+        if (!file.EndsWith(".qst"))
+        {
+            Logger.Error($"Failed to write structure '{file}'. Expected .qst file.");
+            return;
+        }
+
+        string resolvedPath = ResolveProjectPath(file);
+        string directory = System.IO.Path.GetDirectoryName(resolvedPath) ?? string.Empty;
+        if (!string.IsNullOrWhiteSpace(directory))
+            Directory.CreateDirectory(directory);
+
+        using (FileStream stream = File.Create(resolvedPath))
+        using (BinaryWriter writer = new(stream))
+        {
+            writer.Write((byte)(structure.SpawnTile.HasValue ? (byte)((int)structure.SpawnTile.Value + 1) : 0));
+            writer.Write((byte)structure.Size.X);
+            writer.Write((byte)structure.Size.Y);
+
+            foreach (TileTypeID? tileType in structure.Tiles)
+                writer.Write((byte)(tileType.HasValue ? (byte)((int)tileType.Value + 1) : 0));
+
+            writer.Flush();
+            stream.Flush();
+        }
+    }
     public static Structure ReadStructure(string file)
     {
         // Check
@@ -148,13 +187,15 @@ public class LevelGenerator
             Logger.Error($"Failed to read structure '{file}'. Expected .qst file.");
             return new([], Point.Zero, null);
         }
-        if (!File.Exists(file)) Logger.Error($"File {file} not found.", true);
+
+        string resolvedPath = ResolveProjectPath(file);
+        if (!File.Exists(resolvedPath)) Logger.Error($"File {resolvedPath} not found.", true);
 
         // Setup
         List<TileTypeID?> tileTypesBuffer = [];
         TileTypeID? spawn;
         Point size = Point.Zero;
-        using (FileStream stream = File.Open(file, FileMode.Open))
+        using (FileStream stream = File.Open(resolvedPath, FileMode.Open))
         using (BinaryReader reader = new(stream))
         {
             // Header

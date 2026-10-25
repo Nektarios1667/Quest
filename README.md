@@ -107,7 +107,9 @@ The selected tileset can be changed with `Q` and `E` or by pressing the tileset 
 - **Biome Palette**  
 Select biomes from the palette to paint them in the level. The selected biome can be changed with `mouse wheel` or `[` and `]`.
 - **Decal Palette**  
-Select decals from the palette to place them in the level. The selected decal can be changed with `mouse wheel` or `[` and `]`.
+  Select decals from the palette to place them in the level. The selected decal can be changed with `mouse wheel` or `[` and `]`.
+- **Structure Palette**  
+  Select a `.qst` structure from `GameData/Structures` to place it in the level. Cycle through available structures with `mouse wheel` or `[` and `]` and use the structure tool to paint a previewed layout into the map.
 - **Use Tool**  
 `Left Mouse Button` to use the selected tool at the mouse position.
 - **Pick Tool**  
